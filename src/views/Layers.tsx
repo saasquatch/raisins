@@ -1,45 +1,59 @@
-import { h, FunctionalComponent } from '@stencil/core';
+import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
 import * as DOMHandler from 'domhandler';
-import domutils from 'domutils';
+// import domutils from 'domutils';
+import { NodeVisitor, visit, remove } from '../util';
+import { css } from '@emotion/css';
+
+const Layer = css`
+  user-select: none;
+  padding: 5px 20px;
+  background: #ccc;
+  border-bottom: 2px solid #fff;
+`;
+const Selected = css`
+  ${Layer};
+  background: #eee;
+  outline: 1px solid red;
+`;
 
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
-  const remove = (n: DOMHandler.Node) => {
-    domutils.removeElement(n);
-    const next = model.node.cloneNode(true);
-    model.setState(next);
+  const ElementVisitor: NodeVisitor<VNode> = {
+    onElement(element, children) {
+      const name = (
+        <span onClick={() => model.setSelected(element)}>
+          {element && element.name}
+          <button onClick={() => model.removeNode(element)}>x</button>
+        </span>
+      );
+      const hasChildren = children?.length > 0;
+
+      return (
+        <div
+          class={{
+            [Layer]: element !== model.selected,
+            [Selected]: element === model.selected,
+          }}
+        >
+          {!hasChildren && name}
+          {hasChildren && (
+            <details>
+              <summary>{name}</summary>
+              {children}
+            </details>
+          )}
+        </div>
+      );
+    },
+    onRoot(r, children) {
+      return children && <div>{children}</div>;
+    },
   };
+
   return (
     <div>
       Layers:
-      <ul>
-        <ElementView node={model.node} remove={remove} />
-      </ul>
+      {visit(model.node, ElementVisitor)}
     </div>
   );
 };
-
-function ElementView(props: { node: DOMHandler.Node; remove: (n: DOMHandler.Node) => void }) {
-  const { node } = props;
-  // @ts-ignore
-  const children = node.children ? (node as DOMHandler.NodeWithChildren).children: undefined;
-  const element = node.type === 'tag' ? node as DOMHandler.Element : undefined;
-
-  return (
-    <li>
-      <span>
-        {(element && element.name) || node.type}
-        <button onClick={() => props.remove(props.node)}>x</button>
-      </span>
-      {children && (
-        <ul>
-          {children
-            .filter(c => c.type === 'tag')
-            .map(c => (
-              <ElementView node={c} remove={props.remove} />
-            ))}
-        </ul>
-      )}
-    </li>
-  );
-}

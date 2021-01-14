@@ -1,7 +1,7 @@
-import { h, FunctionalComponent } from '@stencil/core';
+import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
-import serialize from 'dom-serializer';
 import { css } from '@emotion/css';
+import { NodeVisitor, visit } from '../util';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -12,22 +12,44 @@ const wrapper = css`
 `;
 const content = css`
   background: white;
-  width: 500px;
   margin: 0 auto;
   padding: 20px;
+
+  .selected {
+    border: 1px solid red;
+  }
 `;
 
 export const Canvas: FunctionalComponent<Model> = props => {
-  const fragment = serialize(props.node.cloneNode(true));
-  const body = `<html>
-  <body>
-    ${fragment}
-  </body>
-  </html>`;
+  const CanvasVisitor: NodeVisitor<VNode | string> = {
+    onRoot(root, children) {
+      return <div>{children}</div>;
+    },
+    onText(text) {
+      return text.data;
+    },
+    onElement(element, children) {
+      if (element.tagName === 'template') {
+        return (
+          <div>
+            <h1>Template:</h1>
+            {element.children.map(c => visit(c, CanvasVisitor))}
+          </div>
+        );
+      }
+      const claz = element === props.selected ? 'selected' : '';
+      const onClick = e => {
+        props.setSelected(element);
+        e.stopPropogation();
+      };
+      // @ts-ignore
+      return h(element.tagName, { ...element.attribs, class: claz, onClick }, children);
+    },
+  };
 
   return (
     <div class={wrapper}>
-      <div class={content} innerHTML={body}></div>
+      <div class={content}>{visit(props.node, CanvasVisitor)}</div>
     </div>
   );
 };

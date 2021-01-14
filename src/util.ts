@@ -1,0 +1,111 @@
+import { Node, Text, ProcessingInstruction, Element, Comment, NodeWithChildren, Document } from 'domhandler';
+import { ElementType } from 'domelementtype';
+
+export function visit<T>(node: Node, visitor: NodeVisitor<T>): T {
+  let result: T;
+  const skip = visitor.skipNode && visitor.skipNode(node);
+  if (skip) {
+    return;
+  }
+
+  switch (node.type) {
+    case ElementType.Text:
+      result = visitor.onText && visitor.onText(node as Text);
+      break;
+    case ElementType.Directive: {
+      result = visitor.onDirective && visitor.onDirective(node as ProcessingInstruction);
+      break;
+    }
+    case ElementType.Comment:
+      result = visitor.onComment && visitor.onComment(node as Comment);
+      break;
+    case ElementType.Tag:
+    case ElementType.Script:
+    case ElementType.Style: {
+      if (!visitor.onElement) break;
+      const element = node as Element;
+      const children = element.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      result = visitor.onElement(element, children);
+      break;
+    }
+    case ElementType.CDATA: {
+      if (!visitor.onCData) break;
+      const cdata = node as NodeWithChildren;
+      const children = cdata.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      result = visitor.onCData(cdata, children);
+      break;
+    }
+    case ElementType.Root: {
+      if (!visitor.onRoot) break;
+      const root = node as Document;
+      const children = root.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      result = visitor.onRoot(root, children);
+      break;
+    }
+    case ElementType.Doctype: {
+      // This type isn't used yet.
+      throw new Error('Not implemented yet: ElementType.Doctype case');
+    }
+  }
+  return result;
+}
+
+/**
+ * A depth-first visitor that will visit the deepest children first
+ */
+export interface NodeVisitor<T> {
+  skipNode?(node: Node): boolean;
+  onText?(text: Text): T | undefined;
+  onDirective?(directive: ProcessingInstruction): T | undefined;
+  onComment?(comment: Comment): T | undefined;
+  onElement?(element: Element, children?: T[]): T | undefined;
+  onCData?(element: NodeWithChildren, children?: T[]): T | undefined;
+  onRoot?(node: Document, children?: T[]): T | undefined;
+}
+
+/**
+ * Returns a clone of `root` with `node` removed.
+ *
+ * @param root
+ * @param node
+ */
+export function remove(root: Node, node: Node): Node {
+  return visit(root, {
+    skipNode(n) {
+      return n === node;
+    },
+    ...CloneVisitor,
+  });
+}
+
+const CloneVisitor: NodeVisitor<Node> = {
+  onText: n => n.cloneNode(),
+  onDirective: n => n.cloneNode(),
+  onComment: n => n.cloneNode(),
+  onElement: (elem, children) => {
+    const clone = elem.cloneNode() as Element;
+    setLinking(children, clone);
+    clone.childNodes = children;
+    return clone;
+  },
+  onCData: (cdata, children) => {
+    const clone = cdata.cloneNode() as NodeWithChildren;
+    setLinking(children, clone);
+    clone.childNodes = children;
+    return clone;
+  },
+  onRoot: (doc, children) => {
+    const clone = doc.cloneNode() as NodeWithChildren;
+    setLinking(children, clone);
+    clone.childNodes = children;
+    return clone;
+  },
+};
+
+function setLinking(children: Node[], parent: NodeWithChildren): void {
+  for (let i = 1; i < children.length; i++) {
+    children[i].parent = parent;
+    children[i].prev = children[i - 1];
+    children[i - 1].next = children[i];
+  }
+}

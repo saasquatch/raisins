@@ -3,12 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-    <title>Stencil Component Starter</title>
+    <title>Raisins JS</title>
 
     <script type="module" src="/build/raisins-js.esm.js"></script>
     <script nomodule src="/build/raisins-js.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
   </head>
   <body>
-    <raisin-editor html="<div><h1>Heading</h1><div>And long content</div></div>"></raisin-editor>
+    <raisin-editor
+      html="<div><h1>Heading</h1><div>And long content</div><template>And a template document</template><script type='application/json'>Script tag</script></div>"
+    ></raisin-editor>
   </body>
 </html>

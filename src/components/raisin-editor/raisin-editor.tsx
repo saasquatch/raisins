@@ -1,114 +1,25 @@
 import { Component, Prop, h } from '@stencil/core';
-import htmlparser2 from 'htmlparser2';
 import serialize from 'dom-serializer';
 import { Model } from '../../model/Dom';
 import { Canvas } from '../../views/Canvas';
 import { Layers } from '../../views/Layers';
-import * as DOMHandler from 'domhandler';
-import hotkeys from 'hotkeys-js';
-import { useEffect, useMemo, useState, withHooks } from '@saasquatch/stencil-hooks';
+import { withHooks } from '@saasquatch/stencil-hooks';
+import { ToolbarView } from '../../views/Toolbar';
+import { css } from '@emotion/css';
+import { useEditor } from './useEditor';
 
-type InternalState = {
-  immutableCopy: DOMHandler.Node;
-  current: DOMHandler.Node;
-  undoStack: DOMHandler.Node[];
-  redoStack: DOMHandler.Node[];
-};
+const Row = css`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: no-wrap;
+  width: 100%;
+`;
 
-function useEditor(html: string): Model {
-  const initial = useMemo(() => htmlparser2.parseDocument(html), []);
-  const [state, setState] = useState<InternalState>({
-    redoStack: [],
-    undoStack: [],
-    current: initial,
-    immutableCopy: initial.cloneNode(true),
-  });
-  const undo = () =>
-    setState(previous => {
-      if (!previous.undoStack.length) {
-        console.log('No undo', previous);
-        return previous;
-      }
-      const [current, ...undoStack] = previous.undoStack;
-      const redoStack = [previous.immutableCopy, ...previous.redoStack];
-
-      const newState = {
-        current: current.cloneNode(true),
-        immutableCopy: current.cloneNode(true),
-        undoStack,
-        redoStack,
-      };
-      console.log(
-        'Undo to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
-      );
-      return newState;
-    });
-
-  const redo = () =>
-    setState(previous => {
-      if (!previous.redoStack.length) {
-        return previous;
-      }
-      const [current, ...redoStack] = previous.redoStack;
-      const undoStack = [previous.immutableCopy, ...previous.undoStack];
-
-      const newState = {
-        current: current.cloneNode(true),
-        immutableCopy: current.cloneNode(true),
-        undoStack,
-        redoStack,
-      };
-      console.log(
-        'Setting to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
-      );
-      return newState;
-    });
-
-  const setNode = (current: DOMHandler.Node) =>
-    setState(previous => {
-      const immutableCopy = current.cloneNode(true);
-      const undoStack = [previous.immutableCopy, ...previous.undoStack];
-      const newState = {
-        current: immutableCopy,
-        immutableCopy,
-        undoStack,
-        redoStack: previous.redoStack,
-      };
-      console.log(
-        'Setting to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
-      );
-      return newState;
-    });
-
-  useEffect(() => {
-    hotkeys('ctrl+y,ctrl+z', function (event, handler) {
-      switch (handler.key) {
-        case 'ctrl+z':
-          event.preventDefault();
-          undo();
-          break;
-        case 'ctrl+y':
-          event.preventDefault();
-          redo();
-          break;
-        default:
-      }
-    });
-  }, []);
-  return {
-    node: state.current,
-    setState: setNode,
-  };
-}
+const Column = css`
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+`;
 
 @Component({
   tag: 'raisin-editor',
@@ -132,10 +43,21 @@ export class Editor {
 
     return (
       <div>
-        <pre>{this.html}</pre>
-        <pre>{serialized}</pre>
-        <Canvas {...model} />
-        <Layers {...model} />
+        <ToolbarView {...model} />
+        <div class={Row}>
+          <div class={Column} >
+            <Canvas {...model} />
+          </div>
+
+          <div class={Column} style={{ flexBasis: "400px", maxWidth: "400px" }}>
+            {' '}
+            <Layers {...model} />
+            <h1>Input</h1>
+            <pre style={{wordWrap: "break-word"}}>{this.html}</pre>
+            <h1>Output</h1>
+            <pre style={{wordWrap: "break-word"}}>{serialized}</pre>
+          </div>
+        </div>
       </div>
     );
   }
