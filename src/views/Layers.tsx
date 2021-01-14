@@ -17,11 +17,20 @@ const Selected = css`
   outline: 1px solid red;
 `;
 
+const Handle = css`
+  cursor: move;
+  display: inline-block;
+  padding: 3px;
+  background: #aaa;
+`;
+
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   const ElementVisitor: NodeVisitor<VNode> = {
     onElement(element, children) {
+      const dragStyle = element === model.dragCoords?.element ? { transform: 'translate(' + model.dragCoords.x + 'px, ' + model.dragCoords.y + 'px)' } : {};
       const name = (
         <span onClick={() => model.setSelected(element)}>
+          <span class={{ [Handle]: true, handle: true }}>[=]</span>
           {element && element.name}
           <button onClick={() => model.removeNode(element)}>x</button>
         </span>
@@ -34,6 +43,8 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
             [Layer]: element !== model.selected,
             [Selected]: element === model.selected,
           }}
+          style={dragStyle}
+          ref={el => model.setDraggableRef(element, el)}
         >
           {!hasChildren && name}
           {hasChildren && (
