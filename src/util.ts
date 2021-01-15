@@ -70,12 +70,15 @@ export interface NodeVisitor<T> {
  * @param node
  */
 export function remove(root: Node, node: Node): Node {
-  return visit(root, {
-    skipNode(n) {
-      return n === node;
-    },
-    ...CloneVisitor,
-  });
+  return visit(
+    visit(root, {
+      skipNode(n) {
+        return n === node;
+      },
+      ...CloneVisitor,
+    }),
+    FreezeVisitor,
+  );
 }
 
 /**
@@ -84,7 +87,7 @@ export function remove(root: Node, node: Node): Node {
  * @param root
  * @param node
  */
-export function duplicate(root: Node, node: Node): Node{
+export function duplicate(root: Node, node: Node): Node {
   const cloneIfMatching = (n: Node) => (n === node ? [clone(n), clone(n)] : [clone(n)]);
   const DuplicateVisitor: NodeVisitor<Node[]> = {
     onText: cloneIfMatching,
@@ -115,13 +118,20 @@ export function duplicate(root: Node, node: Node): Node{
 
   const nodes = visit(root, DuplicateVisitor);
   // Root node should not be duplicatable
-  return nodes[0];
+  return visit(nodes[0], FreezeVisitor);
 }
 
 function clone(node: Node) {
   return visit(node, CloneVisitor);
 }
-
+const FreezeVisitor: NodeVisitor<Node> = {
+  onText: Object.freeze,
+  onDirective: Object.freeze,
+  onComment: Object.freeze,
+  onElement: n => Object.freeze(n),
+  onCData: n => Object.freeze(n),
+  onRoot: n => Object.freeze(n),
+};
 const CloneVisitor: NodeVisitor<Node> = {
   onText: n => n.cloneNode(),
   onDirective: n => n.cloneNode(),

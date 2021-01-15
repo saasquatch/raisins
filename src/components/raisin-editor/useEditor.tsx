@@ -206,7 +206,6 @@ export function useEditor(): Model {
       return newState;
     });
   }
-
   function removeNode(n: DOMHandler.Node) {
     const clone = remove(state.current, n);
     setNode(clone);
