@@ -17,7 +17,7 @@ const content = css`
   padding: 20px;
 
   .selected {
-    border: 1px solid red;
+    outline: 1px solid red;
   }
 `;
 
@@ -32,9 +32,18 @@ export const Canvas: FunctionalComponent<Model> = props => {
     onElement(element, children) {
       const claz = element === props.selected ? 'selected' : '';
 
+      const onClick = (e: Event) => {
+        // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
+        e.stopPropagation();
+        props.setSelected(element);
+      };
+      const innerProps = {
+        class:claz,
+        onClick
+      }
       if (element.tagName === 'template') {
         return (
-          <div class={claz}>
+          <div {...innerProps}>
             <h1>Template:</h1>
             {element.children.map(c => visit(c, CanvasVisitor))}
           </div>
@@ -42,7 +51,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
       }
       if (element.tagName === 'script') {
         return (
-          <div class={claz}>
+          <div {...innerProps}>
             Script:
             <br />
             <textarea>
@@ -54,17 +63,12 @@ export const Canvas: FunctionalComponent<Model> = props => {
           </div>
         );
       }
-      // const id = 'element-' + Math.random();
-      const onClick = (e: Event) => {
-        // const el = e.target as HTMLElement;
-          props.setSelected(element);
-      };
       // @ts-ignore
-      return h(element.tagName, { ...element.attribs, 'class': claz, onClick}, children);
+      return h(element.tagName, { ...element.attribs, ...innerProps }, children);
     },
   };
   return (
-    <div class={wrapper}>
+    <div class={wrapper} onClick={()=>props.setSelected(undefined)}>
       <div class={content}>{visit(props.node, CanvasVisitor)}</div>
     </div>
   );
