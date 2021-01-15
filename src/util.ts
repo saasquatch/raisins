@@ -78,6 +78,50 @@ export function remove(root: Node, node: Node): Node {
   });
 }
 
+/**
+ * Returns a clone of `root` with `node` removed.
+ *
+ * @param root
+ * @param node
+ */
+export function duplicate(root: Node, node: Node): Node{
+  const cloneIfMatching = (n: Node) => (n === node ? [clone(n), clone(n)] : [clone(n)]);
+  const DuplicateVisitor: NodeVisitor<Node[]> = {
+    onText: cloneIfMatching,
+    onDirective: cloneIfMatching,
+    onComment: cloneIfMatching,
+    onElement: (n, dupeChildren) => {
+      if (node === n) {
+        return [clone(n), clone(n)];
+      }
+      const children = flatDeep<Node>(dupeChildren);
+      return [CloneVisitor.onElement(n, children)];
+    },
+    onCData: (n, dupeChildren) => {
+      if (node === n) {
+        return [clone(n), clone(n)];
+      }
+      const children = flatDeep<Node>(dupeChildren);
+      return [CloneVisitor.onCData(n, children)];
+    },
+    onRoot: (n, dupeChildren) => {
+      if (node === n) {
+        return [clone(n), clone(n)];
+      }
+      const children = flatDeep<Node>(dupeChildren);
+      return [CloneVisitor.onRoot(n, children)];
+    },
+  };
+
+  const nodes = visit(root, DuplicateVisitor);
+  // Root node should not be duplicatable
+  return nodes[0];
+}
+
+function clone(node: Node) {
+  return visit(node, CloneVisitor);
+}
+
 const CloneVisitor: NodeVisitor<Node> = {
   onText: n => n.cloneNode(),
   onDirective: n => n.cloneNode(),
@@ -101,6 +145,12 @@ const CloneVisitor: NodeVisitor<Node> = {
     return clone;
   },
 };
+
+// to enable deep level flatten use recursion with reduce and concat
+function flatDeep<T>(arr: any, d = 1): T[] {
+  // @ts-ignore
+  return d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), []) : arr.slice();
+}
 
 function setLinking(children: Node[], parent: NodeWithChildren): void {
   for (let i = 1; i < children.length; i++) {

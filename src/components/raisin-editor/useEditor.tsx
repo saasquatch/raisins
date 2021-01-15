@@ -1,14 +1,13 @@
-import htmlparser2, { DefaultHandler } from 'htmlparser2';
+import htmlparser2 from 'htmlparser2';
 import serialize from 'dom-serializer';
 import { Model } from '../../model/Dom';
 import * as DOMHandler from 'domhandler';
 import hotkeys from 'hotkeys-js';
-import { useEffect, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { remove } from '../../util';
+import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
+import { duplicate, remove } from '../../util';
 import interact from 'interactjs';
 import { DragCoords } from './DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
-import { newCoordsSet } from '@interactjs/core/tests/_helpers';
 
 export type InternalState = {
   immutableCopy: DOMHandler.Node;
@@ -25,8 +24,12 @@ export type DraggableState = Map<
   }
 >;
 
-export function useEditor(html: string): Model {
-  const initial = useMemo(() => htmlparser2.parseDocument(html), []);
+export function useEditor(): Model {
+  const host = useHost();
+  const initial = useMemo(() => {
+    const html = host.querySelectorAll('template')[0].innerHTML;
+    return htmlparser2.parseDocument(html);
+  }, []);
   const [selected, setSelected] = useState<DOMHandler.Node>(undefined);
   const [state, setState] = useState<InternalState>({
     redoStack: [],
@@ -67,7 +70,7 @@ export function useEditor(html: string): Model {
         .draggable({
           // enable inertial throwing
           allowFrom: element.querySelectorAll('.handle')[0] as HTMLElement,
-          inertia: true,
+          inertia: false,
           // keep the element within the area of it's parent
           modifiers: [
             // interact.modifiers.restrictRect({
@@ -88,6 +91,15 @@ export function useEditor(html: string): Model {
               console.log('Drag end', event);
               // var textEl = event.target.querySelector('p');
 
+              setDragCoords(prev => {
+                if (prev && prev.element) {
+                  return {
+                    element: prev.element,
+                    x: 0,
+                    y: 0,
+                  };
+                }
+              });
               // textEl && (textEl.textContent = 'moved a distance of ' + Math.sqrt((Math.pow(event.pageX - event.x0, 2) + Math.pow(event.pageY - event.y0, 2)) | 0).toFixed(2) + 'px');
               moveTargetRelative(event.target, 0, 0);
             },
@@ -194,6 +206,10 @@ export function useEditor(html: string): Model {
     const clone = remove(state.current, n);
     setNode(clone);
   }
+  function duplicateNode(n: DOMHandler.Node) {
+    const clone = duplicate(state.current, n);
+    setNode(clone);
+  }
   useEffect(() => {
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
       switch (handler.key) {
@@ -218,14 +234,20 @@ export function useEditor(html: string): Model {
   }, []);
   return {
     node: state.current,
-    setState: setNode,
+    initial: serialize(initial),
+
     selected,
     setSelected,
+
+    setState: setNode,
     removeNode,
+    duplicateNode,
+
     undo,
     redo,
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
+
     setDraggableRef,
     dragCoords,
   };

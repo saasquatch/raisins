@@ -3,6 +3,7 @@ import { DragCoords } from '../components/raisin-editor/DragCoords';
 
 export type Model = {
   node: DOMHandler.Node;
+  initial: string;
 
   /*
    * Interactions
@@ -14,6 +15,7 @@ export type Model = {
    * Mutations
    */
   setState(node: DOMHandler.Node): void;
+  duplicateNode(node: DOMHandler.Node): void;
   removeNode(node: DOMHandler.Node): void;
 
   /*

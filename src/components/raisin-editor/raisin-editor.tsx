@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, h, getElement } from '@stencil/core';
 import serialize from 'dom-serializer';
 import { Model } from '../../model/Dom';
 import { Canvas } from '../../views/Canvas';
@@ -25,11 +25,6 @@ const Column = css`
   tag: 'raisin-editor',
 })
 export class Editor {
-  /**
-   * The first name
-   */
-  @Prop() html: string;
-
   constructor() {
     withHooks(this);
   }
@@ -37,7 +32,7 @@ export class Editor {
   disconnectedCallback() {}
 
   render() {
-    const model: Model = useEditor(this.html);
+    const model: Model = useEditor();
 
     const serialized = serialize(model.node);
 
@@ -45,19 +40,21 @@ export class Editor {
       <div>
         <ToolbarView {...model} />
         <div class={Row}>
-          <div class={Column} >
+          <div class={Column}>
             <Canvas {...model} />
           </div>
 
-          <div class={Column} style={{ flexBasis: "400px", maxWidth: "400px" }}>
+          <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
             {' '}
             <Layers {...model} />
             <h1>Input</h1>
-            <pre style={{wordWrap: "break-word"}}>{this.html}</pre>
+            <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
-            <pre style={{wordWrap: "break-word"}}>{serialized}</pre>
+            <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre>
           </div>
         </div>
+        
+        <slot/>
       </div>
     );
   }

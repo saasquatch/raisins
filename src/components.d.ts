@@ -7,10 +7,6 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface RaisinEditor {
-        /**
-          * The first name
-         */
-        "html": string;
     }
 }
 declare global {
@@ -26,10 +22,6 @@ declare global {
 }
 declare namespace LocalJSX {
     interface RaisinEditor {
-        /**
-          * The first name
-         */
-        "html"?: string;
     }
     interface IntrinsicElements {
         "raisin-editor": RaisinEditor;

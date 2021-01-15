@@ -12,8 +12,20 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
   </head>
   <body>
-    <raisin-editor
-      html="<div><h1>Heading</h1><div>And long content</div><template>And a template document</template><script type='application/json'>Script tag</script></div>"
-    ></raisin-editor>
+    <raisin-editor html="">
+      <template>
+        <div>
+          <h1>Heading</h1>
+          <div>
+            <p>And long content</p>
+            <p>And more content</p>
+          </div>
+          <template>And a template document</template>
+          <script type="application/json">
+            { "age": 50, "name": "Bob" }
+          </script>
+        </div>
+      </template>
+    </raisin-editor>
   </body>
 </html>

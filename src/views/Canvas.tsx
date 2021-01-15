@@ -2,6 +2,7 @@ import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
 import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
+import serialize from 'dom-serializer';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -36,6 +37,12 @@ export const Canvas: FunctionalComponent<Model> = props => {
             {element.children.map(c => visit(c, CanvasVisitor))}
           </div>
         );
+      }
+      if (element.tagName === "script"){
+        return <textarea>{
+          // @ts-ignore
+          serialize(element.children)
+          }</textarea>
       }
       const claz = element === props.selected ? 'selected' : '';
       const onClick = e => {
