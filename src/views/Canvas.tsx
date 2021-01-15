@@ -30,30 +30,39 @@ export const Canvas: FunctionalComponent<Model> = props => {
       return text.data;
     },
     onElement(element, children) {
+      const claz = element === props.selected ? 'selected' : '';
+
       if (element.tagName === 'template') {
         return (
-          <div>
+          <div class={claz}>
             <h1>Template:</h1>
             {element.children.map(c => visit(c, CanvasVisitor))}
           </div>
         );
       }
-      if (element.tagName === "script"){
-        return <textarea>{
-          // @ts-ignore
-          serialize(element.children)
-          }</textarea>
+      if (element.tagName === 'script') {
+        return (
+          <div class={claz}>
+            Script:
+            <br />
+            <textarea>
+              {
+                // @ts-ignore
+                serialize(element.children)
+              }
+            </textarea>
+          </div>
+        );
       }
-      const claz = element === props.selected ? 'selected' : '';
-      const onClick = e => {
-        props.setSelected(element);
-        e.stopPropogation();
+      // const id = 'element-' + Math.random();
+      const onClick = (e: Event) => {
+        // const el = e.target as HTMLElement;
+          props.setSelected(element);
       };
       // @ts-ignore
-      return h(element.tagName, { ...element.attribs, class: claz, onClick }, children);
+      return h(element.tagName, { ...element.attribs, 'class': claz, onClick}, children);
     },
   };
-
   return (
     <div class={wrapper}>
       <div class={content}>{visit(props.node, CanvasVisitor)}</div>

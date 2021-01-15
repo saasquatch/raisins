@@ -35,7 +35,7 @@ export class Editor {
     const model: Model = useEditor();
 
     const serialized = serialize(model.node);
-
+    console.log("Top-level render", new Date())
     return (
       <div>
         <ToolbarView {...model} />
@@ -53,7 +53,7 @@ export class Editor {
             <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre>
           </div>
         </div>
-        
+
         <slot/>
       </div>
     );

@@ -38,7 +38,7 @@ export function useEditor(): Model {
     immutableCopy: initial.cloneNode(true),
   });
 
-  const [, setDragMap] = useState<
+  const [dragMap, setDragMap] = useState<
     Map<
       DOMHandler.Node,
       {
@@ -49,6 +49,10 @@ export function useEditor(): Model {
   >(new Map());
   const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
   const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement) => {
+    const existing = dragMap.get(node);
+    if(existing && element === existing.element){
+      return;
+    }
     setDragMap(prev => {
       const next = new Map(prev);
       if (!element) {
@@ -58,6 +62,7 @@ export function useEditor(): Model {
       const existing = next.get(node);
       if (existing) {
         if (element === existing.element) {
+          console.log("Nothing changed");
           // Nothing changed
           return prev;
         } else {
@@ -248,10 +253,12 @@ export function useEditor(): Model {
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
 
+    // setDraggableRef:noop,
     setDraggableRef,
     dragCoords,
   };
 }
+const noop = ()=>{};
 function moveTargetRelative(target: any, x: any, y: any) {
   // target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
   // // update the posiion attributes
