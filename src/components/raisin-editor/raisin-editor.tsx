@@ -1,4 +1,4 @@
-import { Component, Prop, h, getElement } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 import serialize from 'dom-serializer';
 import { Model } from '../../model/Dom';
 import { Canvas } from '../../views/Canvas';

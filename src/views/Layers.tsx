@@ -4,6 +4,7 @@ import { Model } from '../model/Dom';
 // import domutils from 'domutils';
 import { NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
+import { getSlots } from '../components/raisin-editor/getSlots';
 
 const Layer = css`
   user-select: none;
@@ -19,7 +20,7 @@ const Selected = css`
 const Label = css`
   cursor: pointer;
   padding: 20px;
-`
+`;
 const Handle = css`
   cursor: move;
   display: inline-block;
@@ -37,10 +38,16 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           <span class={{ [Handle]: true, handle: true }}>[=]</span>
           <button onClick={() => model.duplicateNode(element)}>+</button>
           <button onClick={() => model.removeNode(element)}>x</button>
+
+          <button onClick={() => model.moveUp(element)}>↑</button>
+          <button onClick={() => model.moveDown(element)}>↓</button>
         </span>
       );
       const hasChildren = children?.length > 0;
+      const nodeWithSlots = getSlots(element);
 
+      const slots = nodeWithSlots.slots || [];
+      const hasSlots = slots?.length > 0;
       return (
         <div
           class={{
@@ -50,15 +57,26 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           style={dragStyle}
           ref={el => model.setDraggableRef(element, el)}
         >
-          {!hasChildren && name}
-          {hasChildren && (
+          {!hasSlots && name}
+          {hasSlots && (
             <details>
               <summary>{name}</summary>
-              {children}
+              {hasSlots && (
+                <div>
+                  {slots.map(s => (
+                    <div>
+                      <div>---- {s.name} ----({s.children?.length})</div>
+                      {s.children.map(c => visit(c.node, ElementVisitor, false))}
+                      <div ref={e => model.setDroppableRef(element, e)}>drop target</div>
+                    </div>
+                  ))}
+                </div>
+              )}{' '}
             </details>
           )}
         </div>
       );
+      // return <div></div>
     },
     onRoot(r, children) {
       return children && <div>{children}</div>;

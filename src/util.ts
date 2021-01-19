@@ -1,7 +1,7 @@
 import { Node, Text, ProcessingInstruction, Element, Comment, NodeWithChildren, Document } from 'domhandler';
 import { ElementType } from 'domelementtype';
 
-export function visit<T>(node: Node, visitor: NodeVisitor<T>): T {
+export function visit<T>(node: Node, visitor: NodeVisitor<T>, recursive: boolean = true): T {
   let result: T;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
@@ -24,21 +24,21 @@ export function visit<T>(node: Node, visitor: NodeVisitor<T>): T {
     case ElementType.Style: {
       if (!visitor.onElement) break;
       const element = node as Element;
-      const children = element.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      const children = recursive ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onElement(element, children);
       break;
     }
     case ElementType.CDATA: {
       if (!visitor.onCData) break;
       const cdata = node as NodeWithChildren;
-      const children = cdata.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      const children = recursive ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onCData(cdata, children);
       break;
     }
     case ElementType.Root: {
       if (!visitor.onRoot) break;
       const root = node as Document;
-      const children = root.children.map(c => visit(c, visitor)).filter(c => c !== undefined);
+      const children = recursive ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onRoot(root, children);
       break;
     }
@@ -119,6 +119,33 @@ export function duplicate(root: Node, node: Node): Node {
   const nodes = visit(root, DuplicateVisitor);
   // Root node should not be duplicatable
   return visit(nodes[0], FreezeVisitor);
+}
+
+export function move(root: Node, node: Node, newParent: Node, newIdx: number): Node {
+  const cloned = clone(node);
+  return visit(
+    visit(root, {
+      skipNode(n) {
+        return n === node;
+      },
+      ...CloneVisitor,
+      onElement(el, children) {
+        const newChildren = el === newParent ? add(children, cloned, newIdx) : children;
+        return CloneVisitor.onElement(el, newChildren);
+      },
+      onRoot(el, children) {
+        const newChildren = el === newParent ? add(children, cloned, newIdx) : children;
+        return CloneVisitor.onRoot(el, newChildren);
+      },
+    }),
+    FreezeVisitor,
+  );
+}
+
+function add<T>(arr: T[], el: T, idx: number): T[] {
+  const before = arr.slice(0, idx);
+  const after = arr.slice(idx, arr.length);
+  return [...before, el, ...after];
 }
 
 function clone(node: Node) {

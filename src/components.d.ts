@@ -6,10 +6,18 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface HasSlots {
+    }
     interface RaisinEditor {
     }
 }
 declare global {
+    interface HTMLHasSlotsElement extends Components.HasSlots, HTMLStencilElement {
+    }
+    var HTMLHasSlotsElement: {
+        prototype: HTMLHasSlotsElement;
+        new (): HTMLHasSlotsElement;
+    };
     interface HTMLRaisinEditorElement extends Components.RaisinEditor, HTMLStencilElement {
     }
     var HTMLRaisinEditorElement: {
@@ -17,13 +25,17 @@ declare global {
         new (): HTMLRaisinEditorElement;
     };
     interface HTMLElementTagNameMap {
+        "has-slots": HTMLHasSlotsElement;
         "raisin-editor": HTMLRaisinEditorElement;
     }
 }
 declare namespace LocalJSX {
+    interface HasSlots {
+    }
     interface RaisinEditor {
     }
     interface IntrinsicElements {
+        "has-slots": HasSlots;
         "raisin-editor": RaisinEditor;
     }
 }
@@ -31,6 +43,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "has-slots": LocalJSX.HasSlots & JSXBase.HTMLAttributes<HTMLHasSlotsElement>;
             "raisin-editor": LocalJSX.RaisinEditor & JSXBase.HTMLAttributes<HTMLRaisinEditorElement>;
         }
     }

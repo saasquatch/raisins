@@ -1,17 +1,17 @@
 import htmlparser2 from 'htmlparser2';
 import serialize from 'dom-serializer';
-import { Model } from '../../model/Dom';
+import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import * as DOMHandler from 'domhandler';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, remove } from '../../util';
-import interact from 'interactjs';
-import { DragCoords } from './DragCoords';
-import { Interactable } from '@interactjs/core/Interactable';
+import { duplicate, move, remove } from '../../util';
+import { useDND } from './useDragState';
+import { getSlots } from './getSlots';
 
 export type InternalState = {
   immutableCopy: DOMHandler.Node;
   current: DOMHandler.Node;
+  slots: NodeWithSlots;
   undoStack: DOMHandler.Node[];
   redoStack: DOMHandler.Node[];
 };
@@ -23,6 +23,18 @@ export type DraggableState = Map<
     handle?: HTMLElement;
   }
 >;
+
+const nodeToId = new WeakMap<DOMHandler.Node,string>();
+
+export function getId(node:DOMHandler.Node):string{
+  const existing = nodeToId.get(node);
+  if(existing){
+    return existing;
+  }
+  const id = "node-" + Math.round(Math.random() * 10000);
+  nodeToId.set(node, id);
+  return id;
+}
 
 export function useEditor(): Model {
   const host = useHost();
@@ -36,110 +48,9 @@ export function useEditor(): Model {
     undoStack: [],
     current: initial,
     immutableCopy: initial.cloneNode(true),
+    slots: getSlots(initial)
   });
 
-  const [dragMap, setDragMap] = useState<
-    Map<
-      DOMHandler.Node,
-      {
-        element: HTMLElement;
-        interact: Interactable;
-      }
-    >
-  >(new Map());
-  const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
-  const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement) => {
-    const existing = dragMap.get(node);
-    if(existing && element === existing.element){
-      return;
-    }
-    setDragMap(prev => {
-      const next = new Map(prev);
-      if (!element) {
-        next.set(node, undefined);
-        return next;
-      }
-      const existing = next.get(node);
-      if (existing) {
-        if (element === existing.element) {
-          console.log("Nothing changed");
-          // Nothing changed
-          return prev;
-        } else {
-          // existing element neads to be town down
-          existing.interact.unset();
-        }
-      }
-      const interactable = interact(element)
-        .styleCursor(false)
-        .draggable({
-          // enable inertial throwing
-          allowFrom: element.querySelectorAll('.handle')[0] as HTMLElement,
-          inertia: false,
-          // keep the element within the area of it's parent
-          modifiers: [
-            // interact.modifiers.restrictRect({
-            //   restriction: 'parent',
-            //   endOnly: true,
-            // }),
-          ],
-          // enable autoScroll
-          autoScroll: true,
-
-          listeners: {
-            // call this function on every dragmove event
-            move: dragMoveListener,
-
-            // call this function on every dragend event
-            end(event) {
-              // removeNode(node);
-              console.log('Drag end', event);
-              // var textEl = event.target.querySelector('p');
-
-              setDragCoords(prev => {
-                if (prev && prev.element) {
-                  return {
-                    element: prev.element,
-                    x: 0,
-                    y: 0,
-                  };
-                }
-              });
-              // textEl && (textEl.textContent = 'moved a distance of ' + Math.sqrt((Math.pow(event.pageX - event.x0, 2) + Math.pow(event.pageY - event.y0, 2)) | 0).toFixed(2) + 'px');
-              moveTargetRelative(event.target, 0, 0);
-            },
-          },
-        });
-      function dragMoveListener(event) {
-        var target = event.target;
-
-        setDragCoords(prev => {
-          if (prev && prev.element === node) {
-            return {
-              element: node,
-              x: event.dx + prev.x,
-              y: event.dy + prev.y,
-            };
-          }
-          return {
-            element: node,
-            x: event.dx,
-            y: event.dy,
-          };
-        });
-
-        // keep the dragged position in the data-x/data-y attributes
-        // var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        // var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        // translate the element
-        // moveTargetRelative(target, 0, y);
-      }
-      console.log('Set up drag listener', node, element, interactable);
-      next.set(node, { element, interact: interactable });
-      return next;
-    });
-  };
   const undo = () =>
     setState(previous => {
       if (!previous.undoStack.length) {
@@ -149,11 +60,13 @@ export function useEditor(): Model {
       const [current, ...undoStack] = previous.undoStack;
       const redoStack = [previous.immutableCopy, ...previous.redoStack];
 
+      const nextCurrent = current.cloneNode(true);
       const newState = {
-        current: current.cloneNode(true),
+        current: nextCurrent,
         immutableCopy: current.cloneNode(true),
         undoStack,
         redoStack,
+        slots: getSlots(nextCurrent)
       };
       console.log(
         'Undo to',
@@ -172,11 +85,13 @@ export function useEditor(): Model {
       const [current, ...redoStack] = previous.redoStack;
       const undoStack = [previous.immutableCopy, ...previous.undoStack];
 
+      const nextCurrent = current.cloneNode(true);
       const newState = {
-        current: current.cloneNode(true),
+        current: nextCurrent,
         immutableCopy: current.cloneNode(true),
         undoStack,
         redoStack,
+        slots: getSlots(nextCurrent)
       };
       console.log(
         'Setting to',
@@ -187,15 +102,16 @@ export function useEditor(): Model {
       return newState;
     });
 
-  function setNode(current: DOMHandler.Node) {
+  const setNode: StateUpdater<DOMHandler.Node> = next => {
     setState(previous => {
-      const immutableCopy = current.cloneNode(true);
+      const immutableCopy = typeof next === 'function' ? next(previous.current).cloneNode(true) : next.cloneNode(true);
       const undoStack = [previous.immutableCopy, ...previous.undoStack];
       const newState = {
         current: immutableCopy,
         immutableCopy,
         undoStack,
         redoStack: [],
+        slots: getSlots(immutableCopy)
       };
       console.log(
         'Setting to',
@@ -205,13 +121,23 @@ export function useEditor(): Model {
       );
       return newState;
     });
-  }
+  };
   function removeNode(n: DOMHandler.Node) {
     const clone = remove(state.current, n);
     setNode(clone);
   }
   function duplicateNode(n: DOMHandler.Node) {
     const clone = duplicate(state.current, n);
+    setNode(clone);
+  }
+  function moveUp(n: DOMHandler.Node) {
+    const currentIdx = n.parent.children.indexOf(n);
+    const clone = move(state.current, n, n.parent, currentIdx-1);
+    setNode(clone);
+  }
+  function moveDown(n: DOMHandler.Node) {
+    const currentIdx = n.parent.children.indexOf(n);
+    const clone = move(state.current, n, n.parent, currentIdx+1);
     setNode(clone);
   }
   useEffect(() => {
@@ -236,9 +162,14 @@ export function useEditor(): Model {
       }
     });
   }, []);
+
+  const slots = getSlots(state.current);
   return {
-    node: state.current,
     initial: serialize(initial),
+
+    node: state.current,
+    slots,
+    getId,
 
     selected,
     setSelected,
@@ -246,22 +177,25 @@ export function useEditor(): Model {
     setState: setNode,
     removeNode,
     duplicateNode,
+    moveDown,
+    moveUp,
 
     undo,
     redo,
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
 
-    // setDraggableRef:noop,
-    setDraggableRef,
-    dragCoords,
+    ...useDND({ node: state.current, setNode }),
+
   };
 }
-const noop = ()=>{};
-function moveTargetRelative(target: any, x: any, y: any) {
+
+export function moveTargetRelative(target: any, x: any, y: any) {
   // target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
   // // update the posiion attributes
   // target.setAttribute('data-x', x);
   // target.setAttribute('data-y', y);
   // TODO: Surface state so that stencil to handle the transforms?
 }
+
+
