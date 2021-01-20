@@ -3,13 +3,11 @@ import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
 
 export type Model = {
-
   node: DOMHandler.Node;
   slots: NodeWithSlots;
   initial: string;
 
-
-  getId(node: DOMHandler.Node):string;
+  getId(node: DOMHandler.Node): string;
 
   /*
    * Interactions
@@ -20,11 +18,12 @@ export type Model = {
   /*
    * Mutations
    */
-  setState:StateUpdater<DOMHandler.Node>;
+  setState: StateUpdater<DOMHandler.Node>;
   duplicateNode(node: DOMHandler.Node): void;
   removeNode(node: DOMHandler.Node): void;
   moveUp(node: DOMHandler.Node): void;
   moveDown(node: DOMHandler.Node): void;
+  replaceNode(prev: DOMHandler.Node, next: DOMHandler.Node): void;
 
   /*
    * History management
@@ -42,7 +41,6 @@ export type Model = {
   dragCoords: DragCoords;
   dropTarget?: DropState;
   elementToNode: WeakMap<HTMLElement, DOMHandler.Node>;
-
 };
 
 export type NodeWithSlots = {
@@ -64,7 +62,6 @@ export type Block = {
   name: string;
   tag: string;
 };
-
 
 export type NewState<T> = T | ((previousState?: T) => T);
 export type StateUpdater<T> = (value: NewState<T>) => void;

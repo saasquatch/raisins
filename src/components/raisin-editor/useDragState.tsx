@@ -60,6 +60,7 @@ function useDragState(sharedState: SharedState) {
           end(event) {
             // removeNode(node);
             console.log('Drag end', event);
+            event.target.style.opacity = 1;
             // var textEl = event.target.querySelector('p');
             setDragCoords(prev => {
               if (prev && prev.element) {
@@ -78,6 +79,7 @@ function useDragState(sharedState: SharedState) {
     function dragMoveListener(event) {
       var target = event.target;
 
+      target.style.opacity = 0.5;
       setDragCoords(prev => {
         if (prev && prev.element === node) {
           return {
@@ -106,10 +108,10 @@ export function useDropState(sharedState: SharedState) {
 
   const setDroppableRef = useDragRefs(sharedState, (element, node) => {
     return interact(element).dropzone({
-      // only accept elements matching this CSS selector
-      accept: '*',
-      // Require a 75% element overlap for a drop to be possible
-      overlap: 0.1,
+      // // only accept elements matching this CSS selector
+      // accept: '*',
+      // // Require a 75% element overlap for a drop to be possible
+      // overlap: 0.1,
 
       // listen for drop related events:
 

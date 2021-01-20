@@ -4,6 +4,7 @@ import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
 import { getId } from '../components/raisin-editor/useEditor';
+import * as DOMHandler from 'domhandler';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -22,13 +23,32 @@ const content = css`
   }
 `;
 
+
+function isBlank(str:string) {
+  return (!str || /^\s*$/.test(str));
+}
+
 export const Canvas: FunctionalComponent<Model> = props => {
   const CanvasVisitor: NodeVisitor<VNode | string> = {
     onRoot(root, children) {
       return <div>{children}</div>;
     },
-    onText(text) {
-      return text.data;
+    onText(text: DOMHandler.Text) {
+      const textValue = text.data;
+      if ((props.selected === text || props.selected === text.parent) && !isBlank(textValue)) {
+        return (
+          <input
+            value={textValue}
+            onBlur={e => {
+              const newText = (e.target as HTMLInputElement).value as string;
+              const newNode = text.cloneNode() as DOMHandler.Text;
+              newNode.data = newText;
+              props.replaceNode(text, newNode);
+            }}
+          />
+        );
+      }
+      return textValue;
     },
     onElement(element, children) {
       const claz = element === props.selected ? 'selected' : '';
@@ -39,15 +59,15 @@ export const Canvas: FunctionalComponent<Model> = props => {
         props.setSelected(element);
       };
       const innerProps = {
-        class:claz,
+        class: claz,
         onClick,
-        key: getId(element)
-      }
+        key: getId(element),
+      };
       if (element.tagName === 'template') {
         return (
           <div {...innerProps}>
             <h1>Template:</h1>
-            {element.children.map(c => visit(c, CanvasVisitor))}
+            {children}
           </div>
         );
       }
@@ -70,7 +90,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
   };
   return (
-    <div class={wrapper} onClick={()=>props.setSelected(undefined)}>
+    <div class={wrapper} onClick={() => props.setSelected(undefined)}>
       <div class={content}>{visit(props.node, CanvasVisitor)}</div>
     </div>
   );

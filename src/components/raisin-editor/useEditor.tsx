@@ -4,7 +4,7 @@ import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import * as DOMHandler from 'domhandler';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, move, remove } from '../../util';
+import { duplicate, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 
@@ -24,14 +24,14 @@ export type DraggableState = Map<
   }
 >;
 
-const nodeToId = new WeakMap<DOMHandler.Node,string>();
+const nodeToId = new WeakMap<DOMHandler.Node, string>();
 
-export function getId(node:DOMHandler.Node):string{
+export function getId(node: DOMHandler.Node): string {
   const existing = nodeToId.get(node);
-  if(existing){
+  if (existing) {
     return existing;
   }
-  const id = "node-" + Math.round(Math.random() * 10000);
+  const id = 'node-' + Math.round(Math.random() * 10000);
   nodeToId.set(node, id);
   return id;
 }
@@ -48,7 +48,7 @@ export function useEditor(): Model {
     undoStack: [],
     current: initial,
     immutableCopy: initial.cloneNode(true),
-    slots: getSlots(initial)
+    slots: getSlots(initial),
   });
 
   const undo = () =>
@@ -66,7 +66,7 @@ export function useEditor(): Model {
         immutableCopy: current.cloneNode(true),
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent)
+        slots: getSlots(nextCurrent),
       };
       console.log(
         'Undo to',
@@ -91,7 +91,7 @@ export function useEditor(): Model {
         immutableCopy: current.cloneNode(true),
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent)
+        slots: getSlots(nextCurrent),
       };
       console.log(
         'Setting to',
@@ -111,7 +111,7 @@ export function useEditor(): Model {
         immutableCopy,
         undoStack,
         redoStack: [],
-        slots: getSlots(immutableCopy)
+        slots: getSlots(immutableCopy),
       };
       console.log(
         'Setting to',
@@ -132,12 +132,16 @@ export function useEditor(): Model {
   }
   function moveUp(n: DOMHandler.Node) {
     const currentIdx = n.parent.children.indexOf(n);
-    const clone = move(state.current, n, n.parent, currentIdx-1);
+    const clone = move(state.current, n, n.parent, currentIdx - 1);
     setNode(clone);
   }
   function moveDown(n: DOMHandler.Node) {
     const currentIdx = n.parent.children.indexOf(n);
-    const clone = move(state.current, n, n.parent, currentIdx+1);
+    const clone = move(state.current, n, n.parent, currentIdx + 1);
+    setNode(clone);
+  }
+  function replaceNode(prev: DOMHandler.Node, next: DOMHandler.NodeWithChildren) {
+    const clone = replace(state.current, prev, next);
     setNode(clone);
   }
   useEffect(() => {
@@ -179,6 +183,7 @@ export function useEditor(): Model {
     duplicateNode,
     moveDown,
     moveUp,
+    replaceNode,
 
     undo,
     redo,
@@ -186,7 +191,6 @@ export function useEditor(): Model {
     hasUndo: state.undoStack.length > 0,
 
     ...useDND({ node: state.current, setNode }),
-
   };
 }
 
@@ -197,5 +201,3 @@ export function moveTargetRelative(target: any, x: any, y: any) {
   // target.setAttribute('data-y', y);
   // TODO: Surface state so that stencil to handle the transforms?
 }
-
-

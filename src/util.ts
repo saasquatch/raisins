@@ -56,11 +56,12 @@ export function visit<T>(node: Node, visitor: NodeVisitor<T>, recursive: boolean
 export interface NodeVisitor<T> {
   skipNode?(node: Node): boolean;
   onText?(text: Text): T | undefined;
+  onElement?(element: Element, children?: T[]): T | undefined;
+  onRoot?(node: Document, children?: T[]): T | undefined;
+
   onDirective?(directive: ProcessingInstruction): T | undefined;
   onComment?(comment: Comment): T | undefined;
-  onElement?(element: Element, children?: T[]): T | undefined;
   onCData?(element: NodeWithChildren, children?: T[]): T | undefined;
-  onRoot?(node: Document, children?: T[]): T | undefined;
 }
 
 /**
@@ -119,6 +120,21 @@ export function duplicate(root: Node, node: Node): Node {
   const nodes = visit(root, DuplicateVisitor);
   // Root node should not be duplicatable
   return visit(nodes[0], FreezeVisitor);
+}
+
+export function replace(root: Node, previous: Node, next: Node): Node {
+  const swap = (n: Node) => (n === previous ? next : n);
+  return visit(
+    visit(root, {
+      onText: swap,
+      onCData: swap,
+      onComment: swap,
+      onDirective: swap,
+      onElement: swap,
+      onRoot: swap,
+    }),
+    CloneVisitor,
+  );
 }
 
 export function move(root: Node, node: Node, newParent: Node, newIdx: number): Node {
