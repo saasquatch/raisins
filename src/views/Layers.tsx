@@ -5,6 +5,7 @@ import { Model } from '../model/Dom';
 import { NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
+import { getId } from '../components/raisin-editor/useEditor';
 
 const Layer = css`
   user-select: none;
@@ -56,10 +57,12 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           }}
           style={dragStyle}
           ref={el => model.setDraggableRef(element, el)}
+          key={getId(element)}
         >
           {!hasSlots && name}
           {hasSlots && (
-            <details>
+            // <details>
+            <div>
               <summary>{name}</summary>
               {hasSlots && (
                 <div>
@@ -72,7 +75,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                   ))}
                 </div>
               )}{' '}
-            </details>
+            </div>
           )}
         </div>
       );

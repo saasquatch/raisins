@@ -3,6 +3,7 @@ import { Model } from '../model/Dom';
 import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
+import { getId } from '../components/raisin-editor/useEditor';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -39,7 +40,8 @@ export const Canvas: FunctionalComponent<Model> = props => {
       };
       const innerProps = {
         class:claz,
-        onClick
+        onClick,
+        key: getId(element)
       }
       if (element.tagName === 'template') {
         return (

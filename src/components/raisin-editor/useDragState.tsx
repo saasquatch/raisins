@@ -115,24 +115,27 @@ export function useDropState(sharedState: SharedState) {
 
       ondragenter: function (event) {
         // feedback the possibility of a drop
-        // event.relatedTarget.style.background = 'green';
-        // event.target.style.background = 'blue';
+        event.relatedTarget.style.background = 'green';
+        event.target.style.background = 'blue';
         setDropTarget([event.relatedTarget, event.target]);
       },
       ondragleave: function (event) {
         // remove the drop feedback style
         // 'Dragged out'
-        // event.target.style.background = '';
-        // event.relatedTarget.style.background = '';
+        event.target.style.background = '';
+        event.relatedTarget.style.background = '';
         setDropTarget(undefined);
       },
 
       // TODO
       ondrop: function (event) {
-        const dropzoneNode = sharedState.elementToNode.get(event.relatedTarget);
-        const dropped = sharedState.elementToNode.get(event.target);
+        const dropped = sharedState.elementToNode.get(event.relatedTarget);
+        const dropzoneNode = sharedState.elementToNode.get(event.target);
 
-        sharedState.props.setNode(root => move(root, dropped, dropzoneNode, -1));
+        console.log('Dropped', dropped, 'into', dropzoneNode);
+        // @ts-ignore
+        const position =  dropzoneNode.children.length-1;
+        sharedState.props.setNode(root => move(root, dropped, dropzoneNode,position));
         // event.relatedTarget.style.background = 'pink';
       },
 
@@ -155,12 +158,16 @@ export function useDropState(sharedState: SharedState) {
 
 function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: DOMHandler.Node) => Interactable) {
   const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement) => {
+    // Don't care about refs being nulled out
+    if (!element) return;
+
     const existing = sharedState.elementToInteract.get(element);
     if (existing) {
       // Already have drag state, do nothing.
       return;
     }
     console.log('New ref', node, element);
+
     const interactable = builder(element, node);
 
     sharedState.elementToNode.set(element, node);

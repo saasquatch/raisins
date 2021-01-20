@@ -35,7 +35,7 @@ export class Editor {
     const model: Model = useEditor();
 
     const serialized = serialize(model.node);
-    console.log("Top-level render", new Date())
+    // console.log("Top-level render", new Date())
     return (
       <div>
         <ToolbarView {...model} />
