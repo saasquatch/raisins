@@ -1,4 +1,5 @@
 import * as DOMHandler from 'domhandler';
+import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
 
@@ -42,7 +43,7 @@ export type Model = {
   dragCoords: DragCoords;
   dropTarget?: DropState;
   elementToNode: WeakMap<HTMLElement, DOMHandler.Node>;
-};
+} & ReturnType<typeof useInlinedHTML>;
 
 export type NodeWithSlots = {
   node: DOMHandler.Node;

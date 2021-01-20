@@ -23,9 +23,8 @@ const content = css`
   }
 `;
 
-
-function isBlank(str:string) {
-  return (!str || /^\s*$/.test(str));
+function isBlank(str: string) {
+  return !str || /^\s*$/.test(str);
 }
 
 export const Canvas: FunctionalComponent<Model> = props => {
@@ -47,11 +46,12 @@ export const Canvas: FunctionalComponent<Model> = props => {
             }}
           />
         );
+        // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
       }
       return textValue;
     },
     onElement(element, children) {
-      const claz = element === props.selected ? 'selected' : '';
+      const claz = element === props.selected ? 'selected ' : '';
 
       const onClick = (e: Event) => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
@@ -59,7 +59,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
         props.setSelected(element);
       };
       const innerProps = {
-        class: claz,
+        class: claz + element.attribs.class,
         onClick,
         key: getId(element),
       };
@@ -82,6 +82,20 @@ export const Canvas: FunctionalComponent<Model> = props => {
                 serialize(element.children)
               }
             </textarea>
+          </div>
+        );
+      }
+      if (element.tagName === 'style') {
+        return (
+          <div>
+            Style:
+            <textarea>
+              {
+                // @ts-ignore
+                serialize(element.children)
+              }
+            </textarea>
+            <style innerHTML={serialize(element.children)} />;
           </div>
         );
       }

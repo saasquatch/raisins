@@ -7,6 +7,7 @@ import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks
 import { duplicate, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
+import { useInlinedHTML } from './useInlinedHTML';
 
 export type InternalState = {
   immutableCopy: DOMHandler.Node;
@@ -124,7 +125,6 @@ export function useEditor(): Model {
     });
   };
 
-  
   function removeNode(n: DOMHandler.Node) {
     const clone = remove(state.current, n);
     setNode(clone);
@@ -148,13 +148,12 @@ export function useEditor(): Model {
     setNode(clone);
   }
 
-  function replaceText(node: DOMHandler.Element, textContent:string){
+  function replaceText(node: DOMHandler.Element, textContent: string) {
     // const text = node.childNodes.find(c=>c.type === "text");
-    const newNode = htmlparser2.parseDocument("<span>I am foo</span>").firstChild;
+    const newNode = htmlparser2.parseDocument('<span>I am foo</span>').firstChild;
     const clone = replace(state.current, node, newNode);
     setNode(clone);
   }
-
 
   useEffect(() => {
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
@@ -203,6 +202,7 @@ export function useEditor(): Model {
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
 
+    ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode }),
   };
 }
