@@ -168,7 +168,7 @@ function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, n
       // Already have drag state, do nothing.
       return;
     }
-    console.log('New ref', node, element);
+    // console.log('New ref', node, element);
 
     const interactable = builder(element, node);
 

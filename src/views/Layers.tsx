@@ -37,6 +37,8 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
         <span onClick={() => model.setSelected(element)}>
           <span class={Label}>{element.name}</span>
           <span class={{ [Handle]: true, handle: true }}>[=]</span>
+
+          <button onClick={() => model.replaceText(element, 'Layer update')}>T</button>
           <button onClick={() => model.duplicateNode(element)}>+</button>
           <button onClick={() => model.removeNode(element)}>x</button>
 
@@ -68,7 +70,9 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                 <div>
                   {slots.map(s => (
                     <div>
-                      <div>---- {s.name} ----({s.children?.length})</div>
+                      <div>
+                        ---- {s.name} ----({s.children?.length})
+                      </div>
                       {s.children.map(c => visit(c.node, ElementVisitor, false))}
                       <div ref={e => model.setDroppableRef(element, e)}>drop target</div>
                     </div>

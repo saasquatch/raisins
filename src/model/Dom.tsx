@@ -24,6 +24,7 @@ export type Model = {
   moveUp(node: DOMHandler.Node): void;
   moveDown(node: DOMHandler.Node): void;
   replaceNode(prev: DOMHandler.Node, next: DOMHandler.Node): void;
+  replaceText(node: DOMHandler.Node, text: string): void;
 
   /*
    * History management

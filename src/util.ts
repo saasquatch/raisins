@@ -1,5 +1,6 @@
 import { Node, Text, ProcessingInstruction, Element, Comment, NodeWithChildren, Document } from 'domhandler';
 import { ElementType } from 'domelementtype';
+import { getId } from './components/raisin-editor/useEditor';
 
 export function visit<T>(node: Node, visitor: NodeVisitor<T>, recursive: boolean = true): T {
   let result: T;
@@ -123,15 +124,43 @@ export function duplicate(root: Node, node: Node): Node {
 }
 
 export function replace(root: Node, previous: Node, next: Node): Node {
-  const swap = (n: Node) => (n === previous ? next : n);
+  const oldId = getId(previous);
+  const newId = getId(next);
+
+  function swap(n: Node): Node {
+    const nId = getId(n);
+    if (n === previous) {
+      console.log('Swapping out', nId, '  from ', oldId, ' to ', newId);
+      return next;
+    }
+    console.log('NOT Swapping out', nId, '  from ', oldId, ' to ', newId);
+    return n.cloneNode();
+  }
+
   return visit(
     visit(root, {
+      // skipNode: n => {
+      //   if(n === previous){
+      //     console.log("Skipping node")
+      //     return true;
+      //   }
+      //   return false
+      // },
       onText: swap,
-      onCData: swap,
       onComment: swap,
       onDirective: swap,
-      onElement: swap,
-      onRoot: swap,
+      onCData(el, children) {
+        if (el === previous) return next;
+        return CloneVisitor.onCData(el, children);
+      },
+      onElement(el, children) {
+        if (el === previous) return next;
+        return CloneVisitor.onElement(el, children);
+      },
+      onRoot(el, children) {
+        if (el === previous) return next;
+        return CloneVisitor.onRoot(el, children);
+      },
     }),
     CloneVisitor,
   );

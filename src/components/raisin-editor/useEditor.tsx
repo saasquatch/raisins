@@ -42,6 +42,7 @@ export function useEditor(): Model {
     const html = host.querySelectorAll('template')[0].innerHTML;
     return htmlparser2.parseDocument(html);
   }, []);
+
   const [selected, setSelected] = useState<DOMHandler.Node>(undefined);
   const [state, setState] = useState<InternalState>({
     redoStack: [],
@@ -122,6 +123,8 @@ export function useEditor(): Model {
       return newState;
     });
   };
+
+  
   function removeNode(n: DOMHandler.Node) {
     const clone = remove(state.current, n);
     setNode(clone);
@@ -144,6 +147,15 @@ export function useEditor(): Model {
     const clone = replace(state.current, prev, next);
     setNode(clone);
   }
+
+  function replaceText(node: DOMHandler.Element, textContent:string){
+    // const text = node.childNodes.find(c=>c.type === "text");
+    const newNode = htmlparser2.parseDocument("<span>I am foo</span>").firstChild;
+    const clone = replace(state.current, node, newNode);
+    setNode(clone);
+  }
+
+
   useEffect(() => {
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
       switch (handler.key) {
@@ -184,6 +196,7 @@ export function useEditor(): Model {
     moveDown,
     moveUp,
     replaceNode,
+    replaceText,
 
     undo,
     redo,
