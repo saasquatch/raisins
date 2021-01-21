@@ -5,6 +5,7 @@ import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
 import { getId } from '../components/raisin-editor/useEditor';
 import * as DOMHandler from 'domhandler';
+import styleToObject from 'style-to-object';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -17,9 +18,15 @@ const content = css`
   background: white;
   margin: 0 auto;
   padding: 20px;
+`;
 
-  .selected {
-    outline: 1px solid red;
+const Selected = css`
+  outline: 1px solid red;
+`;
+
+const Selectable = css`
+  &:hover {
+    outline: 1px solid blue;
   }
 `;
 
@@ -51,7 +58,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
       return textValue;
     },
     onElement(element, children) {
-      const claz = element === props.selected ? 'selected ' : '';
+      const claz = element === props.selected ? Selected : Selectable;
 
       const onClick = (e: Event) => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
@@ -59,7 +66,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
         props.setSelected(element);
       };
       const innerProps = {
-        class: claz + element.attribs.class,
+        class: claz + " " + element.attribs.class,
         onClick,
         key: getId(element),
       };
@@ -99,13 +106,23 @@ export const Canvas: FunctionalComponent<Model> = props => {
           </div>
         );
       }
+      const { style, ...rest } = element.attribs;
+      const styleObj = styleToObject(style);
+
       // @ts-ignore
-      return h(element.tagName, { ...element.attribs, ...innerProps }, children);
+      return h(element.tagName, { style: styleObj, ...rest, ...innerProps }, children);
     },
   };
+
+  const target = props.dropTarget && props.dropTarget.length && props.dropTarget?.filter(t=>t).map(e=>props.elementToNode.get(e));
+  
+  
   return (
     <div class={wrapper} onClick={() => props.setSelected(undefined)}>
       <div class={content}>{visit(props.node, CanvasVisitor)}</div>
+
+
+      {target && target.map(n=>serialize(n)).join(" to ")}
     </div>
   );
 };

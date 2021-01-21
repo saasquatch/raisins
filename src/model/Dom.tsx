@@ -25,7 +25,6 @@ export type Model = {
   moveUp(node: DOMHandler.Node): void;
   moveDown(node: DOMHandler.Node): void;
   replaceNode(prev: DOMHandler.Node, next: DOMHandler.Node): void;
-  replaceText(node: DOMHandler.Node, text: string): void;
 
   /*
    * History management
@@ -39,9 +38,10 @@ export type Model = {
    * Drag and drop
    */
   setDraggableRef(node: DOMHandler.Node, element: HTMLElement): void;
-  setDroppableRef(node: DOMHandler.Node, element: HTMLElement): void;
+  setDroppableRef(node: DOMHandler.Node, element: HTMLElement, idx:number): void;
   dragCoords: DragCoords;
   dropTarget?: DropState;
+  isDragActive: boolean;
   elementToNode: WeakMap<HTMLElement, DOMHandler.Node>;
 } & ReturnType<typeof useInlinedHTML>;
 

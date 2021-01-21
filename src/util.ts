@@ -72,14 +72,13 @@ export interface NodeVisitor<T> {
  * @param node
  */
 export function remove(root: Node, node: Node): Node {
-  return visit(
+  return freeze(
     visit(root, {
       skipNode(n) {
         return n === node;
       },
       ...CloneVisitor,
     }),
-    FreezeVisitor,
   );
 }
 
@@ -120,32 +119,19 @@ export function duplicate(root: Node, node: Node): Node {
 
   const nodes = visit(root, DuplicateVisitor);
   // Root node should not be duplicatable
-  return visit(nodes[0], FreezeVisitor);
+  return freeze(nodes[0]);
 }
 
 export function replace(root: Node, previous: Node, next: Node): Node {
-  const oldId = getId(previous);
-  const newId = getId(next);
-
   function swap(n: Node): Node {
-    const nId = getId(n);
     if (n === previous) {
-      console.log('Swapping out', nId, '  from ', oldId, ' to ', newId);
       return next;
     }
-    console.log('NOT Swapping out', nId, '  from ', oldId, ' to ', newId);
     return n.cloneNode();
   }
 
   return visit(
     visit(root, {
-      // skipNode: n => {
-      //   if(n === previous){
-      //     console.log("Skipping node")
-      //     return true;
-      //   }
-      //   return false
-      // },
       onText: swap,
       onComment: swap,
       onDirective: swap,
@@ -168,7 +154,7 @@ export function replace(root: Node, previous: Node, next: Node): Node {
 
 export function move(root: Node, node: Node, newParent: Node, newIdx: number): Node {
   const cloned = clone(node);
-  return visit(
+  return freeze(
     visit(root, {
       skipNode(n) {
         return n === node;
@@ -183,7 +169,6 @@ export function move(root: Node, node: Node, newParent: Node, newIdx: number): N
         return CloneVisitor.onRoot(el, newChildren);
       },
     }),
-    FreezeVisitor,
   );
 }
 
@@ -196,14 +181,21 @@ function add<T>(arr: T[], el: T, idx: number): T[] {
 function clone(node: Node) {
   return visit(node, CloneVisitor);
 }
-const FreezeVisitor: NodeVisitor<Node> = {
-  onText: Object.freeze,
-  onDirective: Object.freeze,
-  onComment: Object.freeze,
-  onElement: n => Object.freeze(n),
-  onCData: n => Object.freeze(n),
-  onRoot: n => Object.freeze(n),
-};
+function freeze(node: Node) {
+  return visitAll(node, Object.freeze);
+}
+
+function visitAll(node: Node, fn: (n: Node) => Node): Node {
+  return visit(node, {
+    onCData: fn,
+    onText: fn,
+    onDirective: fn,
+    onComment: fn,
+    onElement: fn,
+    onRoot: fn,
+  });
+}
+
 const CloneVisitor: NodeVisitor<Node> = {
   onText: n => n.cloneNode(),
   onDirective: n => n.cloneNode(),

@@ -7,6 +7,8 @@ import { moveTargetRelative } from './useEditor';
 import { DropState } from '../../model/DropState';
 import { move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
+import { css } from '@emotion/css';
+import drop from '@interactjs/actions/drop/plugin';
 
 type Props = { node: DOMHandler.Node; setNode: StateUpdater<DOMHandler.Node> };
 
@@ -36,11 +38,12 @@ function useDragState(sharedState: SharedState) {
   const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
 
   function createDraggable(element: HTMLElement, node: DOMHandler.Node) {
+    const handle = element.querySelector('.handle');
     const interactable = interact(element)
       .styleCursor(false)
       .draggable({
         // enable inertial throwing
-        allowFrom: element.querySelectorAll('.handle')[0] as HTMLElement,
+        allowFrom: handle && handle[0] as HTMLElement,
         inertia: false,
         // keep the element within the area of it's parent
         modifiers: [
@@ -103,10 +106,19 @@ function useDragState(sharedState: SharedState) {
   return { dragCoords, setDraggableRef } as const;
 }
 
+const ActiveDropTarget = css`
+  &: before {
+    background: red !important;
+    height: 6px !important;
+  }
+`;
+
 export function useDropState(sharedState: SharedState) {
   const [dropTarget, setDropTarget] = useState<DropState>(undefined);
+  const [isDragActive, setIsDragActive] = useState<boolean>(false);
+  // const [possibleDrop, setPossibleDrop] = useState<HTMLElement>(undefined)
 
-  const setDroppableRef = useDragRefs(sharedState, (element, node) => {
+  const setDroppableRef = useDragRefs(sharedState, (element, node, idx: string) => {
     return interact(element).dropzone({
       // // only accept elements matching this CSS selector
       // accept: '*',
@@ -118,13 +130,16 @@ export function useDropState(sharedState: SharedState) {
       ondragenter: function (event) {
         // feedback the possibility of a drop
         event.relatedTarget.style.background = 'green';
-        event.target.style.background = 'blue';
+        (event.target as HTMLElement).classList.add(ActiveDropTarget);
+        // event.target.style.outline = '3px solid red';
         setDropTarget([event.relatedTarget, event.target]);
+        console.log('Possible drop', event.target);
       },
       ondragleave: function (event) {
         // remove the drop feedback style
         // 'Dragged out'
-        event.target.style.background = '';
+        (event.target as HTMLElement).classList.remove(ActiveDropTarget);
+        // event.target.style.background = '';
         event.relatedTarget.style.background = '';
         setDropTarget(undefined);
       },
@@ -136,8 +151,12 @@ export function useDropState(sharedState: SharedState) {
 
         console.log('Dropped', dropped, 'into', dropzoneNode);
         // @ts-ignore
-        const position =  dropzoneNode.children.length-1;
-        sharedState.props.setNode(root => move(root, dropped, dropzoneNode,position));
+        const position = idx as number;
+        sharedState.props.setNode(root => {
+          console.log("Moving", dropped, "to", dropzoneNode, "at idx", position);
+          return move(root, dropped, dropzoneNode, position)
+          
+        });
         // event.relatedTarget.style.background = 'pink';
       },
 
@@ -147,19 +166,21 @@ export function useDropState(sharedState: SharedState) {
       ondropactivate: function (event) {
         // add active dropzone feedback
         // event.target.style.border = '1px dotted #CCC';
+        setIsDragActive(true);
       },
       ondropdeactivate: function (event) {
+        setIsDragActive(false);
         // event.target.style.border = '';
         // remove active dropzone feedback
       },
     });
   });
 
-  return { setDroppableRef, dropTarget };
+  return { setDroppableRef, dropTarget, isDragActive };
 }
 
-function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: DOMHandler.Node) => Interactable) {
-  const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement) => {
+function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: DOMHandler.Node, ...args: unknown[]) => Interactable) {
+  const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement, ...args: unknown[]) => {
     // Don't care about refs being nulled out
     if (!element) return;
 
@@ -170,7 +191,7 @@ function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, n
     }
     // console.log('New ref', node, element);
 
-    const interactable = builder(element, node);
+    const interactable = builder(element, node, ...args);
 
     sharedState.elementToNode.set(element, node);
     sharedState.elementToInteract.set(element, interactable);

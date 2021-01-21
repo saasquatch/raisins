@@ -148,13 +148,6 @@ export function useEditor(): Model {
     setNode(clone);
   }
 
-  function replaceText(node: DOMHandler.Element, textContent: string) {
-    // const text = node.childNodes.find(c=>c.type === "text");
-    const newNode = htmlparser2.parseDocument('<span>I am foo</span>').firstChild;
-    const clone = replace(state.current, node, newNode);
-    setNode(clone);
-  }
-
   useEffect(() => {
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
       switch (handler.key) {
@@ -195,7 +188,6 @@ export function useEditor(): Model {
     moveDown,
     moveUp,
     replaceNode,
-    replaceText,
 
     undo,
     redo,
