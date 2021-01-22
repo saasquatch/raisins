@@ -38,7 +38,7 @@ export type Model = {
    * Drag and drop
    */
   setDraggableRef(node: DOMHandler.Node, element: HTMLElement): void;
-  setDroppableRef(node: DOMHandler.Node, element: HTMLElement, idx:number): void;
+  setDroppableRef(node: DOMHandler.Node, element: HTMLElement, idx:number, slot:string): void;
   dragCoords: DragCoords;
   dropTarget?: DropState;
   isDragActive: boolean;

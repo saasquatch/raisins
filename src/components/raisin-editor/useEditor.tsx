@@ -145,6 +145,7 @@ export function useEditor(): Model {
   }
   function replaceNode(prev: DOMHandler.Node, next: DOMHandler.NodeWithChildren) {
     const clone = replace(state.current, prev, next);
+    // TODO: When a node is selected, they should remain selected
     setNode(clone);
   }
 

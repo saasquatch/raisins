@@ -6,8 +6,11 @@ import { NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
+import { NodeWithChildren } from 'domhandler';
+import { nodeContains } from '@interactjs/utils/domUtils';
 
 const Layer = css`
+  position: relative;
   user-select: none;
   padding: 5px 0;
   background: #ccc;
@@ -41,14 +44,14 @@ const SlotName = css`
   display: none;
 `;
 const SlotChildren = css`
-  // width: 100%;
+  width: 100%;
 `;
 const DropTarget = css`
   display: none;
   padding: 5px 0;
   // Creates a sizeable drop target without shifting content around the page
   // position: absolute;
-  z-index: 2px;
+  z-index: 5;
   top: -30px;
   width: 100%;
 `;
@@ -65,13 +68,21 @@ const PossibleDropTarget = css`
   }
 `;
 const DropTargetWrapper = css`
-  // height: 1px;
+  height: 1px;
   overflow: visible;
   position: relative;
 `;
 
+const DropLabel = css`
+  position: absolute;
+  top: -30px;
+  height: 30px;
+  box-sizing: border-box;
+  background: red;
+  color: white;
+`;
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
-  function DropSlot(props: { node: DOMHandler.Node; idx: number }) {
+  function DropSlot(props: { node: DOMHandler.Node; idx: number; slot: string }) {
     const claz = {
       [DropTarget]: !model.isDragActive,
       [PossibleDropTarget]: model.isDragActive,
@@ -79,8 +90,8 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     };
     return (
       <div class={DropTargetWrapper}>
-        <div class={claz} ref={e => model.setDroppableRef(props.node, e, props.idx)}>
-          {props.idx}
+        <div class={claz} ref={e => model.setDroppableRef(props.node, e, props.idx, props.slot)}>
+          {/* {props.idx} */}
         </div>
       </div>
     );
@@ -104,8 +115,8 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       );
       const hasChildren = children?.length > 0;
       const nodeWithSlots = getSlots(element);
-      const dropElement = model.dropTarget && model.dropTarget[1];
-      const dropNode = dropElement && model.elementToNode.get(dropElement);
+      const dropNode = model.dropTarget?.from?.model;
+      const isDroppable = element === dropNode;
 
       const slots = nodeWithSlots.slots || [];
       const hasSlots = slots?.length > 0;
@@ -114,12 +125,19 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           class={{
             [Layer]: element !== model.selected,
             [Selected]: element === model.selected,
-            [DropLayer]: element === dropNode,
+            [DropLayer]: isDroppable,
           }}
           style={dragStyle}
           ref={el => model.setDraggableRef(element, el)}
           key={getId(element)}
         >
+          {isDroppable && (
+            <div class={DropLabel}>
+              <DepthLabel node={model.dropTarget.to.model}>
+                slot {model.dropTarget.to.slot} at {model.dropTarget.to.idx}
+              </DepthLabel>
+            </div>
+          )}
           {!hasSlots && name}
           {hasSlots && (
             // <details>
@@ -131,13 +149,13 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                     <div class={SlotContainer}>
                       <div class={SlotName}>{s.name}</div>
                       <div class={SlotChildren}>
-                        <DropSlot node={element} idx={0} />
+                        <DropSlot node={element} idx={0} slot={s.key} />
                         {s.children
                           .filter(x => x)
                           .map((c, idx) => {
                             const childElement = visit(c.node, ElementVisitor, false);
                             // Doesn't render empty text nodes
-                            return childElement && [childElement, <DropSlot node={element} idx={idx + 1} />];
+                            return childElement && [childElement, <DropSlot node={element} idx={idx + 1} slot={s.key} />];
                           })}
                       </div>
                     </div>
@@ -172,3 +190,15 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     </div>
   );
 };
+
+function DepthLabel(props: { node: DOMHandler.Node }, children: VNode[]): VNode {
+  if (props.node.parent) {
+    return (
+      <DepthLabel node={props.node.parent}>
+        {(props.node as DOMHandler.Element).tagName} &gt; {children}
+      </DepthLabel>
+    );
+  }
+
+  return <div>{children}</div>;
+}
