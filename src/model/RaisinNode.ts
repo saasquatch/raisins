@@ -4,13 +4,13 @@ import { ElementType } from 'domelementtype';
  * DOM-Level-1-compliant structure.
  */
 export interface RaisinNode<T extends ElementType = ElementType> {
-  type: ElementType;
+  type: T;
   nodeType: number;
 }
 type DataNodesTypes = ElementType.Comment | ElementType.Text | ElementType.Directive;
 
 export interface DataNode<T extends DataNodesTypes = DataNodesTypes> extends RaisinNode<T> {
-  type: ElementType.Comment | ElementType.Text | ElementType.Directive;
+  type: T;
   data: string;
   /**
    * @param type The type of the node

@@ -164,24 +164,33 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
     onDirective: swap,
     onCData(el, children) {
       if (el === previous) return next;
-      return {
-        ...el,
-        children,
-      };
+      if (el.children !== children) {
+        return {
+          ...el,
+          children,
+        };
+      }
+      return el;
     },
     onElement(el, children) {
       if (el === previous) return next;
-      return {
-        ...el,
-        children,
-      };
+      if (el.children !== children) {
+        return {
+          ...el,
+          children,
+        };
+      }
+      return el;
     },
     onRoot(el, children) {
       if (el === previous) return next;
-      return {
-        ...el,
-        children,
-      };
+      if (el.children !== children) {
+        return {
+          ...el,
+          children,
+        };
+      }
+      return el;
     },
   });
 }
@@ -253,4 +262,31 @@ function clone(n: RaisinNode): RaisinNode {
 function flatDeep<T>(arr: any, d = 1): T[] {
   // @ts-ignore
   return d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), []) : arr.slice();
+}
+
+/**
+ * Returns an array of parents, with the first element being the parent, and then their ancestors
+ */
+export function getAncestry(root: RaisinNode, node: RaisinNode): RaisinNodeWithChildren[] {
+  function addToAncestry(n: RaisinNodeWithChildren, children: RaisinNodeWithChildren[]) {
+    if (n.children.indexOf(node)) {
+      // First parent
+      return [n];
+    }
+    if (children && children.some(x => x)) {
+      // Grand parent
+      return [...children.filter(x => x), n];
+    }
+    // Not in ancestry
+    return undefined;
+  }
+  return visit(root, {
+    onText: () => undefined,
+    onDirective: () => undefined,
+    onComment: () => undefined,
+
+    onCData: addToAncestry,
+    onElement: addToAncestry,
+    onRoot: addToAncestry,
+  });
 }

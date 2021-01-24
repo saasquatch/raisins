@@ -1,14 +1,16 @@
 import { h } from '@stencil/core';
-import { Element } from 'domhandler';
 import { Model } from '../model/Dom';
+import { RaisinElementNode } from '../model/RaisinNode';
 
-export function AttributesEditor(props: { model: Model; node: Element }) {
+export function AttributesEditor(props: { model: Model; node: RaisinElementNode }) {
   const schema = props.model.getComponentMeta(props.node)?.attributes;
 
   const onchange = (key: string) => {
     return (value: string) => {
-      const clone = props.node.cloneNode() as Element;
-      clone.attribs = { ...clone.attribs, [key]: value };
+      const clone = {
+        ...props.node,
+        attribs: { ...props.node.attribs, [key]: value },
+      };
       props.model.replaceNode(props.node, clone);
     };
   };

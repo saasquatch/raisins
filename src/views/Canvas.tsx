@@ -3,9 +3,7 @@ import { Model } from '../model/Dom';
 import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
-import * as DOMHandler from 'domhandler';
 import styleToObject from 'style-to-object';
-import HTML from '../components/example';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -30,13 +28,13 @@ const Selectable = css`
   }
 `;
 
-function isBlank(str: string) {
-  return !str || /^\s*$/.test(str);
-}
+// function isBlank(str: string) {
+//   return !str || /^\s*$/.test(str);
+// }
 
 export const Canvas: FunctionalComponent<Model> = props => {
   const CanvasVisitor: NodeVisitor<VNode | string> = {
-    onRoot(root, children) {
+    onRoot(_, children) {
       return <div>{children}</div>;
     },
     onText(text) {

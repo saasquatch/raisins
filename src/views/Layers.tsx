@@ -1,13 +1,11 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
-import * as DOMHandler from 'domhandler';
-// import domutils from 'domutils';
-import { getParent, NodeVisitor, visit } from '../util';
+import { getAncestry, getParent, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
-import { RaisinNode } from '../model/RaisinNode';
-import { attributesToProps } from '../attributesToProps';
+import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
+// import { attributesToProps } from '../attributesToProps';
 
 const Layer = css`
   position: relative;
@@ -99,7 +97,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
 
   const ElementVisitor: NodeVisitor<VNode> = {
     onText: () => undefined,
-    onElement(element, children) {
+    onElement(element, _) {
       const dragStyle = element === model.dragCoords?.element ? { transform: 'translate(' + model.dragCoords.x + 'px, ' + model.dragCoords.y + 'px)' } : {};
 
       const meta = model.getComponentMeta(element);
@@ -115,7 +113,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           <button onClick={() => model.moveDown(element)}>↓</button>
         </span>
       );
-      const hasChildren = children?.length > 0;
+      // const hasChildren = children?.length > 0;
       const nodeWithSlots = getSlots(element);
       const dropNode = model.dropTarget?.from?.model;
       const isDroppable = element === dropNode;
@@ -170,7 +168,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       );
       // return <div></div>
     },
-    onRoot(r, children) {
+    onRoot(_, children) {
       return <div>{children}</div>;
       // return (
       //   children
@@ -194,13 +192,10 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
 };
 
 function DepthLabel(props: { node: RaisinNode; model: Model }, children: VNode[]): VNode {
-  const parent = getParent(props.model.node, props.node);
+  const parents = getAncestry(props.model.node, props.node);
   if (parent) {
-    return (
-      <DepthLabel node={parent} model={props.model}>
-        {(props.node as DOMHandler.Element).tagName} &gt; {children}
-      </DepthLabel>
-    );
+    const str = parents.map(n => (n as RaisinElementNode).tagName).join('&gt;');
+    return <span>{str}</span>;
   }
 
   return <div>{children}</div>;

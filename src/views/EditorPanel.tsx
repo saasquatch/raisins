@@ -1,12 +1,12 @@
 import { h } from '@stencil/core';
 import { ElementType } from 'domelementtype';
-import { Element } from 'domhandler';
 import { Model } from '../model/Dom';
+import { RaisinElementNode } from '../model/RaisinNode';
 import { AttributesEditor } from './AttributeEditor';
 
 export function EditorPanel(props: Model) {
   if (props.selected?.type === ElementType.Tag) {
-    const element = props.selected as Element;
+    const element = props.selected as RaisinElementNode;
 
     return <AttributesEditor node={element} model={props} />;
   }

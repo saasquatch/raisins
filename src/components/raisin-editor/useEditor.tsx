@@ -68,6 +68,7 @@ export function useEditor(): Model {
         undoStack,
         redoStack,
         slots: getSlots(nextCurrent),
+        selected: previous.selected,
       };
       console.log(
         'Undo to',
@@ -93,6 +94,7 @@ export function useEditor(): Model {
         undoStack,
         redoStack,
         slots: getSlots(nextCurrent),
+        selected: previous.selected,
       };
       console.log(
         'Setting to',
@@ -152,9 +154,25 @@ export function useEditor(): Model {
     setNode(clone);
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
-    const clone = replace(state.current, prev, next);
-    // TODO: When a node is selected, they should remain selected
-    setNode(clone);
+    setState(previous => {
+      const nextNode = replace(state.current, prev, next);
+      const undoStack = [previous.current, ...previous.undoStack];
+      const selected = previous.selected === prev ? next : undefined;
+      const newState = {
+        selected,
+        current: nextNode,
+        undoStack,
+        redoStack: [],
+        slots: getSlots(nextNode),
+      };
+      console.log(
+        'Setting to',
+        // serialize(newState.current),
+        // newState.undoStack.map(x => serialize(x)),
+        // newState.redoStack.map(x => serialize(x)),
+      );
+      return newState;
+    });
   }
 
   useEffect(() => {

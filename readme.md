@@ -2,10 +2,11 @@
 
 Likes GrapesJS but more DRY
 
-
-
 ## TODO
 
- -[ ] Attribute editing
- -[ ] Component Model
- -[ ] Adapter pattern so that Editors can be supplied by E.g. React Portal
+- Adapter pattern so that Editors can be supplied by E.g. React Portal
+- Serialization / adapter back to DomHandler
+
+## Bugs
+
+- Typing too fast in the attribute editor makes it blow up
