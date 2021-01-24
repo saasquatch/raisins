@@ -3,12 +3,13 @@ import serialize from 'dom-serializer';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getParent, move, remove, replace } from '../../util';
+import { duplicate, getAncestry, getParent, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
 import { useComponentModel } from './useComponentModel';
 import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
+import { domHandlerToRaisin } from '../../model/DomHandlerToRaisin';
 
 export type InternalState = {
   current: RaisinNode;
@@ -42,7 +43,9 @@ export function useEditor(): Model {
   const host = useHost();
   const initial = useMemo(() => {
     const html = host.querySelectorAll('template')[0].innerHTML;
-    return htmlparser2.parseDocument(html);
+    const DomNode = htmlparser2.parseDocument(html);
+    const raisinNode = domHandlerToRaisin(DomNode);
+    return raisinNode;
   }, []);
 
   // const [selected, setSelected] = useState<RaisinNode>(undefined);
@@ -155,15 +158,31 @@ export function useEditor(): Model {
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
     setState(previous => {
-      const nextNode = replace(state.current, prev, next);
+      const nextRoot = replace(state.current, prev, next);
+
+      const previousAncestry = getAncestry(previous.current, prev);
+      const newAncestry = getAncestry(nextRoot, next);
+      if (previousAncestry.length !== newAncestry.length) {
+        throw new Error("Ancestry shouldn't change during replace");
+      }
+      const selectedIx = previousAncestry.indexOf(previous.selected as RaisinNodeWithChildren);
+      console.log(
+        'Selected index',
+        selectedIx,
+        previousAncestry.map(a => a.type),
+        newAncestry.map(a => a.type),
+        previousAncestry,
+        newAncestry,
+      );
+      const parentSelection = selectedIx ? newAncestry[selectedIx] : previous.selected;
+      const selected = previous.selected === prev ? next : parentSelection;
       const undoStack = [previous.current, ...previous.undoStack];
-      const selected = previous.selected === prev ? next : undefined;
       const newState = {
         selected,
-        current: nextNode,
+        current: nextRoot,
         undoStack,
         redoStack: [],
-        slots: getSlots(nextNode),
+        slots: getSlots(nextRoot),
       };
       console.log(
         'Setting to',
@@ -200,7 +219,7 @@ export function useEditor(): Model {
 
   const slots = getSlots(state.current);
   return {
-    initial: serialize(initial),
+    initial: '', //serialize(initial),
 
     node: state.current,
     slots,

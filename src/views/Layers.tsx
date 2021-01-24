@@ -103,7 +103,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       const meta = model.getComponentMeta(element);
       const name = (
         <span onClick={() => model.setSelected(element)}>
-          <span class={Label}>{meta?.title || element.name}</span>
+          <span class={Label}>{meta?.title || element.tagName}</span>
           <span class={{ [Handle]: true, handle: true }}>[=]</span>
 
           <button onClick={() => model.duplicateNode(element)}>+</button>

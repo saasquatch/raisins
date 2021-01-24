@@ -12,11 +12,6 @@ type DataNodesTypes = ElementType.Comment | ElementType.Text | ElementType.Direc
 export interface DataNode<T extends DataNodesTypes = DataNodesTypes> extends RaisinNode<T> {
   type: T;
   data: string;
-  /**
-   * @param type The type of the node
-   * @param data The content of the data node
-   */
-  nodeValue: string;
 }
 
 export interface RaisinTextNode extends DataNode<ElementType.Text> {}
@@ -40,20 +35,9 @@ export interface RaisinDocumentNode extends RaisinNodeWithChildren<ElementType.R
   'x-mode'?: 'no-quirks' | 'quirks' | 'limited-quirks';
 }
 
-export interface Attribute {
-  name: string;
-  value: string;
-  namespace?: string;
-  prefix?: string;
-}
-
 export interface RaisinElementNode extends RaisinNodeWithChildren<ElementType.Tag | ElementType.Script | ElementType.Style> {
-  'name': string;
-  'attribs': {
+  attribs: {
     [name: string]: string;
   };
-  'tagName': string;
-  'attributes': Attribute[];
-  'x-attribsNamespace'?: Record<string, string>;
-  'x-attribsPrefix'?: Record<string, string>;
+  tagName: string;
 }

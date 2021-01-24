@@ -30,7 +30,7 @@ export function getParent(root: RaisinNode, child: RaisinNode): RaisinNodeWithCh
   }
 }
 
-export function visit<T>(node: RaisinNode, visitor: NodeVisitor<T>, recursive: boolean = true): T {
+export function visit<T = unknown>(node: RaisinNode, visitor: NodeVisitor<T>, recursive: boolean = true): T {
   let result: T;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
@@ -268,19 +268,20 @@ function flatDeep<T>(arr: any, d = 1): T[] {
  * Returns an array of parents, with the first element being the parent, and then their ancestors
  */
 export function getAncestry(root: RaisinNode, node: RaisinNode): RaisinNodeWithChildren[] {
-  function addToAncestry(n: RaisinNodeWithChildren, children: RaisinNodeWithChildren[]) {
-    if (n.children.indexOf(node)) {
+  function addToAncestry(n: RaisinNodeWithChildren, children: RaisinNodeWithChildren[][]) {
+    if (n.children?.indexOf(node) >= 0) {
       // First parent
       return [n];
     }
-    if (children && children.some(x => x)) {
+    const nonNull = children?.reduce((a, c) => [...a, ...c], []).filter(x => x);
+    if (nonNull?.length >= 0) {
       // Grand parent
-      return [...children.filter(x => x), n];
+      return [...nonNull, n];
     }
     // Not in ancestry
     return undefined;
   }
-  return visit(root, {
+  return visit<RaisinNodeWithChildren[]>(root, {
     onText: () => undefined,
     onDirective: () => undefined,
     onComment: () => undefined,
