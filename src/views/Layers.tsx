@@ -194,7 +194,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
 function DepthLabel(props: { node: RaisinNode; model: Model }, children: VNode[]): VNode {
   const parents = getAncestry(props.model.node, props.node);
   if (parent) {
-    const str = parents.map(n => (n as RaisinElementNode).tagName).join('&gt;');
+    const str = parents.map(n => (n as RaisinElementNode).tagName).join(' > ');
     return <span>{str}</span>;
   }
 

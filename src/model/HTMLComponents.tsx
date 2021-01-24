@@ -46,7 +46,7 @@ export const A: ComponentType = {
 // 'dialog',
 // 'div',
 export const DIV: ComponentType = {
-  title: 'Div',
+  title: 'Block',
   tagName: 'div',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
 };
@@ -147,6 +147,11 @@ export const P: ComponentType = {
 // 'small',
 // 'source',
 // 'span',
+export const SPAN: ComponentType = {
+  title: 'Text (span)',
+  tagName: 'span',
+  childTags: ['span'],
+};
 // 'strong',
 // 'style',
 // 'sub',
