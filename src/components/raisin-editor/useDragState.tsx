@@ -5,15 +5,15 @@ import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { moveTargetRelative } from './useEditor';
 import { DropState, Location } from '../../model/DropState';
-import { move } from '../../util';
+import { getParent, move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
 import { css } from '@emotion/css';
-import drop from '@interactjs/actions/drop/plugin';
+import { RaisinNode } from '../../model/RaisinNode';
 
-type Props = { node: DOMHandler.Node; setNode: StateUpdater<DOMHandler.Node> };
+type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode> };
 
 export function useDND(props: Props) {
-  const elementToNode = useRef(new WeakMap<HTMLElement, DOMHandler.Node>()).current;
+  const elementToNode = useRef(new WeakMap<HTMLElement, RaisinNode>()).current;
   const elementToInteract = useRef(new WeakMap<HTMLElement, Interactable>()).current;
 
   const sharedState = {
@@ -29,7 +29,7 @@ export function useDND(props: Props) {
 }
 
 type SharedState = {
-  elementToNode: WeakMap<HTMLElement, DOMHandler.Node>;
+  elementToNode: WeakMap<HTMLElement, RaisinNode>;
   elementToInteract: WeakMap<HTMLElement, Interactable>;
   props: Props;
 };
@@ -37,7 +37,7 @@ type SharedState = {
 function useDragState(sharedState: SharedState) {
   const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
 
-  function createDraggable(element: HTMLElement, node: DOMHandler.Node) {
+  function createDraggable(element: HTMLElement, node: RaisinNode) {
     const handle = element.querySelector('.handle');
     const interactable = interact(element)
       .styleCursor(false)
@@ -65,7 +65,7 @@ function useDragState(sharedState: SharedState) {
             // removeNode(node);
             console.log('Drag end', event);
             event.target.style.opacity = 1;
-            event.target.style.zIndex = "";
+            event.target.style.zIndex = '';
 
             // var textEl = event.target.querySelector('p');
             setDragCoords(prev => {
@@ -124,15 +124,16 @@ export function useDropState(sharedState: SharedState) {
 
   function getLocation(element: HTMLElement): Location {
     const node = sharedState.elementToNode.get(element);
+    const parent = getParent(sharedState.props.node, node);
     return {
       model: node,
       DOM: element,
-      idx: node.parent.children.indexOf(node),
+      idx: parent.children.indexOf(node),
       slot: (node as DOMHandler.Element).attribs?.slot,
     };
   }
 
-  const setDroppableRef = useDragRefs(sharedState, (element, node, idx: number, slot:string) => {
+  const setDroppableRef = useDragRefs(sharedState, (element, node, idx: number, slot: string) => {
     return interact(element).dropzone({
       // // only accept elements matching this CSS selector
       // accept: '*',
@@ -154,8 +155,8 @@ export function useDropState(sharedState: SharedState) {
             model: dropzone,
             DOM: event.target,
             idx,
-            slot
-          }
+            slot,
+          },
         });
         console.log('Possible drop', event.target);
       },
@@ -202,8 +203,8 @@ export function useDropState(sharedState: SharedState) {
   return { setDroppableRef, dropTarget, isDragActive };
 }
 
-function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: DOMHandler.Node, ...args: unknown[]) => Interactable) {
-  const setDraggableRef = (node: DOMHandler.Node, element: HTMLElement, ...args: unknown[]) => {
+function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: RaisinNode, ...args: unknown[]) => Interactable) {
+  const setDraggableRef = (node: RaisinNode, element: HTMLElement, ...args: unknown[]) => {
     // Don't care about refs being nulled out
     if (!element) return;
 

@@ -1,4 +1,4 @@
-import { Node } from 'domhandler';
+import { RaisinNode } from './RaisinNode';
 
 export type DropState = PossibleDrop;
 
@@ -7,7 +7,7 @@ export type Location = {
 } & ModelLocation;
 
 export type ModelLocation = {
-  model: Node;
+  model: RaisinNode;
   idx: number;
   slot: string;
 };

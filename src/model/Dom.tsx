@@ -1,30 +1,30 @@
-import * as DOMHandler from 'domhandler';
+import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
+import { RaisinNode } from './RaisinNode';
 
 export type Model = {
-  node: DOMHandler.Node;
+  node: RaisinNode;
   slots: NodeWithSlots;
   initial: string;
 
-  getId(node: DOMHandler.Node): string;
+  getId(node: RaisinNode): string;
 
   /*
    * Interactions
    */
-  selected?: DOMHandler.Node;
-  setSelected(node: DOMHandler.Node): void;
+  selected?: RaisinNode;
+  setSelected(node: RaisinNode): void;
 
   /*
    * Mutations
    */
-  setState: StateUpdater<DOMHandler.Node>;
-  duplicateNode(node: DOMHandler.Node): void;
-  removeNode(node: DOMHandler.Node): void;
-  moveUp(node: DOMHandler.Node): void;
-  moveDown(node: DOMHandler.Node): void;
-  replaceNode(prev: DOMHandler.Node, next: DOMHandler.Node): void;
+  duplicateNode(node: RaisinNode): void;
+  removeNode(node: RaisinNode): void;
+  moveUp(node: RaisinNode): void;
+  moveDown(node: RaisinNode): void;
+  replaceNode(prev: RaisinNode, next: RaisinNode): void;
 
   /*
    * History management
@@ -37,16 +37,17 @@ export type Model = {
   /*
    * Drag and drop
    */
-  setDraggableRef(node: DOMHandler.Node, element: HTMLElement): void;
-  setDroppableRef(node: DOMHandler.Node, element: HTMLElement, idx:number, slot:string): void;
+  setDraggableRef(node: RaisinNode, element: HTMLElement): void;
+  setDroppableRef(node: RaisinNode, element: HTMLElement, idx: number, slot: string): void;
   dragCoords: DragCoords;
   dropTarget?: DropState;
   isDragActive: boolean;
-  elementToNode: WeakMap<HTMLElement, DOMHandler.Node>;
-} & ReturnType<typeof useInlinedHTML>;
+  elementToNode: WeakMap<HTMLElement, RaisinNode>;
+} & ReturnType<typeof useInlinedHTML> &
+  ReturnType<typeof useComponentModel>;
 
 export type NodeWithSlots = {
-  node: DOMHandler.Node;
+  node: RaisinNode;
   slots?: NamedSlot[];
 };
 

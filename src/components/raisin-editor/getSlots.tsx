@@ -1,12 +1,12 @@
 import { DefaultSlot, NodeWithSlots } from '../../model/Dom';
-import * as DOMHandler from 'domhandler';
 import { visit } from '../../util';
+import { RaisinNode } from '../../model/RaisinNode';
 
-export function getSlots(node: DOMHandler.Node) {
-  const noSlots = (node: DOMHandler.Node) => ({
+export function getSlots(node: RaisinNode) {
+  const noSlots = (node: RaisinNode) => ({
     node,
   });
-  const noSlotsWChildren = (node: DOMHandler.Node, children: NodeWithSlots[]) => ({
+  const noSlotsWChildren = (node: RaisinNode, children: NodeWithSlots[]) => ({
     node,
     slots: [
       {

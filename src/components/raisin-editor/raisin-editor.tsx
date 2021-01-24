@@ -7,6 +7,8 @@ import { withHooks } from '@saasquatch/stencil-hooks';
 import { ToolbarView } from '../../views/Toolbar';
 import { css } from '@emotion/css';
 import { useEditor } from './useEditor';
+import { AttributesEditor } from '../../views/AttributeEditor';
+import { EditorPanel } from '../../views/EditorPanel';
 
 const Row = css`
   display: flex;
@@ -34,7 +36,7 @@ export class Editor {
   render() {
     const model: Model = useEditor();
 
-    const serialized = serialize(model.node);
+    // const serialized = serialize(model.node);
     // console.log("Top-level render", new Date())
     return (
       <div>
@@ -47,14 +49,16 @@ export class Editor {
           <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
             {' '}
             <Layers {...model} />
+            <h1>Editor</h1>
+            <EditorPanel {...model} />
             <h1>Input</h1>
             <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
-            <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre>
+            {/* <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre> */}
           </div>
         </div>
 
-        <slot/>
+        <slot />
       </div>
     );
   }

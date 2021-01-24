@@ -2,12 +2,12 @@ import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
 import * as DOMHandler from 'domhandler';
 // import domutils from 'domutils';
-import { NodeVisitor, visit } from '../util';
+import { getParent, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
-import { NodeWithChildren } from 'domhandler';
-import { nodeContains } from '@interactjs/utils/domUtils';
+import { RaisinNode } from '../model/RaisinNode';
+import { attributesToProps } from '../attributesToProps';
 
 const Layer = css`
   position: relative;
@@ -82,7 +82,7 @@ const DropLabel = css`
   color: white;
 `;
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
-  function DropSlot(props: { node: DOMHandler.Node; idx: number; slot: string }) {
+  function DropSlot(props: { node: RaisinNode; idx: number; slot: string }) {
     const claz = {
       [DropTarget]: !model.isDragActive,
       [PossibleDropTarget]: model.isDragActive,
@@ -101,9 +101,11 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     onText: () => undefined,
     onElement(element, children) {
       const dragStyle = element === model.dragCoords?.element ? { transform: 'translate(' + model.dragCoords.x + 'px, ' + model.dragCoords.y + 'px)' } : {};
+
+      const meta = model.getComponentMeta(element);
       const name = (
         <span onClick={() => model.setSelected(element)}>
-          <span class={Label}>{element.name}</span>
+          <span class={Label}>{meta?.title || element.name}</span>
           <span class={{ [Handle]: true, handle: true }}>[=]</span>
 
           <button onClick={() => model.duplicateNode(element)}>+</button>
@@ -133,7 +135,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
         >
           {isDroppable && (
             <div class={DropLabel}>
-              <DepthLabel node={model.dropTarget.to.model}>
+              <DepthLabel node={model.dropTarget.to.model} model={model}>
                 slot {model.dropTarget.to.slot} at {model.dropTarget.to.idx}
               </DepthLabel>
             </div>
@@ -191,10 +193,11 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
   );
 };
 
-function DepthLabel(props: { node: DOMHandler.Node }, children: VNode[]): VNode {
-  if (props.node.parent) {
+function DepthLabel(props: { node: RaisinNode; model: Model }, children: VNode[]): VNode {
+  const parent = getParent(props.model.node, props.node);
+  if (parent) {
     return (
-      <DepthLabel node={props.node.parent}>
+      <DepthLabel node={parent} model={props.model}>
         {(props.node as DOMHandler.Element).tagName} &gt; {children}
       </DepthLabel>
     );

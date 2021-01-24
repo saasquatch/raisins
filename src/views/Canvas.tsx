@@ -3,7 +3,6 @@ import { Model } from '../model/Dom';
 import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
-import { getId } from '../components/raisin-editor/useEditor';
 import * as DOMHandler from 'domhandler';
 import styleToObject from 'style-to-object';
 import HTML from '../components/example';
@@ -40,7 +39,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
     onRoot(root, children) {
       return <div>{children}</div>;
     },
-    onText(text: DOMHandler.Text) {
+    onText(text) {
       const textValue = text.data;
       // if ((props.selected === text || props.selected === text.parent) && !isBlank(textValue)) {
       return (
@@ -48,8 +47,10 @@ export const Canvas: FunctionalComponent<Model> = props => {
           value={textValue}
           onInput={e => {
             const newText = (e.target as HTMLInputElement).value as string;
-            const newNode = text.cloneNode() as DOMHandler.Text;
-            newNode.data = newText;
+            const newNode = {
+              ...text,
+              data: newText,
+            };
             props.replaceNode(text, newNode);
           }}
         />
@@ -101,10 +102,13 @@ export const Canvas: FunctionalComponent<Model> = props => {
             <textarea>
               {
                 // @ts-ignore
-                serialize(element.children)
+                // TODO: Convert from RaisinNode to DOMHandler.Node
+                // serialize(element.children)
               }
             </textarea>
-            <style innerHTML={serialize(element.children)} />;
+            {/* 
+                // TODO: Convert from RaisinNode to DOMHandler.Node
+            <style innerHTML={serialize(element.children)} />; */}
           </div>
         );
       }

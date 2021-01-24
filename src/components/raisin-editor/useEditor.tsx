@@ -1,33 +1,34 @@
 import htmlparser2 from 'htmlparser2';
 import serialize from 'dom-serializer';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
-import * as DOMHandler from 'domhandler';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, move, remove, replace } from '../../util';
+import { duplicate, getParent, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
+import { useComponentModel } from './useComponentModel';
+import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 
 export type InternalState = {
-  immutableCopy: DOMHandler.Node;
-  current: DOMHandler.Node;
+  current: RaisinNode;
   slots: NodeWithSlots;
-  undoStack: DOMHandler.Node[];
-  redoStack: DOMHandler.Node[];
+  undoStack: RaisinNode[];
+  redoStack: RaisinNode[];
+  selected?: RaisinNode;
 };
 
 export type DraggableState = Map<
-  DOMHandler.Node,
+  RaisinNode,
   {
     element?: HTMLElement;
     handle?: HTMLElement;
   }
 >;
 
-const nodeToId = new WeakMap<DOMHandler.Node, string>();
+const nodeToId = new WeakMap<RaisinNode, string>();
 
-export function getId(node: DOMHandler.Node): string {
+export function getId(node: RaisinNode): string {
   const existing = nodeToId.get(node);
   if (existing) {
     return existing;
@@ -44,12 +45,11 @@ export function useEditor(): Model {
     return htmlparser2.parseDocument(html);
   }, []);
 
-  const [selected, setSelected] = useState<DOMHandler.Node>(undefined);
+  // const [selected, setSelected] = useState<RaisinNode>(undefined);
   const [state, setState] = useState<InternalState>({
     redoStack: [],
     undoStack: [],
     current: initial,
-    immutableCopy: initial.cloneNode(true),
     slots: getSlots(initial),
   });
 
@@ -60,21 +60,20 @@ export function useEditor(): Model {
         return previous;
       }
       const [current, ...undoStack] = previous.undoStack;
-      const redoStack = [previous.immutableCopy, ...previous.redoStack];
+      const redoStack = [previous.current, ...previous.redoStack];
 
-      const nextCurrent = current.cloneNode(true);
+      const nextCurrent = current;
       const newState = {
         current: nextCurrent,
-        immutableCopy: current.cloneNode(true),
         undoStack,
         redoStack,
         slots: getSlots(nextCurrent),
       };
       console.log(
         'Undo to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
+        // serialize(newState.current),
+        // newState.undoStack.map(x => serialize(x)),
+        // newState.redoStack.map(x => serialize(x)),
       );
       return newState;
     });
@@ -85,65 +84,74 @@ export function useEditor(): Model {
         return previous;
       }
       const [current, ...redoStack] = previous.redoStack;
-      const undoStack = [previous.immutableCopy, ...previous.undoStack];
+      const undoStack = [previous.current, ...previous.undoStack];
 
-      const nextCurrent = current.cloneNode(true);
+      const nextCurrent = current;
       const newState = {
         current: nextCurrent,
-        immutableCopy: current.cloneNode(true),
+        immutableCopy: current,
         undoStack,
         redoStack,
         slots: getSlots(nextCurrent),
       };
       console.log(
         'Setting to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
+        // serialize(newState.current),
+        // newState.undoStack.map(x => serialize(x)),
+        // newState.redoStack.map(x => serialize(x)),
       );
       return newState;
     });
 
-  const setNode: StateUpdater<DOMHandler.Node> = next => {
+  const setSelected = (next: RaisinNode) => {
+    setState(prev => {
+      return {
+        ...prev,
+        selected: next,
+      };
+    });
+  };
+  const setNode: StateUpdater<RaisinNode> = next => {
     setState(previous => {
-      const immutableCopy = typeof next === 'function' ? next(previous.current).cloneNode(true) : next.cloneNode(true);
-      const undoStack = [previous.immutableCopy, ...previous.undoStack];
+      const nextNode = typeof next === 'function' ? next(previous.current) : next;
+      const undoStack = [previous.current, ...previous.undoStack];
       const newState = {
-        current: immutableCopy,
-        immutableCopy,
+        current: nextNode,
         undoStack,
         redoStack: [],
-        slots: getSlots(immutableCopy),
+        slots: getSlots(nextNode),
       };
       console.log(
         'Setting to',
-        serialize(newState.current),
-        newState.undoStack.map(x => serialize(x)),
-        newState.redoStack.map(x => serialize(x)),
+        // serialize(newState.current),
+        // newState.undoStack.map(x => serialize(x)),
+        // newState.redoStack.map(x => serialize(x)),
       );
       return newState;
     });
   };
 
-  function removeNode(n: DOMHandler.Node) {
+  function removeNode(n: RaisinNode) {
     const clone = remove(state.current, n);
     setNode(clone);
   }
-  function duplicateNode(n: DOMHandler.Node) {
+  function duplicateNode(n: RaisinNode) {
     const clone = duplicate(state.current, n);
     setNode(clone);
   }
-  function moveUp(n: DOMHandler.Node) {
-    const currentIdx = n.parent.children.indexOf(n);
-    const clone = move(state.current, n, n.parent, currentIdx - 1);
+  function moveUp(n: RaisinNode) {
+    const parent = getParent(state.current, n);
+    const currentIdx = parent.children.indexOf(n);
+    const clone = move(state.current, n, parent, currentIdx - 1);
     setNode(clone);
   }
-  function moveDown(n: DOMHandler.Node) {
-    const currentIdx = n.parent.children.indexOf(n);
-    const clone = move(state.current, n, n.parent, currentIdx + 1);
+  function moveDown(n: RaisinNode) {
+    const parent = getParent(state.current, n);
+    const currentIdx = parent.children.indexOf(n);
+    const clone = move(state.current, n, parent, currentIdx + 1);
     setNode(clone);
   }
-  function replaceNode(prev: DOMHandler.Node, next: DOMHandler.NodeWithChildren) {
+  function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
     const clone = replace(state.current, prev, next);
     // TODO: When a node is selected, they should remain selected
     setNode(clone);
@@ -164,8 +172,8 @@ export function useEditor(): Model {
         case 'backspace':
         case 'delete':
           event.preventDefault();
-          if (selected) {
-            removeNode(selected);
+          if (state.selected) {
+            removeNode(state.selected);
           }
         default:
       }
@@ -180,10 +188,9 @@ export function useEditor(): Model {
     slots,
     getId,
 
-    selected,
+    selected: state.selected,
     setSelected,
 
-    setState: setNode,
     removeNode,
     duplicateNode,
     moveDown,
@@ -195,6 +202,7 @@ export function useEditor(): Model {
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
 
+    ...useComponentModel(),
     ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode }),
   };

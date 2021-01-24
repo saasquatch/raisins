@@ -1,7 +1,7 @@
-import { Node } from "domhandler";
+import { RaisinNode } from './RaisinNode';
 
 export type DragCoords = {
-  element: Node;
+  element: RaisinNode;
   x: number;
   y: number;
 };
