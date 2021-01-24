@@ -9,4 +9,4 @@ Likes GrapesJS but more DRY
 
 ## Bugs
 
-- Typing too fast in the attribute editor makes it blow up
+- Typing too fast in the attribute editor OR the canvas does not register all input. It only gets the last one. This is likely performance-related, since stencil starter and react don't have the same problem. To reproduce press 4 keys at the exact same time. Only one of the keys will register. Also if you type quickly in the middle of a text input, the selection will jump to the end.

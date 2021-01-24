@@ -158,7 +158,7 @@ export function useEditor(): Model {
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
     setState(previous => {
-      const nextRoot = replace(state.current, prev, next);
+      const nextRoot = replace(previous.current, prev, next);
 
       const previousAncestry = getAncestry(previous.current, prev);
       const newAncestry = getAncestry(nextRoot, next);
