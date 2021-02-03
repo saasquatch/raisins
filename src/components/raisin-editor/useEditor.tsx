@@ -10,6 +10,7 @@ import { useInlinedHTML } from './useInlinedHTML';
 import { useComponentModel } from './useComponentModel';
 import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 import { domHandlerToRaisin } from '../../model/DomHandlerToRaisin';
+import serializer from '../../model/serializer';
 
 export type InternalState = {
   current: RaisinNode;
@@ -219,7 +220,7 @@ export function useEditor(): Model {
 
   const slots = getSlots(state.current);
   return {
-    initial: '', //serialize(initial),
+    initial: serializer(initial),
 
     node: state.current,
     slots,

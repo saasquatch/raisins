@@ -1,5 +1,4 @@
 import { Component, h } from '@stencil/core';
-import serialize from 'dom-serializer';
 import { Model } from '../../model/Dom';
 import { Canvas } from '../../views/Canvas';
 import { Layers } from '../../views/Layers';
@@ -7,8 +6,8 @@ import { withHooks } from '@saasquatch/stencil-hooks';
 import { ToolbarView } from '../../views/Toolbar';
 import { css } from '@emotion/css';
 import { useEditor } from './useEditor';
-import { AttributesEditor } from '../../views/AttributeEditor';
 import { EditorPanel } from '../../views/EditorPanel';
+import serializer from '../../model/serializer';
 
 const Row = css`
   display: flex;
@@ -36,7 +35,7 @@ export class Editor {
   render() {
     const model: Model = useEditor();
 
-    // const serialized = serialize(model.node);
+    const serialized = serializer(model.node);
     // console.log("Top-level render", new Date())
     return (
       <div>
@@ -54,7 +53,7 @@ export class Editor {
             <h1>Input</h1>
             <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
-            {/* <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre> */}
+            <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre>
           </div>
         </div>
 

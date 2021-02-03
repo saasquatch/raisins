@@ -1,6 +1,28 @@
 import { ElementType } from 'domelementtype';
-
 import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './model/RaisinNode';
+
+/**
+ * Provides a WeakMap for parent lookups
+ *
+ * @param root
+ */
+export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWithChildren> {
+  const map = new WeakMap<RaisinNode, RaisinNodeWithChildren>();
+  function storeParent(elem: RaisinNodeWithChildren, children?: RaisinNode[]) {
+    children.forEach(c => map.set(c, elem));
+    return elem;
+  }
+
+  visit(root, {
+    onCData: storeParent,
+    onElement: storeParent,
+    onRoot: storeParent,
+    onComment: n => n,
+    onDirective: n => n,
+    onText: n => n,
+  });
+  return map;
+}
 
 export function getParent(root: RaisinNode, child: RaisinNode): RaisinNodeWithChildren {
   switch (root.type) {
