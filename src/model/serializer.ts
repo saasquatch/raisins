@@ -1,7 +1,7 @@
 import { getParents, visit } from '../util';
 
 import { encodeXML } from 'entities';
-import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
+import { RaisinCommentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
 import { elementNames, attributeNames } from 'dom-serializer/lib/foreignNames';
 import type { DomSerializerOptions } from 'dom-serializer';
 

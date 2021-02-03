@@ -172,48 +172,38 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
   return freeze(nodes[0]);
 }
 
-export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode): RaisinNode {
+export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode, callback?: ReplacementCallback): RaisinNode {
   function swap(n: RaisinNode): RaisinNode {
     if (n === previous) {
+      callback && callback(n, next);
       return next;
     }
     return n;
+  }
+
+  function swapWithChildren(el: RaisinNodeWithChildren, children?: RaisinNode[]) {
+    if (el === previous) {
+      callback && callback(el, next);
+      return next;
+    }
+    if (el.children !== children) {
+      const replacement = {
+        ...el,
+        children,
+      };
+      callback && callback(el, replacement);
+      return replacement;
+    }
+    return el;
   }
 
   return visit(root, {
     onText: swap,
     onComment: swap,
     onDirective: swap,
-    onCData(el, children) {
-      if (el === previous) return next;
-      if (el.children !== children) {
-        return {
-          ...el,
-          children,
-        };
-      }
-      return el;
-    },
-    onElement(el, children) {
-      if (el === previous) return next;
-      if (el.children !== children) {
-        return {
-          ...el,
-          children,
-        };
-      }
-      return el;
-    },
-    onRoot(el, children) {
-      if (el === previous) return next;
-      if (el.children !== children) {
-        return {
-          ...el,
-          children,
-        };
-      }
-      return el;
-    },
+    onCData: swapWithChildren,
+    onElement: swapWithChildren,
+    onRoot: swapWithChildren,
   });
 }
 
@@ -290,26 +280,18 @@ function flatDeep<T>(arr: any, d = 1): T[] {
  * Returns an array of parents, with the first element being the parent, and then their ancestors
  */
 export function getAncestry(root: RaisinNode, node: RaisinNode): RaisinNodeWithChildren[] {
-  function addToAncestry(n: RaisinNodeWithChildren, children: RaisinNodeWithChildren[][]) {
-    if (n.children?.indexOf(node) >= 0) {
-      // First parent
-      return [n];
+  const parents = getParents(root);
+  const ancestry: RaisinNodeWithChildren[] = [];
+  let current = node;
+  while (true) {
+    let parent = parents.get(current);
+    if (parent === undefined) {
+      break;
     }
-    const nonNull = children?.reduce((a, c) => [...a, ...c], []).filter(x => x);
-    if (nonNull?.length >= 0) {
-      // Grand parent
-      return [...nonNull, n];
-    }
-    // Not in ancestry
-    return undefined;
+    ancestry.push(parent);
+    current = parent;
   }
-  return visit<RaisinNodeWithChildren[]>(root, {
-    onText: () => undefined,
-    onDirective: () => undefined,
-    onComment: () => undefined,
-
-    onCData: addToAncestry,
-    onElement: addToAncestry,
-    onRoot: addToAncestry,
-  });
+  return [...ancestry];
 }
+
+type ReplacementCallback = (prev: RaisinNode, next: RaisinNode) => void;

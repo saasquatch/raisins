@@ -3,7 +3,6 @@ import { State, useRef, useState } from '@saasquatch/stencil-hooks';
 import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
-import { moveTargetRelative } from './useEditor';
 import { DropState, Location } from '../../model/DropState';
 import { getParent, move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
@@ -78,7 +77,7 @@ function useDragState(sharedState: SharedState) {
               }
             });
             // textEl && (textEl.textContent = 'moved a distance of ' + Math.sqrt((Math.pow(event.pageX - event.x0, 2) + Math.pow(event.pageY - event.y0, 2)) | 0).toFixed(2) + 'px');
-            moveTargetRelative(event.target, 0, 0);
+            // moveTargetRelative(event.target, 0, 0);
           },
         },
       });

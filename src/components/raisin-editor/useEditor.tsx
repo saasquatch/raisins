@@ -1,9 +1,8 @@
 import htmlparser2 from 'htmlparser2';
-import serialize from 'dom-serializer';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getAncestry, getParent, move, remove, replace } from '../../util';
+import { duplicate, getAncestry, getParent, getParents, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
@@ -159,38 +158,21 @@ export function useEditor(): Model {
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
     setState(previous => {
-      const nextRoot = replace(previous.current, prev, next);
+      let newSelection: RaisinNode;
+      const nextRoot = replace(previous.current, prev, next, (old, replacement) => {
+        if (old === previous.selected) {
+          newSelection = replacement;
+        }
+      });
 
-      const previousAncestry = getAncestry(previous.current, prev);
-      const newAncestry = getAncestry(nextRoot, next);
-      if (previousAncestry.length !== newAncestry.length) {
-        throw new Error("Ancestry shouldn't change during replace");
-      }
-      const selectedIx = previousAncestry.indexOf(previous.selected as RaisinNodeWithChildren);
-      console.log(
-        'Selected index',
-        selectedIx,
-        previousAncestry.map(a => a.type),
-        newAncestry.map(a => a.type),
-        previousAncestry,
-        newAncestry,
-      );
-      const parentSelection = selectedIx ? newAncestry[selectedIx] : previous.selected;
-      const selected = previous.selected === prev ? next : parentSelection;
       const undoStack = [previous.current, ...previous.undoStack];
       const newState = {
-        selected,
+        selected: newSelection,
         current: nextRoot,
         undoStack,
         redoStack: [],
         slots: getSlots(nextRoot),
       };
-      console.log(
-        'Setting to',
-        // serialize(newState.current),
-        // newState.undoStack.map(x => serialize(x)),
-        // newState.redoStack.map(x => serialize(x)),
-      );
       return newState;
     });
   }
@@ -218,11 +200,13 @@ export function useEditor(): Model {
     });
   }, []);
 
+  const parents = useMemo(() => getParents(state.current), [state.current]);
   const slots = getSlots(state.current);
   return {
     initial: serializer(initial),
 
     node: state.current,
+    parents,
     slots,
     getId,
 
@@ -244,12 +228,4 @@ export function useEditor(): Model {
     ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode }),
   };
-}
-
-export function moveTargetRelative(target: any, x: any, y: any) {
-  // target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-  // // update the posiion attributes
-  // target.setAttribute('data-x', x);
-  // target.setAttribute('data-y', y);
-  // TODO: Surface state so that stencil to handle the transforms?
 }

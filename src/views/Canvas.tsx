@@ -4,6 +4,7 @@ import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
 import styleToObject from 'style-to-object';
+import { elementNames } from 'dom-serializer/lib/foreignNames';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -18,13 +19,35 @@ const content = css`
   padding: 20px;
 `;
 
+const SelectedTooltip = css`
+  &::before {
+    content: attr(data-tagname);
+    position: absolute;
+    color: #fff;
+    background: blue;
+    top: -20px;
+    height: 20px;
+    z-index: 9;
+  }
+`;
+
 const Selected = css`
   outline: 1px solid red;
 `;
 
 const Selectable = css`
+  position: relative;
   &:hover {
     outline: 1px solid blue;
+  }
+  &:hover::before {
+    content: attr(data-tagname);
+    position: absolute;
+    color: #fff;
+    background: blue;
+    top: -20px;
+    height: 20px;
+    z-index: 9;
   }
 `;
 
@@ -39,23 +62,24 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
     onText(text) {
       const textValue = text.data;
-      // if ((props.selected === text || props.selected === text.parent) && !isBlank(textValue)) {
-      return (
-        <input
-          value={textValue}
-          onInput={e => {
-            const newText = (e.target as HTMLInputElement).value as string;
-            const newNode = {
-              ...text,
-              data: newText,
-            };
-            props.replaceNode(text, newNode);
-          }}
-        />
-      );
-      // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
-      // }
-      // return textValue;
+      const parent = props.parents.get(text);
+      if (props.selected === text || props.selected === parent) {
+        return (
+          <input
+            value={textValue}
+            onInput={e => {
+              const newText = (e.target as HTMLInputElement).value as string;
+              const newNode = {
+                ...text,
+                data: newText,
+              };
+              props.replaceNode(text, newNode);
+            }}
+          />
+        );
+        // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
+      }
+      return textValue;
     },
     onElement(element, children) {
       const claz = element === props.selected ? Selected : Selectable;
@@ -66,8 +90,9 @@ export const Canvas: FunctionalComponent<Model> = props => {
         props.setSelected(element);
       };
       const innerProps = {
-        class: claz + ' ' + element.attribs.class,
+        'class': claz + ' ' + element.attribs.class,
         onClick,
+        'data-tagname': element.tagName,
         // Don't use -- element changes evey time!
         // key: getId(element),
       };

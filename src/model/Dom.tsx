@@ -2,10 +2,11 @@ import { useComponentModel } from '../components/raisin-editor/useComponentModel
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
-import { RaisinNode } from './RaisinNode';
+import { RaisinNode, RaisinNodeWithChildren } from './RaisinNode';
 
 export type Model = {
   node: RaisinNode;
+  parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
   slots: NodeWithSlots;
   initial: string;
 
