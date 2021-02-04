@@ -2,7 +2,7 @@ import htmlparser2 from 'htmlparser2';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getParent, getParents, move, remove, replace } from '../../util';
+import { duplicate, getParent, getParents, insertAt, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
@@ -156,6 +156,10 @@ export function useEditor(): Model {
     const clone = move(state.current, n, parent, currentIdx + 1);
     setNode(clone);
   }
+  function insertNode(n: RaisinNode, parent: RaisinNodeWithChildren, idx: number) {
+    const clone = insertAt(state.current, n, parent, idx);
+    setNode(clone);
+  }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
     setState(previous => {
       let newSelection: RaisinNode;
@@ -215,6 +219,7 @@ export function useEditor(): Model {
 
     removeNode,
     duplicateNode,
+    insert: insertNode,
     moveDown,
     moveUp,
     replaceNode,

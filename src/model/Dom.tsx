@@ -23,6 +23,7 @@ export type Model = {
    */
   duplicateNode(node: RaisinNode): void;
   removeNode(node: RaisinNode): void;
+  insert(node: RaisinNode, parent: RaisinNode, idx: number): void;
   moveUp(node: RaisinNode): void;
   moveDown(node: RaisinNode): void;
   replaceNode(prev: RaisinNode, next: RaisinNode): void;

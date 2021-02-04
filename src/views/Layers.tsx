@@ -4,9 +4,8 @@ import { getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
-import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
-import { useComponentModel } from '../components/raisin-editor/useComponentModel';
-// import { attributesToProps } from '../attributesToProps';
+import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../model/RaisinNode';
+import { ElementType } from 'domelementtype';
 
 const Layer = css`
   position: relative;
@@ -34,7 +33,8 @@ const Handle = css`
   background: #aaa;
 `;
 const SlotContainer = css`
-  border: 1px dotted #ccc;
+  margin-left: 3px;
+  border: 1px dotted #000;
   display: flex;
 `;
 const SlotName = css`
@@ -81,6 +81,22 @@ const DropLabel = css`
   color: white;
 `;
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
+  function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
+    const claz = {
+      [DropTarget]: !model.isDragActive,
+      [PossibleDropTarget]: model.isDragActive,
+      // [ActiveDropTarget]:  === props.node
+    };
+    const divNode = {
+      type: ElementType.Tag,
+      tagName: 'div',
+      nodeType: 1,
+      attribs: {},
+      children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
+    };
+    return <button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</button>;
+  }
+
   function DropSlot(props: { node: RaisinNode; idx: number; slot: string }) {
     const claz = {
       [DropTarget]: !model.isDragActive,
@@ -149,6 +165,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                       <div class={SlotName}>{s.name}</div>
                       <div class={SlotChildren}>
                         <DropSlot node={element} idx={0} slot={s.key} />
+                        <AddNew node={element} idx={0} slot={s.key} />
                         {s.children
                           .filter(x => x)
                           .map((c, idx) => {

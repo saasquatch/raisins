@@ -172,6 +172,11 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
   return freeze(nodes[0]);
 }
 
+/**
+ * Replaces an element in place in the tree and all it's parents.
+ *
+ * @param callback - used to notify of any changes anywhere in the tree
+ */
 export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode, callback?: ReplacementCallback): RaisinNode {
   function swap(n: RaisinNode): RaisinNode {
     if (n === previous) {
@@ -207,6 +212,11 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
   });
 }
 
+/**
+ * Move a node to be a child of the parent at the given index.
+ *
+ * The node will be removed from it's other location in the tree if it exists.
+ */
 export function move(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, newIdx: number): RaisinNode {
   const cloned = node;
   return freeze(
@@ -221,6 +231,28 @@ export function move(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, 
       },
       onRoot(el, children) {
         const newChildren = el === newParent ? add(children, cloned, newIdx) : children;
+        return { ...el, children: newChildren };
+      },
+    }),
+  );
+}
+
+/**
+ * Inserts a new node as a child of the parent at the specified index.
+ *
+ * When adding new elements make sure they are cloned or fresh elements before inserting them here.
+ *
+ */
+export function insertAt(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, newIdx: number): RaisinNode {
+  return freeze(
+    visit(root, {
+      ...IdentityVisitor,
+      onElement(el, children) {
+        const newChildren = el === newParent ? add(children, node, newIdx) : children;
+        return { ...el, children: newChildren };
+      },
+      onRoot(el, children) {
+        const newChildren = el === newParent ? add(children, node, newIdx) : children;
         return { ...el, children: newChildren };
       },
     }),

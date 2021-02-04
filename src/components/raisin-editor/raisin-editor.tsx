@@ -8,6 +8,7 @@ import { css } from '@emotion/css';
 import { useEditor } from './useEditor';
 import { EditorPanel } from '../../views/EditorPanel';
 import serializer from '../../model/serializer';
+import BlocksList from '../../views/BlocksList';
 
 const Row = css`
   display: flex;
@@ -50,6 +51,7 @@ export class Editor {
             <Layers {...model} />
             <h1>Editor</h1>
             <EditorPanel {...model} />
+            <BlocksList {...model} />
             <h1>Input</h1>
             <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
