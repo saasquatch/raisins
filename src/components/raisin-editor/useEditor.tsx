@@ -2,7 +2,7 @@ import htmlparser2 from 'htmlparser2';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getAncestry, getParent, getParents, move, remove, replace } from '../../util';
+import { duplicate, getParent, getParents, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';

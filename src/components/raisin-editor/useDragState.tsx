@@ -168,7 +168,6 @@ export function useDropState(sharedState: SharedState) {
         setDropTarget(undefined);
       },
 
-      // TODO
       ondrop: function (event) {
         const dropped = sharedState.elementToNode.get(event.relatedTarget);
         const dropzoneNode = sharedState.elementToNode.get(event.target);
@@ -180,6 +179,7 @@ export function useDropState(sharedState: SharedState) {
           console.log('Moving', dropped, 'to', dropzoneNode, 'at idx', position);
           return move(root, dropped, dropzoneNode, position);
         });
+        setDropTarget(undefined);
         // event.relatedTarget.style.background = 'pink';
       },
 

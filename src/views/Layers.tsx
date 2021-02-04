@@ -1,10 +1,11 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
-import { getAncestry, getParent, NodeVisitor, visit } from '../util';
+import { getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
 import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
+import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 // import { attributesToProps } from '../attributesToProps';
 
 const Layer = css`
@@ -133,9 +134,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
         >
           {isDroppable && (
             <div class={DropLabel}>
-              <DepthLabel node={model.dropTarget.to.model} model={model}>
-                slot {model.dropTarget.to.slot} at {model.dropTarget.to.idx}
-              </DepthLabel>
+              <DepthLabel node={element} model={model} />
             </div>
           )}
           {!hasSlots && name}
@@ -187,16 +186,39 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     <div>
       Layers:
       {visit(model.node, ElementVisitor)}
+      <div>
+        {
+          //@ts-ignore
+          model.dropTarget?.from?.model.tagName
+        }{' '}
+        {model.dropTarget?.from?.idx} in {model.dropTarget?.from?.slot} of{' '}
+        {
+          // TODO: For some reason this isn't returning anything
+          //@ts-ignore
+          model.parents.get(model.dropTarget?.from?.model)?.tagName ?? 'No parent'
+        }
+      </div>
+      Dropping to
+      <div>
+        {
+          //@ts-ignore
+          model.dropTarget?.to?.model.tagName
+        }{' '}
+        {model.dropTarget?.to?.idx} in {model.dropTarget?.to?.slot}
+      </div>
     </div>
   );
 };
 
-function DepthLabel(props: { node: RaisinNode; model: Model }, children: VNode[]): VNode {
-  const parents = getAncestry(props.model.node, props.node);
-  if (parent) {
-    const str = parents.map(n => (n as RaisinElementNode).tagName).join(' > ');
-    return <span>{str}</span>;
-  }
-
-  return <div>{children}</div>;
+function DepthLabel(props: { node: RaisinNode; model: Model }): VNode {
+  const parents = getAncestry(props.model.node, props.model.dropTarget?.to?.model);
+  const str = [props.model.dropTarget?.to?.model, ...parents]
+    .reverse()
+    .map(n => (n as RaisinElementNode).tagName ?? 'root')
+    .join(' > ');
+  return (
+    <span>
+      Drop to: {str} at {props.model.dropTarget?.to?.idx} in {props.model.dropTarget?.to?.slot}
+    </span>
+  );
 }
