@@ -6,13 +6,15 @@ import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
 import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../model/RaisinNode';
 import { ElementType } from 'domelementtype';
+import { Handle } from './Handle';
+import { JSXBase } from '@stencil/core/internal';
 
 const Layer = css`
   position: relative;
   user-select: none;
-  padding: 5px 0;
-  background: #ccc;
-  border-bottom: 2px solid #fff;
+  padding: 10px 0;
+  background: #eee;
+  border: 1px solid #ccc;
 `;
 const DropLayer = css`
   background: pink;
@@ -24,17 +26,12 @@ const Selected = css`
 `;
 const Label = css`
   cursor: pointer;
-  padding: 20px 0;
-`;
-const Handle = css`
-  cursor: move;
-  display: inline-block;
-  padding: 3px;
-  background: #aaa;
+  line-height: 28px;
 `;
 const SlotContainer = css`
   margin-left: 3px;
-  border: 1px dotted #000;
+  border-left: 3px solid green;
+  padding: 5px;
   display: flex;
 `;
 const SlotName = css`
@@ -80,13 +77,24 @@ const DropLabel = css`
   background: red;
   color: white;
 `;
+const TitleBar = css`
+  display: flex;
+  justify-content: space-between;
+`;
+const Toolbar = css`
+  // order: -1;
+`;
+
+function Button(props: JSXBase.ButtonHTMLAttributes<HTMLButtonElement>, children: unknown) {
+  return (
+    <sl-button size="small" {...props}>
+      {children}
+    </sl-button>
+  );
+}
+
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
-    const claz = {
-      [DropTarget]: !model.isDragActive,
-      [PossibleDropTarget]: model.isDragActive,
-      // [ActiveDropTarget]:  === props.node
-    };
     const divNode = {
       type: ElementType.Tag,
       tagName: 'div',
@@ -94,7 +102,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       attribs: {},
       children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
     };
-    return <button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</button>;
+    return <Button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</Button>;
   }
 
   function DropSlot(props: { node: RaisinNode; idx: number; slot: string }) {
@@ -119,16 +127,18 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
 
       const meta = model.getComponentMeta(element);
       const name = (
-        <span onClick={() => model.setSelected(element)}>
-          <span class={Label}>{meta?.title || element.tagName}</span>
-          <span class={{ [Handle]: true, handle: true }}>[=]</span>
-
-          <button onClick={() => model.duplicateNode(element)}>+</button>
-          <button onClick={() => model.removeNode(element)}>x</button>
-
-          <button onClick={() => model.moveUp(element)}>↑</button>
-          <button onClick={() => model.moveDown(element)}>↓</button>
-        </span>
+        <div onClick={() => model.setSelected(element)} class={TitleBar}>
+          <div class={Label}>
+            <Handle />
+            {meta?.title || element.tagName}
+          </div>
+          <sl-button-group class={Toolbar}>
+            <Button onClick={() => model.duplicateNode(element)}>Duplicate</Button>
+            <Button onClick={() => model.removeNode(element)}>Del</Button>
+            <Button onClick={() => model.moveUp(element)}>Mv Up</Button>
+            <Button onClick={() => model.moveDown(element)}>Mv Down</Button>
+          </sl-button-group>
+        </div>
       );
       // const hasChildren = children?.length > 0;
       const nodeWithSlots = getSlots(element);
@@ -157,7 +167,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           {hasSlots && (
             // <details>
             <div>
-              <div>{name}</div>
+              {name}
               {hasSlots && (
                 <div>
                   {slots.map(s => (
@@ -165,7 +175,6 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                       <div class={SlotName}>{s.name}</div>
                       <div class={SlotChildren}>
                         <DropSlot node={element} idx={0} slot={s.key} />
-                        <AddNew node={element} idx={0} slot={s.key} />
                         {s.children
                           .filter(x => x)
                           .map((c, idx) => {
@@ -173,6 +182,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
                             // Doesn't render empty text nodes
                             return childElement && [childElement, <DropSlot node={element} idx={idx + 1} slot={s.key} />];
                           })}
+                        <AddNew node={element} idx={s.children.length} slot={s.key} />
                       </div>
                     </div>
                   ))}

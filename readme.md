@@ -4,6 +4,10 @@ Likes GrapesJS but more DRY
 
 ## TODO
 
+- Canvas drag and drop
+- Expand / Collapse layer children tree
+- Restrictions on drag and drop (valid drop location / hide invalid drops)
+- Sidebar to canvas drag
 - Adapter pattern so that Editors can be supplied by E.g. React Portal
 - Serialization / adapter back to DomHandler
 
