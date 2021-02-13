@@ -154,6 +154,22 @@ This kitten is as cute as he is playful. Bring him home today!<br>
 <sqh-column><span>This little piggy went to market.</span></sqh-column>
 <sqh-column><span>This little piggy went to market.</span></sqh-column>
 </sqh-grid>`),
+  blockFromHtml(`<sl-form class="form-overview">
+<sl-input name="name" type="text" label="Name"></sl-input>
+<br>
+<sl-select name="favorite" label="Select your favorite">
+  <sl-menu-item value="birds">Birds</sl-menu-item>
+  <sl-menu-item value="cats">Cats</sl-menu-item>
+  <sl-menu-item value="dogs">Dogs</sl-menu-item>
+</sl-select>
+<br>
+<sl-checkbox name="agree" value="yes">
+  I totally agree
+</sl-checkbox>
+<br><br>
+<sl-button submit>Submit</sl-button>
+</sl-form>
+`),
 ].filter(x => typeof x !== 'undefined') as RaisinElementNode[];
 
 const components: ComponentType[] = [...Object.values(HTMLComponents), ...SquatchComponents, ...ShoelaceComponents];
