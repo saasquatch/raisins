@@ -1,15 +1,16 @@
-import htmlparser2 from 'htmlparser2';
 import { Model, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getParent, getParents, insertAt, move, remove, replace } from '../../util';
+import { duplicate, getParents, insertAt, move, remove, replace } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
 import { useComponentModel } from './useComponentModel';
 import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
-import { domHandlerToRaisin } from '../../model/DomHandlerToRaisin';
 import serializer from '../../model/serializer';
+import { parse } from '../../model/parser';
+
+export type Mode = 'preview' | 'edit';
 
 export type InternalState = {
   current: RaisinNode;
@@ -41,10 +42,10 @@ export function getId(node: RaisinNode): string {
 
 export function useEditor(): Model {
   const host = useHost();
+  const [mode, setMode] = useState<Mode>('edit');
   const initial = useMemo(() => {
     const html = host.querySelectorAll('template')[0].innerHTML;
-    const DomNode = htmlparser2.parseDocument(html);
-    const raisinNode = domHandlerToRaisin(DomNode);
+    const raisinNode = parse(html);
     return raisinNode;
   }, []);
 
@@ -145,16 +146,20 @@ export function useEditor(): Model {
     setNode(clone);
   }
   function moveUp(n: RaisinNode) {
-    const parent = getParent(state.current, n);
-    const currentIdx = parent.children.indexOf(n);
-    const clone = move(state.current, n, parent, currentIdx - 1);
-    setNode(clone);
+    setNode(previousState => {
+      const parent = parents.get(n);
+      const currentIdx = parent.children.indexOf(n);
+      const clone = move(previousState, n, parent, currentIdx - 1);
+      return clone;
+    });
   }
   function moveDown(n: RaisinNode) {
-    const parent = getParent(state.current, n);
-    const currentIdx = parent.children.indexOf(n);
-    const clone = move(state.current, n, parent, currentIdx + 1);
-    setNode(clone);
+    setNode(previousState => {
+      const parent = parents.get(n);
+      const currentIdx = parent.children.indexOf(n);
+      const clone = move(previousState, n, parent, currentIdx + 1);
+      return clone;
+    });
   }
   function insertNode(n: RaisinNode, parent: RaisinNodeWithChildren, idx: number) {
     const clone = insertAt(state.current, n, parent, idx);
@@ -229,8 +234,10 @@ export function useEditor(): Model {
     hasRedo: state.redoStack.length > 0,
     hasUndo: state.undoStack.length > 0,
 
+    mode,
+    setMode,
     ...useComponentModel(),
     ...useInlinedHTML({ setNode }),
-    ...useDND({ node: state.current, setNode }),
+    ...useDND({ node: state.current, setNode, parents }),
   };
 }

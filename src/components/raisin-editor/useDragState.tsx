@@ -4,12 +4,12 @@ import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../../model/DropState';
-import { getParent, move } from '../../util';
+import { move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
 import { css } from '@emotion/css';
-import { RaisinNode } from '../../model/RaisinNode';
+import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 
-type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode> };
+type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren> };
 
 export function useDND(props: Props) {
   const elementToNode = useRef(new WeakMap<HTMLElement, RaisinNode>()).current;
@@ -64,7 +64,7 @@ function useDragState(sharedState: SharedState) {
             // removeNode(node);
             console.log('Drag end', event);
             event.target.style.opacity = 1;
-            event.target.style.zIndex = '';
+            event.target.style.zIndex = 'auto';
 
             // var textEl = event.target.querySelector('p');
             setDragCoords(prev => {
@@ -123,7 +123,8 @@ export function useDropState(sharedState: SharedState) {
 
   function getLocation(element: HTMLElement): Location {
     const node = sharedState.elementToNode.get(element);
-    const parent = getParent(sharedState.props.node, node);
+
+    const parent = sharedState.props.parents.get(node);
     return {
       model: node,
       DOM: element,

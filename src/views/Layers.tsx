@@ -31,7 +31,7 @@ const Label = css`
 const SlotContainer = css`
   margin-left: 3px;
   border-left: 3px solid green;
-  padding: 5px;
+  padding: 5px 0 5px 5px;
   display: flex;
 `;
 const SlotName = css`
@@ -102,7 +102,29 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       attribs: {},
       children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
     };
-    return <Button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</Button>;
+    // return <Button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</Button>;
+    return (
+      <sl-dropdown>
+        <sl-button slot="trigger" caret size="small">
+          Add New
+        </sl-button>
+        <sl-menu>
+          {model.blocks.map(b => {
+            const meta = model.getComponentMeta(b);
+            return (
+              <sl-menu-item
+                onClick={e =>
+                  // TOOD: Better clone
+                  model.insert({ ...b }, props.node, props.idx)
+                }
+              >
+                {meta.title}
+              </sl-menu-item>
+            );
+          })}
+        </sl-menu>
+      </sl-dropdown>
+    );
   }
 
   function DropSlot(props: { node: RaisinNode; idx: number; slot: string }) {
@@ -133,10 +155,20 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
             {meta?.title || element.tagName}
           </div>
           <sl-button-group class={Toolbar}>
-            <Button onClick={() => model.duplicateNode(element)}>Duplicate</Button>
-            <Button onClick={() => model.removeNode(element)}>Del</Button>
-            <Button onClick={() => model.moveUp(element)}>Mv Up</Button>
-            <Button onClick={() => model.moveDown(element)}>Mv Down</Button>
+            <Button onClick={() => model.duplicateNode(element)}>
+              <sl-icon name="files"></sl-icon>
+            </Button>
+            <Button onClick={() => model.removeNode(element)}>
+              <sl-icon name="trash"></sl-icon>
+            </Button>
+            <Button onClick={() => model.moveUp(element)}>
+              {' '}
+              <sl-icon name="arrow-bar-up"></sl-icon>
+            </Button>
+            <Button onClick={() => model.moveDown(element)}>
+              {' '}
+              <sl-icon name="arrow-bar-down"></sl-icon>
+            </Button>
           </sl-button-group>
         </div>
       );

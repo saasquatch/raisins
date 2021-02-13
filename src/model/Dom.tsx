@@ -1,4 +1,5 @@
 import { useComponentModel } from '../components/raisin-editor/useComponentModel';
+import { Mode } from '../components/raisin-editor/useEditor';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
@@ -36,6 +37,11 @@ export type Model = {
   hasUndo: boolean;
   hasRedo: boolean;
 
+  /**
+   * Canvas
+   */
+  mode: Mode;
+  setMode: StateUpdater<Mode>;
   /*
    * Drag and drop
    */

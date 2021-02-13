@@ -82,7 +82,10 @@ export const Canvas: FunctionalComponent<Model> = props => {
       return textValue;
     },
     onElement(element, children) {
-      const claz = element === props.selected ? Selected : Selectable;
+      const claz = {
+        [Selected]: element === props.selected,
+        [Selectable]: props.mode === 'edit',
+      };
 
       const onClick = (e: Event) => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
@@ -90,8 +93,8 @@ export const Canvas: FunctionalComponent<Model> = props => {
         props.setSelected(element);
       };
       const innerProps = {
-        'class': claz + ' ' + element.attribs.class,
-        onClick,
+        'class': { ...claz, [element.attribs.class]: true },
+        'onClick': props.mode === 'edit' ? onClick : () => {},
         'data-tagname': element.tagName,
         // Don't use -- element changes evey time!
         // key: getId(element),

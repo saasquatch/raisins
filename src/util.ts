@@ -1,4 +1,5 @@
 import { ElementType } from 'domelementtype';
+import { testElement } from 'domutils';
 import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './model/RaisinNode';
 
 /**
@@ -22,34 +23,6 @@ export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWith
     onText: n => n,
   });
   return map;
-}
-
-export function getParent(root: RaisinNode, child: RaisinNode): RaisinNodeWithChildren {
-  switch (root.type) {
-    case ElementType.Text:
-      return undefined;
-    case ElementType.Directive:
-      return undefined;
-    case ElementType.Comment:
-      return undefined;
-    case ElementType.Tag:
-    case ElementType.Script:
-    case ElementType.Style:
-    case ElementType.Root:
-    case ElementType.CDATA: {
-      const element = root as RaisinNodeWithChildren;
-      const idx = element.children.indexOf(child);
-      if (idx) {
-        return element;
-      }
-      const descendant = element.children.find(c => getParent(c, child));
-      return descendant as RaisinNodeWithChildren;
-    }
-    case ElementType.Doctype: {
-      // This type isn't used yet.
-      throw new Error('Not implemented yet: ElementType.Doctype case');
-    }
-  }
 }
 
 export function visit<T = unknown>(node: RaisinNode, visitor: NodeVisitor<T>, recursive: boolean = true): T {
@@ -259,6 +232,22 @@ export function insertAt(root: RaisinNode, node: RaisinNode, newParent: RaisinNo
   );
 }
 
+function isBlank(str) {
+  return !str || /^\s*$/.test(str);
+}
+
+export function removeWhitespace(root: RaisinNode): RaisinNode {
+  return visit(root, {
+    ...IdentityVisitor,
+    onText(text) {
+      if (isBlank(text.data)) {
+        return undefined;
+      }
+      return text;
+    },
+  });
+}
+
 function add<T>(arr: T[], el: T, idx: number): T[] {
   const before = arr.slice(0, idx);
   const after = arr.slice(idx, arr.length);
@@ -298,7 +287,7 @@ const CloneVisitor: NodeVisitor<RaisinNode> = {
   onRoot: (n, children) => ({ ...n, children }),
 };
 
-function clone(n: RaisinNode): RaisinNode {
+export function clone(n: RaisinNode): RaisinNode {
   return visit(n, CloneVisitor);
 }
 
@@ -311,6 +300,7 @@ function flatDeep<T>(arr: any, d = 1): T[] {
 /**
  * Returns an array of parents, with the first element being the parent, and then their ancestors
  */
+// TODO: Replace with parents WeakMap
 export function getAncestry(root: RaisinNode, node: RaisinNode): RaisinNodeWithChildren[] {
   const parents = getParents(root);
   const ancestry: RaisinNodeWithChildren[] = [];

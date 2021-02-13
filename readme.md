@@ -7,9 +7,9 @@ Likes GrapesJS but more DRY
 - Canvas drag and drop
 - Expand / Collapse layer children tree
 - Restrictions on drag and drop (valid drop location / hide invalid drops)
-- Sidebar to canvas drag
+- Drag new blocks from the sidebar
 - Adapter pattern so that Editors can be supplied by E.g. React Portal
-- Serialization / adapter back to DomHandler
+- Remove empty text nodes / whitespace
 
 ## Bugs
 
