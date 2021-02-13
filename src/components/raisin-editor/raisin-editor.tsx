@@ -49,13 +49,13 @@ export class Editor {
           <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
             {' '}
             <Layers {...model} />
-            <h1>Editor</h1>
+            {/* <h1>Editor</h1>
             <EditorPanel {...model} />
             <BlocksList {...model} />
             <h1>Input</h1>
             <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
-            <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre>
+            <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre> */}
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
-import { getAncestry, NodeVisitor, visit } from '../util';
+import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
@@ -115,7 +115,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
               <sl-menu-item
                 onClick={e =>
                   // TOOD: Better clone
-                  model.insert({ ...b }, props.node, props.idx)
+                  model.insert(clone(b), props.node, props.idx)
                 }
               >
                 {meta.title}
@@ -241,32 +241,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     },
   };
 
-  return (
-    <div>
-      Layers:
-      {visit(model.node, ElementVisitor)}
-      <div>
-        {
-          //@ts-ignore
-          model.dropTarget?.from?.model.tagName
-        }{' '}
-        {model.dropTarget?.from?.idx} in {model.dropTarget?.from?.slot} of{' '}
-        {
-          // TODO: For some reason this isn't returning anything
-          //@ts-ignore
-          model.parents.get(model.dropTarget?.from?.model)?.tagName ?? 'No parent'
-        }
-      </div>
-      Dropping to
-      <div>
-        {
-          //@ts-ignore
-          model.dropTarget?.to?.model.tagName
-        }{' '}
-        {model.dropTarget?.to?.idx} in {model.dropTarget?.to?.slot}
-      </div>
-    </div>
-  );
+  return <div>{visit(model.node, ElementVisitor)}</div>;
 };
 
 function DepthLabel(props: { node: RaisinNode; model: Model }): VNode {

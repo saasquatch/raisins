@@ -21,11 +21,11 @@ export function ToolbarView(props: Model) {
         </sl-button>
       </sl-button-group>
       <sl-button-group onClick={change}>
-        <sl-button size="small" pill type={props.mode === 'edit' && 'success'}>
+        <sl-button size="small" pill type={props.mode === 'edit' ? 'success' : 'default'}>
           <sl-icon slot="prefix" name="pencil"></sl-icon>
           Edit
         </sl-button>
-        <sl-button size="small" pill type={props.mode === 'preview' && 'success'}>
+        <sl-button size="small" pill type={props.mode === 'preview' ? 'success' : 'default'}>
           <sl-icon slot="prefix" name="eye"></sl-icon>
           Preview
         </sl-button>

@@ -63,7 +63,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
     onText(text) {
       const textValue = text.data;
       const parent = props.parents.get(text);
-      if (props.selected === text || props.selected === parent) {
+      if ((props.selected === text || props.selected === parent) && props.mode === 'edit') {
         return (
           <input
             value={textValue}

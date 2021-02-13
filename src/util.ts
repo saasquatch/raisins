@@ -240,7 +240,7 @@ export function removeWhitespace(root: RaisinNode): RaisinNode {
   return visit(root, {
     ...IdentityVisitor,
     onText(text) {
-      if (isBlank(text.data)) {
+      if (!text.data || isBlank(text.data)) {
         return undefined;
       }
       return text;
@@ -282,9 +282,9 @@ const CloneVisitor: NodeVisitor<RaisinNode> = {
   onText: n => ({ ...n }),
   onDirective: n => ({ ...n }),
   onComment: n => ({ ...n }),
-  onElement: (n, children) => ({ ...n, children }),
-  onCData: (n, children) => ({ ...n, children }),
-  onRoot: (n, children) => ({ ...n, children }),
+  onElement: (n, children) => ({ ...n, children: [...children] }),
+  onCData: (n, children) => ({ ...n, children: [...children] }),
+  onRoot: (n, children) => ({ ...n, children: [...children] }),
 };
 
 export function clone(n: RaisinNode): RaisinNode {
