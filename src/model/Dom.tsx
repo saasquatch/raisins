@@ -1,3 +1,4 @@
+import useCanvas from '../components/raisin-editor/useCanvas';
 import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 import { Mode } from '../components/raisin-editor/useEditor';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
@@ -52,7 +53,8 @@ export type Model = {
   isDragActive: boolean;
   elementToNode: WeakMap<HTMLElement, RaisinNode>;
 } & ReturnType<typeof useInlinedHTML> &
-  ReturnType<typeof useComponentModel>;
+  ReturnType<typeof useComponentModel> &
+  ReturnType<typeof useCanvas>;
 
 export type NodeWithSlots = {
   node: RaisinNode;

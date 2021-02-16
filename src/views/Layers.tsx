@@ -7,7 +7,7 @@ import { getId } from '../components/raisin-editor/useEditor';
 import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../model/RaisinNode';
 import { ElementType } from 'domelementtype';
 import { Handle } from './Handle';
-import { JSXBase } from '@stencil/core/internal';
+import { Button } from './Button';
 
 const Layer = css`
   position: relative;
@@ -84,14 +84,6 @@ const TitleBar = css`
 const Toolbar = css`
   // order: -1;
 `;
-
-function Button(props: JSXBase.ButtonHTMLAttributes<HTMLButtonElement>, children: unknown) {
-  return (
-    <sl-button size="small" {...props}>
-      {children}
-    </sl-button>
-  );
-}
 
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {

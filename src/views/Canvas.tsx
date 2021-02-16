@@ -4,7 +4,7 @@ import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
 import styleToObject from 'style-to-object';
-import { elementNames } from 'dom-serializer/lib/foreignNames';
+import { Button } from './Button';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -19,6 +19,9 @@ const content = css`
   padding: 20px;
 `;
 
+const SelectedToolbar = css`
+  background: green;
+`;
 const SelectedTooltip = css`
   &::before {
     content: attr(data-tagname);
@@ -92,10 +95,12 @@ export const Canvas: FunctionalComponent<Model> = props => {
         e.stopPropagation();
         props.setSelected(element);
       };
+
       const innerProps = {
         'class': { ...claz, [element.attribs.class]: true },
         'onClick': props.mode === 'edit' ? onClick : () => {},
         'data-tagname': element.tagName,
+        'ref': (el: HTMLElement) => props.registerRef(element, el),
         // Don't use -- element changes evey time!
         // key: getId(element),
       };
@@ -150,9 +155,37 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
   };
 
+  const hasSelected = typeof props.selected !== 'undefined';
   return (
-    <div class={wrapper} onClick={() => props.setSelected(undefined)}>
-      <div class={content}>{visit(props.node, CanvasVisitor)}</div>
+    <div>
+      <div class={wrapper} onClick={() => props.setSelected(undefined)}>
+        <div class={content} data-content>
+          {visit(props.node, CanvasVisitor)}
+        </div>
+      </div>
+      <div ref={el => (props.toolbarRef.current = el)} class={SelectedToolbar} data-toolbar>
+        {hasSelected && (
+          <div>
+            Toolbar
+            <sl-button-group>
+              <Button onClick={() => props.duplicateNode(props.selected)}>
+                <sl-icon name="files"></sl-icon>
+              </Button>
+              <Button onClick={() => props.removeNode(props.selected)}>
+                <sl-icon name="trash"></sl-icon>
+              </Button>
+              <Button onClick={() => props.moveUp(props.selected)}>
+                {' '}
+                <sl-icon name="arrow-bar-up"></sl-icon>
+              </Button>
+              <Button onClick={() => props.moveDown(props.selected)}>
+                {' '}
+                <sl-icon name="arrow-bar-down"></sl-icon>
+              </Button>
+            </sl-button-group>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

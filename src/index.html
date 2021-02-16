@@ -15,19 +15,7 @@
     <!-- TODO: Script management -->
     <script type="text/javascript" src="https://fast.ssqt.io/npm/@saasquatch/vanilla-components@1.0.x/dist/widget-components.js"></script>
     <link href="https://fast.ssqt.io/npm/@saasquatch/vanilla-components-assets@0.0.x/icons.css" type="text/css" rel="stylesheet" />
-    <sl-icon-library name="boxicons"></sl-icon-library>
-    <sl-icon slot="prefix" library="boxicons" name="copy"></sl-icon>
 
-    <script>
-      const library = document.querySelector('sl-icon-library[name="boxicons"]');
-      library.resolver = name => {
-        let folder = 'regular';
-        if (name.substring(0, 4) === 'bxs-') folder = 'solid';
-        if (name.substring(0, 4) === 'bxl-') folder = 'logos';
-        return `https://cdn.jsdelivr.net/npm/boxicons@2.0.5/svg/${folder}/${name}.svg`;
-      };
-      library.mutator = svg => svg.setAttribute('fill', 'currentColor');
-    </script>
     <style>
       sqh-grid {
         display: flex;
