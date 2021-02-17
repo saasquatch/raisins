@@ -1,5 +1,5 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
-import { Model } from '../model/Dom';
+import { Block, Model } from '../model/Dom';
 import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
@@ -89,13 +89,31 @@ const GreyOut = css`
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   const greyOnDrag = { [GreyOut]: model.isDragActive };
   function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
+    const slots = model.getComponentMeta(props.node as RaisinElementNode)?.slots;
+    if (!slots) {
+      return <span>No slots</span>;
+    }
+    const slotMeta = slots.find(s => s.key === props.slot);
+    if (!slotMeta) {
+      return (
+        <span>
+          No slot meta for {props.slot} {JSON.stringify(slots)}
+        </span>
+      );
+    }
+    const { childTags } = slotMeta;
+    const filter = (block: RaisinElementNode) => childTags?.includes(block.tagName) || childTags?.includes('*');
+    const validChildren = model.blocks.filter(filter);
+    if (!validChildren.length) {
+      return <span>No validChildren</span>;
+    }
     return (
       <sl-dropdown class={greyOnDrag}>
         <sl-button slot="trigger" caret size="small">
           Add New
         </sl-button>
         <sl-menu>
-          {model.blocks.map(b => {
+          {model.blocks.filter(filter).map(b => {
             const meta = model.getComponentMeta(b);
             return (
               <sl-menu-item
