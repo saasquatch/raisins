@@ -42,6 +42,7 @@ export function getId(node: RaisinNode): string {
 }
 
 export function useEditor(): Model {
+  const metamodel = useComponentModel();
   const host = useHost();
   const [mode, setMode] = useState<Mode>('edit');
   const initial = useMemo(() => {
@@ -55,7 +56,7 @@ export function useEditor(): Model {
     redoStack: [],
     undoStack: [],
     current: initial,
-    slots: getSlots(initial),
+    slots: getSlots(initial, metamodel.getComponentMeta),
   });
 
   const undo = () =>
@@ -72,7 +73,7 @@ export function useEditor(): Model {
         current: nextCurrent,
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent),
+        slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
       console.log(
@@ -98,7 +99,7 @@ export function useEditor(): Model {
         immutableCopy: current,
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent),
+        slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
       console.log(
@@ -127,7 +128,7 @@ export function useEditor(): Model {
         current: nextNode,
         undoStack,
         redoStack: [],
-        slots: getSlots(nextNode),
+        slots: getSlots(nextNode, metamodel.getComponentMeta),
       };
       console.log('Setting to');
       return newState;
@@ -178,7 +179,7 @@ export function useEditor(): Model {
         current: nextRoot,
         undoStack,
         redoStack: [],
-        slots: getSlots(nextRoot),
+        slots: getSlots(nextRoot, metamodel.getComponentMeta),
       };
       return newState;
     });
@@ -208,7 +209,7 @@ export function useEditor(): Model {
   }, []);
 
   const parents = useMemo(() => getParents(state.current), [state.current]);
-  const slots = getSlots(state.current);
+  const slots = getSlots(state.current, metamodel.getComponentMeta);
   return {
     initial: serializer(initial),
 
@@ -234,8 +235,8 @@ export function useEditor(): Model {
 
     mode,
     setMode,
+    ...metamodel,
     ...useCanvas({ selected: state.selected }),
-    ...useComponentModel(),
     ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode, parents }),
   };

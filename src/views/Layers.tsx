@@ -159,7 +159,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
         </div>
       );
       // const hasChildren = children?.length > 0;
-      const nodeWithSlots = getSlots(element);
+      const nodeWithSlots = getSlots(element, model.getComponentMeta);
       const dropNode = model.dropTarget?.from?.model;
       const isDroppable = element === dropNode;
 

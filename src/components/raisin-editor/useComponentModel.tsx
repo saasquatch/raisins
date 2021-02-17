@@ -1,19 +1,24 @@
-import { ComponentType } from '../../model/Component';
+import { ComponentType, SlotType } from '../../model/Component';
 
 import * as HTMLComponents from '../../model/HTMLComponents';
 import { RaisinElementNode, RaisinTextNode } from '../../model/RaisinNode';
 import { ElementType } from 'domelementtype';
 import { parse } from '../../model/parser';
 
+const DefaultSlot: SlotType = {
+  key: '',
+  title: 'Default slot',
+};
 const SquatchComponents: ComponentType[] = [
-  { tagName: 'sqh-global-container', title: 'Container' },
+  { tagName: 'sqh-global-container', title: 'Container', slots: [DefaultSlot] },
   { tagName: 'sqh-text-component', title: 'Text' },
   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
   { tagName: 'sqh-share-button-container', title: 'Share Buttons' },
-  { tagName: 'sqh-stats-container', title: 'Stats' },
+  { tagName: 'sqh-stats-container', title: 'Stats', slots: [DefaultSlot] },
   { tagName: 'sqh-stat-component', title: 'Stat' },
   { tagName: 'sqh-referral-list', title: 'Referrals' },
-  { tagName: 'sqh-grid', title: '3 Col Grid' },
+  // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
+  { tagName: 'sqh-grid', title: '3 Col Grid', slots: [{ ...DefaultSlot, orientation: 'left-right' }] },
   { tagName: 'sqh-column', title: 'Column' },
 ];
 

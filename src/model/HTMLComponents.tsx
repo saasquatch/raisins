@@ -1,4 +1,9 @@
-import { ComponentType } from './Component';
+import { ComponentType, SlotType } from './Component';
+
+const DefaultSlot: SlotType = {
+  key: '',
+  title: 'Default slot',
+};
 
 const COMMON_HTML_ATTRS_SCHEMA = {
   properties: {
@@ -49,6 +54,7 @@ export const DIV: ComponentType = {
   title: 'Block',
   tagName: 'div',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
+  slots: [DefaultSlot],
 };
 
 // 'dl',
@@ -65,31 +71,37 @@ export const H1: ComponentType = {
   title: 'Heading 1',
   tagName: 'h1',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
+  slots: [DefaultSlot],
 };
 // 'h2',
 export const H2: ComponentType = {
   title: 'Heading 2',
   tagName: 'h2',
+  slots: [DefaultSlot],
 };
 // 'h3',
 export const H3: ComponentType = {
   title: 'Heading 3',
   tagName: 'h3',
+  slots: [DefaultSlot],
 };
 // 'h4',
 export const H4: ComponentType = {
   title: 'Heading 4',
   tagName: 'h4',
+  slots: [DefaultSlot],
 };
 // 'h5',
 export const H5: ComponentType = {
   title: 'Heading 5',
   tagName: 'h5',
+  slots: [DefaultSlot],
 };
 // 'h6',
 export const H6: ComponentType = {
   title: 'Heading 6',
   tagName: 'h6',
+  slots: [DefaultSlot],
 };
 // 'head',
 // 'header',
@@ -130,6 +142,7 @@ export const IMG: ComponentType = {
 export const P: ComponentType = {
   title: 'Paragraph',
   tagName: 'p',
+  slots: [DefaultSlot],
 };
 // 'param',
 // 'picture',
@@ -150,7 +163,12 @@ export const P: ComponentType = {
 export const SPAN: ComponentType = {
   title: 'Text (span)',
   tagName: 'span',
-  childTags: ['span'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['span'],
+    },
+  ],
 };
 // 'strong',
 // 'style',
@@ -161,38 +179,66 @@ export const SPAN: ComponentType = {
 export const TABLE: ComponentType = {
   title: 'Table',
   tagName: 'table',
-  childTags: ['thead', 'tbody', 'tfoot'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['thead', 'tbody', 'tfoot'],
+    },
+  ],
 };
 // 'tbody',
 export const TBODT: ComponentType = {
   title: 'Table Body',
   tagName: 'tbody',
-  childTags: ['tr'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['tr'],
+    },
+  ],
 };
 // 'td',
 export const TD: ComponentType = {
   title: 'Table Cell',
   tagName: 'td',
-  childTags: ['*'],
+  slots: [
+    {
+      ...DefaultSlot,
+    },
+  ],
 };
 // 'textarea',
 // 'tfoot',
 export const TFOOT: ComponentType = {
   title: 'Table Footer',
   tagName: 'tfoot',
-  childTags: ['tr'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['tr'],
+    },
+  ],
 };
 // 'th',
 export const TH: ComponentType = {
   title: 'Table Header Cell',
   tagName: 'th',
-  childTags: ['*'],
+  slots: [
+    {
+      ...DefaultSlot,
+    },
+  ],
 };
 // 'thead',
 export const THEAD: ComponentType = {
   title: 'Table Header',
   tagName: 'thead',
-  childTags: ['tr'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['tr'],
+    },
+  ],
 };
 // 'time',
 // 'title',
@@ -200,7 +246,12 @@ export const THEAD: ComponentType = {
 export const TR: ComponentType = {
   title: 'Table Row',
   tagName: 'tr',
-  childTags: ['td', 'th'],
+  slots: [
+    {
+      ...DefaultSlot,
+      childTags: ['td', 'th'],
+    },
+  ],
 };
 // 'track',
 // 'u',
