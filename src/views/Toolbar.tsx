@@ -30,6 +30,13 @@ export function ToolbarView(props: Model) {
           Preview
         </sl-button>
       </sl-button-group>
+      <sl-button-group>
+        {props.sizes.map(s => (
+          <sl-button size="small" pill onClick={() => props.setSize(s)} type={props.size === s ? 'success' : 'default'}>
+            {s.name}
+          </sl-button>
+        ))}
+      </sl-button-group>
     </div>
   );
 }

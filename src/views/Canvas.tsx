@@ -12,7 +12,7 @@ const wrapper = css`
     linear-gradient(45deg, transparent 75%, #cccccc 75%), linear-gradient(-45deg, transparent 75%, #cccccc 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-  padding: 100px;
+  padding: 50px;
 `;
 const content = css`
   background: white;
@@ -147,7 +147,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
   return (
     <div>
       <div class={wrapper} onClick={() => props.setSelected(undefined)}>
-        <div class={content} data-content>
+        <div class={content} data-content style={{ width: `${props.size.width}px` }}>
           {visit(props.node, CanvasVisitor)}
         </div>
       </div>

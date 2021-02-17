@@ -6,7 +6,21 @@ import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
 import { sameWidth } from './sameWidth';
 
+export type Size = {
+  name: string;
+  width: number;
+  height: number;
+};
+const sizes: Size[] = [
+  { name: 'HD', width: 1200, height: 1080 },
+  { name: 'Large', width: 992, height: 1080 },
+  { name: 'Medium', width: 768, height: 1080 },
+  { name: 'Small', width: 576, height: 1080 },
+  { name: 'X-Small', width: 400, height: 1080 },
+];
+
 export default function useCanvas(props: { selected: RaisinNode }) {
+  const [size, setSize] = useState<Size>(sizes[0]);
   const [, setPopper] = useState<Instance>(undefined);
   const toolbarRef = useRef<HTMLElement>(undefined);
 
@@ -31,5 +45,8 @@ export default function useCanvas(props: { selected: RaisinNode }) {
   return {
     toolbarRef,
     registerRef,
+    sizes,
+    size,
+    setSize,
   };
 }
