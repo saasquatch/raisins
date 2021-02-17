@@ -1,29 +1,83 @@
 import * as DOMHandler from 'domhandler';
-import { useRef, useState } from '@saasquatch/stencil-hooks';
+import { useCallback, useEffect, useRef, useState } from '@saasquatch/stencil-hooks';
 import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../../model/DropState';
 import { move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
-import { css } from '@emotion/css';
 import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
+import { usePopper } from '../../model/usePopper';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren> };
+
+function useDragBuddy(sharedState: SharedState) {
+  const [popper, setPopper] = useState<HTMLElement>(undefined);
+  function generateGetBoundingClientRect(x = 0, y = 0) {
+    return () => ({
+      width: 0,
+      height: 0,
+      top: y,
+      right: x,
+      bottom: y,
+      left: x,
+    });
+  }
+
+  const virtualElement = useRef({
+    getBoundingClientRect: generateGetBoundingClientRect(),
+  });
+
+  const instance = usePopper(virtualElement.current, popper);
+
+  const onMove = useCallback(
+    ({ clientX: x, clientY: y }) => {
+      virtualElement.current.getBoundingClientRect = generateGetBoundingClientRect(x, y);
+      // if (instance.update) instance.update();
+    },
+    [instance, virtualElement],
+  );
+
+  useEffect(() => {
+    document.addEventListener('mousemove', onMove);
+    () => document.removeEventListener('mousemove', onMove);
+  }, [onMove]);
+
+  return {
+    setDragBuddy: setPopper,
+  };
+}
 
 export function useDND(props: Props) {
   const elementToNode = useRef(new WeakMap<HTMLElement, RaisinNode>()).current;
   const elementToInteract = useRef(new WeakMap<HTMLElement, Interactable>()).current;
+  const [isDragActive, setIsDragActive] = useState<boolean>(false);
+
+  const [referenceElement, setReferenceElement] = useState(null);
+  const [popperElement, setPopperElement] = useState(null);
+  const popper = usePopper(referenceElement, popperElement, {
+    placement: 'left-start',
+    // modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
+  });
 
   const sharedState = {
     elementToNode,
     elementToInteract,
     props,
+    setReferenceElement,
+    popper,
+    isDragActive,
+    setIsDragActive,
   };
   return {
     ...useDragState(sharedState),
     ...useDropState(sharedState),
+    ...useDragBuddy(sharedState),
+    isDragActive,
     elementToNode,
+    popper,
+    setPopperElement,
+    setReferenceElement,
   };
 }
 
@@ -31,6 +85,11 @@ type SharedState = {
   elementToNode: WeakMap<HTMLElement, RaisinNode>;
   elementToInteract: WeakMap<HTMLElement, Interactable>;
   props: Props;
+  setReferenceElement: StateUpdater<HTMLElement>;
+  popper: ReturnType<typeof usePopper>;
+
+  isDragActive: boolean;
+  setIsDragActive: StateUpdater<boolean>;
 };
 
 function useDragState(sharedState: SharedState) {
@@ -100,6 +159,7 @@ function useDragState(sharedState: SharedState) {
           y: event.dy,
         };
       });
+      // sharedState.popper.update();
     }
 
     return interactable;
@@ -109,16 +169,8 @@ function useDragState(sharedState: SharedState) {
   return { dragCoords, setDraggableRef } as const;
 }
 
-const ActiveDropTarget = css`
-  &: before {
-    background: red !important;
-    height: 6px !important;
-  }
-`;
-
 export function useDropState(sharedState: SharedState) {
   const [dropTarget, setDropTarget] = useState<DropState>(undefined);
-  const [isDragActive, setIsDragActive] = useState<boolean>(false);
   // const [possibleDrop, setPossibleDrop] = useState<HTMLElement>(undefined)
 
   function getLocation(element: HTMLElement): Location {
@@ -145,12 +197,13 @@ export function useDropState(sharedState: SharedState) {
       ondragenter: function (event) {
         // feedback the possibility of a drop
         event.relatedTarget.style.background = 'green';
-        (event.target as HTMLElement).classList.add(ActiveDropTarget);
+        // (event.target as HTMLElement).classList.add(ActiveDropTarget);
         // event.target.style.outline = '3px solid red';
         const dropzone = sharedState.elementToNode.get(event.target);
 
+        const from = getLocation(event.relatedTarget);
         setDropTarget({
-          from: getLocation(event.relatedTarget),
+          from,
           to: {
             model: dropzone,
             DOM: event.target,
@@ -158,12 +211,14 @@ export function useDropState(sharedState: SharedState) {
             slot,
           },
         });
+        sharedState.setReferenceElement(event.target);
+
         console.log('Possible drop', event.target);
       },
       ondragleave: function (event) {
         // remove the drop feedback style
         // 'Dragged out'
-        (event.target as HTMLElement).classList.remove(ActiveDropTarget);
+        // (event.target as HTMLElement).classList.remove(ActiveDropTarget);
         // event.target.style.background = '';
         event.relatedTarget.style.background = '';
         setDropTarget(undefined);
@@ -190,17 +245,17 @@ export function useDropState(sharedState: SharedState) {
       ondropactivate: function () {
         // add active dropzone feedback
         // event.target.style.border = '1px dotted #CCC';
-        setIsDragActive(true);
+        sharedState.setIsDragActive(true);
       },
       ondropdeactivate: function () {
-        setIsDragActive(false);
+        sharedState.setIsDragActive(false);
         // event.target.style.border = '';
         // remove active dropzone feedback
       },
     });
   });
 
-  return { setDroppableRef, dropTarget, isDragActive };
+  return { setDroppableRef, dropTarget };
 }
 
 function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: RaisinNode, ...args: unknown[]) => Interactable) {

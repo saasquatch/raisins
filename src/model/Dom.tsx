@@ -1,5 +1,6 @@
 import useCanvas from '../components/raisin-editor/useCanvas';
 import { useComponentModel } from '../components/raisin-editor/useComponentModel';
+import { useDND } from '../components/raisin-editor/useDragState';
 import { Mode } from '../components/raisin-editor/useEditor';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
 import { DragCoords } from './DragCoords';
@@ -52,7 +53,8 @@ export type Model = {
   dropTarget?: DropState;
   isDragActive: boolean;
   elementToNode: WeakMap<HTMLElement, RaisinNode>;
-} & ReturnType<typeof useInlinedHTML> &
+} & ReturnType<typeof useDND> &
+  ReturnType<typeof useInlinedHTML> &
   ReturnType<typeof useComponentModel> &
   ReturnType<typeof useCanvas>;
 

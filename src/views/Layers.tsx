@@ -8,6 +8,9 @@ import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
 import { Handle } from './Handle';
 import { Button } from './Button';
 
+const Hidden = css`
+  display: none;
+`;
 const Layer = css`
   position: relative;
   user-select: none;
@@ -63,16 +66,12 @@ const PossibleDropTarget = css`
   }
 `;
 const DropTargetWrapper = css`
-  height: 1px;
-  overflow: visible;
+  // height: 1px;
+  // overflow: visible;
   position: relative;
 `;
 
 const DropLabel = css`
-  position: absolute;
-  top: -30px;
-  height: 30px;
-  box-sizing: border-box;
   background: red;
   color: white;
 `;
@@ -83,11 +82,15 @@ const TitleBar = css`
 const Toolbar = css`
   // order: -1;
 `;
+const GreyOut = css`
+  opacity: 0.2;
+`;
 
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
+  const greyOnDrag = { [GreyOut]: model.isDragActive };
   function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
     return (
-      <sl-dropdown>
+      <sl-dropdown class={greyOnDrag}>
         <sl-button slot="trigger" caret size="small">
           Add New
         </sl-button>
@@ -137,7 +140,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
             <Handle />
             {meta?.title || element.tagName}
           </div>
-          <sl-button-group class={Toolbar}>
+          <sl-button-group class={{ ...greyOnDrag, [Toolbar]: true }}>
             <Button onClick={() => model.duplicateNode(element)}>
               <sl-icon name="files"></sl-icon>
             </Button>
@@ -173,11 +176,6 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           ref={el => model.setDraggableRef(element, el)}
           key={getId(element)}
         >
-          {isDroppable && (
-            <div class={DropLabel}>
-              <DepthLabel node={element} model={model} />
-            </div>
-          )}
           {!hasSlots && name}
           {hasSlots && (
             // <details>
@@ -213,18 +211,80 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     },
   };
 
-  return <div>{visit(model.node, ElementVisitor)}</div>;
+  return (
+    <div>
+      {visit(model.node, ElementVisitor)}
+      <DepthLabel model={model} />
+      <DragBuddy model={model} />
+    </div>
+  );
 };
 
-function DepthLabel(props: { node: RaisinNode; model: Model }): VNode {
+/**
+ *  Follows the cursor to indicate a drag.
+ */
+function DragBuddy(props: { model: Model }): VNode {
+  return <div ref={props.model.setDragBuddy}>Drag buddy!</div>;
+}
+/**
+ * Positioned next to a drop target to indicate a possible drop location
+ */
+function DepthLabel(props: { model: Model }): VNode {
+  const hasDroppable = typeof props.model.dropTarget?.to?.model !== 'undefined';
+  if (!hasDroppable) {
+    // Empty tooltip
+    return (
+      <div
+        class={Hidden}
+        ref={props.model.setPopperElement}
+        // @ts-ignore
+        style={props.model.popper.styles.popper}
+        {...props.model.popper.attributes.popper}
+      ></div>
+    );
+  }
   const parents = getAncestry(props.model.node, props.model.dropTarget?.to?.model);
   const str = [props.model.dropTarget?.to?.model, ...parents]
     .reverse()
-    .map(n => (n as RaisinElementNode).tagName ?? 'root')
+    .map(n => props.model.getComponentMeta(n as RaisinElementNode).title ?? 'root')
     .join(' > ');
+  const target = props.model.dropTarget?.to?.model as RaisinElementNode;
+  const targetName = props.model.getComponentMeta(target).title;
+  const targetIndex = props.model.dropTarget?.to?.idx;
+  const indexName = getOrdinal(targetIndex + 1);
+  const slotName = props.model.dropTarget?.to?.slot || 'default';
   return (
-    <span>
-      Drop to: {str} at {props.model.dropTarget?.to?.idx} in {props.model.dropTarget?.to?.slot}
-    </span>
+    <div
+      // class={DropLabel}
+      ref={props.model.setPopperElement}
+      // @ts-ignore
+      style={props.model.popper.styles.popper}
+      {...props.model.popper.attributes.popper}
+    >
+      <sl-card style={{ width: '200px' }}>
+        <div slot="header">
+          Move to <b>{targetName}</b>
+        </div>
+        <span style={{ color: '#ccc' }}>
+          Will be the <b>{indexName}</b> element in the <b>{slotName} slot</b> of <b>{str}</b>
+        </span>
+      </sl-card>
+
+      {/* <sl-badge type="success" pill>
+        Drop here
+      </sl-badge> */}
+    </div>
   );
+}
+
+/**
+ * Converts a number into a human ordinal
+ *
+ * Source: https://gist.github.com/jlbruno/1535691/db35b4f3af3dcbb42babc01541410f291a8e8fac
+ * @param n
+ */
+function getOrdinal(n: number): string {
+  var s = ['th', 'st', 'nd', 'rd'],
+    v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
