@@ -1,5 +1,4 @@
 import { ElementType } from 'domelementtype';
-import { testElement } from 'domutils';
 import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './model/RaisinNode';
 
 /**

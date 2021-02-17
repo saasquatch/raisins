@@ -1,5 +1,5 @@
 import * as DOMHandler from 'domhandler';
-import { State, useRef, useState } from '@saasquatch/stencil-hooks';
+import { useRef, useState } from '@saasquatch/stencil-hooks';
 import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
@@ -133,7 +133,7 @@ export function useDropState(sharedState: SharedState) {
     };
   }
 
-  const setDroppableRef = useDragRefs(sharedState, (element, node, idx: number, slot: string) => {
+  const setDroppableRef = useDragRefs(sharedState, (element, _, idx: number, slot: string) => {
     return interact(element).dropzone({
       // // only accept elements matching this CSS selector
       // accept: '*',
@@ -187,12 +187,12 @@ export function useDropState(sharedState: SharedState) {
       /*
        * For dropzones only
        */
-      ondropactivate: function (event) {
+      ondropactivate: function () {
         // add active dropzone feedback
         // event.target.style.border = '1px dotted #CCC';
         setIsDragActive(true);
       },
-      ondropdeactivate: function (event) {
+      ondropdeactivate: function () {
         setIsDragActive(false);
         // event.target.style.border = '';
         // remove active dropzone feedback

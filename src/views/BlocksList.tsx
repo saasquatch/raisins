@@ -1,8 +1,6 @@
 import { css } from '@emotion/css';
 import { h } from '@stencil/core';
-import { ElementType } from 'domelementtype';
 import { Model } from '../model/Dom';
-import { RaisinElementNode, RaisinTextNode } from '../model/RaisinNode';
 import { Handle } from './Handle';
 
 const Block = css`

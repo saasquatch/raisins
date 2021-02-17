@@ -30,7 +30,6 @@
     "@stencil/core": "^1.17.4",
     "dom-serializer": "^1.2.0",
     "domhandler": "^4.0.0",
-    "domutils": "^2.4.4",
     "hotkeys-js": "^3.8.1",
     "htmlparser2": "^6.0.0",
     "interactjs": "^1.10.2",

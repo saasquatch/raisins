@@ -1,13 +1,9 @@
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import serialize from 'dom-serializer';
-import { RaisinNode } from '../../model/RaisinNode';
-
 type Editor = any;
 
 const elementToEditor = new WeakMap<HTMLElement, Editor>();
 
-export function useInlinedHTML({ setNode }) {
-  function useInlineHTMLEditorRef(element: HTMLElement, node: RaisinNode) {
+export function useInlinedHTML({}) {
+  function useInlineHTMLEditorRef(element: HTMLElement) {
     // Ignore null refs
     if (!element) return;
 

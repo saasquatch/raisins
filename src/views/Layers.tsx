@@ -4,8 +4,7 @@ import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
-import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../model/RaisinNode';
-import { ElementType } from 'domelementtype';
+import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
 import { Handle } from './Handle';
 import { Button } from './Button';
 
@@ -87,14 +86,6 @@ const Toolbar = css`
 
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
-    const divNode = {
-      type: ElementType.Tag,
-      tagName: 'div',
-      nodeType: 1,
-      attribs: {},
-      children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
-    };
-    // return <Button onClick={e => model.insert(divNode, props.node, props.idx)}>Add div here</Button>;
     return (
       <sl-dropdown>
         <sl-button slot="trigger" caret size="small">
@@ -105,7 +96,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
             const meta = model.getComponentMeta(b);
             return (
               <sl-menu-item
-                onClick={e =>
+                onClick={() =>
                   // TOOD: Better clone
                   model.insert(clone(b), props.node, props.idx)
                 }
@@ -216,20 +207,9 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           )}
         </div>
       );
-      // return <div></div>
     },
     onRoot(_, children) {
       return <div>{children}</div>;
-      // return (
-      //   children
-      // && (
-      //   <div>
-      //     {children.map((c, idx) => {
-      //       return [<DropSlot node={r} idx={idx} />, c];
-      //     })}
-      //   </div>
-      // )
-      // );
     },
   };
 

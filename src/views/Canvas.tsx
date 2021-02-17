@@ -2,10 +2,10 @@ import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/Dom';
 import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
-import serialize from 'dom-serializer';
 import styleToObject from 'style-to-object';
 import { Button } from './Button';
 import { RaisinElementNode } from '../model/RaisinNode';
+import serializer from '../model/serializer';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -50,10 +50,6 @@ const Selectable = css`
   //   z-index: 9;
   // }
 `;
-
-// function isBlank(str: string) {
-//   return !str || /^\s*$/.test(str);
-// }
 
 export const Canvas: FunctionalComponent<Model> = props => {
   const CanvasVisitor: NodeVisitor<VNode | string> = {
@@ -114,12 +110,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
           <div {...innerProps}>
             Script:
             <br />
-            <textarea>
-              {
-                // @ts-ignore
-                serialize(element.children)
-              }
-            </textarea>
+            <textarea>{serializer(element.children)}</textarea>
           </div>
         );
       }
