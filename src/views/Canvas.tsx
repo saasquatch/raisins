@@ -5,6 +5,7 @@ import { NodeVisitor, visit } from '../util';
 import serialize from 'dom-serializer';
 import styleToObject from 'style-to-object';
 import { Button } from './Button';
+import { RaisinElementNode } from '../model/RaisinNode';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -20,18 +21,14 @@ const content = css`
 `;
 
 const SelectedToolbar = css`
-  background: green;
+  background: red;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
 `;
-const SelectedTooltip = css`
-  &::before {
-    content: attr(data-tagname);
-    position: absolute;
-    color: #fff;
-    background: blue;
-    top: -20px;
-    height: 20px;
-    z-index: 9;
-  }
+const SelectedTitle = css`
+  line-height: 28px;
 `;
 
 const Selected = css`
@@ -41,17 +38,17 @@ const Selected = css`
 const Selectable = css`
   position: relative;
   &:hover {
-    outline: 1px solid blue;
+    outline: 1px solid #ccc;
   }
-  &:hover::before {
-    content: attr(data-tagname);
-    position: absolute;
-    color: #fff;
-    background: blue;
-    top: -20px;
-    height: 20px;
-    z-index: 9;
-  }
+  // &:hover::before {
+  //   content: attr(data-tagname);
+  //   position: absolute;
+  //   color: #fff;
+  //   background: blue;
+  //   top: -20px;
+  //   height: 20px;
+  //   z-index: 9;
+  // }
 `;
 
 // function isBlank(str: string) {
@@ -163,10 +160,10 @@ export const Canvas: FunctionalComponent<Model> = props => {
           {visit(props.node, CanvasVisitor)}
         </div>
       </div>
-      <div ref={el => (props.toolbarRef.current = el)} class={SelectedToolbar} data-toolbar>
+      <div ref={el => (props.toolbarRef.current = el)} data-toolbar>
         {hasSelected && (
-          <div>
-            Toolbar
+          <div class={SelectedToolbar}>
+            <div class={SelectedTitle}>{props.getComponentMeta(props.selected as RaisinElementNode)?.title || props.selected?.nodeType}</div>
             <sl-button-group>
               <Button onClick={() => props.duplicateNode(props.selected)}>
                 <sl-icon name="files"></sl-icon>
