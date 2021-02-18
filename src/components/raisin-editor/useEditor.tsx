@@ -119,6 +119,20 @@ export function useEditor(): Model {
       };
     });
   };
+  const selectParent = () => {
+    setState(prev => {
+      if (prev.selected) {
+        const parent = parents.get(prev.selected);
+        if (parent) {
+          return {
+            ...prev,
+            selected: parent,
+          };
+        }
+      }
+      return prev;
+    });
+  };
   function setNodeInternal(next: NewState<RaisinNode>, newSelection?: RaisinNode) {
     setState(previous => {
       const nextNode = typeof next === 'function' ? next(previous.current) : next;
@@ -209,17 +223,31 @@ export function useEditor(): Model {
   }, []);
 
   const parents = useMemo(() => getParents(state.current), [state.current]);
+  function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
+    let ancestry: RaisinNodeWithChildren[] = [];
+    let current = node;
+    while (current) {
+      const parent = parents.get(current);
+      if (parent) {
+        ancestry.push(parent);
+      }
+      current = parent;
+    }
+    return ancestry;
+  }
   const slots = getSlots(state.current, metamodel.getComponentMeta);
   return {
     initial: serializer(initial),
 
     node: state.current,
     parents,
+    getAncestry,
     slots,
     getId,
 
     selected: state.selected,
     setSelected,
+    selectParent,
 
     removeNode,
     duplicateNode,
@@ -238,6 +266,6 @@ export function useEditor(): Model {
     ...metamodel,
     ...useCanvas({ selected: state.selected }),
     ...useInlinedHTML({ setNode }),
-    ...useDND({ node: state.current, setNode, parents }),
+    ...useDND({ node: state.current, setNode, parents, componentModel: metamodel }),
   };
 }

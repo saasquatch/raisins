@@ -54,7 +54,7 @@ export const DIV: ComponentType = {
   title: 'Block',
   tagName: 'div',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [DefaultSlot],
+  slots: [{ ...DefaultSlot, childTags: ['*'] }],
 };
 
 // 'dl',
@@ -204,6 +204,7 @@ export const TD: ComponentType = {
   slots: [
     {
       ...DefaultSlot,
+      childTags: ['*'],
     },
   ],
 };

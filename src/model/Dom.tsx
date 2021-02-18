@@ -1,5 +1,5 @@
 import useCanvas from '../components/raisin-editor/useCanvas';
-import { useComponentModel } from '../components/raisin-editor/useComponentModel';
+import { ComponentModel, useComponentModel } from '../components/raisin-editor/useComponentModel';
 import { useDND } from '../components/raisin-editor/useDragState';
 import { Mode } from '../components/raisin-editor/useEditor';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';
@@ -9,9 +9,11 @@ import { RaisinNode, RaisinNodeWithChildren } from './RaisinNode';
 
 export type Model = {
   node: RaisinNode;
-  parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
   slots: NodeWithSlots;
   initial: string;
+
+  parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
+  getAncestry(node: RaisinNode): RaisinNodeWithChildren[];
 
   getId(node: RaisinNode): string;
 
@@ -20,6 +22,7 @@ export type Model = {
    */
   selected?: RaisinNode;
   setSelected(node: RaisinNode): void;
+  selectParent(): void;
 
   /*
    * Mutations
@@ -55,7 +58,7 @@ export type Model = {
   elementToNode: WeakMap<HTMLElement, RaisinNode>;
 } & ReturnType<typeof useDND> &
   ReturnType<typeof useInlinedHTML> &
-  ReturnType<typeof useComponentModel> &
+  ComponentModel &
   ReturnType<typeof useCanvas>;
 
 export type NodeWithSlots = {

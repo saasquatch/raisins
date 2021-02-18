@@ -14,5 +14,7 @@ export interface SlotType {
    * Layout of the slot. Used for UI hints on layout
    */
   orientation?: 'up-down' | 'left-right' | 'right-left' | 'down-up';
+
+  parentTags?: string[];
   childTags?: string[];
 }

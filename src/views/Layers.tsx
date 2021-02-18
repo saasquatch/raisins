@@ -71,10 +71,6 @@ const DropTargetWrapper = css`
   position: relative;
 `;
 
-const DropLabel = css`
-  background: red;
-  color: white;
-`;
 const TitleBar = css`
   display: flex;
   justify-content: space-between;
@@ -88,24 +84,10 @@ const GreyOut = css`
 
 export const Layers: FunctionalComponent<Model> = (model: Model) => {
   const greyOnDrag = { [GreyOut]: model.isDragActive };
-  function AddNew(props: { node: RaisinNode; idx: number; slot: string }) {
-    const slots = model.getComponentMeta(props.node as RaisinElementNode)?.slots;
-    if (!slots) {
-      return <span>No slots</span>;
-    }
-    const slotMeta = slots.find(s => s.key === props.slot);
-    if (!slotMeta) {
-      return (
-        <span>
-          No slot meta for {props.slot} {JSON.stringify(slots)}
-        </span>
-      );
-    }
-    const { childTags } = slotMeta;
-    const filter = (block: RaisinElementNode) => childTags?.includes(block.tagName) || childTags?.includes('*');
-    const validChildren = model.blocks.filter(filter);
+  function AddNew(props: { node: RaisinElementNode; idx: number; slot: string }) {
+    const validChildren = model.getValidChildren(props.node, props.slot);
     if (!validChildren.length) {
-      return <span>No validChildren</span>;
+      return <div />;
     }
     return (
       <sl-dropdown class={greyOnDrag}>
@@ -113,28 +95,20 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           Add New
         </sl-button>
         <sl-menu>
-          {model.blocks.filter(filter).map(b => {
+          {validChildren.map(b => {
             const meta = model.getComponentMeta(b);
-            return (
-              <sl-menu-item
-                onClick={() =>
-                  // TOOD: Better clone
-                  model.insert(clone(b), props.node, props.idx)
-                }
-              >
-                {meta.title}
-              </sl-menu-item>
-            );
+            return <sl-menu-item onClick={() => model.insert(clone(b), props.node, props.idx)}>{meta.title}</sl-menu-item>;
           })}
         </sl-menu>
       </sl-dropdown>
     );
   }
 
-  function DropSlot(props: { node: RaisinNode; idx: number; slot: string }) {
+  function DropSlot(props: { node: RaisinElementNode; idx: number; slot: string }) {
+    const isLegalDrop = () => model.isValidChild(model.dragCoords?.element, props.node, props.slot);
     const claz = {
       [DropTarget]: !model.isDragActive,
-      [PossibleDropTarget]: model.isDragActive,
+      [PossibleDropTarget]: model.isDragActive && isLegalDrop(),
       // [ActiveDropTarget]:  === props.node
     };
     return (

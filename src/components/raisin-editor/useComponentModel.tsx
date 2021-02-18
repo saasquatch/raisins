@@ -1,9 +1,10 @@
 import { ComponentType, SlotType } from '../../model/Component';
 
 import * as HTMLComponents from '../../model/HTMLComponents';
-import { RaisinElementNode, RaisinTextNode } from '../../model/RaisinNode';
+import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../../model/RaisinNode';
 import { ElementType } from 'domelementtype';
 import { parse } from '../../model/parser';
+import { visit } from '../../util';
 
 const DefaultSlot: SlotType = {
   key: '',
@@ -193,11 +194,59 @@ export function useComponentModel() {
     };
   }
 
+  function isValidChild(from: RaisinNode, to: RaisinElementNode, slot: string) {
+    if (from === to) {
+      // Can't drop into yourself
+      return false;
+    }
+    const slots = getComponentMeta(to)?.slots;
+    const slotMeta = slots?.find(s => s.key === slot);
+    if (!slotMeta) return false;
+
+    const element = visit(from, {
+      onElement: n => n,
+    });
+    return slotMeta.childTags?.includes('*') || slotMeta.childTags?.includes(element?.tagName) || false;
+  }
+
+  function getValidChildren(node: RaisinElementNode, slot: string): RaisinElementNode[] {
+    const slots = getComponentMeta(node)?.slots;
+    if (!slots) {
+      // No documented slots
+      return [];
+    }
+    const slotMeta = slots.find(s => s.key === slot);
+    if (!slotMeta) {
+      // No slot meta for slot
+      return [];
+    }
+    const { childTags } = slotMeta;
+    if (!Array.isArray(childTags) || childTags.length < 1) {
+      // No valid children
+      return [];
+    }
+    const filter = (block: RaisinElementNode) => childTags?.includes('*') || childTags?.includes(block.tagName);
+    const validChildren = blocks.filter(filter);
+    if (!validChildren.length) {
+      return [];
+    }
+    return validChildren;
+  }
+
+  function canHaveChildren(node: RaisinElementNode, slot: string): boolean {
+    return getValidChildren(node, slot).length > 0;
+  }
+
   return {
     getComponentMeta,
     blocks,
+    getValidChildren,
+    canHaveChildren,
+    isValidChild,
   };
 }
+
+export type ComponentModel = ReturnType<typeof useComponentModel>;
 
 function blockFromHtml(html: string): RaisinElementNode {
   try {

@@ -6,10 +6,11 @@ import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../../model/DropState';
 import { move } from '../../util';
 import { StateUpdater } from '../../model/Dom';
-import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
+import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 import { usePopper } from '../../model/usePopper';
+import { ComponentModel } from './useComponentModel';
 
-type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren> };
+type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
 
 function useDragBuddy(sharedState: SharedState) {
   const [popper, setPopper] = useState<HTMLElement>(undefined);
@@ -68,6 +69,7 @@ export function useDND(props: Props) {
     popper,
     isDragActive,
     setIsDragActive,
+    componentModel: props.componentModel,
   };
   return {
     ...useDragState(sharedState),
@@ -88,6 +90,7 @@ type SharedState = {
   setReferenceElement: StateUpdater<HTMLElement>;
   popper: ReturnType<typeof usePopper>;
 
+  componentModel: ComponentModel;
   isDragActive: boolean;
   setIsDragActive: StateUpdater<boolean>;
 };
@@ -185,15 +188,16 @@ export function useDropState(sharedState: SharedState) {
     };
   }
 
-  const setDroppableRef = useDragRefs(sharedState, (element, _, idx: number, slot: string) => {
+  const setDroppableRef = useDragRefs(sharedState, (element, raisinNode, idx: number, slot: string) => {
     return interact(element).dropzone({
-      // // only accept elements matching this CSS selector
-      // accept: '*',
-      // // Require a 75% element overlap for a drop to be possible
-      // overlap: 0.1,
+      // Require a 75% element overlap for a drop to be possible
+      // overlap: 0.75,
 
-      // listen for drop related events:
-
+      accept: ({ draggableElement }: { dropzone: Interactable; draggableElement: HTMLElement }) => {
+        const dropped = sharedState.elementToNode.get(draggableElement);
+        // const dropzoneNode = sharedState.elementToNode.get(dropzone);
+        return sharedState.componentModel.isValidChild(dropped, raisinNode, slot);
+      },
       ondragenter: function (event) {
         // feedback the possibility of a drop
         event.relatedTarget.style.background = 'green';
@@ -235,6 +239,7 @@ export function useDropState(sharedState: SharedState) {
           console.log('Moving', dropped, 'to', dropzoneNode, 'at idx', position);
           return move(root, dropped, dropzoneNode, position);
         });
+
         setDropTarget(undefined);
         // event.relatedTarget.style.background = 'pink';
       },
@@ -258,8 +263,8 @@ export function useDropState(sharedState: SharedState) {
   return { setDroppableRef, dropTarget };
 }
 
-function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: RaisinNode, ...args: unknown[]) => Interactable) {
-  const setDraggableRef = (node: RaisinNode, element: HTMLElement, ...args: unknown[]) => {
+function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: RaisinElementNode, ...args: unknown[]) => Interactable) {
+  const setDraggableRef = (node: RaisinElementNode, element: HTMLElement, ...args: unknown[]) => {
     // Don't care about refs being nulled out
     if (!element) return;
 

@@ -6,6 +6,7 @@ import styleToObject from 'style-to-object';
 import { Button } from './Button';
 import { RaisinElementNode } from '../model/RaisinNode';
 import serializer from '../model/serializer';
+import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -24,11 +25,20 @@ const SelectedToolbar = css`
   background: red;
   color: white;
   display: flex;
-  justify-content: space-between;
   padding: 4px;
+
+  flex-wrap: wrap;
+  sl-button-group {
+    justify-self: end;
+  }
+  // CSS from: https://shoelace.style/components/button-group?id=toolbar-example
+  sl-button-group:not(:last-of-type) {
+    margin-right: var(--sl-spacing-x-small);
+  }
 `;
 const SelectedTitle = css`
   line-height: 28px;
+  flex-grow: 1;
 `;
 
 const Selected = css`
@@ -143,6 +153,8 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
   };
 
+  const selectedAncestry = props.getAncestry(props.selected).reverse();
+  const hasSelectedAncestry = selectedAncestry.length > 1 ? true : false;
   const hasSelected = typeof props.selected !== 'undefined';
   return (
     <div>
@@ -170,7 +182,31 @@ export const Canvas: FunctionalComponent<Model> = props => {
                 {' '}
                 <sl-icon name="arrow-bar-down"></sl-icon>
               </Button>
-            </sl-button-group>
+            </sl-button-group>{' '}
+            {hasSelectedAncestry && (
+              <sl-button-group>
+                <sl-dropdown placement="top-end">
+                  <sl-button slot="trigger" caret pill size="small">
+                    <sl-icon name="bar-chart-steps"></sl-icon>
+                  </sl-button>
+                  <sl-menu>
+                    <sl-menu-label>Select Parent</sl-menu-label>
+
+                    {selectedAncestry.map((n, idx) => {
+                      const meta = props.getComponentMeta(n as any);
+                      return (
+                        <sl-menu-item onClick={() => props.setSelected(n)}>
+                          {'-'.repeat(idx)} {meta?.title || 'Root'}
+                        </sl-menu-item>
+                      );
+                    })}
+                    <sl-menu-item>
+                      {'-'.repeat(selectedAncestry.length)} <b>{props.getComponentMeta(props.selected as RaisinElementNode).title}</b>
+                    </sl-menu-item>
+                  </sl-menu>
+                </sl-dropdown>
+              </sl-button-group>
+            )}
           </div>
         )}
       </div>
