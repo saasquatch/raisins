@@ -244,8 +244,10 @@ export function useDropState(sharedState: SharedState) {
         // event.relatedTarget.style.background = 'pink';
       },
 
-      /*
+      /**
        * For dropzones only
+       *
+       * `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
        */
       ondropactivate: function () {
         // add active dropzone feedback
@@ -263,6 +265,11 @@ export function useDropState(sharedState: SharedState) {
   return { setDroppableRef, dropTarget };
 }
 
+/**
+ *
+ * @param sharedState
+ * @param builder
+ */
 function useDragRefs(sharedState: SharedState, builder: (element: HTMLElement, node: RaisinElementNode, ...args: unknown[]) => Interactable) {
   const setDraggableRef = (node: RaisinElementNode, element: HTMLElement, ...args: unknown[]) => {
     // Don't care about refs being nulled out

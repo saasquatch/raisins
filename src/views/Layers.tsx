@@ -1,10 +1,10 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
-import { Block, Model } from '../model/Dom';
+import { Model } from '../model/Dom';
 import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';
 import { getId } from '../components/raisin-editor/useEditor';
-import { RaisinElementNode, RaisinNode } from '../model/RaisinNode';
+import { RaisinElementNode } from '../model/RaisinNode';
 import { Handle } from './Handle';
 import { Button } from './Button';
 

@@ -6,7 +6,6 @@ import styleToObject from 'style-to-object';
 import { Button } from './Button';
 import { RaisinElementNode } from '../model/RaisinNode';
 import serializer from '../model/serializer';
-import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),

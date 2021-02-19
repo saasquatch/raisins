@@ -3,7 +3,7 @@ import { visit } from '../../util';
 import { RaisinNode } from '../../model/RaisinNode';
 
 export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponentMeta']) {
-  const noSlots = (node: RaisinNode) => undefined;
+  const noSlots = (_: RaisinNode) => undefined;
   const noSlotsWChildren = (node: RaisinNode, children: NodeWithSlots[]) => ({
     node,
     slots: [

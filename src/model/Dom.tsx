@@ -1,5 +1,5 @@
 import useCanvas from '../components/raisin-editor/useCanvas';
-import { ComponentModel, useComponentModel } from '../components/raisin-editor/useComponentModel';
+import { ComponentModel } from '../components/raisin-editor/useComponentModel';
 import { useDND } from '../components/raisin-editor/useDragState';
 import { Mode } from '../components/raisin-editor/useEditor';
 import { useInlinedHTML } from '../components/raisin-editor/useInlinedHTML';

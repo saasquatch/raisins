@@ -136,16 +136,7 @@ export function useEditor(): Model {
   function setNodeInternal(next: NewState<RaisinNode>, newSelection?: RaisinNode) {
     setState(previous => {
       const nextNode = typeof next === 'function' ? next(previous.current) : next;
-      const undoStack = [previous.current, ...previous.undoStack];
-      const newState = {
-        selected: newSelection,
-        current: nextNode,
-        undoStack,
-        redoStack: [],
-        slots: getSlots(nextNode, metamodel.getComponentMeta),
-      };
-      console.log('Setting to');
-      return newState;
+      return generateNextState(previous, newSelection, nextNode, metamodel);
     });
   }
   const setNode: StateUpdater<RaisinNode> = n => setNodeInternal(n);
@@ -198,6 +189,15 @@ export function useEditor(): Model {
       return newState;
     });
   }
+  function deleteSelected() {
+    setState(previous => {
+      if (previous.selected) {
+        const clone = remove(previous.current, previous.selected);
+        return generateNextState(previous, undefined, clone, metamodel);
+      }
+      return previous;
+    });
+  }
 
   useEffect(() => {
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
@@ -214,9 +214,7 @@ export function useEditor(): Model {
         case 'backspace':
         case 'delete':
           event.preventDefault();
-          if (state.selected) {
-            removeNode(state.selected);
-          }
+          deleteSelected();
         default:
       }
     });
@@ -268,4 +266,16 @@ export function useEditor(): Model {
     ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode, parents, componentModel: metamodel }),
   };
+}
+function generateNextState(previous: InternalState, newSelection, nextNode, metamodel) {
+  const undoStack = [previous.current, ...previous.undoStack];
+  const newState = {
+    selected: newSelection,
+    current: nextNode,
+    undoStack,
+    redoStack: [],
+    slots: getSlots(nextNode, metamodel.getComponentMeta),
+  };
+  console.log('Setting to');
+  return newState;
 }
