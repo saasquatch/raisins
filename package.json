@@ -28,6 +28,8 @@
     "@saasquatch/stencil-hooks": "^1.0.0",
     "@shoelace-style/shoelace": "^2.0.0-beta.25",
     "@stencil/core": "^1.17.4",
+    "@wry/equality": "^0.3.2",
+    "debug": "^4.3.1",
     "dom-serializer": "^1.2.0",
     "domhandler": "^4.0.0",
     "hotkeys-js": "^3.8.1",

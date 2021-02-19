@@ -1,5 +1,5 @@
 import * as DOMHandler from 'domhandler';
-import { useCallback, useEffect, useRef, useState } from '@saasquatch/stencil-hooks';
+import { useRef, useState } from '@saasquatch/stencil-hooks';
 import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
@@ -12,43 +12,6 @@ import { ComponentModel } from './useComponentModel';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
 
-function useDragBuddy(sharedState: SharedState) {
-  const [popper, setPopper] = useState<HTMLElement>(undefined);
-  function generateGetBoundingClientRect(x = 0, y = 0) {
-    return () => ({
-      width: 0,
-      height: 0,
-      top: y,
-      right: x,
-      bottom: y,
-      left: x,
-    });
-  }
-
-  const virtualElement = useRef({
-    getBoundingClientRect: generateGetBoundingClientRect(),
-  });
-
-  const instance = usePopper(virtualElement.current, popper);
-
-  const onMove = useCallback(
-    ({ clientX: x, clientY: y }) => {
-      virtualElement.current.getBoundingClientRect = generateGetBoundingClientRect(x, y);
-      // if (instance.update) instance.update();
-    },
-    [instance, virtualElement],
-  );
-
-  useEffect(() => {
-    document.addEventListener('mousemove', onMove);
-    () => document.removeEventListener('mousemove', onMove);
-  }, [onMove]);
-
-  return {
-    setDragBuddy: setPopper,
-  };
-}
-
 export function useDND(props: Props) {
   const elementToNode = useRef(new WeakMap<HTMLElement, RaisinElementNode>()).current;
   const elementToInteract = useRef(new WeakMap<HTMLElement, Interactable>()).current;
@@ -58,7 +21,6 @@ export function useDND(props: Props) {
   const [popperElement, setPopperElement] = useState(null);
   const popper = usePopper(referenceElement, popperElement, {
     placement: 'left-start',
-    // modifiers: [{ name: 'arrow', options: { element: arrowElement } }],
   });
 
   const sharedState = {
@@ -74,7 +36,6 @@ export function useDND(props: Props) {
   return {
     ...useDragState(sharedState),
     ...useDropState(sharedState),
-    ...useDragBuddy(sharedState),
     isDragActive,
     elementToNode,
     popper,

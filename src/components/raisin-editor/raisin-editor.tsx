@@ -6,6 +6,8 @@ import { withHooks } from '@saasquatch/stencil-hooks';
 import { ToolbarView } from '../../views/Toolbar';
 import { css } from '@emotion/css';
 import { useEditor } from './useEditor';
+import { RaisinElementNode } from '../../model/RaisinNode';
+import { EditorPanel } from '../../views/EditorPanel';
 
 const Row = css`
   display: flex;
@@ -18,6 +20,16 @@ const Column = css`
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
+`;
+const Main = css`
+  font-family: var(--sl-font-sans);
+  font-size: var(--sl-font-size-medium);
+  font-weight: var(--sl-font-weight-normal);
+  letter-spacing: var(--sl-letter-spacing-normal);
+  color: var(--sl-color-gray-800);
+  line-height: var(--sl-line-height-normal);
+  background: var(--sl-color-gray-900);
+  color: var(--sl-color-gray-200);
 `;
 
 @Component({
@@ -35,29 +47,35 @@ export class Editor {
 
     // console.log("Top-level render", new Date())
     return (
-      <div>
-        <ToolbarView {...model} />
-        <div class={Row}>
-          <div class={Column}>
-            <Canvas {...model} />
-          </div>
+      <sl-theme name="dark">
+        <div class={Main}>
+          <ToolbarView {...model} />
+          <div class={Row}>
+            <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px', padding: '5px' }}>
+              {model.selected && `Attributes for ${model.getComponentMeta(model.selected as RaisinElementNode)?.title || 'Element'}`}
+              <EditorPanel {...model} />
+            </div>
+            <div class={Column} style={{ flexGrow: '1' }}>
+              <Canvas {...model} />
+            </div>
 
-          <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
-            {' '}
-            <Layers {...model} />
-            {/* <EditorPanel {...model} /> */}
-            {/* <h1>Editor</h1>
+            <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
+              {' '}
+              <Layers {...model} />
+              {/* <EditorPanel {...model} /> */}
+              {/* <h1>Editor</h1>
          
             <BlocksList {...model} />
             <h1>Input</h1>
             <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
             <h1>Output</h1>
             <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre> */}
+            </div>
           </div>
-        </div>
 
-        <slot />
-      </div>
+          <slot />
+        </div>
+      </sl-theme>
     );
   }
 }

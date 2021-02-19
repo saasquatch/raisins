@@ -15,15 +15,15 @@ const Layer = css`
   position: relative;
   user-select: none;
   padding: 10px 0;
-  background: #eee;
+  background: var(--sl-color-gray-900);
   border: 1px solid #ccc;
 `;
 const DropLayer = css`
-  background: pink;
+  background: var(--sl-color-gray-900);
 `;
 const Selected = css`
   ${Layer};
-  background: #eee;
+  background: var(--sl-color-gray-900);
   outline: 1px solid red;
 `;
 const Label = css`
@@ -55,8 +55,6 @@ const DropTarget = css`
 `;
 const PossibleDropTarget = css`
   ${DropTarget}
-  // Background for debugging size of drop targets
-  // background: rgb(0,0,255,0.2);
   display: block;
   &: before {
     content: ' ';
@@ -207,17 +205,10 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     <div>
       {visit(model.node, ElementVisitor)}
       <DepthLabel model={model} />
-      <DragBuddy model={model} />
     </div>
   );
 };
 
-/**
- *  Follows the cursor to indicate a drag.
- */
-function DragBuddy(props: { model: Model }): VNode {
-  return <div ref={props.model.setDragBuddy}>Drag buddy!</div>;
-}
 /**
  * Positioned next to a drop target to indicate a possible drop location
  */

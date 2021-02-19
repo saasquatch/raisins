@@ -7,6 +7,7 @@ import { Button } from './Button';
 import { RaisinElementNode } from '../model/RaisinNode';
 import serializer from '../model/serializer';
 import { useComponentModel } from '../components/raisin-editor/useComponentModel';
+import { EditorPanel } from './EditorPanel';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -59,6 +60,15 @@ const Selectable = css`
   //   height: 20px;
   //   z-index: 9;
   // }
+`;
+const EditorPopper = css`
+  background: white;
+  border: 1px solid black;
+`;
+
+const EditorDrawer = css`
+  justify-self: flex-start;
+  width: 200px;
 `;
 
 export const Canvas: FunctionalComponent<Model> = props => {
@@ -163,7 +173,13 @@ export const Canvas: FunctionalComponent<Model> = props => {
           {visit(props.node, CanvasVisitor)}
         </div>
       </div>
-      <div ref={el => (props.toolbarRef.current = el)} data-toolbar>
+      <div
+        ref={el => (props.toolbarRef.current = el)}
+        data-toolbar
+        {...props.toolbarPopper.attributes.popper}
+        // @ts-ignore
+        style={props.toolbarPopper.styles.popper}
+      >
         {hasSelected && (
           <div class={SelectedToolbar}>
             <div class={SelectedTitle}>{props.getComponentMeta(props.selected as RaisinElementNode)?.title || props.selected?.nodeType}</div>
@@ -210,6 +226,18 @@ export const Canvas: FunctionalComponent<Model> = props => {
           </div>
         )}
       </div>
+
+      {/* <div
+        class={EditorPopper}
+        ref={el => (props.editorRef.current = el)}
+        data-toolbar
+        {...props.editorPopper.attributes.popper}
+        // @ts-ignore
+        style={props.editorPopper.styles.popper}
+      >
+        <EditorPanel {...props} />
+      </div> */}
+
       {hasSelected && <div>Selected</div>}
     </div>
   );

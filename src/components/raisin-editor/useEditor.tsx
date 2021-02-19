@@ -47,15 +47,6 @@ export function useEditor(): Model {
   const initial = useMemo(() => {
     const html = host.querySelectorAll('template')[0].innerHTML;
     const raisinNode = parse(html);
-    visit(raisinNode, {
-      onText(text) {
-        if (!text.data.trim()) {
-          console.log('Prased to blank!', text);
-        } else {
-          console.log('Parsed to not blank!', text);
-        }
-      },
-    });
     return raisinNode;
   }, []);
 

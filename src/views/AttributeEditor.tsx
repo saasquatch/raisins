@@ -4,7 +4,7 @@ import { RaisinElementNode } from '../model/RaisinNode';
 
 export function AttributesEditor(props: { model: Model; node: RaisinElementNode }) {
   const schema = props.model.getComponentMeta(props.node)?.attributes;
-
+  const attribs = props.node.attribs || {};
   const onchange = (key: string) => {
     return (value: string) => {
       const clone = {
@@ -14,14 +14,38 @@ export function AttributesEditor(props: { model: Model; node: RaisinElementNode 
       props.model.replaceNode(props.node, clone);
     };
   };
+  const allProps = new Set([...Object.keys(attribs), ...Object.keys(schema?.properties || {})]);
+  const allPropKeys = [...allProps];
   return (
     <div>
-      <AttributeEditor model={props.model} attr={{ key: 'title', value: props.node.attribs?.title }} onChange={onchange('title')} />
-      Attributes: <br />
-      <pre>{JSON.stringify(props.node.attribs)}</pre>
-      Schema:
-      <br />
-      <pre>{JSON.stringify(schema)}</pre>
+      <table>
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allPropKeys.map(key => {
+            return (
+              <tr>
+                <td>{key}</td>
+                <td>
+                  <AttributeEditor model={props.model} attr={{ key, value: attribs[key] }} onChange={onchange(key)} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+        <tbody></tbody>
+      </table>
+      <sl-details summary="Debugging">
+        Attributes: <br />
+        <pre style={{ overflow: 'scroll' }}>{JSON.stringify(props.node.attribs, null, 2)}</pre>
+        Schema:
+        <br />
+        <pre>{JSON.stringify(schema)}</pre>
+      </sl-details>
     </div>
   );
 }

@@ -16,6 +16,10 @@ import { createPopper as defaultCreatePopper, Options as PopperOptions, VirtualE
 import { useEffect, useMemo, useRef, useState } from '@saasquatch/stencil-hooks';
 //   import isEqual from 'react-fast-compare';
 //   import { fromEntries, useIsomorphicLayoutEffect } from './utils';
+import debugFN from 'debug';
+import { equal } from '@wry/equality';
+
+const debug = debugFN('usePopper');
 
 type Options = Partial<
   PopperOptions & {
@@ -76,7 +80,7 @@ export const usePopper = (referenceElement?: Element | VirtualElement, popperEle
     [],
   );
 
-  const popperOptions = useMemo(() => {
+  const popperOptions = useDeepMemo(() => {
     const newOptions = {
       onFirstUpdate: optionsWithDefaults.onFirstUpdate,
       placement: optionsWithDefaults.placement,
@@ -95,12 +99,14 @@ export const usePopper = (referenceElement?: Element | VirtualElement, popperEle
   const popperInstanceRef = useRef<Instance>(undefined);
 
   useIsomorphicLayoutEffect(() => {
+    debug('Updating options');
     if (popperInstanceRef.current) {
       popperInstanceRef.current.setOptions(popperOptions);
     }
   }, [popperOptions]);
 
   useIsomorphicLayoutEffect(() => {
+    debug('Updating elements');
     if (referenceElement == null || popperElement == null) {
       return;
     }
@@ -135,10 +141,25 @@ const fromEntries = (entries: Array<[string, any]>) =>
   }, {});
 
 function isEqual(...args) {
-  console.warn('TODO implement `isEqual` for performance', ...args);
+  debug('TODO implement `isEqual` for performance', ...args);
   return true;
 }
 
 function useIsomorphicLayoutEffect(cb: () => void | VoidFunction, deps?: unknown[]) {
-  useEffect(cb, deps);
+  useEffect(() => {
+    let unMount: VoidFunction | void;
+    setTimeout(() => (unMount = cb()), 100);
+    return () => unMount && unMount();
+  }, deps);
+}
+
+export function useDeepMemo<TKey, TValue>(memoFn: () => TValue, key: TKey): TValue {
+  //@ts-ignore
+  const ref = useRef<{ key: TKey; value: TValue }>();
+
+  if (!ref.current || !equal(key, ref.current.key)) {
+    ref.current = { key, value: memoFn() };
+  }
+
+  return ref.current.value;
 }
