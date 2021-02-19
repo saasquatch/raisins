@@ -231,17 +231,18 @@ export function insertAt(root: RaisinNode, node: RaisinNode, newParent: RaisinNo
   );
 }
 
-function isBlank(str) {
-  return !str || /^\s*$/.test(str);
+function isBlankOrEmpty(str: string) {
+  return !str || /^\s*$/.test(str) || str.length === 0 || !str.trim();
 }
 
 export function removeWhitespace(root: RaisinNode): RaisinNode {
   return visit(root, {
-    ...IdentityVisitor,
+    ...CloneVisitor,
     onText(text) {
-      if (!text.data || isBlank(text.data)) {
+      if (isBlankOrEmpty(text.data.trim())) {
         return undefined;
       }
+      console.log('Not Blank', text);
       return text;
     },
   });

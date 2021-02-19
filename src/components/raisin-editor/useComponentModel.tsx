@@ -11,7 +11,7 @@ const DefaultSlot: SlotType = {
   title: 'Default slot',
 };
 const SquatchComponents: ComponentType[] = [
-  { tagName: 'sqh-global-container', title: 'Container', slots: [DefaultSlot] },
+  { tagName: 'sqh-global-container', title: 'Container', slots: [{ ...DefaultSlot, childTags: ['*'] }] },
   { tagName: 'sqh-text-component', title: 'Text' },
   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
   { tagName: 'sqh-share-button-container', title: 'Share Buttons' },

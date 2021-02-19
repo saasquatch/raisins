@@ -1,7 +1,7 @@
 import { Model, NewState, NodeWithSlots, StateUpdater } from '../../model/Dom';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks';
-import { duplicate, getParents, insertAt, move, remove, replace } from '../../util';
+import { duplicate, getParents, insertAt, move, remove, replace, visit } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
 import { useInlinedHTML } from './useInlinedHTML';
@@ -48,6 +48,15 @@ export function useEditor(): Model {
   const initial = useMemo(() => {
     const html = host.querySelectorAll('template')[0].innerHTML;
     const raisinNode = parse(html);
+    visit(raisinNode, {
+      onText(text) {
+        if (!text.data.trim()) {
+          console.log('Prased to blank!', text);
+        } else {
+          console.log('Parsed to not blank!', text);
+        }
+      },
+    });
     return raisinNode;
   }, []);
 
@@ -200,6 +209,8 @@ export function useEditor(): Model {
   }
 
   useEffect(() => {
+    // TODO: Scope so that backspace and delete only work depending on what is "focused"
+    // TODO: Cleanup listeners on onmount so that the shortcuts don't live forever (e.g. and mess up program engine installation)
     hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
       switch (handler.key) {
         case 'ctrl+z':
