@@ -4,7 +4,6 @@ import { useEffect, useHost, useMemo, useState } from '@saasquatch/stencil-hooks
 import { duplicate, getParents, insertAt, move, remove, replace, visit } from '../../util';
 import { useDND } from './useDragState';
 import { getSlots } from './getSlots';
-import { useInlinedHTML } from './useInlinedHTML';
 import { useComponentModel } from './useComponentModel';
 import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 import serializer from '../../model/serializer';
@@ -286,8 +285,7 @@ export function useEditor(): Model {
     mode,
     setMode,
     ...metamodel,
-    ...useCanvas({ selected: state.selected }),
-    ...useInlinedHTML({ setNode }),
+    ...useCanvas({ selected: state.selected, setNodeInternal }),
     ...useDND({ node: state.current, setNode, parents, componentModel: metamodel }),
   };
 }

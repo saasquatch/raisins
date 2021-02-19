@@ -6,6 +6,7 @@ import styleToObject from 'style-to-object';
 import { Button } from './Button';
 import { RaisinElementNode } from '../model/RaisinNode';
 import serializer from '../model/serializer';
+import { useComponentModel } from '../components/raisin-editor/useComponentModel';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -67,23 +68,23 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
     onText(text) {
       const textValue = text.data;
-      const parent = props.parents.get(text);
-      if ((props.selected === text || props.selected === parent) && props.mode === 'edit') {
-        return (
-          <input
-            value={textValue}
-            onInput={e => {
-              const newText = (e.target as HTMLInputElement).value as string;
-              const newNode = {
-                ...text,
-                data: newText,
-              };
-              props.replaceNode(text, newNode);
-            }}
-          />
-        );
-        // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
-      }
+      // const parent = props.parents.get(text);
+      // if ((props.selected === text || props.selected === parent) && props.mode === 'edit') {
+      //   return (
+      //     <input
+      //       value={textValue}
+      //       onInput={e => {
+      //         const newText = (e.target as HTMLInputElement).value as string;
+      //         const newNode = {
+      //           ...text,
+      //           data: newText,
+      //         };
+      //         props.replaceNode(text, newNode);
+      //       }}
+      //     />
+      //   );
+      //   // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
+      // }
       return textValue;
     },
     onElement(element, children) {
