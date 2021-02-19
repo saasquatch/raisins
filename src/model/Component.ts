@@ -4,6 +4,8 @@ export interface ComponentType {
   title: string;
   tagName: string;
   attributes?: JSONSchema;
+
+  parentTags?: string[];
   slots?: SlotType[];
 }
 
@@ -15,6 +17,5 @@ export interface SlotType {
    */
   orientation?: 'up-down' | 'left-right' | 'right-left' | 'down-up';
 
-  parentTags?: string[];
   childTags?: string[];
 }

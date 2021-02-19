@@ -120,8 +120,22 @@ export function useEditor(): Model {
       return newState;
     });
 
+  function generateNextState(previous: InternalState, nextNode: RaisinNode, newSelection?: RaisinNode) {
+    const undoStack = [previous.current, ...previous.undoStack];
+    const newState = {
+      selected: newSelection,
+      current: nextNode,
+      undoStack,
+      redoStack: [],
+      slots: getSlots(nextNode, metamodel.getComponentMeta),
+    };
+    console.log('Setting to');
+    return newState;
+  }
+
   const setSelected = (next: RaisinNode) => {
     setState(prev => {
+      // TODO: Allows for selecting nodes that aren't part of the current tree
       return {
         ...prev,
         selected: next,
@@ -145,14 +159,13 @@ export function useEditor(): Model {
   function setNodeInternal(next: NewState<RaisinNode>, newSelection?: RaisinNode) {
     setState(previous => {
       const nextNode = typeof next === 'function' ? next(previous.current) : next;
-      return generateNextState(previous, newSelection, nextNode, metamodel);
+      return generateNextState(previous, nextNode, newSelection);
     });
   }
   const setNode: StateUpdater<RaisinNode> = n => setNodeInternal(n);
 
   function removeNode(n: RaisinNode) {
-    const clone = remove(state.current, n);
-    setNodeInternal(clone);
+    setNodeInternal(previous => remove(previous, n), undefined);
   }
   function duplicateNode(n: RaisinNode) {
     const clone = duplicate(state.current, n);
@@ -202,7 +215,7 @@ export function useEditor(): Model {
     setState(previous => {
       if (previous.selected) {
         const clone = remove(previous.current, previous.selected);
-        return generateNextState(previous, undefined, clone, metamodel);
+        return generateNextState(previous, clone);
       }
       return previous;
     });
@@ -277,16 +290,4 @@ export function useEditor(): Model {
     ...useInlinedHTML({ setNode }),
     ...useDND({ node: state.current, setNode, parents, componentModel: metamodel }),
   };
-}
-function generateNextState(previous: InternalState, newSelection, nextNode, metamodel) {
-  const undoStack = [previous.current, ...previous.undoStack];
-  const newState = {
-    selected: newSelection,
-    current: nextNode,
-    undoStack,
-    redoStack: [],
-    slots: getSlots(nextNode, metamodel.getComponentMeta),
-  };
-  console.log('Setting to');
-  return newState;
 }

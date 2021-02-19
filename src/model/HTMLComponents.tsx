@@ -38,10 +38,31 @@ export const A: ComponentType = {
 // 'button',
 // 'canvas',
 // 'caption',
+export const CAPTION: ComponentType = {
+  title: 'Table Caption',
+  tagName: 'caption',
+  attributes: COMMON_HTML_ATTRS_SCHEMA,
+  parentTags: ['table'],
+  slots: [{ ...DefaultSlot }],
+};
 // 'cite',
 // 'code',
 // 'col',
+export const COL: ComponentType = {
+  title: 'Table Column',
+  tagName: 'col',
+  // Could use `span` property
+  attributes: COMMON_HTML_ATTRS_SCHEMA,
+  parentTags: ['colgroup'],
+};
 // 'colgroup',
+export const COLGROUP: ComponentType = {
+  title: 'Table Column Group',
+  tagName: 'colgroup',
+  attributes: COMMON_HTML_ATTRS_SCHEMA,
+  parentTags: ['table'],
+  slots: [{ ...DefaultSlot, childTags: ['col'] }],
+};
 // 'data',
 // 'datalist',
 // 'dd',
@@ -182,14 +203,15 @@ export const TABLE: ComponentType = {
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['thead', 'tbody', 'tfoot'],
+      childTags: ['caption', 'colgroup', 'thead', 'tbody', 'tr', 'tfoot'],
     },
   ],
 };
 // 'tbody',
-export const TBODT: ComponentType = {
+export const TBODY: ComponentType = {
   title: 'Table Body',
   tagName: 'tbody',
+  parentTags: ['table'],
   slots: [
     {
       ...DefaultSlot,
@@ -201,6 +223,7 @@ export const TBODT: ComponentType = {
 export const TD: ComponentType = {
   title: 'Table Cell',
   tagName: 'td',
+  parentTags: ['tr'],
   slots: [
     {
       ...DefaultSlot,
@@ -213,6 +236,7 @@ export const TD: ComponentType = {
 export const TFOOT: ComponentType = {
   title: 'Table Footer',
   tagName: 'tfoot',
+  parentTags: ['table'],
   slots: [
     {
       ...DefaultSlot,
@@ -224,9 +248,11 @@ export const TFOOT: ComponentType = {
 export const TH: ComponentType = {
   title: 'Table Header Cell',
   tagName: 'th',
+  parentTags: ['tr'],
   slots: [
     {
       ...DefaultSlot,
+      childTags: ['*'],
     },
   ],
 };
@@ -234,6 +260,7 @@ export const TH: ComponentType = {
 export const THEAD: ComponentType = {
   title: 'Table Header',
   tagName: 'thead',
+  parentTags: ['table'],
   slots: [
     {
       ...DefaultSlot,
@@ -247,6 +274,7 @@ export const THEAD: ComponentType = {
 export const TR: ComponentType = {
   title: 'Table Row',
   tagName: 'tr',
+  parentTags: ['thead', 'tfoot', 'tbody'],
   slots: [
     {
       ...DefaultSlot,

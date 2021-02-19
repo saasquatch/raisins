@@ -209,6 +209,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
           </div>
         )}
       </div>
+      {hasSelected && <div>Selected</div>}
     </div>
   );
 };

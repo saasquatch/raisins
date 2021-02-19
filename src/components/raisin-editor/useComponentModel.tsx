@@ -15,12 +15,12 @@ const SquatchComponents: ComponentType[] = [
   { tagName: 'sqh-text-component', title: 'Text' },
   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
   { tagName: 'sqh-share-button-container', title: 'Share Buttons' },
-  { tagName: 'sqh-stats-container', title: 'Stats', slots: [DefaultSlot] },
-  { tagName: 'sqh-stat-component', title: 'Stat' },
+  { tagName: 'sqh-stats-container', title: 'Stats', slots: [{ ...DefaultSlot, childTags: ['sqh-stat-component'] }] },
+  { tagName: 'sqh-stat-component', title: 'Stat', parentTags: ['sqh-stats-container'] },
   { tagName: 'sqh-referral-list', title: 'Referrals' },
   // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
-  { tagName: 'sqh-grid', title: '3 Col Grid', slots: [{ ...DefaultSlot, orientation: 'left-right' }] },
-  { tagName: 'sqh-column', title: 'Column' },
+  { tagName: 'sqh-grid', title: '3 Col Grid', slots: [{ ...DefaultSlot, orientation: 'left-right', childTags: ['sqh-column'] }] },
+  { tagName: 'sqh-column', title: 'Column', parentTags: ['sqh-grid'], slots: [{ ...DefaultSlot, childTags: ['*'] }] },
 ];
 
 const ShoelaceComponents: ComponentType[] = [
@@ -39,6 +39,7 @@ const blocks: RaisinElementNode[] = [
     attribs: {},
     children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
   },
+  blockFromHtml(`<sqh-stat-component></sqh-stat-component>`),
   blockFromHtml(`<sqh-copy-link-button 
   ishidden="false"
   copysuccess="copied!"
@@ -194,7 +195,7 @@ export function useComponentModel() {
     };
   }
 
-  function isValidChild(from: RaisinNode, to: RaisinElementNode, slot: string) {
+  function isValidChild(from: RaisinElementNode, to: RaisinElementNode, slot: string) {
     if (from === to) {
       // Can't drop into yourself
       return false;
@@ -206,7 +207,12 @@ export function useComponentModel() {
     const element = visit(from, {
       onElement: n => n,
     });
-    return slotMeta.childTags?.includes('*') || slotMeta.childTags?.includes(element?.tagName) || false;
+    const parentAllowsChild = slotMeta.childTags?.includes('*') || slotMeta.childTags?.includes(element?.tagName) || false;
+
+    const childMeta = getComponentMeta(from);
+    const childAllowsParents = doesChildAllowParent(childMeta, to);
+
+    return parentAllowsChild && childAllowsParents;
   }
 
   function getValidChildren(node: RaisinElementNode, slot: string): RaisinElementNode[] {
@@ -225,7 +231,12 @@ export function useComponentModel() {
       // No valid children
       return [];
     }
-    const filter = (block: RaisinElementNode) => childTags?.includes('*') || childTags?.includes(block.tagName);
+    const filter = (block: RaisinElementNode) => {
+      const parentAllowsChild = childTags?.includes('*') || childTags?.includes(block.tagName);
+      const childMeta = getComponentMeta(block);
+      const childAllowsParents = doesChildAllowParent(childMeta, node);
+      return parentAllowsChild && childAllowsParents;
+    };
     const validChildren = blocks.filter(filter);
     if (!validChildren.length) {
       return [];
@@ -247,6 +258,13 @@ export function useComponentModel() {
 }
 
 export type ComponentModel = ReturnType<typeof useComponentModel>;
+
+function doesChildAllowParent(childMeta: ComponentType, to: RaisinElementNode) {
+  const childHasRestrictions = Array.isArray(childMeta?.parentTags) && childMeta.parentTags.length > 0;
+
+  const childAllowsParents = !childHasRestrictions || childMeta.parentTags.includes(to.tagName);
+  return childAllowsParents;
+}
 
 function blockFromHtml(html: string): RaisinElementNode {
   try {

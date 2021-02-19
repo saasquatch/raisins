@@ -24,5 +24,5 @@ export const Grippy = css`
 `;
 
 export function Handle() {
-  return <span class={Grippy} />;
+  return <span class={Grippy} data-draggable />;
 }

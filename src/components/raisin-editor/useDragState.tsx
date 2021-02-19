@@ -50,7 +50,7 @@ function useDragBuddy(sharedState: SharedState) {
 }
 
 export function useDND(props: Props) {
-  const elementToNode = useRef(new WeakMap<HTMLElement, RaisinNode>()).current;
+  const elementToNode = useRef(new WeakMap<HTMLElement, RaisinElementNode>()).current;
   const elementToInteract = useRef(new WeakMap<HTMLElement, Interactable>()).current;
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
 
@@ -84,7 +84,7 @@ export function useDND(props: Props) {
 }
 
 type SharedState = {
-  elementToNode: WeakMap<HTMLElement, RaisinNode>;
+  elementToNode: WeakMap<HTMLElement, RaisinElementNode>;
   elementToInteract: WeakMap<HTMLElement, Interactable>;
   props: Props;
   setReferenceElement: StateUpdater<HTMLElement>;
@@ -98,13 +98,12 @@ type SharedState = {
 function useDragState(sharedState: SharedState) {
   const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
 
-  function createDraggable(element: HTMLElement, node: RaisinNode) {
-    const handle = element.querySelector('.handle');
+  function createDraggable(element: HTMLElement, node: RaisinElementNode) {
     const interactable = interact(element)
       .styleCursor(false)
       .draggable({
         // enable inertial throwing
-        allowFrom: handle && (handle[0] as HTMLElement),
+        allowFrom: '[data-draggable]',
         inertia: false,
         // keep the element within the area of it's parent
         modifiers: [
