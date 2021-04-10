@@ -1,4 +1,4 @@
-import { DefaultSlot, Model, NodeWithSlots } from '../../model/Dom';
+import { DefaultSlot, Model, NodeWithSlots } from '../../model/EditorModel';
 import { visit } from '../../util';
 import { RaisinNode } from '../../model/RaisinNode';
 

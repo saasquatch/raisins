@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from '@saasquatch/stencil-hooks';
+import { useEffect, useMemo, useRef, useState } from '@saasquatch/universal-hooks';
 import { RaisinNode } from '../../model/RaisinNode';
 import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
 import { sameWidth } from './sameWidth';
-import { StateUpdater } from '../../model/Dom';
+import { StateUpdater } from '../../model/EditorModel';
 import { usePopper } from '../../model/usePopper';
 import { getRectOffset } from '@interactjs/modifiers/Modification';
 

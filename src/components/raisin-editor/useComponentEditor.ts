@@ -1,4 +1,4 @@
-import { Model } from '../../model/Dom';
+import { Model } from '../../model/EditorModel';
 import { RaisinElementNode, RaisinNode } from '../../model/RaisinNode';
 
 interface ComponentEditor<T = unknown> {

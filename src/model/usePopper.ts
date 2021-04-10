@@ -13,7 +13,7 @@
  *
  */
 import { createPopper as defaultCreatePopper, Options as PopperOptions, VirtualElement, Instance } from '@popperjs/core';
-import { useEffect, useMemo, useRef, useState } from '@saasquatch/stencil-hooks';
+import { useEffect, useMemo, useRef, useState } from '@saasquatch/universal-hooks';
 //   import isEqual from 'react-fast-compare';
 //   import { fromEntries, useIsomorphicLayoutEffect } from './utils';
 import debugFN from 'debug';

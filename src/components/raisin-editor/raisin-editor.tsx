@@ -1,13 +1,14 @@
 import { Component, h } from '@stencil/core';
-import { Model } from '../../model/Dom';
+import { Model } from '../../model/EditorModel';
 import { Canvas } from '../../views/Canvas';
 import { Layers } from '../../views/Layers';
-import { withHooks } from '@saasquatch/stencil-hooks';
+import { useHost, withHooks } from '@saasquatch/stencil-hooks';
 import { ToolbarView } from '../../views/Toolbar';
 import { css } from '@emotion/css';
 import { useEditor } from './useEditor';
 import { RaisinElementNode } from '../../model/RaisinNode';
 import { EditorPanel } from '../../views/EditorPanel';
+import { StyleEditor } from '../../views/StyleEditor';
 
 const Row = css`
   display: flex;
@@ -43,7 +44,8 @@ export class Editor {
   disconnectedCallback() {}
 
   render() {
-    const model: Model = useEditor();
+    const host = useHost();
+    const model: Model = useEditor(host);
 
     // console.log("Top-level render", new Date())
     return (
@@ -54,12 +56,13 @@ export class Editor {
             <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px', padding: '5px' }}>
               {model.selected && `Attributes for ${model.getComponentMeta(model.selected as RaisinElementNode)?.title || 'Element'}`}
               <EditorPanel {...model} />
+              <StyleEditor {...model} />
             </div>
             <div class={Column} style={{ flexGrow: '1' }}>
               <Canvas {...model} />
             </div>
 
-            <div class={Column} style={{ flexBasis: '400px', maxWidth: '400px' }}>
+            <div class={Column} style={{ flexBasis: '600px', maxWidth: '600px' }}>
               {' '}
               <Layers {...model} />
               {/* <EditorPanel {...model} /> */}

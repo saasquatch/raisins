@@ -1,5 +1,5 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
-import { Model } from '../model/Dom';
+import { Model } from '../model/EditorModel';
 import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
 import { getSlots } from '../components/raisin-editor/getSlots';

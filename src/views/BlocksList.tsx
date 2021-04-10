@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import { h } from '@stencil/core';
-import { Model } from '../model/Dom';
+import { Model } from '../model/EditorModel';
 import { Handle } from './Handle';
 
 const Block = css`

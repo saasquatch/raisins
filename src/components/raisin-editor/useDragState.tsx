@@ -1,11 +1,11 @@
 import * as DOMHandler from 'domhandler';
-import { useRef, useState } from '@saasquatch/stencil-hooks';
+import { useRef, useState } from '@saasquatch/universal-hooks';
 import interact from 'interactjs';
 import { DragCoords } from '../../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../../model/DropState';
 import { move } from '../../util';
-import { StateUpdater } from '../../model/Dom';
+import { StateUpdater } from '../../model/EditorModel';
 import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
 import { usePopper } from '../../model/usePopper';
 import { ComponentModel } from './useComponentModel';
