@@ -37,7 +37,9 @@
     "domhandler": "^4.0.0",
     "hotkeys-js": "^3.8.1",
     "htmlparser2": "^6.0.0",
+    "immer": "^9.0.1",
     "interactjs": "^1.10.2",
+    "json-pointer": "^0.6.1",
     "style-to-object": "^0.3.0"
   },
   "license": "MIT",

@@ -35,13 +35,15 @@ export function useStyleEditor({}: Props) {
     }`,
       {},
     );
-    return obj;
+    const plain = csstree.toPlainObject(obj);
+    const extraPlain = JSON.parse(JSON.stringify(plain));
+    return extraPlain;
   }, []);
   const [fakeCSS, setFakeCss] = useState(initialCss);
 
   return {
     stylesheet: fakeCSS,
     setStyleSheet: setFakeCss,
-    styleString: csstree.generate(fakeCSS, {}),
+    // styleString: csstree.generate(csstree.fromPlainObject(fakeCSS), {}),
   };
 }
