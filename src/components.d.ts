@@ -5,10 +5,14 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { VNode } from "@stencil/core";
 export namespace Components {
     interface HasSlots {
     }
     interface RaisinEditor {
+    }
+    interface StencilView {
+        "view": VNode | VNode[];
     }
 }
 declare global {
@@ -24,9 +28,16 @@ declare global {
         prototype: HTMLRaisinEditorElement;
         new (): HTMLRaisinEditorElement;
     };
+    interface HTMLStencilViewElement extends Components.StencilView, HTMLStencilElement {
+    }
+    var HTMLStencilViewElement: {
+        prototype: HTMLStencilViewElement;
+        new (): HTMLStencilViewElement;
+    };
     interface HTMLElementTagNameMap {
         "has-slots": HTMLHasSlotsElement;
         "raisin-editor": HTMLRaisinEditorElement;
+        "stencil-view": HTMLStencilViewElement;
     }
 }
 declare namespace LocalJSX {
@@ -34,9 +45,13 @@ declare namespace LocalJSX {
     }
     interface RaisinEditor {
     }
+    interface StencilView {
+        "view"?: VNode | VNode[];
+    }
     interface IntrinsicElements {
         "has-slots": HasSlots;
         "raisin-editor": RaisinEditor;
+        "stencil-view": StencilView;
     }
 }
 export { LocalJSX as JSX };
@@ -45,6 +60,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "has-slots": LocalJSX.HasSlots & JSXBase.HTMLAttributes<HTMLHasSlotsElement>;
             "raisin-editor": LocalJSX.RaisinEditor & JSXBase.HTMLAttributes<HTMLRaisinEditorElement>;
+            "stencil-view": LocalJSX.StencilView & JSXBase.HTMLAttributes<HTMLStencilViewElement>;
         }
     }
 }

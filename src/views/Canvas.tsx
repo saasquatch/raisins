@@ -164,12 +164,14 @@ export const Canvas: FunctionalComponent<Model> = props => {
   const selectedAncestry = props.getAncestry(props.selected).reverse();
   const hasSelectedAncestry = selectedAncestry.length > 1 ? true : false;
   const hasSelected = typeof props.selected !== 'undefined';
+  const ContentComponent: FunctionalComponent = () => {
+    return <div>{visit(props.node, CanvasVisitor)}</div>;
+  };
+  props.componentRef.current = ContentComponent;
   return (
     <div>
       <div class={wrapper} onClick={() => props.setSelected(undefined)}>
-        <div class={content} data-content style={{ width: `${props.size.width}px` }}>
-          {visit(props.node, CanvasVisitor)}
-        </div>
+        <div class={content} data-content style={{ width: `${props.size.width}px` }} ref={el => (props.containerRef.current = el)} />
       </div>
       <div
         ref={el => (props.toolbarRef.current = el)}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from '@saasquatch/universal-hooks';
+import { useMemo, useRef, useState } from '@saasquatch/universal-hooks';
 import { RaisinNode } from '../../model/RaisinNode';
 import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
@@ -7,6 +7,9 @@ import { sameWidth } from './sameWidth';
 import { StateUpdater } from '../../model/EditorModel';
 import { usePopper } from '../../model/usePopper';
 import { getRectOffset } from '@interactjs/modifiers/Modification';
+import { h, FunctionalComponent } from '@stencil/core';
+import render from 'dom-serializer';
+import { useIframeRenderer } from './useIFrameRenderer';
 
 export type Size = {
   name: string;
@@ -21,6 +24,9 @@ const sizes: Size[] = [
   { name: 'X-Small', width: 400, height: 1080 },
 ];
 
+/**
+ * A virtual Ref object that works with Interact.js
+ */
 function useVirtualRef() {
   const ref = useRef<HTMLElement>(undefined);
 
@@ -49,6 +55,46 @@ function useVirtualRef() {
     ref,
     virtualElement,
   };
+}
+
+const scripts = [
+  `    <script type="module" src="/build/raisins-js.esm.js"></script>
+<script nomodule src="/build/raisins-js.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.27/themes/dark.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
+
+<!-- TODO: Script management -->
+<script type="text/javascript" src="https://fast.ssqt.io/npm/@saasquatch/vanilla-components@1.0.x/dist/widget-components.js"></script>
+<link href="https://fast.ssqt.io/npm/@saasquatch/vanilla-components-assets@0.0.x/icons.css" type="text/css" rel="stylesheet" />`,
+];
+
+const iframeSrc = `
+<!DOCTYPE html>
+<html>
+<head>
+  ${scripts}
+</head>
+<body>
+  <stencil-view></stencil-view>
+</body>
+</html>`;
+function useStencilIframeRenderer() {
+  const componentRef = useRef<FunctionalComponent>();
+  const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {
+    if (!Comp) return; // no Component yet
+    const stencilView = iframe.contentDocument.querySelector('stencil-view');
+    stencilView.view = <Comp />;
+  };
+
+  const props = useIframeRenderer({
+    src: iframeSrc,
+    renderer,
+    Component: componentRef.current,
+  });
+
+  return { componentRef, containerRef: props.container };
 }
 
 const refToInlinEditor = new WeakMap<HTMLElement, unknown>();
@@ -102,8 +148,7 @@ export default function useCanvas(props: { selected: RaisinNode; setNodeInternal
       // refToInlinEditor.set(element, newEditor);
     }
   }
-  useEffect;
-
+  const frameProps = useStencilIframeRenderer();
   return {
     toolbarRef,
     toolbarPopper,
@@ -113,5 +158,6 @@ export default function useCanvas(props: { selected: RaisinNode; setNodeInternal
     sizes,
     size,
     setSize,
+    ...frameProps,
   };
 }
