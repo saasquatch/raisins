@@ -1,11 +1,28 @@
 import { useEffect, useRef, useState } from '@saasquatch/universal-hooks';
 
 export type UseIframeProps<C> = {
+  /**
+   * A source document to use in the iframe
+   */
   src: string;
+  /**
+   * A function to call when the iframe is ready to render, and whenever a render occurs
+   */
   renderer: (iframe: HTMLIFrameElement, Component: C) => void;
+  /**
+   * The component to render
+   */
   Component: C;
 };
 
+/**
+ * Creates a renderer that will render a Component into an iframe.
+ *
+ * This was written to be generic and not rely on Stencil in any way, and focus just on the specifics of how to create a useful iframe element.
+ *
+ * @param props - controls for how to render the iframe
+ * @returns
+ */
 export function useIframeRenderer<C>({ src, renderer, Component }: UseIframeProps<C>) {
   const container = useRef<HTMLElement>();
   const iframeRef = useRef<HTMLIFrameElement>();
