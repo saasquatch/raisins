@@ -39,6 +39,8 @@ export function StyleNodeEditor(props: StyleNodeProps) {
   if (type === 'TypeSelector') return <TypeSelectorEditor node={node as Css.TypeSelector} {...rest} />;
   if (type === 'ClassSelector') return <ClassSelectorEditor node={node as Css.ClassSelector} {...rest} />;
   if (type === 'PseudoClassSelector') return <PseudoClassSelectorEditor node={node as Css.PseudoClassSelectorPlain} {...rest} />;
+  if (type === 'Dimension') return <DimensionEditor node={node as Css.Dimension} {...rest} />;
+  if (type === 'WhiteSpace') return <WhiteSpaceEditor node={node as Css.WhiteSpace} {...rest} />;
   return <div>"{type}" is unhandled</div>;
 }
 
@@ -52,7 +54,7 @@ function StylesheetEditor(props: StyleNodeProps<Css.StyleSheetPlain>) {
   }
 
   return (
-    <div>
+    <div data-type={props.node.type}>
       StyleSheet!
       <hr />
       <Children {...props} />
@@ -64,18 +66,19 @@ function StylesheetEditor(props: StyleNodeProps<Css.StyleSheetPlain>) {
 }
 
 function RuleEditor(props: StyleNodeProps<Css.RulePlain>) {
-  let preludeStr: string;
-  try {
-    // preludeStr = Css.generate(Css.fromPlainObject(props.node.prelude));
-  } finally {
-  }
-
-  const setPrelude = createUpdater<Css.RulePlain, Css.SelectorListPlain | Css.Raw>(props, (prev, next) => (prev.prelude = next));
-  const setBlock = createUpdater<Css.RulePlain, Css.BlockPlain>(props, (prev, next) => (prev.block = next));
+  const setPrelude = createUpdater<Css.RulePlain, Css.SelectorListPlain | Css.Raw>(
+    props,
+    prev => prev.prelude,
+    (prev, next) => (prev.prelude = next),
+  );
+  const setBlock = createUpdater<Css.RulePlain, Css.BlockPlain>(
+    props,
+    prev => prev.block,
+    (prev, next) => (prev.block = next),
+  );
 
   return (
-    <div>
-      {preludeStr}
+    <div data-type={props.node.type}>
       <StyleNodeEditor node={props.node.prelude} setNode={setPrelude} />
       <StyleNodeEditor node={props.node.block} setNode={setBlock} />
     </div>
@@ -84,11 +87,13 @@ function RuleEditor(props: StyleNodeProps<Css.RulePlain>) {
 
 function BlockEditor(props: StyleNodeProps<Css.BlockPlain>) {
   return (
-    <Fragment>
+    <div data-type={props.node.type}>
       {'{'}
-      <Children {...props} />
+      <div style={{ paddingLeft: '20px;' }}>
+        <Children {...props} />
+      </div>
       {'}'}
-    </Fragment>
+    </div>
   );
 }
 
@@ -99,19 +104,23 @@ function SelectorEditor(props: StyleNodeProps<Css.SelectorPlain>) {
   return <Children {...props} />;
 }
 function TypeSelectorEditor(props: StyleNodeProps<Css.TypeSelector>) {
-  return props.node.name;
+  return <span data-type={props.node.type}>{props.node.name}</span>;
 }
 function ClassSelectorEditor(props: StyleNodeProps<Css.ClassSelector>) {
-  return '.' + props.node.name;
+  return <span data-type={props.node.type}>.{props.node.name}</span>;
 }
 function PseudoClassSelectorEditor(props: StyleNodeProps<Css.PseudoClassSelectorPlain>) {
-  return <Fragment>::{props.node.name}</Fragment>;
+  return <span data-type={props.node.type}>::{props.node.name}</span>;
 }
 
 function DeclarationEditor(props: StyleNodeProps<Css.DeclarationPlain>) {
-  const setValue = createUpdater<Css.DeclarationPlain, Css.ValuePlain | Css.Raw>(props, (prev, next) => (prev.value = next));
+  const setValue = createUpdater<Css.DeclarationPlain, Css.ValuePlain | Css.Raw>(
+    props,
+    prev => prev.value,
+    (prev, next) => (prev.value = next),
+  );
   return (
-    <div>
+    <div data-type={props.node.type}>
       {props.node.property} : <StyleNodeEditor node={props.node.value} setNode={setValue} />
     </div>
   );
@@ -124,7 +133,7 @@ function RawEditor(props: StyleNodeProps<Css.Raw>) {
       return { ...current, value: next };
     });
   };
-  return <input type="text" value={props.node.value} onInput={onInput} />;
+  return <input type="text" value={props.node.value} onInput={onInput} data-type={props.node.type} />;
 }
 
 function ValueEditor(props: StyleNodeProps<Css.ValuePlain>) {
@@ -132,9 +141,19 @@ function ValueEditor(props: StyleNodeProps<Css.ValuePlain>) {
 }
 
 function IdentifierEditor(props: StyleNodeProps<Css.Identifier>) {
-  return props.node.name;
+  return <span data-type={props.node.type}>{props.node.name}</span>;
 }
-
+function DimensionEditor(props: StyleNodeProps<Css.Dimension>) {
+  return (
+    <span data-type={props.node.type}>
+      {props.node.value}
+      {props.node.unit}
+    </span>
+  );
+}
+function WhiteSpaceEditor(props: StyleNodeProps<Css.WhiteSpace>) {
+  return <span data-type={props.node.type}>{props.node.value}</span>;
+}
 /**
  * Renders children, with the right mutation wired up
  *
@@ -142,16 +161,6 @@ function IdentifierEditor(props: StyleNodeProps<Css.Identifier>) {
  * @returns
  */
 export function Children(props: StyleNodeProps<HasChildren>): VNode[] {
-  // if (!props.node.children || !props.node.children.length) return <div>Empty {props.node.children.length ?? 0}</div>;
-
-  // const pre = <pre>{JSON.stringify(props.node.children)}</pre>;
-  // // const childs = JSON.parse(JSON.stringify(props.node.children));
-  // const childs = props.node.children;
-  // const childLength = childs.length?.toLocaleString();
-  // const divs = props.node.children.map(n => <div>foo</div>) ?? [];
-  // return [pre, <div>foo</div>, <div>foo</div>, divs.length, childLength];
-
-  // return props.node.children.map(n => <div>foo</div>);
   return props.node.children.map((n, idx) => {
     const subUpdate: StateUpdater<Css.CssNodePlain> = createChildUpdater(props.setNode, idx);
     return <StyleNodeEditor node={n} setNode={subUpdate} />;

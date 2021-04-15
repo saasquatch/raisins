@@ -12,6 +12,7 @@ export function useStyleEditor({}: Props) {
       `
       html {
         background: red;
+        border: 1px solid red;
       }
       .foo {
         border: 1px solid blue;

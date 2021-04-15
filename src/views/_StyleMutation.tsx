@@ -11,11 +11,13 @@ import { StyleNodeProps } from './StyleEditor';
  */
 export function createUpdater<Node extends Css.CssNodePlain, Child extends Css.CssNodePlain>(
   props: StyleNodeProps<Node>,
-  updater: (prev: Node, nextVal: Child) => void,
+  selector: (prev: Node) => Child,
+  updater: (node: Node, prev: Child) => Child,
 ): StateUpdater<Child> {
   return next => {
-    const nextVal = typeof next === 'function' ? next() : next;
     props.setNode(prev => {
+      const prevChild = selector(prev);
+      const nextVal = typeof next === 'function' ? next(prevChild) : next;
       const clone = { ...prev };
       updater(clone, nextVal);
       return clone;
@@ -31,8 +33,8 @@ export function createUpdater<Node extends Css.CssNodePlain, Child extends Css.C
  */
 export function createChildUpdater(setNode: StateUpdater<HasChildren>, idx: number): StateUpdater<Css.CssNodePlain> {
   return next => {
-    const nextVal = typeof next === 'function' ? next() : next;
     setNode(current => {
+      const nextVal = typeof next === 'function' ? next(current) : next;
       return {
         ...current,
         children: current.children.splice(idx, 1, nextVal),
