@@ -1,6 +1,6 @@
 import { useMemo, useState } from '@saasquatch/universal-hooks';
 import csstree from 'css-tree';
-import { StateUpdater } from '../model/EditorModel';
+import { StateUpdater } from "../util/NewState";
 import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
 import { ComponentModel } from './useComponentModel';
 

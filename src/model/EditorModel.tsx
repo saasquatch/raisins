@@ -6,6 +6,7 @@ import { useStyleEditor } from '../hooks/useStyleEditor';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
 import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
+import { StateUpdater } from '../util/NewState';
 
 export type Model = {
   node: RaisinNode;
@@ -81,5 +82,4 @@ export type Block = {
   tag: string;
 };
 
-export type NewState<T> = T | ((previousState?: T) => T);
-export type StateUpdater<T> = (value: NewState<T>) => void;
+

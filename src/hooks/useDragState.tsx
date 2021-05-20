@@ -5,7 +5,7 @@ import { DragCoords } from '../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../model/DropState';
 import { move } from '../html-dom/util';
-import { StateUpdater } from '../model/EditorModel';
+import { StateUpdater } from "../util/NewState";
 import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
 import { usePopper } from '../popper/usePopper';
 import { ComponentModel } from './useComponentModel';

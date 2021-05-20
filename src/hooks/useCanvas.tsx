@@ -4,7 +4,7 @@ import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
 import { sameWidth } from '../popper/sameWidth';
-import { StateUpdater } from '../model/EditorModel';
+import { StateUpdater } from "../util/NewState";
 import { usePopper } from '../popper/usePopper';
 import { getRectOffset } from '@interactjs/modifiers/Modification';
 import { h, FunctionalComponent } from '@stencil/core';

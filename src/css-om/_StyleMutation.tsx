@@ -1,6 +1,6 @@
-import { StateUpdater } from '../model/EditorModel';
+import { StateUpdater } from "../util/NewState";
 import * as Css from 'css-tree';
-import { StyleNodeProps } from './StyleEditor';
+import { StyleNodeProps } from '../views/StyleEditor';
 
 /**
  * Creates an immutable state updater for child editors
