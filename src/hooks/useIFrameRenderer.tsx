@@ -12,7 +12,7 @@ export type UseIframeProps<C> = {
   /**
    * The component to render
    */
-  Component: C;
+  initialComponent: C;
 };
 
 /**
@@ -23,10 +23,11 @@ export type UseIframeProps<C> = {
  * @param props - controls for how to render the iframe
  * @returns
  */
-export function useIframeRenderer<C>({ src, renderer, Component }: UseIframeProps<C>) {
+export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIframeProps<C>) {
+  const initialComponentRef = useRef<C>(initialComponent);
   const container = useRef<HTMLElement>();
   const iframeRef = useRef<HTMLIFrameElement>();
-  const [loaded, setLoaded] = useState(false);
+  const loaded = useRef(false);
 
   useEffect(() => {
     if (container.current) {
@@ -51,32 +52,37 @@ export function useIframeRenderer<C>({ src, renderer, Component }: UseIframeProp
         });
 
         ro.observe(iframe.contentDocument.body);
-        setLoaded(true);
+        loaded.current = true;
+        renderer(iframe, initialComponentRef.current);
       };
       iframe.addEventListener('load', loadListener);
       el.appendChild(iframe);
 
       return () => {
         iframeRef.current = undefined;
-        setLoaded(false);
+        loaded.current = false;
         iframe.removeEventListener('load', loadListener);
       };
     }
   }, [container.current, src]);
 
-  useEffect(() => {
+  const renderInIframe = (Component: C) => {
+    if(Component === initialComponentRef.current){
+      // Won't attempt to re-render exact same component
+      return;
+    }
+    initialComponentRef.current = Component;
     if (iframeRef.current && loaded) {
       renderer(iframeRef.current, Component);
+    } else {
+      // Render will be called when the iframe is loaded
     }
-  }, [iframeRef.current, Component, loaded]);
-  
-  if (iframeRef.current && loaded) {
-    renderer(iframeRef.current, Component);
-  }
+  };
 
   return {
     loaded,
     container,
     iframeRef,
+    renderInIframe,
   };
 }

@@ -167,7 +167,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
   const ContentComponent: FunctionalComponent = () => {
     return <div>{visit(props.node, CanvasVisitor)}</div>;
   };
-  props.componentRef.current = ContentComponent;
+  props.renderInIframe(ContentComponent);
   
   return (
     <div>

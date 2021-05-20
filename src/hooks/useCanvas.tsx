@@ -83,9 +83,9 @@ const iframeSrc = `
 
 
 function useStencilIframeRenderer() {
-  const componentRef = useRef<FunctionalComponent>();
   const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {
     if (!Comp) return; // no Component yet
+    console.log("Render iframe")
     const stencilView = iframe.contentDocument.querySelector('stencil-view');
     stencilView.view = <Comp />;
   };
@@ -93,10 +93,10 @@ function useStencilIframeRenderer() {
   const props = useIframeRenderer({
     src: iframeSrc,
     renderer,
-    Component: componentRef.current,
+    initialComponent: <div/>,
   });
 
-  return { componentRef, containerRef: props.container };
+  return { renderInIframe:props.renderInIframe, containerRef: props.container };
 }
 
 const refToInlinEditor = new WeakMap<HTMLElement, unknown>();
