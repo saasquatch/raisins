@@ -2,7 +2,7 @@ import { Model } from '../model/EditorModel';
 import { StateUpdater } from "../util/NewState";
 import { h, VNode } from '@stencil/core';
 import * as Css from 'css-tree';
-import { createChildUpdater, createUpdater, HasChildren } from '../css-om/_StyleMutation';
+import { createChildUpdater, createUpdater, HasChildren } from '../css-om/cssUtils';
 
 export function StyleEditor(model: Model) {
   if (!model.stylesheet) {
