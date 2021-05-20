@@ -1,4 +1,4 @@
-import { getParents, visit } from '../util';
+import { getParents, visit } from './util';
 
 import { encodeXML } from 'entities';
 import { RaisinCommentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';

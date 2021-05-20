@@ -1,7 +1,7 @@
 import { NewState, StateUpdater } from '../model/EditorModel';
 import hotkeys from 'hotkeys-js';
 import { useEffect, useMemo, useState } from '@saasquatch/universal-hooks';
-import { duplicate, getParents, insertAt, move, remove, replace } from '../util';
+import { duplicate, getParents, insertAt, move, remove, replace } from '../html-dom/util';
 import { getSlots } from '../component-metamodel/getSlots';
 import { ComponentModel } from './useComponentModel';
 import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';

@@ -1,10 +1,10 @@
-import { ComponentType, SlotType } from '../component-metamodel/Component';
+import { ComponentType, SlotType } from '../../component-metamodel/Component';
 
-import * as HTMLComponents from '../component-metamodel/HTMLComponents';
-import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../html-dom/RaisinNode';
+import * as HTMLComponents from '../../component-metamodel/HTMLComponents';
+import { RaisinElementNode, RaisinNode, RaisinTextNode } from '../../html-dom/RaisinNode';
 import { ElementType } from 'domelementtype';
-import { parse } from '../html-dom/parser';
-import { visit } from '../html-dom/util';
+import { parse } from '../../html-dom/parser';
+import { visit } from '../../html-dom/util';
 
 const DefaultSlot: SlotType = {
   key: '',

@@ -1,7 +1,7 @@
 import { domHandlerToRaisin } from './DomHandlerToRaisin';
 import { RaisinDocumentNode } from './RaisinNode';
 import htmlparser2 from 'htmlparser2';
-import { removeWhitespace } from '../util';
+import { removeWhitespace } from './util';
 
 export function parse(html: string): RaisinDocumentNode {
   const DomNode = htmlparser2.parseDocument(html);

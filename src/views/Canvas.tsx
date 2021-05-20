@@ -1,7 +1,7 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/EditorModel';
 import { css } from '@emotion/css';
-import { NodeVisitor, visit } from '../util';
+import { NodeVisitor, visit } from '../html-dom/util';
 import styleToObject from 'style-to-object';
 import { Button } from './Button';
 import { RaisinElementNode } from '../html-dom/RaisinNode';

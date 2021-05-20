@@ -1,6 +1,6 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/EditorModel';
-import { clone, getAncestry, NodeVisitor, visit } from '../util';
+import { clone, getAncestry, NodeVisitor, visit } from '../html-dom/util';
 import { css } from '@emotion/css';
 import { getSlots } from '../component-metamodel/getSlots';
 import { getId } from '../hooks/useEditor';
@@ -150,7 +150,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       );
       // const hasChildren = children?.length > 0;
       const nodeWithSlots = getSlots(element, model.getComponentMeta);
-      const dropNode = model.dropTarget?.from?.model;
+      const dropNode = model.dropTarget?.from?.modelElement;
       const isDroppable = element === dropNode;
 
       const slots = nodeWithSlots.slots || [];
@@ -213,7 +213,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
  * Positioned next to a drop target to indicate a possible drop location
  */
 function DepthLabel(props: { model: Model }): VNode {
-  const hasDroppable = typeof props.model.dropTarget?.to?.model !== 'undefined';
+  const hasDroppable = typeof props.model.dropTarget?.to?.modelElement !== 'undefined';
   if (!hasDroppable) {
     // Empty tooltip
     return (
@@ -226,16 +226,16 @@ function DepthLabel(props: { model: Model }): VNode {
       ></div>
     );
   }
-  const parents = getAncestry(props.model.node, props.model.dropTarget?.to?.model);
-  const str = [props.model.dropTarget?.to?.model, ...parents]
+  const parents = getAncestry(props.model.node, props.model.dropTarget?.to?.modelElement);
+  const str = [props.model.dropTarget?.to?.modelElement, ...parents]
     .reverse()
     .map(n => props.model.getComponentMeta(n as RaisinElementNode).title ?? 'root')
     .join(' > ');
-  const target = props.model.dropTarget?.to?.model as RaisinElementNode;
+  const target = props.model.dropTarget?.to?.modelElement as RaisinElementNode;
   const targetName = props.model.getComponentMeta(target).title;
-  const targetIndex = props.model.dropTarget?.to?.idx;
+  const targetIndex = props.model.dropTarget?.to?.idxInParent;
   const indexName = getOrdinal(targetIndex + 1);
-  const slotName = props.model.dropTarget?.to?.slot || 'default';
+  const slotName = props.model.dropTarget?.to?.slotInParent || 'default';
   return (
     <div
       // class={DropLabel}

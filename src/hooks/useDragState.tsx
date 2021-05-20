@@ -4,7 +4,7 @@ import interact from 'interactjs';
 import { DragCoords } from '../model/DragCoords';
 import { Interactable } from '@interactjs/core/Interactable';
 import { DropState, Location } from '../model/DropState';
-import { move } from '../util';
+import { move } from '../html-dom/util';
 import { StateUpdater } from '../model/EditorModel';
 import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
 import { usePopper } from '../popper/usePopper';
@@ -141,10 +141,10 @@ export function useDropState(sharedState: SharedState) {
 
     const parent = sharedState.props.parents.get(node);
     return {
-      model: node,
-      DOM: element,
-      idx: parent.children.indexOf(node),
-      slot: (node as DOMHandler.Element).attribs?.slot,
+      modelElement: node,
+      viewElement: element,
+      idxInParent: parent.children.indexOf(node),
+      slotInParent: (node as DOMHandler.Element).attribs?.slot,
     };
   }
 
@@ -169,10 +169,10 @@ export function useDropState(sharedState: SharedState) {
         setDropTarget({
           from,
           to: {
-            model: dropzone,
-            DOM: event.target,
-            idx,
-            slot,
+            modelElement: dropzone,
+            viewElement: event.target,
+            idxInParent: idx,
+            slotInParent: slot,
           },
         });
         sharedState.setReferenceElement(event.target);

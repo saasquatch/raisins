@@ -1,5 +1,5 @@
 import { DefaultSlot, Model, NodeWithSlots } from '../model/EditorModel';
-import { visit } from '../util';
+import { visit } from '../html-dom/util';
 import { RaisinNode } from '../html-dom/RaisinNode';
 
 export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponentMeta']) {
