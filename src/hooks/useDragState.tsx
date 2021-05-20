@@ -7,7 +7,7 @@ import { DropState, Location } from '../model/DropState';
 import { move } from '../util';
 import { StateUpdater } from '../model/EditorModel';
 import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
-import { usePopper } from '../model/usePopper';
+import { usePopper } from '../popper/usePopper';
 import { ComponentModel } from './useComponentModel';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
