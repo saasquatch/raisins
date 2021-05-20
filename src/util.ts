@@ -1,5 +1,5 @@
 import { ElementType } from 'domelementtype';
-import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './model/RaisinNode';
+import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './html-dom/RaisinNode';
 
 /**
  * Provides a WeakMap for parent lookups

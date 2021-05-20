@@ -1,11 +1,11 @@
 import { useMemo, useRef, useState } from '@saasquatch/universal-hooks';
-import { RaisinNode } from '../../model/RaisinNode';
+import { RaisinNode } from '../html-dom/RaisinNode';
 import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
-import { sameWidth } from './sameWidth';
-import { StateUpdater } from '../../model/EditorModel';
-import { usePopper } from '../../model/usePopper';
+import { sameWidth } from '../components/raisin-editor/sameWidth';
+import { StateUpdater } from '../model/EditorModel';
+import { usePopper } from '../model/usePopper';
 import { getRectOffset } from '@interactjs/modifiers/Modification';
 import { h, FunctionalComponent } from '@stencil/core';
 import render from 'dom-serializer';
@@ -80,6 +80,8 @@ const iframeSrc = `
   <stencil-view></stencil-view>
 </body>
 </html>`;
+
+
 function useStencilIframeRenderer() {
   const componentRef = useRef<FunctionalComponent>();
   const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {

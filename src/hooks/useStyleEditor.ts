@@ -1,7 +1,7 @@
 import { useMemo, useState } from '@saasquatch/universal-hooks';
 import csstree from 'css-tree';
-import { StateUpdater } from '../../model/EditorModel';
-import { RaisinNode, RaisinNodeWithChildren } from '../../model/RaisinNode';
+import { StateUpdater } from '../model/EditorModel';
+import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
 import { ComponentModel } from './useComponentModel';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };

@@ -5,8 +5,8 @@ import { Layers } from '../../views/Layers';
 import { useHost, withHooks } from '@saasquatch/stencil-hooks';
 import { ToolbarView } from '../../views/Toolbar';
 import { css } from '@emotion/css';
-import { useEditor } from './useEditor';
-import { RaisinElementNode } from '../../model/RaisinNode';
+import { useEditor } from '../../hooks/useEditor';
+import { RaisinElementNode } from '../../html-dom/RaisinNode';
 import { EditorPanel } from '../../views/EditorPanel';
 import { StyleEditor } from '../../views/StyleEditor';
 

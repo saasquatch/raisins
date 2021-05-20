@@ -69,6 +69,7 @@ export function useIframeRenderer<C>({ src, renderer, Component }: UseIframeProp
       renderer(iframeRef.current, Component);
     }
   }, [iframeRef.current, Component, loaded]);
+  
   if (iframeRef.current && loaded) {
     renderer(iframeRef.current, Component);
   }

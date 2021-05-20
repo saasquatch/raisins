@@ -2,9 +2,9 @@ import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/EditorModel';
 import { clone, getAncestry, NodeVisitor, visit } from '../util';
 import { css } from '@emotion/css';
-import { getSlots } from '../components/raisin-editor/getSlots';
-import { getId } from '../components/raisin-editor/useEditor';
-import { RaisinElementNode } from '../model/RaisinNode';
+import { getSlots } from '../component-metamodel/getSlots';
+import { getId } from '../hooks/useEditor';
+import { RaisinElementNode } from '../html-dom/RaisinNode';
 import { Handle } from './Handle';
 import { Button } from './Button';
 

@@ -1,11 +1,11 @@
-import useCanvas from '../components/raisin-editor/useCanvas';
-import { ComponentModel } from '../components/raisin-editor/useComponentModel';
-import { useDND } from '../components/raisin-editor/useDragState';
-import { Mode } from '../components/raisin-editor/useEditor';
-import { useStyleEditor } from '../components/raisin-editor/useStyleEditor';
+import useCanvas from '../hooks/useCanvas';
+import { ComponentModel } from '../hooks/useComponentModel';
+import { useDND } from '../hooks/useDragState';
+import { Mode } from '../hooks/useEditor';
+import { useStyleEditor } from '../hooks/useStyleEditor';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
-import { RaisinNode, RaisinNodeWithChildren } from './RaisinNode';
+import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
 
 export type Model = {
   node: RaisinNode;

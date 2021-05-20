@@ -1,4 +1,4 @@
-import { RaisinElementNode } from './RaisinNode';
+import { RaisinElementNode } from '../html-dom/RaisinNode';
 
 export type DragCoords = {
   element: RaisinElementNode;

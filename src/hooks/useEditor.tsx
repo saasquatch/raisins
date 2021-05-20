@@ -1,9 +1,9 @@
-import { Model, NodeWithSlots } from '../../model/EditorModel';
+import { Model, NodeWithSlots } from '../model/EditorModel';
 import { useMemo, useState } from '@saasquatch/universal-hooks';
 import { useDND } from './useDragState';
 import { useComponentModel } from './useComponentModel';
-import { RaisinNode } from '../../model/RaisinNode';
-import { parse } from '../../model/parser';
+import { RaisinNode } from '../html-dom/RaisinNode';
+import { parse } from '../html-dom/parser';
 import useCanvas from './useCanvas';
 import { useCore } from './useCore';
 import { useStyleEditor } from './useStyleEditor';

@@ -1,5 +1,5 @@
-import { Model } from '../../model/EditorModel';
-import { RaisinElementNode, RaisinNode } from '../../model/RaisinNode';
+import { Model } from '../model/EditorModel';
+import { RaisinElementNode, RaisinNode } from '../html-dom/RaisinNode';
 
 interface ComponentEditor<T = unknown> {
   mount(element: HTMLElement, value: RaisinElementNode, model: Model): Promise<T>;

@@ -4,8 +4,8 @@ import { css } from '@emotion/css';
 import { NodeVisitor, visit } from '../util';
 import styleToObject from 'style-to-object';
 import { Button } from './Button';
-import { RaisinElementNode } from '../model/RaisinNode';
-import serializer from '../model/serializer';
+import { RaisinElementNode } from '../html-dom/RaisinNode';
+import serializer from '../html-dom/serializer';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -168,6 +168,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
     return <div>{visit(props.node, CanvasVisitor)}</div>;
   };
   props.componentRef.current = ContentComponent;
+  
   return (
     <div>
       <div class={wrapper} onClick={() => props.setSelected(undefined)}>
