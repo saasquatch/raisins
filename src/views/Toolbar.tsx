@@ -4,6 +4,9 @@ import { Model } from '../model/EditorModel';
 
 const ToolbarStyle = css`
   padding: 10px;
+  & > * {
+    margin-left: 5px;
+  }
 `;
 export function ToolbarView(props: Model) {
   const change = () => props.setMode(previous => (previous === 'preview' ? 'edit' : 'preview'));
@@ -31,6 +34,11 @@ export function ToolbarView(props: Model) {
         </sl-button>
       </sl-button-group>
       <sl-button-group>
+        <sl-button size="small" pill type="default" disabled style={{ cursor: 'initial' }}>
+          <sl-icon slot="prefix" name="window"></sl-icon>
+          Screen
+        </sl-button>
+
         {props.sizes.map(s => (
           <sl-button size="small" pill onClick={() => props.setSize(s)} type={props.size === s ? 'success' : 'default'}>
             {s.name}

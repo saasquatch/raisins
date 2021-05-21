@@ -40,10 +40,6 @@ const SelectedTitle = css`
   flex-grow: 1;
 `;
 
-const Selected = css`
-  outline: 1px solid red;
-`;
-
 const Selectable = css`
   position: relative;
   &:hover {
@@ -58,15 +54,6 @@ const Selectable = css`
   //   height: 20px;
   //   z-index: 9;
   // }
-`;
-const EditorPopper = css`
-  background: white;
-  border: 1px solid black;
-`;
-
-const EditorDrawer = css`
-  justify-self: flex-start;
-  width: 200px;
 `;
 
 export const Canvas: FunctionalComponent<Model> = props => {
@@ -97,7 +84,6 @@ export const Canvas: FunctionalComponent<Model> = props => {
     },
     onElement(element, children) {
       const claz = {
-        [Selected]: element === props.selected,
         [Selectable]: props.mode === 'edit',
       };
 
@@ -108,6 +94,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
       };
 
       const innerProps = {
+        'rjs-selected': element === props.selected,
         'class': { ...claz, [element.attribs.class]: true },
         'onClick': props.mode === 'edit' ? onClick : () => {},
         'data-tagname': element.tagName,
@@ -172,7 +159,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
   return (
     <div>
       <div class={wrapper} onClick={() => props.setSelected(undefined)}>
-        <div class={content} data-content style={{ width: `${props.size.width}px` }} ref={el => (props.containerRef.current = el)} />
+        <div class={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el)} />
       </div>
       <div
         ref={el => (props.toolbarRef.current = el)}

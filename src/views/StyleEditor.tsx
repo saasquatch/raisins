@@ -1,5 +1,5 @@
 import { Model } from '../model/EditorModel';
-import { StateUpdater } from "../util/NewState";
+import { StateUpdater } from '../util/NewState';
 import { h, VNode } from '@stencil/core';
 import * as Css from 'css-tree';
 import { createChildUpdater, createUpdater, HasChildren } from '../css-om/cssUtils';
@@ -55,12 +55,12 @@ function StylesheetEditor(props: StyleNodeProps<Css.StyleSheetPlain>) {
 
   return (
     <div data-type={props.node.type}>
-      StyleSheet!
-      <hr />
       <Children {...props} />
-      <hr />
-      <pre style={{ overflow: 'hidden' }}>{rawSheet}</pre>
-      <pre>{JSON.stringify(node, null, 2)}</pre>
+      <details>
+        StyleSheet!
+        <pre style={{ overflow: 'hidden' }}>{rawSheet}</pre>
+        <pre>{JSON.stringify(node, null, 2)}</pre>
+      </details>
     </div>
   );
 }

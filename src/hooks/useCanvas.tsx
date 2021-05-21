@@ -4,24 +4,23 @@ import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
 import { sameWidth } from '../popper/sameWidth';
-import { StateUpdater } from "../util/NewState";
+import { StateUpdater } from '../util/NewState';
 import { usePopper } from '../popper/usePopper';
 import { getRectOffset } from '@interactjs/modifiers/Modification';
 import { h, FunctionalComponent } from '@stencil/core';
-import render from 'dom-serializer';
 import { useIframeRenderer } from './useIFrameRenderer';
 
 export type Size = {
   name: string;
-  width: number;
+  width: string;
   height: number;
 };
 const sizes: Size[] = [
-  { name: 'HD', width: 1200, height: 1080 },
-  { name: 'Large', width: 992, height: 1080 },
-  { name: 'Medium', width: 768, height: 1080 },
-  { name: 'Small', width: 576, height: 1080 },
-  { name: 'X-Small', width: 400, height: 1080 },
+  { name: 'Auto', width: 'auto', height: 1080 },
+  { name: 'Large', width: '992px', height: 1080 },
+  { name: 'Medium', width: '768px', height: 1080 },
+  { name: 'Small', width: '576px', height: 1080 },
+  { name: 'X-Small', width: '400px', height: 1080 },
 ];
 
 /**
@@ -76,16 +75,20 @@ const iframeSrc = `
 <head>
   ${scripts}
 </head>
+<style>
+[rjs-selected]{
+  outline: 1px solid red;
+}
+</style>
 <body>
   <stencil-view></stencil-view>
 </body>
 </html>`;
 
-
 function useStencilIframeRenderer() {
   const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {
     if (!Comp) return; // no Component yet
-    console.log("Render iframe")
+    console.log('Render iframe');
     const stencilView = iframe.contentDocument.querySelector('stencil-view');
     stencilView.view = <Comp />;
   };
@@ -93,21 +96,36 @@ function useStencilIframeRenderer() {
   const props = useIframeRenderer({
     src: iframeSrc,
     renderer,
-    initialComponent: <div/>,
+    initialComponent: <div />,
   });
 
-  return { renderInIframe:props.renderInIframe, containerRef: props.container };
+  return { renderInIframe: props.renderInIframe, containerRef: props.container };
 }
 
 const refToInlinEditor = new WeakMap<HTMLElement, unknown>();
 export default function useCanvas(props: { selected: RaisinNode; setNodeInternal: StateUpdater<RaisinNode> }) {
+  const frameProps = useStencilIframeRenderer();
   const [size, setSize] = useState<Size>(sizes[0]);
 
   const { ref, virtualElement } = useVirtualRef();
 
+  const clientRect = frameProps.containerRef.current?.getBoundingClientRect();
+  const containerOffsetTopPos = clientRect?.y;
+  const containerOffsetLeftPos = clientRect?.x;
+
   const toolbarRef = useRef<HTMLElement>(undefined);
   const toolbarPopper = usePopper(virtualElement, toolbarRef.current, {
-    modifiers: [flip, preventOverflow, sameWidth],
+    modifiers: [
+      flip,
+      preventOverflow,
+      sameWidth,
+      clientRect ? {
+        name: 'offset',
+        options: {
+          offset: [containerOffsetLeftPos, containerOffsetTopPos],
+        },
+      } : undefined,
+    ],
     placement: 'top-start',
   });
 
@@ -150,7 +168,6 @@ export default function useCanvas(props: { selected: RaisinNode; setNodeInternal
       // refToInlinEditor.set(element, newEditor);
     }
   }
-  const frameProps = useStencilIframeRenderer();
   return {
     toolbarRef,
     toolbarPopper,

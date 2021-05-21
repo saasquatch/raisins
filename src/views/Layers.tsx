@@ -244,7 +244,7 @@ function DepthLabel(props: { model: Model }): VNode {
       style={props.model.popper.styles.popper}
       {...props.model.popper.attributes.popper}
     >
-      <sl-card style={{ width: '200px' }}>
+      <sl-card>
         <div slot="header">
           Move to <b>{targetName}</b>
         </div>
