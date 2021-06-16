@@ -1,50 +1,38 @@
 import { useMemo, useState } from '@saasquatch/universal-hooks';
-import csstree from 'css-tree';
-import { StateUpdater } from "../util/NewState";
-import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
+import { RaisinNode, RaisinNodeWithChildren, RaisinStyleNode } from '../core/html-dom/RaisinNode';
+import { IdentityVisitor, replace, visit } from '../core/html-dom/util';
+import { StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
+import * as css from 'css-tree';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
 
-export function useStyleEditor({}: Props) {
-  const initialCss = useMemo(() => {
-    var obj = csstree.parse(
-      `
-      html {
-        background: red;
-        border: 1px solid red;
-      }
-      .foo {
-        border: 1px solid blue;
-      }
-      :root {
-      --sl-color-black: #000;
-      --sl-color-white: #fff;
-      --sl-color-gray-50: #f9fafb;
-      --sl-color-gray-100: #f3f4f6;
-      --sl-color-gray-200: #e5e7eb;
-      --sl-color-gray-300: #d1d5db;
-      --sl-color-gray-400: #9ca3af;
-      --sl-color-gray-500: #6b7280;
-      --sl-color-gray-600: #4b5563;
-      --sl-color-gray-700: #374151;
-      --sl-color-gray-800: #1f2937;
-      --sl-color-gray-900: #111827;
-      --sl-color-gray-950: #0d131e;
-      --sl-color-primary-50: #f0f9ff;
-      --sl-color-primary-100: #e0f2fe
-    }`,
-      {},
-    );
-    const plain = csstree.toPlainObject(obj);
-    const extraPlain = JSON.parse(JSON.stringify(plain));
-    return extraPlain;
-  }, []);
-  const [fakeCSS, setFakeCss] = useState(initialCss);
+export function useStyleEditor(props: Props) {
+  const sheets = useMemo(() => {
+    // Finds all style nodes.
+    const nodes: RaisinStyleNode[] = [];
+    visit(props.node, {
+      ...IdentityVisitor,
+      onStyle: n => {
+        nodes.push(n);
+        return n;
+      },
+    });
+    return nodes;
+  }, [props.node]);
 
+  const [selectedSheet, setSelectedsheet] = useState<RaisinStyleNode>(undefined);
+  const updateSelectedSheet = (next: css.CssNodePlain) => {
+    props.setNode(prev => {
+      const newSheet = { ...selectedSheet, cssContents: next };
+      return replace(prev, selectedSheet, newSheet);
+    });
+  };
   return {
-    stylesheet: fakeCSS,
-    setStyleSheet: setFakeCss,
+    sheets,
+    selectedSheet,
+    setSelectedsheet,
+    updateSelectedSheet,
     // styleString: csstree.generate(csstree.fromPlainObject(fakeCSS), {}),
   };
 }

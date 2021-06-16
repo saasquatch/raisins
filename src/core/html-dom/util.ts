@@ -1,5 +1,15 @@
 import { ElementType } from 'domelementtype';
-import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
+import {
+  RaisinCommentNode,
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
+  RaisinProcessingInstructionNode,
+  RaisinStyleNode,
+  RaisinTextNode,
+} from './RaisinNode';
+import cloneDeep from 'lodash.clonedeep';
 
 /**
  * Provides a WeakMap for parent lookups
@@ -17,6 +27,7 @@ export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWith
     onCData: storeParent,
     onElement: storeParent,
     onRoot: storeParent,
+    onStyle: n => n,
     onComment: n => n,
     onDirective: n => n,
     onText: n => n,
@@ -24,7 +35,7 @@ export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWith
   return map;
 }
 
-export function visit<T = unknown>(node: RaisinNode, visitor: NodeVisitor<T>, recursive: boolean = true): T {
+export function visit<T = unknown>(node: RaisinNode, visitor: Partial<NodeVisitor<T>>, recursive: boolean = true): T {
   let result: T;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
@@ -43,25 +54,30 @@ export function visit<T = unknown>(node: RaisinNode, visitor: NodeVisitor<T>, re
       result = visitor.onComment && visitor.onComment(node as RaisinCommentNode);
       break;
     case ElementType.Tag:
-    case ElementType.Script:
-    case ElementType.Style: {
+    case ElementType.Script: {
       if (!visitor.onElement) break;
       const element = node as RaisinElementNode;
-      const children = recursive ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && element.children ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onElement(element, children);
+      break;
+    }
+    case ElementType.Style: {
+      if (!visitor.onStyle) break;
+      const element = node as RaisinStyleNode;
+      result = visitor.onStyle(element);
       break;
     }
     case ElementType.CDATA: {
       if (!visitor.onCData) break;
       const cdata = node as RaisinNodeWithChildren;
-      const children = recursive ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && cdata.children ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onCData(cdata, children);
       break;
     }
     case ElementType.Root: {
       if (!visitor.onRoot) break;
       const root = node as RaisinDocumentNode;
-      const children = recursive ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && root.children ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onRoot(root, children);
       break;
     }
@@ -78,13 +94,14 @@ export function visit<T = unknown>(node: RaisinNode, visitor: NodeVisitor<T>, re
  */
 export interface NodeVisitor<T> {
   skipNode?(node: RaisinNode): boolean;
-  onText?(text: RaisinTextNode): T | undefined;
-  onElement?(element: RaisinElementNode, children?: T[]): T | undefined;
-  onRoot?(node: RaisinDocumentNode, children?: T[]): T | undefined;
+  onText(text: RaisinTextNode): T | undefined;
+  onStyle(element: RaisinStyleNode): T | undefined;
+  onElement(element: RaisinElementNode, children?: T[]): T | undefined;
+  onRoot(node: RaisinDocumentNode, children?: T[]): T | undefined;
 
-  onDirective?(directive: RaisinProcessingInstructionNode): T | undefined;
-  onComment?(comment: RaisinCommentNode): T | undefined;
-  onCData?(element: RaisinNodeWithChildren, children?: T[]): T | undefined;
+  onDirective(directive: RaisinProcessingInstructionNode): T | undefined;
+  onComment(comment: RaisinCommentNode): T | undefined;
+  onCData(element: RaisinNodeWithChildren, children?: T[]): T | undefined;
 }
 
 /**
@@ -116,6 +133,7 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
     onText: cloneIfMatching,
     onDirective: cloneIfMatching,
     onComment: cloneIfMatching,
+    onStyle: cloneIfMatching,
     onElement: (n, dupeChildren) => {
       if (node === n) {
         return [n, clone(n)];
@@ -178,6 +196,7 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
     onText: swap,
     onComment: swap,
     onDirective: swap,
+    onStyle: swap,
     onCData: swapWithChildren,
     onElement: swapWithChildren,
     onRoot: swapWithChildren,
@@ -262,6 +281,7 @@ function visitAll(node: RaisinNode, fn: (n: RaisinNode) => RaisinNode): RaisinNo
   return visit(node, {
     onCData: fn,
     onText: fn,
+    onStyle: fn,
     onDirective: fn,
     onComment: fn,
     onElement: fn,
@@ -269,11 +289,12 @@ function visitAll(node: RaisinNode, fn: (n: RaisinNode) => RaisinNode): RaisinNo
   });
 }
 
-const IdentityVisitor: NodeVisitor<RaisinNode> = {
+export const IdentityVisitor: NodeVisitor<RaisinNode> = {
   onText: n => n,
   onDirective: n => n,
   onComment: n => n,
   onElement: n => n,
+  onStyle: n => n,
   onCData: n => n,
   onRoot: n => n,
 };
@@ -282,17 +303,26 @@ const CloneVisitor: NodeVisitor<RaisinNode> = {
   onText: n => ({ ...n }),
   onDirective: n => ({ ...n }),
   onComment: n => ({ ...n }),
+  // TODO: deep clone CSS ast
+  onStyle: n => ({...n}),
   onElement: (n, children) => ({ ...n, children: [...children] }),
   onCData: (n, children) => ({ ...n, children: [...children] }),
   onRoot: (n, children) => ({ ...n, children: [...children] }),
 };
 
+/**
+ * Returns a deep copy of a RaisinNode
+ */
 export function clone(n: RaisinNode): RaisinNode {
-  return visit(n, CloneVisitor);
+  return cloneDeep(n);
 }
 
-// to enable deep level flatten use recursion with reduce and concat
-function flatDeep<T>(arr: any, d = 1): T[] {
+/**
+ * Deep flattening of arrays of arrays
+ *
+ * use recursion with reduce and concat
+ */
+function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
   // @ts-ignore
   return d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), []) : arr.slice();
 }
@@ -300,9 +330,12 @@ function flatDeep<T>(arr: any, d = 1): T[] {
 /**
  * Returns an array of parents, with the first element being the parent, and then their ancestors
  */
-// TODO: Replace with parents WeakMap
-export function getAncestry(root: RaisinNode, node: RaisinNode): RaisinNodeWithChildren[] {
-  const parents = getParents(root);
+export function getAncestry(
+  root: RaisinNode,
+  node: RaisinNode,
+  // Provide this for performance improvement
+  parents = getParents(root),
+): RaisinNodeWithChildren[] {
   const ancestry: RaisinNodeWithChildren[] = [];
   let current = node;
   while (true) {

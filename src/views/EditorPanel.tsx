@@ -1,7 +1,7 @@
 import { h } from '@stencil/core';
 import { ElementType } from 'domelementtype';
 import { Model } from '../model/EditorModel';
-import { RaisinElementNode } from '../html-dom/RaisinNode';
+import { RaisinElementNode } from '../core/html-dom/RaisinNode';
 import { AttributesEditor } from './AttributeEditor';
 
 export function EditorPanel(props: Model) {

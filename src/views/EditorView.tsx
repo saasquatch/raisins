@@ -5,7 +5,7 @@ import { Model } from '../model/EditorModel';
 import { Canvas } from './Canvas';
 import { Layers } from './Layers';
 import { ToolbarView } from './Toolbar';
-import { RaisinElementNode } from '../html-dom/RaisinNode';
+import { RaisinElementNode } from '../core/html-dom/RaisinNode';
 import { EditorPanel } from './EditorPanel';
 import { StyleEditor } from './StyleEditor';
 
@@ -90,11 +90,12 @@ export function EditorView(model: Model) {
           <ToolbarView {...model} />
         </div>
         <div class={Edits}>
+          <StyleEditor {...model} />
           {model.selected && `Attributes for ${model.getComponentMeta(model.selected as RaisinElementNode)?.title || 'Element'}`}
           <EditorPanel {...model} />
-          <StyleEditor {...model} />
         </div>
         <div class={CanvasCss}>
+          {model.mode}
           <Canvas {...model} />
         </div>
 

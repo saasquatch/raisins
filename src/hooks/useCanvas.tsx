@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from '@saasquatch/universal-hooks';
-import { RaisinNode } from '../html-dom/RaisinNode';
+import { RaisinNode } from '../core/html-dom/RaisinNode';
 import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
 import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';

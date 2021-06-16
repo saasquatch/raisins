@@ -1,20 +1,31 @@
 import { ElementType } from 'domelementtype';
+import type * as DOMHandler from 'domhandler';
+import cssParser from "../css-om/parser";
 
-import { RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
-import * as DOMHandler from 'domhandler';
+import type {
+  RaisinCommentNode,
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
+  RaisinProcessingInstructionNode,
+  RaisinStyleNode,
+  RaisinTextNode,
+} from './RaisinNode';
 
 /**
  * A depth-first visitor that will visit the deepest children first
  */
 export interface DHNodeVisitor<T> {
   skipNode?(node: DOMHandler.Node): boolean;
-  onText?(text: DOMHandler.Text): T | undefined;
-  onElement?(element: DOMHandler.Element, children?: T[]): T | undefined;
-  onRoot?(node: DOMHandler.Document, children?: T[]): T | undefined;
+  onText(text: DOMHandler.Text): T | undefined;
+  onElement(element: DOMHandler.Element, children?: T[]): T | undefined;
+  onStyle(element: DOMHandler.Element, children?: T[]): T | undefined;
+  onRoot(node: DOMHandler.Document, children?: T[]): T | undefined;
 
-  onDirective?(directive: DOMHandler.ProcessingInstruction): T | undefined;
-  onComment?(comment: DOMHandler.Comment): T | undefined;
-  onCData?(element: DOMHandler.NodeWithChildren, children?: T[]): T | undefined;
+  onDirective(directive: DOMHandler.ProcessingInstruction): T | undefined;
+  onComment(comment: DOMHandler.Comment): T | undefined;
+  onCData(element: DOMHandler.NodeWithChildren, children?: T[]): T | undefined;
 }
 
 export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
@@ -22,6 +33,17 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
     onText(text): RaisinTextNode {
       const { nodeType, data } = text;
       return { nodeType, type: ElementType.Text, data };
+    },
+    onStyle(element, children): RaisinStyleNode {
+      const { type, attribs } = element;
+      const textContent = children && children.filter(c=>c.type===ElementType.Text).map((c:RaisinTextNode)=>c.data).join("\n");
+      return {
+        tagName:"style",
+        // @ts-ignore -- raisin has stronger types than DOMHandler
+        type,
+        contents: textContent && cssParser(textContent),
+        attribs: { ...attribs },
+      }
     },
     onElement(element, children): RaisinElementNode {
       const { tagName, type, attribs } = element;
@@ -79,25 +101,31 @@ export function visit<T>(node: DOMHandler.Node, visitor: DHNodeVisitor<T>, recur
       result = visitor.onComment && visitor.onComment(node as DOMHandler.Comment);
       break;
     case ElementType.Tag:
-    case ElementType.Script:
-    case ElementType.Style: {
+    case ElementType.Script: {
       if (!visitor.onElement) break;
       const element = node as DOMHandler.Element;
-      const children = recursive ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && element.children ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onElement(element, children);
+      break;
+    }
+    case ElementType.Style: {
+      if (!visitor.onStyle) break;
+      const element = node as DOMHandler.Element;
+      const children = recursive && element.children ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      result = visitor.onStyle(element, children);
       break;
     }
     case ElementType.CDATA: {
       if (!visitor.onCData) break;
       const cdata = node as DOMHandler.NodeWithChildren;
-      const children = recursive ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && cdata.children ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onCData(cdata, children);
       break;
     }
     case ElementType.Root: {
       if (!visitor.onRoot) break;
       const root = node as DOMHandler.Document;
-      const children = recursive ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children = recursive && root.children ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
       result = visitor.onRoot(root, children);
       break;
     }

@@ -1,11 +1,11 @@
-import { NewState, StateUpdater } from "../util/NewState";
-import hotkeys from 'hotkeys-js';
 import { useEffect, useMemo, useState } from '@saasquatch/universal-hooks';
-import { duplicate, getParents, insertAt, move, remove, replace } from '../html-dom/util';
-import { getSlots } from '../component-metamodel/getSlots';
+import hotkeys from 'hotkeys-js';
+import { getSlots } from '../model/getSlots';
+import { RaisinNode, RaisinNodeWithChildren } from '../core/html-dom/RaisinNode';
+import serializer from '../core/html-dom/serializer';
+import { duplicate, getParents, insertAt, move, remove, replace, getAncestry as getAncestryUtil } from '../core/html-dom/util';
+import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
-import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
-import serializer from '../html-dom/serializer';
 import { InternalState } from './useEditor';
 
 export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
@@ -185,22 +185,16 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
 
   const parents = useMemo(() => getParents(state.current), [state.current]);
   function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
-    let ancestry: RaisinNodeWithChildren[] = [];
-    let current = node;
-    while (current) {
-      const parent = parents.get(current);
-      if (parent) {
-        ancestry.push(parent);
-      }
-      current = parent;
-    }
-    return ancestry;
+    return getAncestryUtil(state.current, node, parents);
   }
+  
+  const serialized = useMemo(() => serializer(state.current), [state.current]);
   const slots = getSlots(state.current, metamodel.getComponentMeta);
   return {
     initial: serializer(initial),
 
     node: state.current,
+    serialized,
     parents,
     getAncestry,
     slots,

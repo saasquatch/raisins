@@ -9,7 +9,6 @@ const ToolbarStyle = css`
   }
 `;
 export function ToolbarView(props: Model) {
-  const change = () => props.setMode(previous => (previous === 'preview' ? 'edit' : 'preview'));
   return (
     <div class={ToolbarStyle}>
       Toolbar
@@ -23,14 +22,19 @@ export function ToolbarView(props: Model) {
           Redo
         </sl-button>
       </sl-button-group>
-      <sl-button-group onClick={change}>
-        <sl-button size="small" pill type={props.mode === 'edit' ? 'success' : 'default'}>
+      <sl-button-group>
+        {props.mode}
+        <sl-button size="small" pill type={props.mode === 'edit' ? 'success' : 'default'} onClick={()=>props.setMode("edit")}>
           <sl-icon slot="prefix" name="pencil"></sl-icon>
           Edit
         </sl-button>
-        <sl-button size="small" pill type={props.mode === 'preview' ? 'success' : 'default'}>
+        <sl-button size="small" pill type={props.mode === 'preview' ? 'success' : 'default'} onClick={()=>props.setMode("preview")}>
           <sl-icon slot="prefix" name="eye"></sl-icon>
           Preview
+        </sl-button>
+        <sl-button size="small" pill type={props.mode === 'html' ? 'success' : 'default'} onClick={()=>props.setMode("html")}>
+          <sl-icon slot="prefix" name="eye"></sl-icon>
+          HTML
         </sl-button>
       </sl-button-group>
       <sl-button-group>

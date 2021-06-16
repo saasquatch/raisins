@@ -1,6 +1,6 @@
 import { h } from '@stencil/core';
 import { Model } from '../model/EditorModel';
-import { RaisinElementNode } from '../html-dom/RaisinNode';
+import { RaisinElementNode } from '../core/html-dom/RaisinNode';
 
 export function AttributesEditor(props: { model: Model; node: RaisinElementNode }) {
   const schema = props.model.getComponentMeta(props.node)?.attributes;

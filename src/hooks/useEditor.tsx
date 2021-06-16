@@ -1,14 +1,14 @@
-import { Model, NodeWithSlots } from '../model/EditorModel';
 import { useMemo, useState } from '@saasquatch/universal-hooks';
-import { useDND } from './useDragState';
-import { useComponentModel } from './useComponentModel';
-import { RaisinNode } from '../html-dom/RaisinNode';
-import { parse } from '../html-dom/parser';
+import { parse } from '../core/html-dom/parser';
+import { RaisinNode } from '../core/html-dom/RaisinNode';
+import { Model, NodeWithSlots } from '../model/EditorModel';
 import useCanvas from './useCanvas';
+import { useComponentModel } from './useComponentModel';
 import { useCore } from './useCore';
+import { useDND } from './useDragState';
 import { useStyleEditor } from './useStyleEditor';
 
-export type Mode = 'preview' | 'edit';
+export type Mode = 'preview' | 'edit' | 'html';
 
 export type InternalState = {
   current: RaisinNode;

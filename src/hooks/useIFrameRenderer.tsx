@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from '@saasquatch/universal-hooks';
+import { useEffect, useRef } from '@saasquatch/universal-hooks';
 
 export type UseIframeProps<C> = {
   /**

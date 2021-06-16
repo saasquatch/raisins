@@ -1,9 +1,9 @@
-import { getParents, visit } from './util';
-
-import { encodeXML } from 'entities';
-import { RaisinCommentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
-import { elementNames, attributeNames } from 'dom-serializer/lib/foreignNames';
 import type { DomSerializerOptions } from 'dom-serializer';
+import { attributeNames, elementNames } from 'dom-serializer/lib/foreignNames';
+import { encodeXML } from 'entities';
+import type { RaisinCommentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren, RaisinProcessingInstructionNode, RaisinTextNode } from './RaisinNode';
+import { getParents, visit } from './util';
+import cssSerializer from '../css-om/serializer';
 
 /**
  *
@@ -11,7 +11,7 @@ import type { DomSerializerOptions } from 'dom-serializer';
  *  Forked from: https://github.com/cheeriojs/dom-serializer
  *
  *
- * I don't like forking libraries, but in the case of DOM-Handler the programming style is very mutable. Even in forking the
+ * LV: I don't like forking libraries, but in the case of DOM-Handler the programming style is very mutable. Even in forking the
  * code I found that the serializer was **mutating tag names as it was serializing them**. This feels like it would have unintended
  * side effects throughout the state tree.
  *
@@ -108,6 +108,11 @@ function renderNode(node: RaisinNode, options: DomSerializerOptions, parents: Pa
     onElement: (n, children) => renderTag(n, options, parents, children),
     onRoot(_, children?: string[]) {
       return children.join('');
+    },
+    onStyle(n) {
+      const cssContents = n.contents ? cssSerializer(n.contents) : "";
+      const attribs = formatAttributes(n.attribs, options);
+      return `<style${attribs ? ' ' + attribs : ''}>${cssContents}</style>`;
     },
     onDirective: renderDirective,
     onComment: renderComment,

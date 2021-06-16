@@ -1,10 +1,10 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/EditorModel';
-import { clone, getAncestry, NodeVisitor, visit } from '../html-dom/util';
+import { clone, getAncestry, NodeVisitor, visit } from '../core/html-dom/util';
 import { css } from '@emotion/css';
-import { getSlots } from '../component-metamodel/getSlots';
+import { getSlots } from '../model/getSlots';
 import { getId } from '../hooks/useEditor';
-import { RaisinElementNode } from '../html-dom/RaisinNode';
+import { RaisinElementNode } from '../core/html-dom/RaisinNode';
 import { Handle } from './Handle';
 import { Button } from './Button';
 
@@ -118,8 +118,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
     );
   }
 
-  const ElementVisitor: NodeVisitor<VNode> = {
-    onText: () => undefined,
+  const ElementVisitor: Partial<NodeVisitor<VNode>> = {
     onElement(element, _) {
       const dragStyle = element === model.dragCoords?.element ? { transform: 'translate(' + model.dragCoords.x + 'px, ' + model.dragCoords.y + 'px)' } : {};
 

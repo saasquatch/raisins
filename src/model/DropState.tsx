@@ -1,4 +1,4 @@
-import { RaisinNode } from '../html-dom/RaisinNode';
+import { RaisinNode } from '../core/html-dom/RaisinNode';
 
 export type DropState = PossibleDrop;
 

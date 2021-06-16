@@ -1,6 +1,6 @@
-import { DefaultSlot, Model, NodeWithSlots } from '../model/EditorModel';
-import { visit } from '../html-dom/util';
-import { RaisinNode } from '../html-dom/RaisinNode';
+import { DefaultSlot, Model, NodeWithSlots } from './EditorModel';
+import { visit } from '../core/html-dom/util';
+import { RaisinNode } from '../core/html-dom/RaisinNode';
 
 export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponentMeta']) {
   const noSlots = (_: RaisinNode) => undefined;

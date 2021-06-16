@@ -1,3 +1,4 @@
+import { CssNodePlain } from 'css-tree';
 import { ElementType } from 'domelementtype';
 /**
  * This object will be used as the prototype for Nodes when creating a
@@ -35,7 +36,15 @@ export interface RaisinDocumentNode extends RaisinNodeWithChildren<ElementType.R
   'x-mode'?: 'no-quirks' | 'quirks' | 'limited-quirks';
 }
 
-export interface RaisinElementNode extends RaisinNodeWithChildren<ElementType.Tag | ElementType.Script | ElementType.Style> {
+export interface RaisinStyleNode extends RaisinNode<ElementType.Style> {
+  attribs: {
+    [name: string]: string;
+  };
+  tagName: "style";
+  contents?: CssNodePlain;
+}
+
+export interface RaisinElementNode extends RaisinNodeWithChildren<ElementType.Tag | ElementType.Script> {
   attribs: {
     [name: string]: string;
   };

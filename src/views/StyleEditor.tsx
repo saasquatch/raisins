@@ -2,27 +2,32 @@ import { Model } from '../model/EditorModel';
 import { StateUpdater } from '../util/NewState';
 import { h, VNode } from '@stencil/core';
 import * as Css from 'css-tree';
-import { createChildUpdater, createUpdater, HasChildren } from '../css-om/cssUtils';
+import { createChildUpdater, createUpdater, HasChildren } from '../core/css-om/cssUtils';
 
 export function StyleEditor(model: Model) {
-  if (!model.stylesheet) {
-    return <div>No stylesheet</div>;
+  if (!model.sheets) {
+    return <div>No stylesheets</div>;
   }
-  return <StyleNodeEditor node={model.stylesheet} setNode={model.setStyleSheet} />;
+  return (
+    <div>
+      Sheets:
+      {model.sheets.map((s, i) => {
+        const isSelected = s === model.selected;
+        return (
+          <div onClick={() => model.setSelectedsheet(s)} style={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
+            Sheet {i}
+          </div>
+        );
+      })}
+      {model.selectedSheet && <StyleNodeEditor node={model.selectedSheet.contents} setNode={model.updateSelectedSheet} />}
+    </div>
+  );
 }
 
 export type StyleNodeProps<T extends Css.CssNodePlain = Css.CssNodePlain> = {
   node: T;
   setNode: StateUpdater<T>;
 };
-
-function cleanlyGenerateCssString(node: Css.CssNodePlain) {
-  const cloned = JSON.parse(JSON.stringify(node));
-  // `fromPlainObject` is unsafe! It mutates the input object, and breaks JSX/Stencil rendering
-  const richNode = Css.fromPlainObject(cloned);
-  const cssText = Css.generate(richNode);
-  return cssText;
-}
 
 export function StyleNodeEditor(props: StyleNodeProps) {
   const { node, ...rest } = props;

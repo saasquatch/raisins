@@ -1,11 +1,11 @@
 import { h, FunctionalComponent, VNode } from '@stencil/core';
 import { Model } from '../model/EditorModel';
 import { css } from '@emotion/css';
-import { NodeVisitor, visit } from '../html-dom/util';
+import { NodeVisitor, visit } from '../core/html-dom/util';
 import styleToObject from 'style-to-object';
 import { Button } from './Button';
-import { RaisinElementNode } from '../html-dom/RaisinNode';
-import serializer from '../html-dom/serializer';
+import { RaisinElementNode } from '../core/html-dom/RaisinNode';
+import serializer from '../core/html-dom/serializer';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -57,7 +57,22 @@ const Selectable = css`
 `;
 
 export const Canvas: FunctionalComponent<Model> = props => {
+  if (props.mode === 'html') {
+    return <pre>{props.serialized}</pre>;
+  }
+  return <WYSWIGCanvas {...props} />;
+};
+export const WYSWIGCanvas: FunctionalComponent<Model> = props => {
   const CanvasVisitor: NodeVisitor<VNode | string> = {
+    onCData() {
+      return '';
+    },
+    onComment() {
+      return '';
+    },
+    onDirective() {
+      return '';
+    },
     onRoot(_, children) {
       return <div>{children}</div>;
     },
@@ -81,6 +96,24 @@ export const Canvas: FunctionalComponent<Model> = props => {
       //   // return <div ref={e => props.useInlineHTMLEditorRef(e, text)} />;
       // }
       return textValue;
+    },
+    onStyle(style) {
+      return (
+        <div>
+          Style:
+          <textarea>
+            {
+              style.contents && Object.keys(style.contents)
+              // @ts-ignore
+              // TODO: Convert from RaisinNode to DOMHandler.Node
+              // serialize(element.children)
+            }
+          </textarea>
+          {/* 
+              // TODO: Convert from RaisinNode to DOMHandler.Node
+          <style innerHTML={serialize(element.children)} />; */}
+        </div>
+      );
     },
     onElement(element, children) {
       const claz = {
@@ -119,23 +152,6 @@ export const Canvas: FunctionalComponent<Model> = props => {
           </div>
         );
       }
-      if (element.tagName === 'style') {
-        return (
-          <div>
-            Style:
-            <textarea>
-              {
-                // @ts-ignore
-                // TODO: Convert from RaisinNode to DOMHandler.Node
-                // serialize(element.children)
-              }
-            </textarea>
-            {/* 
-                // TODO: Convert from RaisinNode to DOMHandler.Node
-            <style innerHTML={serialize(element.children)} />; */}
-          </div>
-        );
-      }
       const { style, ...rest } = element.attribs;
       const styleObj = styleToObject(style);
 
@@ -155,7 +171,7 @@ export const Canvas: FunctionalComponent<Model> = props => {
     return <div>{visit(props.node, CanvasVisitor)}</div>;
   };
   props.renderInIframe(ContentComponent);
-  
+
   return (
     <div>
       <div class={wrapper} onClick={() => props.setSelected(undefined)}>
