@@ -156,6 +156,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       const hasSlots = slots?.length > 0;
       return (
         <div
+          data-element
           class={{
             [Layer]: element !== model.selected,
             [Selected]: element === model.selected,
@@ -163,6 +164,7 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
           }}
           style={dragStyle}
           ref={el => model.setDraggableRef(element, el)}
+          // TODO: removing this lines removes the Stencil re-render flash, but it also breaks drag and drop
           key={getId(element)}
         >
           {!hasSlots && name}
@@ -196,13 +198,14 @@ export const Layers: FunctionalComponent<Model> = (model: Model) => {
       );
     },
     onRoot(_, children) {
-      return <div>{children}</div>;
+      return <div data-root>{children}</div>;
     },
   };
 
   return (
-    <div>
+    <div data-layers>
       {visit(model.node, ElementVisitor)}
+      <hr />
       <DepthLabel model={model} />
     </div>
   );

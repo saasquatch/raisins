@@ -17,7 +17,7 @@ export function AttributesEditor(props: { model: Model; node: RaisinElementNode 
   const allProps = new Set([...Object.keys(attribs), ...Object.keys(schema?.properties || {})]);
   const allPropKeys = [...allProps];
   return (
-    <div>
+    <div data-attributes-editor>
       <table>
         <thead>
           <tr>
