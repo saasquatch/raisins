@@ -1,4 +1,4 @@
-import { StateUpdater } from "../../util/NewState";
+import { StateUpdater } from '../../util/NewState';
 import * as Css from 'css-tree';
 import { StyleNodeProps } from '../../views/StyleEditor';
 
@@ -34,10 +34,12 @@ export function createUpdater<Node extends Css.CssNodePlain, Child extends Css.C
 export function createChildUpdater(setNode: StateUpdater<HasChildren>, idx: number): StateUpdater<Css.CssNodePlain> {
   return next => {
     setNode(current => {
-      const nextVal = typeof next === 'function' ? next(current) : next;
+      const currentAtIdx = current.children[idx];
+      const nextVal = typeof next === 'function' ? next(currentAtIdx) : next;
       return {
         ...current,
-        children: current.children.splice(idx, 1, nextVal),
+        // https://stackoverflow.com/questions/38060705/replace-element-at-specific-position-in-an-array-without-mutating-it
+        children: Object.assign([], current.children, { [idx]: nextVal }),
       };
     });
   };

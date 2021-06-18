@@ -20,7 +20,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
   const undo = () =>
     setState(previous => {
       if (!previous.undoStack.length) {
-        console.log('No undo', previous);
         return previous;
       }
       const [current, ...undoStack] = previous.undoStack;
@@ -34,7 +33,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
         slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
-      console.log('Undo to');
       return newState;
     });
 
@@ -55,7 +53,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
         slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
-      console.log('Setting to');
       return newState;
     });
 
@@ -68,7 +65,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
       redoStack: [],
       slots: getSlots(nextNode, metamodel.getComponentMeta),
     };
-    console.log('Setting to');
     return newState;
   }
 

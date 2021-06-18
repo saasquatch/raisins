@@ -88,7 +88,6 @@ const iframeSrc = `
 function useStencilIframeRenderer() {
   const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {
     if (!Comp) return; // no Component yet
-    console.log('Render iframe');
     const stencilView = iframe.contentDocument.querySelector('stencil-view');
     stencilView.view = <Comp />;
   };

@@ -7,7 +7,7 @@ import { move } from '../core/html-dom/util';
 import { DragCoords } from '../model/DragCoords';
 import { DropState, Location } from '../model/DropState';
 import { usePopper } from '../popper/usePopper';
-import { StateUpdater } from "../util/NewState";
+import { StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
@@ -84,7 +84,6 @@ function useDragState(sharedState: SharedState) {
           // call this function on every dragend event
           end(event) {
             // removeNode(node);
-            console.log('Drag end', event);
             event.target.style.opacity = 1;
             event.target.style.zIndex = 'auto';
 
@@ -177,7 +176,7 @@ export function useDropState(sharedState: SharedState) {
         });
         sharedState.setReferenceElement(event.target);
 
-        console.log('Possible drop', event.target);
+        // console.log('Possible drop', event.target);
       },
       ondragleave: function (event) {
         // remove the drop feedback style
@@ -192,11 +191,11 @@ export function useDropState(sharedState: SharedState) {
         const dropped = sharedState.elementToNode.get(event.relatedTarget);
         const dropzoneNode = sharedState.elementToNode.get(event.target);
 
-        console.log('Dropped', dropped, 'into', dropzoneNode);
+        // console.log('Dropped', dropped, 'into', dropzoneNode);
         // @ts-ignore
         const position = idx as number;
         sharedState.props.setNode(root => {
-          console.log('Moving', dropped, 'to', dropzoneNode, 'at idx', position);
+          // console.log('Moving', dropped, 'to', dropzoneNode, 'at idx', position);
           return move(root, dropped, dropzoneNode, position);
         });
 

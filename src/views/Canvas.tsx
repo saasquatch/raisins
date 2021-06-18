@@ -1,11 +1,12 @@
-import { h, FunctionalComponent, VNode } from '@stencil/core';
-import { Model } from '../model/EditorModel';
 import { css } from '@emotion/css';
-import { NodeVisitor, visit } from '../core/html-dom/util';
+import { FunctionalComponent, h, VNode } from '@stencil/core';
 import styleToObject from 'style-to-object';
-import { Button } from './Button';
+import cssSerializer from '../core/css-om/serializer';
 import { RaisinElementNode } from '../core/html-dom/RaisinNode';
 import serializer from '../core/html-dom/serializer';
+import { NodeVisitor, visit } from '../core/html-dom/util';
+import { Model } from '../model/EditorModel';
+import { Button } from './Button';
 
 const wrapper = css`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
@@ -98,22 +99,8 @@ export const WYSWIGCanvas: FunctionalComponent<Model> = props => {
       return textValue;
     },
     onStyle(style) {
-      return (
-        <div>
-          Style:
-          <textarea>
-            {
-              style.contents && Object.keys(style.contents)
-              // @ts-ignore
-              // TODO: Convert from RaisinNode to DOMHandler.Node
-              // serialize(element.children)
-            }
-          </textarea>
-          {/* 
-              // TODO: Convert from RaisinNode to DOMHandler.Node
-          <style innerHTML={serialize(element.children)} />; */}
-        </div>
-      );
+      const cssContent = style.contents && cssSerializer(style.contents);
+      return <style innerHTML={cssContent} />;
     },
     onElement(element, children) {
       const claz = {

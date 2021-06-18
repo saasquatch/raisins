@@ -1,8 +1,8 @@
-import { Model } from '../model/EditorModel';
-import { StateUpdater } from '../util/NewState';
 import { h, VNode } from '@stencil/core';
 import * as Css from 'css-tree';
 import { createChildUpdater, createUpdater, HasChildren } from '../core/css-om/cssUtils';
+import { Model } from '../model/EditorModel';
+import { StateUpdater } from '../util/NewState';
 
 export function StyleEditor(model: Model) {
   if (!model.sheets) {
@@ -32,6 +32,8 @@ export type StyleNodeProps<T extends Css.CssNodePlain = Css.CssNodePlain> = {
 export function StyleNodeEditor(props: StyleNodeProps) {
   const { node, ...rest } = props;
   const { type } = node;
+  if(!type) return <EmptyState {...props}/>
+  if (type === 'Function') return <FunctionEditor node={node as Css.FunctionNodePlain} {...rest} />;
   if (type === 'StyleSheet') return <StylesheetEditor node={node as Css.StyleSheetPlain} {...rest} />;
   if (type === 'Rule') return <RuleEditor node={node as Css.RulePlain} {...rest} />;
   if (type === 'Block') return <BlockEditor node={node as Css.BlockPlain} {...rest} />;
@@ -46,9 +48,16 @@ export function StyleNodeEditor(props: StyleNodeProps) {
   if (type === 'PseudoClassSelector') return <PseudoClassSelectorEditor node={node as Css.PseudoClassSelectorPlain} {...rest} />;
   if (type === 'Dimension') return <DimensionEditor node={node as Css.Dimension} {...rest} />;
   if (type === 'WhiteSpace') return <WhiteSpaceEditor node={node as Css.WhiteSpace} {...rest} />;
-  return <div>"{type}" is unhandled</div>;
+  return (
+    <div>
+      "{type}" is unhandled <details>{JSON.stringify(node)}</details>
+    </div>
+  );
 }
 
+function EmptyState(_: StyleNodeProps){
+  return <div/>
+}
 function StylesheetEditor(props: StyleNodeProps<Css.StyleSheetPlain>) {
   const { node } = props;
 
@@ -85,7 +94,7 @@ function RuleEditor(props: StyleNodeProps<Css.RulePlain>) {
   return (
     <div data-type={props.node.type}>
       <StyleNodeEditor node={props.node.prelude} setNode={setPrelude} />
-      <StyleNodeEditor node={props.node.block} setNode={setBlock} />
+      <BlockEditor node={props.node.block} setNode={setBlock} />
     </div>
   );
 }
@@ -102,18 +111,30 @@ function BlockEditor(props: StyleNodeProps<Css.BlockPlain>) {
   );
 }
 
+function FunctionEditor(props: StyleNodeProps<Css.FunctionNodePlain>) {
+  return (
+    <span>
+      {props.node.name}(<Children {...props} />)
+    </span>
+  );
+}
+
 function SelectorListEditor(props: StyleNodeProps<Css.SelectorListPlain>) {
   return <Children {...props} />;
 }
+
 function SelectorEditor(props: StyleNodeProps<Css.SelectorPlain>) {
   return <Children {...props} />;
 }
+
 function TypeSelectorEditor(props: StyleNodeProps<Css.TypeSelector>) {
   return <span data-type={props.node.type}>{props.node.name}</span>;
 }
+
 function ClassSelectorEditor(props: StyleNodeProps<Css.ClassSelector>) {
   return <span data-type={props.node.type}>.{props.node.name}</span>;
 }
+
 function PseudoClassSelectorEditor(props: StyleNodeProps<Css.PseudoClassSelectorPlain>) {
   return <span data-type={props.node.type}>::{props.node.name}</span>;
 }
@@ -135,6 +156,7 @@ function RawEditor(props: StyleNodeProps<Css.Raw>) {
   const onInput = (e: InputEvent) => {
     const next = (e.target as HTMLInputElement).value;
     props.setNode(current => {
+      // console.log('Next CSS', next);
       return { ...current, value: next };
     });
   };
@@ -148,6 +170,7 @@ function ValueEditor(props: StyleNodeProps<Css.ValuePlain>) {
 function IdentifierEditor(props: StyleNodeProps<Css.Identifier>) {
   return <span data-type={props.node.type}>{props.node.name}</span>;
 }
+
 function DimensionEditor(props: StyleNodeProps<Css.Dimension>) {
   return (
     <span data-type={props.node.type}>
@@ -156,9 +179,11 @@ function DimensionEditor(props: StyleNodeProps<Css.Dimension>) {
     </span>
   );
 }
+
 function WhiteSpaceEditor(props: StyleNodeProps<Css.WhiteSpace>) {
   return <span data-type={props.node.type}>{props.node.value}</span>;
 }
+
 /**
  * Renders children, with the right mutation wired up
  *

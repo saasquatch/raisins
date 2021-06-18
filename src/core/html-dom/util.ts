@@ -261,7 +261,6 @@ export function removeWhitespace(root: RaisinNode): RaisinNode {
       if (isBlankOrEmpty(text.data.trim())) {
         return undefined;
       }
-      console.log('Not Blank', text);
       return text;
     },
   });

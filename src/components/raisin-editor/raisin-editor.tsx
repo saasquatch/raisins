@@ -18,7 +18,6 @@ export class Editor {
     const host = useHost();
     const model: Model = useEditor(host);
 
-    // console.log("Top-level render", new Date())
     return <EditorView {...model} />;
   }
 }
