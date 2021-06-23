@@ -1,0 +1,34 @@
+{
+  "name": "@raisins/core",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "source": "src/raisins-core.ts",
+  "exports": "./dist/raisins-core.modern.js",
+  "main": "./dist/raisins-core.cjs",
+  "module": "./dist/raisins-core.module.js",
+  "unpkg": "./dist/raisins-core.umd.js",
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch"
+  },
+  "author": "logvol",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/css-tree": "^1.0.5",
+    "@types/domelementtype": "^2.0.1",
+    "@types/lodash.clonedeep": "^4.5.6",
+    "microbundle": "^0.13.3"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.9.2",
+    "@saasquatch/universal-hooks": "^1.0.0",
+    "@wry/equality": "^0.5.1",
+    "css-tree": "*",
+    "dom-serializer": "^0.2.2",
+    "hotkeys-js": "^3.8.7",
+    "htmlparser2": "^6.1.0",
+    "interactjs": "^1.10.11",
+    "lodash.clonedeep": "^4.5.0"
+  }
+}

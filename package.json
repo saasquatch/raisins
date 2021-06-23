@@ -1,52 +1,7 @@
 {
-  "name": "raisins-js",
-  "version": "0.0.1",
-  "description": "Visual HTML editor for web components",
-  "main": "dist/index.cjs.js",
-  "module": "dist/custom-elements/index.js",
-  "es2015": "dist/esm/index.mjs",
-  "es2017": "dist/esm/index.mjs",
-  "types": "dist/custom-elements/index.d.ts",
-  "collection": "dist/collection/collection-manifest.json",
-  "collection:main": "dist/collection/index.js",
-  "unpkg": "dist/raisins-js/raisins-js.esm.js",
-  "files": [
-    "dist/",
-    "loader/"
-  ],
-  "scripts": {
-    "build": "stencil build --docs",
-    "start": "stencil build --dev --watch --serve",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
-    "generate": "stencil generate"
-  },
-  "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^24.0.0",
-    "@emotion/css": "^11.1.3",
-    "@interactjs/types": "^1.10.2",
-    "@saasquatch/stencil-hooks": "^1.0.0",
-    "@saasquatch/universal-hooks": "^0.1.3",
-    "@shoelace-style/shoelace": "^2.0.0-beta.25",
-    "@stencil/core": "^1.17.4",
-    "@types/css-tree": "^1.0.5",
-    "@wry/equality": "^0.3.2",
-    "css-tree": "^1.1.3",
-    "debug": "^4.3.1",
-    "dom-serializer": "^1.2.0",
-    "domhandler": "^4.0.0",
-    "hotkeys-js": "^3.8.1",
-    "htmlparser2": "^6.0.0",
-    "immer": "^9.0.1",
-    "interactjs": "^1.10.2",
-    "json-pointer": "^0.6.1",
-    "lodash.clonedeep": "^4.5.0",
-    "microbundle": "^0.13.3",
-    "style-to-object": "^0.3.0"
-  },
-  "license": "MIT",
-  "author": "",
+  "name": "root",
+  "private": true,
   "devDependencies": {
-    "@rollup/plugin-alias": "^3.1.2"
+    "lerna": "^4.0.0"
   }
 }
