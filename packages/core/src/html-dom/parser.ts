@@ -21,3 +21,5 @@ export function parse(html: string): RaisinDocumentNode {
   const clean = removeWhitespace(raisinNode);
   return clean as RaisinDocumentNode;
 }
+
+export default parse;

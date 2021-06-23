@@ -1,6 +1,6 @@
+import { Model, RaisinElementNode } from '@raisins/core';
+import SlDetails from "@shoelace-style/react/dist/details";
 import React from "react";
-import { RaisinElementNode } from '../core/html-dom/RaisinNode';
-import { Model } from '../model/EditorModel';
 
 export function AttributesEditor(props: { model: Model; node: RaisinElementNode }) {
   const schema = props.model.getComponentMeta(props.node)?.attributes;
@@ -15,7 +15,7 @@ export function AttributesEditor(props: { model: Model; node: RaisinElementNode 
     };
   };
   const allProps = new Set([...Object.keys(attribs), ...Object.keys(schema?.properties || {})]);
-  const allPropKeys = [...allProps];
+  const allPropKeys = [...allProps.values()];
   return (
     <div data-attributes-editor>
       <table>

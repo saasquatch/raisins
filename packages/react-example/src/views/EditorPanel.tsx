@@ -1,7 +1,6 @@
 import { ElementType } from 'domelementtype';
 import React from "react";
-import { RaisinElementNode } from '../core/html-dom/RaisinNode';
-import { Model } from '../model/EditorModel';
+import { Model, RaisinElementNode } from '@raisins/core';
 import { AttributesEditor } from './AttributeEditor';
 
 export function EditorPanel(props: Model) {

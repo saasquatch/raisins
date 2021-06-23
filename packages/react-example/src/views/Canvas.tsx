@@ -1,27 +1,35 @@
-import { css } from '@emotion/css';
-import React, { FC, ReactNode } from 'react';
-import styleToObject from 'style-to-object';
-import cssSerializer from '../core/css-om/serializer';
-import { RaisinElementNode } from '../core/html-dom/RaisinNode';
-import serializer from '../core/html-dom/serializer';
-import { NodeVisitor, visit } from '../core/html-dom/util';
-import { Model } from '../model/EditorModel';
-import { Button } from './Button';
-
+import { css } from "@emotion/css";
 import SlButtonGroup from "@shoelace-style/react/dist/button-group";
+import SlDropdown from "@shoelace-style/react/dist/dropdown";
 import SlIcon from "@shoelace-style/react/dist/icon";
 import SlMenu from "@shoelace-style/react/dist/menu";
 import SlMenuItem from "@shoelace-style/react/dist/menu-item";
 import SlMenuLabel from "@shoelace-style/react/dist/menu-label";
-import SlDropdown from "@shoelace-style/react/dist/dropdown";
+import {
+  Model,
+  cssSerializer,
+  RaisinElementNode,
+  RaisinNodeVisitor as NodeVisitor,
+  htmlSerializer,
+  htmlUtil,
+} from "@raisins/core";
+
+import React, { FC, ReactNode } from "react";
+import styleToObject from "style-to-object";
+import { Button } from "./Button";
+
+const { visit } = htmlUtil;
 
 const wrapper = css`
-  background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #cccccc 75%), linear-gradient(-45deg, transparent 75%, #cccccc 75%);
+  background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%),
+    linear-gradient(-45deg, #cccccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #cccccc 75%),
+    linear-gradient(-45deg, transparent 75%, #cccccc 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
   padding: 50px;
 `;
+
 const content = css`
   background: white;
   margin: 0 auto;
@@ -35,11 +43,11 @@ const SelectedToolbar = css`
   padding: 4px;
 
   flex-wrap: wrap;
-  SlButtonGroup {
+  sl-button-group {
     justify-self: end;
   }
   // CSS from: https://shoelace.style/components/button-group?id=toolbar-example
-  SlButtonGroup:not(:last-of-type) {
+  sl-button-group:not(:last-of-type) {
     margin-right: var(--sl-spacing-x-small);
   }
 `;
@@ -64,22 +72,22 @@ const Selectable = css`
   // }
 `;
 
-export const Canvas: FC<Model> = props => {
-  if (props.mode === 'html') {
+export const Canvas: FC<Model> = (props) => {
+  if (props.mode === "html") {
     return <pre>{props.serialized}</pre>;
   }
   return <WYSWIGCanvas {...props} />;
 };
-export const WYSWIGCanvas: FC<Model> = props => {
+export const WYSWIGCanvas: FC<Model> = (props) => {
   const CanvasVisitor: NodeVisitor<ReactNode> = {
     onCData() {
-      return '';
+      return "";
     },
     onComment() {
-      return '';
+      return "";
     },
     onDirective() {
-      return '';
+      return "";
     },
     onRoot(_, children) {
       return <div>{children}</div>;
@@ -107,13 +115,15 @@ export const WYSWIGCanvas: FC<Model> = props => {
     },
     onStyle(style) {
       const cssContent = style.contents && cssSerializer(style.contents);
-      return <style innerHTML={cssContent} />;
+      return (
+        <style
+          dangerouslySetInnerHTML={{
+            __html: cssContent ?? "",
+          }}
+        />
+      );
     },
     onElement(element, children) {
-      const claz = {
-        [Selectable]: props.mode === 'edit',
-      };
-
       const onClick = (e: Event) => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
         e.stopPropagation();
@@ -121,15 +131,19 @@ export const WYSWIGCanvas: FC<Model> = props => {
       };
 
       const innerProps = {
-        'rjs-selected': element === props.selected,
-        'class': { ...claz, [element.attribs.class]: true },
-        'onClick': props.mode === 'edit' ? onClick : () => {},
-        'data-tagname': element.tagName,
-        'ref': (el: HTMLElement) => props.registerRef(element, el),
+        "rjs-selected": element === props.selected,
+        className: {
+          [Selectable]: props.mode === "edit",
+          [element.attribs.class]: true,
+        },
+        onClick: props.mode === "edit" ? onClick : () => {},
+        "data-tagname": element.tagName,
+        ref: (el: HTMLElement) => props.registerRef(element, el),
         // Don't use -- element changes evey time!
         // key: getId(element),
       };
-      if (element.tagName === 'template') {
+
+      if (element.tagName === "template") {
         return (
           <div {...innerProps}>
             <h1>Template:</h1>
@@ -137,12 +151,12 @@ export const WYSWIGCanvas: FC<Model> = props => {
           </div>
         );
       }
-      if (element.tagName === 'script') {
+      if (element.tagName === "script") {
         return (
           <div {...innerProps}>
             Script:
             <br />
-            <textarea>{serializer(element.children)}</textarea>
+            <textarea>{htmlSerializer(element.children)}</textarea>
           </div>
         );
       }
@@ -158,9 +172,9 @@ export const WYSWIGCanvas: FC<Model> = props => {
     },
   };
 
-  const selectedAncestry = props.getAncestry(props.selected).reverse();
-  const hasSelectedAncestry = selectedAncestry.length > 1 ? true : false;
-  const hasSelected = typeof props.selected !== 'undefined';
+  const selectedAncestry = props.selected && props.getAncestry(props.selected).reverse();
+  const hasSelectedAncestry = props.selected && selectedAncestry && selectedAncestry.length > 1 ? true : false;
+  const hasSelected = typeof props.selected !== "undefined";
   const ContentComponent: FC = () => {
     return <div>{visit(props.node, CanvasVisitor)}</div>;
   };
@@ -169,10 +183,15 @@ export const WYSWIGCanvas: FC<Model> = props => {
   return (
     <div>
       <div className={wrapper} onClick={() => props.setSelected(undefined)}>
-        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el)} />
+        <div
+          className={content}
+          data-content
+          style={{ width: props.size.width }}
+          ref={(el) => (props.containerRef.current = el)}
+        />
       </div>
       <div
-        ref={el => (props.toolbarRef.current = el)}
+        ref={(el) => (props.toolbarRef.current = el)}
         data-toolbar
         {...props.toolbarPopper.attributes.popper}
         // @ts-ignore
@@ -180,7 +199,10 @@ export const WYSWIGCanvas: FC<Model> = props => {
       >
         {hasSelected && (
           <div className={SelectedToolbar}>
-            <div className={SelectedTitle}>{props.getComponentMeta(props.selected as RaisinElementNode)?.title || props.selected?.nodeType}</div>
+            <div className={SelectedTitle}>
+              {props.getComponentMeta(props.selected as RaisinElementNode)
+                ?.title || props.selected?.nodeType}
+            </div>
             <SlButtonGroup>
               <Button onClick={() => props.duplicateNode(props.selected)}>
                 <SlIcon name="files"></SlIcon>
@@ -189,14 +211,14 @@ export const WYSWIGCanvas: FC<Model> = props => {
                 <SlIcon name="trash"></SlIcon>
               </Button>
               <Button onClick={() => props.moveUp(props.selected)}>
-                {' '}
+                {" "}
                 <SlIcon name="arrow-bar-up"></SlIcon>
               </Button>
               <Button onClick={() => props.moveDown(props.selected)}>
-                {' '}
+                {" "}
                 <SlIcon name="arrow-bar-down"></SlIcon>
               </Button>
-            </SlButtonGroup>{' '}
+            </SlButtonGroup>{" "}
             {hasSelectedAncestry && (
               <SlButtonGroup>
                 <SlDropdown placement="top-end">
@@ -210,12 +232,19 @@ export const WYSWIGCanvas: FC<Model> = props => {
                       const meta = props.getComponentMeta(n as any);
                       return (
                         <SlMenuItem onClick={() => props.setSelected(n)}>
-                          {'-'.repeat(idx)} {meta?.title || 'Root'}
+                          {"-".repeat(idx)} {meta?.title || "Root"}
                         </SlMenuItem>
                       );
                     })}
                     <SlMenuItem>
-                      {'-'.repeat(selectedAncestry.length)} <b>{props.getComponentMeta(props.selected as RaisinElementNode).title}</b>
+                      {"-".repeat(selectedAncestry.length)}{" "}
+                      <b>
+                        {
+                          props.getComponentMeta(
+                            props.selected as RaisinElementNode
+                          ).title
+                        }
+                      </b>
                     </SlMenuItem>
                   </SlMenu>
                 </SlDropdown>
@@ -226,7 +255,7 @@ export const WYSWIGCanvas: FC<Model> = props => {
       </div>
 
       {/* <div
-        class={EditorPopper}
+        className={EditorPopper}
         ref={el => (props.editorRef.current = el)}
         data-toolbar
         {...props.editorPopper.attributes.popper}
@@ -241,7 +270,10 @@ export const WYSWIGCanvas: FC<Model> = props => {
   );
 };
 
-const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = (props, children) => {
+const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = (
+  props,
+  children
+) => {
   // TODO: React render raw
   return React.createElement(props.as, props.inner, children);
 };

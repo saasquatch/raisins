@@ -1,0 +1,19 @@
+0 silly argv {
+0 silly argv   _: [ 'add' ],
+0 silly argv   globs: [],
+0 silly argv   lernaVersion: '4.0.0',
+0 silly argv   '$0': '/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/.bin/lerna',
+0 silly argv   pkg: '@emotion/css'
+0 silly argv }
+1 notice cli v4.0.0
+2 verbose rootPath /home/logan/dev/raisins-js
+3 error TypeError: Invalid comparator: latest
+3 error     at Comparator.parse (/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/comparator.js:37:13)
+3 error     at new Comparator (/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/comparator.js:21:10)
+3 error     at /home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/range.js:121:20
+3 error     at Array.map (<anonymous>)
+3 error     at Range.parseRange (/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/range.js:121:8)
+3 error     at /home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/range.js:34:26
+3 error     at Array.map (<anonymous>)
+3 error     at new Range (/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/classes/range.js:34:8)
+3 error     at Object.intersects (/home/logan/.npm/_npx/d5cad42883f80c04/node_modules/semver/ranges/intersects.js:3:8)

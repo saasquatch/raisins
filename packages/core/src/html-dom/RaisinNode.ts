@@ -10,15 +10,15 @@ export interface RaisinNode<T extends ElementType = ElementType> {
 }
 type DataNodesTypes = ElementType.Comment | ElementType.Text | ElementType.Directive;
 
-export interface DataNode<T extends DataNodesTypes = DataNodesTypes> extends RaisinNode<T> {
+export interface RaisinDataNode<T extends DataNodesTypes = DataNodesTypes> extends RaisinNode<T> {
   type: T;
   data: string;
 }
 
-export interface RaisinTextNode extends DataNode<ElementType.Text> {}
-export interface RaisinCommentNode extends DataNode<ElementType.Comment> {}
+export interface RaisinTextNode extends RaisinDataNode<ElementType.Text> {}
+export interface RaisinCommentNode extends RaisinDataNode<ElementType.Comment> {}
 
-export interface RaisinProcessingInstructionNode extends DataNode<ElementType.Directive> {
+export interface RaisinProcessingInstructionNode extends RaisinDataNode<ElementType.Directive> {
   'name': string;
   'x-name'?: string;
   'x-publicId'?: string;

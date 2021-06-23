@@ -23,7 +23,7 @@ export type Model = {
    * Interactions
    */
   selected?: RaisinNode;
-  setSelected(node: RaisinNode): void;
+  setSelected(node?: RaisinNode): void;
   selectParent(): void;
 
   /*

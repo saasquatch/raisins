@@ -6,6 +6,8 @@
   "source": "src/raisins-core.ts",
   "exports": "./dist/raisins-core.modern.js",
   "main": "./dist/raisins-core.cjs",
+  "types": "./dist/raisins-core.d.ts",
+  "typings": "./dist/raisins-core.d.ts",
   "module": "./dist/raisins-core.module.js",
   "unpkg": "./dist/raisins-core.umd.js",
   "scripts": {
@@ -21,14 +23,18 @@
     "microbundle": "^0.13.3"
   },
   "dependencies": {
+    "@emotion/css": "^11.1.3",
     "@popperjs/core": "^2.9.2",
     "@saasquatch/universal-hooks": "^1.0.0",
+    "@types/css-tree": "^1.0.5",
     "@wry/equality": "^0.5.1",
     "css-tree": "*",
     "dom-serializer": "^0.2.2",
     "hotkeys-js": "^3.8.7",
     "htmlparser2": "^6.1.0",
     "interactjs": "^1.10.11",
-    "lodash.clonedeep": "^4.5.0"
+    "lodash.clonedeep": "^4.5.0",
+    "style-to-object": "^0.3.0",
+    "typescript": "^4.3.4"
   }
 }

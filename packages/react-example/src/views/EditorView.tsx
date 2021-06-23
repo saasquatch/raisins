@@ -1,8 +1,7 @@
 import { css } from '@emotion/css';
 import '@shoelace-style/shoelace/dist/themes/dark.css';
 import React from "react";
-import { RaisinElementNode } from '../core/html-dom/RaisinNode';
-import { Model } from '../model/EditorModel';
+import { Model, RaisinElementNode } from '@raisins/core';
 import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';

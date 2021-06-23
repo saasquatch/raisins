@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import React from "react"
-import { Model } from '../model/EditorModel';
+import { Model } from '@raisins/core';
 
 import SlIcon from '@shoelace-style/react/dist/icon';
 import SlButton from '@shoelace-style/react/dist/button-group';

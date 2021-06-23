@@ -1,6 +1,6 @@
 import * as Css from 'css-tree';
 import { createChildUpdater, createUpdater, HasChildren } from '../core/css-om/cssUtils';
-import { Model } from '../model/EditorModel';
+import { Model } from '@raisins/core';
 import { StateUpdater } from '../../../core/src/util/NewState';
 import { StyleNodeProps } from '../../../core/src/css-om/StyleNodeProps';
 import { ReactNode } from 'react';
