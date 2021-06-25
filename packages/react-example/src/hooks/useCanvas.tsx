@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, createElement } from 'react';
 import { RaisinNode } from '@raisins/core';
 import { VirtualElement } from '@popperjs/core';
 import flip from '@popperjs/core/lib/modifiers/flip';
@@ -9,6 +9,7 @@ import { usePopper } from 'react-popper';
 // import { getRectOffset } from "@interactjs/modifiers/Modification";
 import { useIframeRenderer } from './useIFrameRenderer';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 export type Size = {
   name: string;
@@ -63,7 +64,7 @@ const scripts = [
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.27/themes/dark.css" />
 <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
-
+<style>body{margin:0;}</style>
 <!-- TODO: Script management -->
 <script type="text/javascript" src="https://fast.ssqt.io/npm/@saasquatch/vanilla-components@1.0.x/dist/widget-components.js"></script>
 <link href="https://fast.ssqt.io/npm/@saasquatch/vanilla-components-assets@0.0.x/icons.css" type="text/css" rel="stylesheet" />`,
@@ -81,22 +82,25 @@ const iframeSrc = `
 }
 </style>
 <body>
-  <stencil-view></stencil-view>
+  <div id="root"></div>
 </body>
 </html>`;
 
 function useStencilIframeRenderer() {
   const renderer = (iframe: HTMLIFrameElement, Comp: React.FC) => {
     if (!Comp) return; // no Component yet
-    // const stencilView = iframe.contentDocument.querySelector("stencil-view");
+    if (!iframe.contentDocument) return;
+    const entryDiv = iframe.contentDocument!.body;
     // iframe;
     //    stencilView.view = <Comp />;
+    return ReactDOM.createPortal(<Comp />, entryDiv!);
   };
 
-  const props = useIframeRenderer<React.FC>({
+  const props = useIframeRenderer<React.FC, React.ReactNode>({
     src: iframeSrc,
     renderer,
     initialComponent: () => <div />,
+    createElement,
   });
 
   return {

@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
-import { cssSerializer, htmlSerializer, htmlUtil, RaisinElementNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
-import { Model } from "../model/EditorModel";
+import { cssSerializer, htmlSerializer, htmlUtil, RaisinElementNode, RaisinStyleNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
+import { Model } from '../model/EditorModel';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import SlDropdown from '@shoelace-style/react/dist/dropdown';
 import SlIcon from '@shoelace-style/react/dist/icon';
@@ -80,10 +80,10 @@ export const WYSWIGCanvas: FC<Model> = props => {
     onDirective() {
       return '';
     },
-    onRoot(_, children) {
+    onRoot(_: any, children: ReactNode) {
       return <div>{children}</div>;
     },
-    onText(text) {
+    onText(text: { data: any }) {
       const textValue = text.data;
       // const parent = props.parents.get(text);
       // if ((props.selected === text || props.selected === parent) && props.mode === 'edit') {
@@ -104,7 +104,7 @@ export const WYSWIGCanvas: FC<Model> = props => {
       // }
       return textValue;
     },
-    onStyle(style) {
+    onStyle(style: RaisinStyleNode) {
       const cssContent = style.contents && cssSerializer(style.contents);
       return (
         <style
@@ -114,7 +114,7 @@ export const WYSWIGCanvas: FC<Model> = props => {
         />
       );
     },
-    onElement(element, children) {
+    onElement(element: RaisinElementNode, children: ReactNode) {
       const onClick: MouseEventHandler<Element> = e => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
         e.stopPropagation();
@@ -152,11 +152,9 @@ export const WYSWIGCanvas: FC<Model> = props => {
       const { style, ...rest } = element.attribs;
       const styleObj = styleToObject(style);
 
-      let p = { style: styleObj, ...rest, ...innerProps };
+      let p = { style: styleObj, ...rest, ...innerProps, children };
       return (
-        <HTMLCompont as={element.tagName} inner={p}>
-          {children}
-        </HTMLCompont>
+        <HTMLCompont as={element.tagName} inner={p} />
       );
     },
   };
@@ -165,14 +163,17 @@ export const WYSWIGCanvas: FC<Model> = props => {
   const hasSelectedAncestry = props.selected && selectedAncestry && selectedAncestry.length > 1 ? true : false;
   const hasSelected = typeof props.selected !== 'undefined';
   const ContentComponent: FC = () => {
-    return <div>{visit(props.node, CanvasVisitor)}</div>;
+    return <div>coontent {visit(props.node, CanvasVisitor)}</div>;
   };
-  props.renderInIframe(ContentComponent);
 
+  const returnedPortal = props.renderInIframe(ContentComponent);
+  console.log('Portal', returnedPortal);
   return (
     <div>
       <div className={wrapper} onClick={() => props.setSelected(undefined as any)}>
-        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)} />
+        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)}>
+          {returnedPortal && returnedPortal}
+        </div>
       </div>
       <div
         ref={el => (props.toolbarRef.current = el!)}
@@ -234,23 +235,12 @@ export const WYSWIGCanvas: FC<Model> = props => {
         )}
       </div>
 
-      {/* <div
-        className={EditorPopper}
-        ref={el => (props.editorRef.current = el)}
-        data-toolbar
-        {...props.editorPopper.attributes.popper}
-        // @ts-ignore
-        style={props.editorPopper.styles.popper}
-      >
-        <EditorPanel {...props} />
-      </div> */}
-
       {hasSelected && <div>Selected</div>}
     </div>
   );
 };
 
-const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = (props, children) => {
+const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = props => {
   // TODO: React render raw
-  return React.createElement(props.as, props.inner, children);
+  return React.createElement(props.as, props.inner);
 };

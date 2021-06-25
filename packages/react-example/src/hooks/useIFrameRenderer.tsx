@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export type UseIframeProps<C> = {
+export type UseIframeProps<C, E> = {
   /**
    * A source document to use in the iframe
    */
@@ -8,11 +8,12 @@ export type UseIframeProps<C> = {
   /**
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */
-  renderer: (iframe: HTMLIFrameElement, Component: C) => void;
+  renderer: (iframe: HTMLIFrameElement, Component: C) => E;
   /**
    * The component to render
    */
   initialComponent: C;
+  createElement: (comp: C) => E;
 };
 
 /**
@@ -23,12 +24,12 @@ export type UseIframeProps<C> = {
  * @param props - controls for how to render the iframe
  * @returns
  */
-export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIframeProps<C>) {
+export function useIframeRenderer<C, E>({ src, renderer, initialComponent, createElement }: UseIframeProps<C, E>) {
   const initialComponentRef = useRef<C>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
-  const loaded = useRef(false);
-
+  const [loaded, setLoaded] = useState(false);
+  
   useEffect(
     () => {
       if (container.current) {
@@ -39,6 +40,7 @@ export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIfr
         iframe.width = '100%';
         iframe.scrolling = 'no';
         iframe.setAttribute('style', 'border: 0; background-color: none; width: 1px; min-width: 100%;');
+        // iframe.setAttribute('sandbox', 'allow-scripts');
         const loadListener = async () => {
           // iframe.height = iframe.contentDocument.body.scrollHeight + 'px';
 
@@ -53,7 +55,8 @@ export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIfr
           });
 
           ro.observe(iframe.contentDocument!.body);
-          loaded.current = true;
+          // loaded.current = true;
+          setLoaded(true);
           renderer(iframe, initialComponentRef.current);
         };
         iframe.addEventListener('load', loadListener);
@@ -61,8 +64,8 @@ export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIfr
 
         return () => {
           iframeRef.current = undefined;
-          loaded.current = false;
           iframe.removeEventListener('load', loadListener);
+          setLoaded(false);
         };
       }
     },
@@ -70,18 +73,19 @@ export function useIframeRenderer<C>({ src, renderer, initialComponent }: UseIfr
     [src],
   );
 
-  const renderInIframe = (Component: C) => {
-    if (Component === initialComponentRef.current) {
-      // Won't attempt to re-render exact same component
-      return;
-    }
+  function renderInIframe(Component: C): E | undefined {
     initialComponentRef.current = Component;
     if (iframeRef.current && loaded) {
-      renderer(iframeRef.current, Component);
+      const out = renderer(iframeRef.current, Component);
+      if(out){
+        return out;
+      }
     } else {
       // Render will be called when the iframe is loaded
     }
-  };
+
+    // return createElement(initialComponentRef.current);
+  }
 
   return {
     loaded,
