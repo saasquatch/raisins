@@ -166,13 +166,12 @@ export const WYSWIGCanvas: FC<Model> = props => {
     return <>{visit(props.node, CanvasVisitor)}</>;
   };
 
-  const returnedPortal = props.renderInIframe(ContentComponent);
-  console.log('Portal', returnedPortal);
+  props.renderInIframe(ContentComponent);
+  
   return (
     <div>
       <div className={wrapper} onClick={() => props.setSelected(undefined as any)}>
         <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)}>
-          {returnedPortal && returnedPortal}
         </div>
       </div>
       <div

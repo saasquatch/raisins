@@ -6,10 +6,11 @@ import { RaisinNode, RaisinNodeWithChildren, htmlUtil, htmlSerializer as seriali
 import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
 import { InternalState } from './useEditor';
+import { CoreModel, HistoryModel } from '../model/EditorModel';
 
 const { duplicate, getParents, insertAt, move, remove, replace, getAncestry: getAncestryUtil } = htmlUtil;
 
-export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
+export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreModel & HistoryModel {
   // const [selected, setSelected] = useState<RaisinNode>(undefined);
   const [state, setState] = useState<InternalState>({
     redoStack: [],
@@ -205,7 +206,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
     moveUp,
     replaceNode,
     setNode,
-    setNodeInternal,
 
     undo,
     redo,

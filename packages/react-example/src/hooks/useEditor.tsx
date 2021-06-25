@@ -54,7 +54,7 @@ export function useEditor(initialHTML:string): Model {
     setMode,
     ...useStyleEditor({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),
     ...metamodel,
-    ...useCanvas({ selected: core.selected, setNodeInternal: core.setNodeInternal }),
+    ...useCanvas(core),
     ...useDND({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),
   };
 }

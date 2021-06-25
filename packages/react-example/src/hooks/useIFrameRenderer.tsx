@@ -48,22 +48,21 @@ export function useIframeRenderer<C, E>({ src, renderer, initialComponent, creat
         iframe.width = '100%';
         iframe.scrolling = 'no';
         iframe.setAttribute('style', 'border: 0; background-color: none; width: 1px; min-width: 100%;');
-        // iframe.setAttribute('sandbox', 'allow-scripts');
+        iframe.setAttribute('sandbox', 'allow-scripts');
         const loadListener = async () => {
           // iframe.height = iframe.contentDocument.body.scrollHeight + 'px';
 
           // Adjust frame height when size of body changes
           // @ts-ignore
-          const ro = new iframe.contentWindow.ResizeObserver(entries => {
-            for (const entry of entries) {
-              const { height } = entry.contentRect;
-              // @ts-ignore -- number will be cast to string by browsers
-              iframe.height = height;
-            }
-          });
+          // const ro = new iframe.contentWindow.ResizeObserver(entries => {
+          //   for (const entry of entries) {
+          //     const { height } = entry.contentRect;
+          //     // @ts-ignore -- number will be cast to string by browsers
+          //     iframe.height = height;
+          //   }
+          // });
 
-          ro.observe(iframe.contentDocument!.body);
-          // loaded.current = true;
+          // ro.observe(iframe.contentDocument!.body);
           setLoaded(true);
           renderer(iframe, initialComponentRef.current);
         };

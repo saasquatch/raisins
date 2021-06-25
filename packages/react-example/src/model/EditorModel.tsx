@@ -8,16 +8,16 @@ import { DropState } from './DropState';
 import { RaisinNode, RaisinNodeWithChildren } from '../../../core/src/html-dom/RaisinNode';
 import { StateUpdater } from '../util/NewState';
 
-export type Model = {
+export type CoreModel = {
   node: RaisinNode;
   serialized: string;
-  slots: NodeWithSlots;
+  slots?: NodeWithSlots;
   initial: string;
+
+  setNode: StateUpdater<RaisinNode>;
 
   parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
   getAncestry(node: RaisinNode): RaisinNodeWithChildren[];
-
-  getId(node: RaisinNode): string;
 
   /*
    * Interactions
@@ -35,7 +35,9 @@ export type Model = {
   moveUp(node: RaisinNode): void;
   moveDown(node: RaisinNode): void;
   replaceNode(prev: RaisinNode, next: RaisinNode): void;
+};
 
+export type HistoryModel = {
   /*
    * History management
    */
@@ -43,22 +45,26 @@ export type Model = {
   redo(): void;
   hasUndo: boolean;
   hasRedo: boolean;
+};
 
-  /**
-   * Canvas
-   */
-  mode: Mode;
-  setMode: StateUpdater<Mode>;
-  /*
-   * Drag and drop
-   */
-  setDraggableRef(node: RaisinNode, element: HTMLElement): void;
-  setDroppableRef(node: RaisinNode, element: HTMLElement, idx: number, slot: string): void;
-  dragCoords: DragCoords;
-  dropTarget?: DropState;
-  isDragActive: boolean;
-  elementToNode: WeakMap<HTMLElement, RaisinNode>;
-} & ComponentModel &
+export type Model = CoreModel &
+  HistoryModel & {
+    getId(node: RaisinNode): string;
+    /**
+     * Canvas
+     */
+    mode: Mode;
+    setMode: StateUpdater<Mode>;
+    /*
+     * Drag and drop
+     */
+    setDraggableRef(node: RaisinNode, element: HTMLElement): void;
+    setDroppableRef(node: RaisinNode, element: HTMLElement, idx: number, slot: string): void;
+    dragCoords: DragCoords;
+    dropTarget?: DropState;
+    isDragActive: boolean;
+    elementToNode: WeakMap<HTMLElement, RaisinNode>;
+  } & ComponentModel &
   ReturnType<typeof useDND> &
   ReturnType<typeof useCanvas> &
   ReturnType<typeof useStyleEditor>;
@@ -82,5 +88,3 @@ export type Block = {
   name: string;
   tag: string;
 };
-
-

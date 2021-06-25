@@ -10,8 +10,10 @@ import { usePopper } from 'react-popper';
 import { useIframeRenderer } from './useIFrameRenderer';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Child, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
 
-import { connectToChild } from 'penpal';
+import ReactDOMServer from 'react-dom/server';
+import { CoreModel } from '../model/EditorModel';
 
 export type Size = {
   name: string;
@@ -86,11 +88,35 @@ const iframeSrc = `
 </body>
 </html>`;
 
-function useStencilIframeRenderer() {
+function useInnerHtmlIframeRenderer() {
+  const renderer = (iframe: HTMLIFrameElement, child: Child, Comp: React.FC):string => {
+    if (!Comp) return ""; // no Component yet
+    // if (!iframe.contentDocument) return;
+    // const entryDiv = iframe.contentDocument!.querySelector("#root");
+    // // iframe;
+    // //    stencilView.view = <Comp />;
+    // return ReactDOM.createPortal(<Comp />, entryDiv!);
+    const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
+    child.render(htmlContent);
+    return htmlContent!;
+  };
+
+  const props = useSandboxedIframeRenderer<React.FC>({
+    renderer,
+    initialComponent: () => <div />,
+  });
+
+  return {
+    renderInIframe: props.renderInIframe,
+    containerRef: props.container,
+  };
+}
+
+function useReactIframeRenderer() {
   const renderer = (iframe: HTMLIFrameElement, Comp: React.FC) => {
     if (!Comp) return; // no Component yet
     if (!iframe.contentDocument) return;
-    const entryDiv = iframe.contentDocument!.querySelector("#root");
+    const entryDiv = iframe.contentDocument!.querySelector('#root');
     // iframe;
     //    stencilView.view = <Comp />;
     return ReactDOM.createPortal(<Comp />, entryDiv!);
@@ -109,8 +135,8 @@ function useStencilIframeRenderer() {
   };
 }
 
-export default function useCanvas(props: { selected: RaisinNode; setNodeInternal: StateUpdater<RaisinNode> }) {
-  const frameProps = useStencilIframeRenderer();
+export default function useCanvas(props: CoreModel) {
+  const frameProps = useInnerHtmlIframeRenderer();
   const [size, setSize] = useState<Size>(sizes[0]);
 
   const { ref, virtualElement } = useVirtualRef();
