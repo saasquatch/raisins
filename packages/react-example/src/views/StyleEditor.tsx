@@ -1,10 +1,10 @@
+import { cssUtil, StyleNodeProps } from '@raisins/core';
+import { Model } from "../model/EditorModel";
+import { StateUpdater } from '@raisins/core/dist/util/NewState';
 import * as Css from 'css-tree';
-import { createChildUpdater, createUpdater, HasChildren } from '../core/css-om/cssUtils';
-import { Model } from '@raisins/core';
-import { StateUpdater } from '../../../core/src/util/NewState';
-import { StyleNodeProps } from '../../../core/src/css-om/StyleNodeProps';
-import { ReactNode } from 'react';
+import { FormEvent } from 'react';
 
+const { createChildUpdater, createUpdater } = cssUtil;
 export function StyleEditor(model: Model) {
   if (!model.sheets) {
     return <div>No stylesheets</div>;
@@ -20,30 +20,34 @@ export function StyleEditor(model: Model) {
           </div>
         );
       })}
-      {model.selectedSheet && <StyleNodeEditor node={model.selectedSheet.contents} setNode={model.updateSelectedSheet} />}
+      {model.selectedSheet && <StyleNodeEditor node={model.selectedSheet.contents!} setNode={model.updateSelectedSheet} />}
     </div>
   );
 }
 
 export function StyleNodeEditor(props: StyleNodeProps) {
-  const { node, ...rest } = props;
+  const { node } = props;
   const { type } = node;
-  if(!type) return <EmptyState {...props}/>
-  if (type === 'Function') return <FunctionEditor node={node as Css.FunctionNodePlain} {...rest} />;
-  if (type === 'StyleSheet') return <StylesheetEditor node={node as Css.StyleSheetPlain} {...rest} />;
-  if (type === 'Rule') return <RuleEditor node={node as Css.RulePlain} {...rest} />;
-  if (type === 'Block') return <BlockEditor node={node as Css.BlockPlain} {...rest} />;
-  if (type === 'Declaration') return <DeclarationEditor node={node as Css.DeclarationPlain} {...rest} />;
-  if (type === 'Raw') return <RawEditor node={node as Css.Raw} {...rest} />;
-  if (type === 'Value') return <ValueEditor node={node as Css.ValuePlain} {...rest} />;
-  if (type === 'Identifier') return <IdentifierEditor node={node as Css.Identifier} {...rest} />;
-  if (type === 'SelectorList') return <SelectorListEditor node={node as Css.SelectorListPlain} {...rest} />;
-  if (type === 'Selector') return <SelectorEditor node={node as Css.SelectorPlain} {...rest} />;
-  if (type === 'TypeSelector') return <TypeSelectorEditor node={node as Css.TypeSelector} {...rest} />;
-  if (type === 'ClassSelector') return <ClassSelectorEditor node={node as Css.ClassSelector} {...rest} />;
-  if (type === 'PseudoClassSelector') return <PseudoClassSelectorEditor node={node as Css.PseudoClassSelectorPlain} {...rest} />;
-  if (type === 'Dimension') return <DimensionEditor node={node as Css.Dimension} {...rest} />;
-  if (type === 'WhiteSpace') return <WhiteSpaceEditor node={node as Css.WhiteSpace} {...rest} />;
+  if (!type) return <EmptyState {...props} />;
+  switch (type) {
+    case 'AnPlusB':
+      <div />;
+  }
+  if (type === 'Function') return <FunctionEditor {...(props as StyleNodeProps<Css.FunctionNodePlain>)} />;
+  if (type === 'StyleSheet') return <StylesheetEditor {...(props as StyleNodeProps<Css.StyleSheetPlain>)} />;
+  if (type === 'Rule') return <RuleEditor {...(props as StyleNodeProps<Css.RulePlain>)} />;
+  if (type === 'Block') return <BlockEditor {...(props as StyleNodeProps<Css.BlockPlain>)} />;
+  if (type === 'Declaration') return <DeclarationEditor {...(props as StyleNodeProps<Css.DeclarationPlain>)} />;
+  if (type === 'Raw') return <RawEditor {...(props as StyleNodeProps<Css.Raw>)} />;
+  if (type === 'Value') return <ValueEditor {...(props as StyleNodeProps<Css.ValuePlain>)} />;
+  if (type === 'Identifier') return <IdentifierEditor {...(props as StyleNodeProps<Css.Identifier>)} />;
+  if (type === 'SelectorList') return <SelectorListEditor {...(props as StyleNodeProps<Css.SelectorListPlain>)} />;
+  if (type === 'Selector') return <SelectorEditor {...(props as StyleNodeProps<Css.SelectorPlain>)} />;
+  if (type === 'TypeSelector') return <TypeSelectorEditor {...(props as StyleNodeProps<Css.TypeSelector>)} />;
+  if (type === 'ClassSelector') return <ClassSelectorEditor {...(props as StyleNodeProps<Css.ClassSelector>)} />;
+  if (type === 'PseudoClassSelector') return <PseudoClassSelectorEditor {...(props as StyleNodeProps<Css.PseudoClassSelectorPlain>)} />;
+  if (type === 'Dimension') return <DimensionEditor {...(props as StyleNodeProps<Css.Dimension>)} />;
+  if (type === 'WhiteSpace') return <WhiteSpaceEditor {...(props as StyleNodeProps<Css.WhiteSpace>)} />;
   return (
     <div>
       "{type}" is unhandled <details>{JSON.stringify(node)}</details>
@@ -51,24 +55,17 @@ export function StyleNodeEditor(props: StyleNodeProps) {
   );
 }
 
-function EmptyState(_: StyleNodeProps){
-  return <div/>
+function EmptyState(_: StyleNodeProps) {
+  return <div />;
 }
 function StylesheetEditor(props: StyleNodeProps<Css.StyleSheetPlain>) {
   const { node } = props;
-
-  let rawSheet: string;
-  try {
-    // rawSheet = Css.generate(Css.fromPlainObject(node));
-  } finally {
-  }
 
   return (
     <div data-type={props.node.type}>
       <Children {...props} />
       <details>
         StyleSheet!
-        <pre style={{ overflow: 'hidden' }}>{rawSheet}</pre>
         <pre>{JSON.stringify(node, null, 2)}</pre>
       </details>
     </div>
@@ -89,7 +86,7 @@ function RuleEditor(props: StyleNodeProps<Css.RulePlain>) {
 
   return (
     <div data-type={props.node.type}>
-      <StyleNodeEditor node={props.node.prelude} setNode={setPrelude} />
+      <StyleNodeEditor node={props.node.prelude} setNode={setPrelude as any} />
       <BlockEditor node={props.node.block} setNode={setBlock} />
     </div>
   );
@@ -143,24 +140,23 @@ function DeclarationEditor(props: StyleNodeProps<Css.DeclarationPlain>) {
   );
   return (
     <div data-type={props.node.type}>
-      {props.node.property} : <StyleNodeEditor node={props.node.value} setNode={setValue} />
+      {props.node.property} : <StyleNodeEditor node={props.node.value} setNode={setValue as any} />
     </div>
   );
 }
 
 function RawEditor(props: StyleNodeProps<Css.Raw>) {
-  const onInput = (e: InputEvent) => {
+  const onInput = (e: FormEvent<unknown>) => {
     const next = (e.target as HTMLInputElement).value;
-    props.setNode(current => {
-      // console.log('Next CSS', next);
-      return { ...current, value: next };
+    props.setNode((current: Css.Raw | undefined) => {
+      return { type: 'Raw', value: next };
     });
   };
   return <input type="text" value={props.node.value} onInput={onInput} data-type={props.node.type} />;
 }
 
 function ValueEditor(props: StyleNodeProps<Css.ValuePlain>) {
-  return <Children {...props} />;
+  return <Children {...(props as any)} />;
 }
 
 function IdentifierEditor(props: StyleNodeProps<Css.Identifier>) {
@@ -180,15 +176,25 @@ function WhiteSpaceEditor(props: StyleNodeProps<Css.WhiteSpace>) {
   return <span data-type={props.node.type}>{props.node.value}</span>;
 }
 
+type HasChildrenNodes = {
+  children: Css.CssNodePlain[];
+};
+
+
 /**
  * Renders children, with the right mutation wired up
  *
  * @param props Re
  * @returns
  */
-export function Children(props: StyleNodeProps<HasChildren>): ReactNode {
-  return props.node.children.map((n:Css.CssNodePlain, idx:number) => {
-    const subUpdate: StateUpdater<Css.CssNodePlain> = createChildUpdater(props.setNode, idx);
-    return <StyleNodeEditor node={n} setNode={subUpdate} />;
-  });
+export function Children<T extends Css.CssNodePlain & HasChildrenNodes>(props: StyleNodeProps<T>): JSX.Element {
+  const { setNode } = props;
+  return (
+    <>
+      {props.node.children.map((n: Css.CssNodePlain, idx: number) => {
+        const subUpdate: StateUpdater<Css.CssNodePlain> = createChildUpdater(setNode as any, idx);
+        return <StyleNodeEditor node={n} setNode={subUpdate} />;
+      })}
+    </>
+  );
 }

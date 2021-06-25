@@ -1,4 +1,5 @@
-import { Model, RaisinElementNode } from '@raisins/core';
+import { RaisinElementNode } from '@raisins/core';
+import { Model } from "../model/EditorModel";
 import SlDetails from "@shoelace-style/react/dist/details";
 import React from "react";
 

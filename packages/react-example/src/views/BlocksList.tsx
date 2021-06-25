@@ -1,6 +1,6 @@
 import { css } from '@emotion/css';
 import React from "react";
-import { Model } from '@raisins/core';
+import { Model } from "../model/EditorModel";
 import { Handle } from './Handle';
 
 const Block = css`

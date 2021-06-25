@@ -1,14 +1,14 @@
-import { useMemo, useRef, useState } from "@saasquatch/universal-hooks";
-import { RaisinNode } from "../html-dom/RaisinNode";
-import { VirtualElement } from "@popperjs/core";
-import flip from "@popperjs/core/lib/modifiers/flip";
-import preventOverflow from "@popperjs/core/lib/modifiers/preventOverflow";
-import { sameWidth } from "../popper/sameWidth";
-import { StateUpdater } from "../util/NewState";
-import { usePopper } from "../popper/usePopper";
-import { getRectOffset } from "@interactjs/modifiers/Modification";
-import { h, FunctionalComponent } from "@stencil/core";
-import { useIframeRenderer } from "./useIFrameRenderer";
+import { useMemo, useRef, useState } from 'react';
+import { RaisinNode } from '@raisins/core';
+import { VirtualElement } from '@popperjs/core';
+import flip from '@popperjs/core/lib/modifiers/flip';
+import preventOverflow from '@popperjs/core/lib/modifiers/preventOverflow';
+import { sameWidth } from '../popper/sameWidth';
+import { StateUpdater } from '../util/NewState';
+import { usePopper } from 'react-popper';
+// import { getRectOffset } from "@interactjs/modifiers/Modification";
+import { useIframeRenderer } from './useIFrameRenderer';
+import React from 'react';
 
 export type Size = {
   name: string;
@@ -16,18 +16,18 @@ export type Size = {
   height: number;
 };
 const sizes: Size[] = [
-  { name: "Auto", width: "auto", height: 1080 },
-  { name: "Large", width: "992px", height: 1080 },
-  { name: "Medium", width: "768px", height: 1080 },
-  { name: "Small", width: "576px", height: 1080 },
-  { name: "X-Small", width: "400px", height: 1080 },
+  { name: 'Auto', width: 'auto', height: 1080 },
+  { name: 'Large', width: '992px', height: 1080 },
+  { name: 'Medium', width: '768px', height: 1080 },
+  { name: 'Small', width: '576px', height: 1080 },
+  { name: 'X-Small', width: '400px', height: 1080 },
 ];
 
 /**
  * A virtual Ref object that works with Interact.js
  */
 function useVirtualRef() {
-  const ref = useRef<HTMLElement>(undefined);
+  const ref = useRef<HTMLElement | undefined>(undefined);
 
   const virtualElement = useMemo(() => {
     const ve: VirtualElement = {
@@ -86,16 +86,17 @@ const iframeSrc = `
 </html>`;
 
 function useStencilIframeRenderer() {
-  const renderer = (iframe: HTMLIFrameElement, Comp: FunctionalComponent) => {
+  const renderer = (iframe: HTMLIFrameElement, Comp: React.FC) => {
     if (!Comp) return; // no Component yet
-    const stencilView = iframe.contentDocument.querySelector("stencil-view");
+    // const stencilView = iframe.contentDocument.querySelector("stencil-view");
+    // iframe;
     //    stencilView.view = <Comp />;
   };
 
-  const props = useIframeRenderer({
+  const props = useIframeRenderer<React.FC>({
     src: iframeSrc,
     renderer,
-    initialComponent: <div />,
+    initialComponent: () => <div />,
   });
 
   return {
@@ -104,11 +105,7 @@ function useStencilIframeRenderer() {
   };
 }
 
-const refToInlinEditor = new WeakMap<HTMLElement, unknown>();
-export default function useCanvas(props: {
-  selected: RaisinNode;
-  setNodeInternal: StateUpdater<RaisinNode>;
-}) {
+export default function useCanvas(props: { selected: RaisinNode; setNodeInternal: StateUpdater<RaisinNode> }) {
   const frameProps = useStencilIframeRenderer();
   const [size, setSize] = useState<Size>(sizes[0]);
 
@@ -118,7 +115,7 @@ export default function useCanvas(props: {
   const containerOffsetTopPos = clientRect?.y;
   const containerOffsetLeftPos = clientRect?.x;
 
-  const toolbarRef = useRef<HTMLElement>(undefined);
+  const toolbarRef = useRef<HTMLElement | undefined>(undefined);
   const toolbarPopper = usePopper(virtualElement, toolbarRef.current, {
     modifiers: [
       flip,
@@ -126,20 +123,20 @@ export default function useCanvas(props: {
       sameWidth,
       clientRect
         ? {
-            name: "offset",
+            name: 'offset',
             options: {
               offset: [containerOffsetLeftPos, containerOffsetTopPos],
             },
           }
-        : undefined,
+        : {},
     ],
-    placement: "top-start",
+    placement: 'top-start',
   });
 
-  const editorRef = useRef<HTMLElement>(undefined);
+  const editorRef = useRef<HTMLElement | undefined>(undefined);
   const editorPopper = usePopper(virtualElement, toolbarRef.current, {
     modifiers: [flip, preventOverflow],
-    placement: "bottom-start",
+    placement: 'bottom-start',
   });
 
   function registerRef(node: RaisinNode, element: HTMLElement) {
@@ -147,8 +144,8 @@ export default function useCanvas(props: {
       // Check for infinite loop
       if (ref.current !== element) {
         ref.current = element;
-        editorPopper.update();
-        toolbarPopper.update();
+        // editorPopper.update();
+        // toolbarPopper.update();
       }
 
       // if (refToInlinEditor.has(element)) {

@@ -1,30 +1,21 @@
-import { css } from "@emotion/css";
-import SlButtonGroup from "@shoelace-style/react/dist/button-group";
-import SlDropdown from "@shoelace-style/react/dist/dropdown";
-import SlIcon from "@shoelace-style/react/dist/icon";
-import SlMenu from "@shoelace-style/react/dist/menu";
-import SlMenuItem from "@shoelace-style/react/dist/menu-item";
-import SlMenuLabel from "@shoelace-style/react/dist/menu-label";
-import {
-  Model,
-  cssSerializer,
-  RaisinElementNode,
-  RaisinNodeVisitor as NodeVisitor,
-  htmlSerializer,
-  htmlUtil,
-} from "@raisins/core";
-
-import React, { FC, ReactNode } from "react";
-import styleToObject from "style-to-object";
-import { Button } from "./Button";
+import { css } from '@emotion/css';
+import { cssSerializer, htmlSerializer, htmlUtil, RaisinElementNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
+import { Model } from "../model/EditorModel";
+import SlButtonGroup from '@shoelace-style/react/dist/button-group';
+import SlDropdown from '@shoelace-style/react/dist/dropdown';
+import SlIcon from '@shoelace-style/react/dist/icon';
+import SlMenu from '@shoelace-style/react/dist/menu';
+import SlMenuItem from '@shoelace-style/react/dist/menu-item';
+import SlMenuLabel from '@shoelace-style/react/dist/menu-label';
+import classNames from 'classnames';
+import React, { FC, MouseEventHandler, ReactNode } from 'react';
+import styleToObject from 'style-to-object';
 
 const { visit } = htmlUtil;
 
 const wrapper = css`
-  background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%),
-    linear-gradient(-45deg, #cccccc 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #cccccc 75%),
-    linear-gradient(-45deg, transparent 75%, #cccccc 75%);
+  background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #cccccc 75%), linear-gradient(-45deg, transparent 75%, #cccccc 75%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
   padding: 50px;
@@ -72,22 +63,22 @@ const Selectable = css`
   // }
 `;
 
-export const Canvas: FC<Model> = (props) => {
-  if (props.mode === "html") {
+export const Canvas: FC<Model> = props => {
+  if (props.mode === 'html') {
     return <pre>{props.serialized}</pre>;
   }
   return <WYSWIGCanvas {...props} />;
 };
-export const WYSWIGCanvas: FC<Model> = (props) => {
+export const WYSWIGCanvas: FC<Model> = props => {
   const CanvasVisitor: NodeVisitor<ReactNode> = {
     onCData() {
-      return "";
+      return '';
     },
     onComment() {
-      return "";
+      return '';
     },
     onDirective() {
-      return "";
+      return '';
     },
     onRoot(_, children) {
       return <div>{children}</div>;
@@ -118,32 +109,30 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
       return (
         <style
           dangerouslySetInnerHTML={{
-            __html: cssContent ?? "",
+            __html: cssContent ?? '',
           }}
         />
       );
     },
     onElement(element, children) {
-      const onClick = (e: Event) => {
+      const onClick: MouseEventHandler<Element> = e => {
         // Relevant reading if this causes problems later: https://javascript.info/bubbling-and-capturing#stopping-bubbling
         e.stopPropagation();
         props.setSelected(element);
       };
 
-      const innerProps = {
-        "rjs-selected": element === props.selected,
-        className: {
-          [Selectable]: props.mode === "edit",
+      const innerProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> = {
+        // 'data-rjs-selected': element === props.selected,
+        // 'data-tagname': element.tagName,
+        className: classNames({
+          [Selectable]: props.mode === 'edit',
           [element.attribs.class]: true,
-        },
-        onClick: props.mode === "edit" ? onClick : () => {},
-        "data-tagname": element.tagName,
-        ref: (el: HTMLElement) => props.registerRef(element, el),
-        // Don't use -- element changes evey time!
-        // key: getId(element),
+        }),
+        onClick: props.mode === 'edit' ? onClick : () => {},
+        ref: (el: HTMLElement | null) => props.registerRef(element, el as HTMLElement),
       };
 
-      if (element.tagName === "template") {
+      if (element.tagName === 'template') {
         return (
           <div {...innerProps}>
             <h1>Template:</h1>
@@ -151,7 +140,7 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
           </div>
         );
       }
-      if (element.tagName === "script") {
+      if (element.tagName === 'script') {
         return (
           <div {...innerProps}>
             Script:
@@ -174,7 +163,7 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
 
   const selectedAncestry = props.selected && props.getAncestry(props.selected).reverse();
   const hasSelectedAncestry = props.selected && selectedAncestry && selectedAncestry.length > 1 ? true : false;
-  const hasSelected = typeof props.selected !== "undefined";
+  const hasSelected = typeof props.selected !== 'undefined';
   const ContentComponent: FC = () => {
     return <div>{visit(props.node, CanvasVisitor)}</div>;
   };
@@ -182,16 +171,11 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
 
   return (
     <div>
-      <div className={wrapper} onClick={() => props.setSelected(undefined)}>
-        <div
-          className={content}
-          data-content
-          style={{ width: props.size.width }}
-          ref={(el) => (props.containerRef.current = el)}
-        />
+      <div className={wrapper} onClick={() => props.setSelected(undefined as any)}>
+        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)} />
       </div>
       <div
-        ref={(el) => (props.toolbarRef.current = el)}
+        ref={el => (props.toolbarRef.current = el!)}
         data-toolbar
         {...props.toolbarPopper.attributes.popper}
         // @ts-ignore
@@ -199,52 +183,48 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
       >
         {hasSelected && (
           <div className={SelectedToolbar}>
-            <div className={SelectedTitle}>
-              {props.getComponentMeta(props.selected as RaisinElementNode)
-                ?.title || props.selected?.nodeType}
-            </div>
+            <div className={SelectedTitle}>{props.getComponentMeta(props.selected as RaisinElementNode)?.title || props.selected?.nodeType}</div>
             <SlButtonGroup>
-              <Button onClick={() => props.duplicateNode(props.selected)}>
+              <button
+                onClick={() => {
+                  props.duplicateNode(props.selected!);
+                }}
+              >
                 <SlIcon name="files"></SlIcon>
-              </Button>
-              <Button onClick={() => props.removeNode(props.selected)}>
+              </button>
+              <button onClick={() => props.removeNode(props.selected!)}>
                 <SlIcon name="trash"></SlIcon>
-              </Button>
-              <Button onClick={() => props.moveUp(props.selected)}>
-                {" "}
+              </button>
+              <button onClick={() => props.moveUp(props.selected!)}>
+                {' '}
                 <SlIcon name="arrow-bar-up"></SlIcon>
-              </Button>
-              <Button onClick={() => props.moveDown(props.selected)}>
-                {" "}
+              </button>
+              <button onClick={() => props.moveDown(props.selected!)}>
+                {' '}
                 <SlIcon name="arrow-bar-down"></SlIcon>
-              </Button>
-            </SlButtonGroup>{" "}
-            {hasSelectedAncestry && (
+              </button>
+            </SlButtonGroup>{' '}
+            {selectedAncestry && (
               <SlButtonGroup>
                 <SlDropdown placement="top-end">
-                  <Button slot="trigger" caret pill size="small">
+                  <button slot="trigger">
                     <SlIcon name="bar-chart-steps"></SlIcon>
-                  </Button>
+                  </button>
                   <SlMenu>
                     <SlMenuLabel>Select Parent</SlMenuLabel>
 
                     {selectedAncestry.map((n, idx) => {
                       const meta = props.getComponentMeta(n as any);
                       return (
-                        <SlMenuItem onClick={() => props.setSelected(n)}>
-                          {"-".repeat(idx)} {meta?.title || "Root"}
+                        <SlMenuItem>
+                          <span onClick={() => props.setSelected(n)}>
+                            {'-'.repeat(idx)} {meta?.title || 'Root'}
+                          </span>
                         </SlMenuItem>
                       );
                     })}
                     <SlMenuItem>
-                      {"-".repeat(selectedAncestry.length)}{" "}
-                      <b>
-                        {
-                          props.getComponentMeta(
-                            props.selected as RaisinElementNode
-                          ).title
-                        }
-                      </b>
+                      {'-'.repeat(selectedAncestry.length)} <b>{props.getComponentMeta(props.selected as RaisinElementNode).title}</b>
                     </SlMenuItem>
                   </SlMenu>
                 </SlDropdown>
@@ -270,10 +250,7 @@ export const WYSWIGCanvas: FC<Model> = (props) => {
   );
 };
 
-const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = (
-  props,
-  children
-) => {
+const HTMLCompont: FC<{ as: string; inner: Record<any, any> }> = (props, children) => {
   // TODO: React render raw
   return React.createElement(props.as, props.inner, children);
 };

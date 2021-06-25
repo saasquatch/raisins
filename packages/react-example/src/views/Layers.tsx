@@ -1,15 +1,15 @@
-import { Model, RaisinElementNode, RaisinNodeVisitor as NodeVisitor, htmlUtil } from "@raisins/core";
-import { css } from "@emotion/css";
-import { Handle } from "./Handle";
-import { Button } from "./Button";
-
-import SlButtonGroup from "@shoelace-style/react/dist/button-group";
-import SlIcon from "@shoelace-style/react/dist/icon";
-import SlCard from "@shoelace-style/react/dist/card";
-import SlDropdown from "@shoelace-style/react/dist/dropdown";
-import SlMenu from "@shoelace-style/react/dist/menu";
-import SlMenuItem from "@shoelace-style/react/dist/menu-item";
-import React, { FC } from "react";
+import { css } from '@emotion/css';
+import { htmlUtil, RaisinElementNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
+import { Model } from "../model/EditorModel";
+import SlButtonGroup from '@shoelace-style/react/dist/button-group';
+import SlCard from '@shoelace-style/react/dist/card';
+import SlDropdown from '@shoelace-style/react/dist/dropdown';
+import SlIcon from '@shoelace-style/react/dist/icon';
+import SlMenu from '@shoelace-style/react/dist/menu';
+import SlMenuItem from '@shoelace-style/react/dist/menu-item';
+import classNames from 'classnames';
+import React, { FC } from 'react';
+import { Handle } from './Handle';
 
 const { clone, getAncestry, visit } = htmlUtil;
 
@@ -62,7 +62,7 @@ const PossibleDropTarget = css`
   ${DropTarget}
   display: block;
   &: before {
-    content: " ";
+    content: ' ';
     background: blue;
     display: block;
     height: 4px;
@@ -85,29 +85,21 @@ const GreyOut = css`
   opacity: 0.2;
 `;
 
-export const Layers: FC<Model> = (model) => {
-  function AddNew(props: {
-    node: RaisinElementNode;
-    idx: number;
-    slot: string;
-  }) {
+export const Layers: FC<Model> = model => {
+  function AddNew(props: { node: RaisinElementNode; idx: number; slot: string }) {
     const validChildren = model.getValidChildren(props.node, props.slot);
     if (!validChildren.length) {
       return <div />;
     }
     return (
-      <SlDropdown className={model.isDragActive ? GreyOut : ""}>
-        <Button slot="trigger" caret size="small">
-          Add New
-        </Button>
+      <SlDropdown className={model.isDragActive ? GreyOut : ''}>
+        <button slot="trigger">Add New</button>
         <SlMenu>
-          {validChildren.map((b) => {
+          {validChildren.map(b => {
             const meta = model.getComponentMeta(b);
             return (
-              <SlMenuItem
-                onClick={() => model.insert(clone(b), props.node, props.idx)}
-              >
-                {meta.title}
+              <SlMenuItem>
+                <span onClick={() => model.insert(clone(b), props.node, props.idx)}>{meta.title}</span>
               </SlMenuItem>
             );
           })}
@@ -116,13 +108,8 @@ export const Layers: FC<Model> = (model) => {
     );
   }
 
-  function DropSlot(props: {
-    node: RaisinElementNode;
-    idx: number;
-    slot: string;
-  }) {
-    const isLegalDrop = () =>
-      model.isValidChild(model.dragCoords?.element, props.node, props.slot);
+  function DropSlot(props: { node: RaisinElementNode; idx: number; slot: string }) {
+    const isLegalDrop = () => model.isValidChild(model.dragCoords?.element, props.node, props.slot);
     const claz = {
       [DropTarget]: !model.isDragActive,
       [PossibleDropTarget]: model.isDragActive && isLegalDrop(),
@@ -130,12 +117,7 @@ export const Layers: FC<Model> = (model) => {
     };
     return (
       <div className={DropTargetWrapper}>
-        <div
-          className={claz}
-          ref={(e) =>
-            model.setDroppableRef(props.node, e, props.idx, props.slot)
-          }
-        >
+        <div className={classNames(claz)} ref={e => model.setDroppableRef(props.node, e!, props.idx, props.slot)}>
           {/* {props.idx} */}
         </div>
       </div>
@@ -147,12 +129,7 @@ export const Layers: FC<Model> = (model) => {
       const dragStyle =
         element === model.dragCoords?.element
           ? {
-              transform:
-                "translate(" +
-                model.dragCoords.x +
-                "px, " +
-                model.dragCoords.y +
-                "px)",
+              transform: 'translate(' + model.dragCoords.x + 'px, ' + model.dragCoords.y + 'px)',
             }
           : {};
 
@@ -163,21 +140,26 @@ export const Layers: FC<Model> = (model) => {
             <Handle />
             {meta?.title || element.tagName}
           </div>
-          <SlButtonGroup className={{ ...greyOnDrag, [Toolbar]: true }}>
-            <Button onClick={() => model.duplicateNode(element)}>
+          <SlButtonGroup
+            className={classNames({
+              //...greyOnDrag,
+              [Toolbar]: true,
+            })}
+          >
+            <button onClick={() => model.duplicateNode(element)}>
               <SlIcon name="files"></SlIcon>
-            </Button>
-            <Button onClick={() => model.removeNode(element)}>
+            </button>
+            <button onClick={() => model.removeNode(element)}>
               <SlIcon name="trash"></SlIcon>
-            </Button>
-            <Button onClick={() => model.moveUp(element)}>
-              {" "}
+            </button>
+            <button onClick={() => model.moveUp(element)}>
+              {' '}
               <SlIcon name="arrow-bar-up"></SlIcon>
-            </Button>
-            <Button onClick={() => model.moveDown(element)}>
-              {" "}
+            </button>
+            <button onClick={() => model.moveDown(element)}>
+              {' '}
               <SlIcon name="arrow-bar-down"></SlIcon>
-            </Button>
+            </button>
           </SlButtonGroup>
         </div>
       );
@@ -191,13 +173,13 @@ export const Layers: FC<Model> = (model) => {
       return (
         <div
           data-element
-          className={{
+          className={classNames({
             [Layer]: element !== model.selected,
             [Selected]: element === model.selected,
             [DropLayer]: isDroppable,
-          }}
+          })}
           style={dragStyle}
-          ref={(el) => model.setDraggableRef(element, el)}
+          ref={el => model.setDraggableRef(element, el!)}
           // TODO: removing this lines removes the Stencil re-render flash, but it also breaks drag and drop
           // key={getId(element)}
         >
@@ -208,41 +190,24 @@ export const Layers: FC<Model> = (model) => {
               {name}
               {hasSlots && (
                 <div>
-                  {slots.map((s) => (
+                  {slots.map(s => (
                     <div className={SlotContainer}>
                       <div className={SlotName}>{s.name}</div>
                       <div className={SlotChildren}>
                         <DropSlot node={element} idx={0} slot={s.key} />
-                        {s.children
-                          .filter((x) => x)
+                        {s
+                          .children!.filter(x => x)
                           .map((c, idx) => {
-                            const childElement = visit(
-                              c.node,
-                              ElementVisitor,
-                              false
-                            );
+                            const childElement = visit(c.node, ElementVisitor, false);
                             // Doesn't render empty text nodes
-                            return (
-                              childElement && [
-                                childElement,
-                                <DropSlot
-                                  node={element}
-                                  idx={idx + 1}
-                                  slot={s.key}
-                                />,
-                              ]
-                            );
+                            return childElement && [childElement, <DropSlot node={element} idx={idx + 1} slot={s.key} />];
                           })}
-                        <AddNew
-                          node={element}
-                          idx={s.children.length}
-                          slot={s.key}
-                        />
+                        <AddNew node={element} idx={s.children!.length} slot={s.key} />
                       </div>
                     </div>
                   ))}
                 </div>
-              )}{" "}
+              )}{' '}
             </div>
           )}
         </div>
@@ -265,9 +230,8 @@ export const Layers: FC<Model> = (model) => {
 /**
  * Positioned next to a drop target to indicate a possible drop location
  */
-const DepthLabel: FC<{ model: Model }> = (props) => {
-  const hasDroppable =
-    typeof props.model.dropTarget?.to?.modelElement !== "undefined";
+const DepthLabel: FC<{ model: Model }> = props => {
+  const hasDroppable = typeof props.model.dropTarget?.to?.modelElement !== 'undefined';
   if (!hasDroppable) {
     // Empty tooltip
     return (
@@ -280,22 +244,16 @@ const DepthLabel: FC<{ model: Model }> = (props) => {
       ></div>
     );
   }
-  const parents = getAncestry(
-    props.model.node,
-    props.model.dropTarget?.to?.modelElement
-  );
+  const parents = getAncestry(props.model.node, props.model.dropTarget?.to?.modelElement);
   const str = [props.model.dropTarget?.to?.modelElement, ...parents]
     .reverse()
-    .map(
-      (n) =>
-        props.model.getComponentMeta(n as RaisinElementNode).title ?? "root"
-    )
-    .join(" > ");
+    .map(n => props.model.getComponentMeta(n as RaisinElementNode).title ?? 'root')
+    .join(' > ');
   const target = props.model.dropTarget?.to?.modelElement as RaisinElementNode;
   const targetName = props.model.getComponentMeta(target).title;
   const targetIndex = props.model.dropTarget?.to?.idxInParent;
   const indexName = getOrdinal(targetIndex + 1);
-  const slotName = props.model.dropTarget?.to?.slotInParent || "default";
+  const slotName = props.model.dropTarget?.to?.slotInParent || 'default';
   return (
     <div
       // className={DropLabel}
@@ -308,9 +266,8 @@ const DepthLabel: FC<{ model: Model }> = (props) => {
         <div slot="header">
           Move to <b>{targetName}</b>
         </div>
-        <span style={{ color: "#ccc" }}>
-          Will be the <b>{indexName}</b> element in the <b>{slotName} slot</b>{" "}
-          of <b>{str}</b>
+        <span style={{ color: '#ccc' }}>
+          Will be the <b>{indexName}</b> element in the <b>{slotName} slot</b> of <b>{str}</b>
         </span>
       </SlCard>
 
@@ -328,7 +285,7 @@ const DepthLabel: FC<{ model: Model }> = (props) => {
  * @param n
  */
 function getOrdinal(n: number): string {
-  var s = ["th", "st", "nd", "rd"],
+  var s = ['th', 'st', 'nd', 'rd'],
     v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }

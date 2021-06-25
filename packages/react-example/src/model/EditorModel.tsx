@@ -5,7 +5,7 @@ import { Mode } from '../hooks/useEditor';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { DragCoords } from './DragCoords';
 import { DropState } from './DropState';
-import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
+import { RaisinNode, RaisinNodeWithChildren } from '../../../core/src/html-dom/RaisinNode';
 import { StateUpdater } from '../util/NewState';
 
 export type Model = {

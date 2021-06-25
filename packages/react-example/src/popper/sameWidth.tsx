@@ -8,10 +8,10 @@ export const sameWidth = {
   enabled: true,
   phase: 'beforeWrite' as const,
   requires: ['computeStyles'],
-  fn: ({ state }) => {
+  fn: ({ state }: any) => {
     state.styles.popper.width = `${state.rects.reference.width}px`;
   },
-  effect: ({ state }) => {
+  effect: ({ state }: any) => {
     state.elements.popper.style.width = `${state.elements.reference.offsetWidth}px`;
   },
 };

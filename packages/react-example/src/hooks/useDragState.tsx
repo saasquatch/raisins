@@ -1,14 +1,16 @@
+// @ts-nocheck
 import { Interactable } from '@interactjs/core/Interactable';
-import { useRef, useState } from '@saasquatch/universal-hooks';
+import { useRef, useState } from 'react';
 import * as DOMHandler from 'domhandler';
 import interact from 'interactjs';
-import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
-import { move } from '../html-dom/util';
+import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren, htmlUtil } from '@raisins/core';
 import { DragCoords } from '../model/DragCoords';
 import { DropState, Location } from '../model/DropState';
-import { usePopper } from '../popper/usePopper';
+import { usePopper } from 'react-popper';
 import { StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
+
+const { move } = htmlUtil;
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
 
@@ -57,7 +59,7 @@ type SharedState = {
 };
 
 function useDragState(sharedState: SharedState) {
-  const [dragCoords, setDragCoords] = useState<DragCoords>(undefined);
+  const [dragCoords, setDragCoords] = useState<DragCoords | undefined>(undefined);
 
   function createDraggable(element: HTMLElement, node: RaisinElementNode) {
     const interactable = interact(element)
@@ -102,7 +104,7 @@ function useDragState(sharedState: SharedState) {
           },
         },
       });
-    function dragMoveListener(event) {
+    function dragMoveListener(event: any) {
       var target = event.target;
 
       // target.style.opacity = 0.7;

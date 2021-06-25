@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from '@saasquatch/universal-hooks';
+import { useEffect, useMemo, useState } from 'react';
 import hotkeys from 'hotkeys-js';
 import { getSlots } from '../model/getSlots';
-import { RaisinNode, RaisinNodeWithChildren } from '../html-dom/RaisinNode';
-import serializer from '../html-dom/serializer';
-import { duplicate, getParents, insertAt, move, remove, replace, getAncestry as getAncestryUtil } from '../html-dom/util';
+import { RaisinNode, RaisinNodeWithChildren, htmlUtil, htmlSerializer as serializer } from '@raisins/core';
+
 import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
 import { InternalState } from './useEditor';
+
+const { duplicate, getParents, insertAt, move, remove, replace, getAncestry: getAncestryUtil } = htmlUtil;
 
 export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
   // const [selected, setSelected] = useState<RaisinNode>(undefined);
@@ -14,7 +15,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
     redoStack: [],
     undoStack: [],
     current: initial,
-    slots: getSlots(initial, metamodel.getComponentMeta),
   });
 
   const undo = () =>
@@ -30,7 +30,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
         current: nextCurrent,
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
       return newState;
@@ -50,7 +49,6 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
         immutableCopy: current,
         undoStack,
         redoStack,
-        slots: getSlots(nextCurrent, metamodel.getComponentMeta),
         selected: previous.selected,
       };
       return newState;
@@ -58,12 +56,11 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
 
   function generateNextState(previous: InternalState, nextNode: RaisinNode, newSelection?: RaisinNode) {
     const undoStack = [previous.current, ...previous.undoStack];
-    const newState = {
+    const newState: InternalState = {
       selected: newSelection,
       current: nextNode,
       undoStack,
       redoStack: [],
-      slots: getSlots(nextNode, metamodel.getComponentMeta),
     };
     return newState;
   }
@@ -109,16 +106,16 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
   function moveUp(n: RaisinNode) {
     setNodeInternal(previousState => {
       const parent = parents.get(n);
-      const currentIdx = parent.children.indexOf(n);
-      const clone = move(previousState, n, parent, currentIdx - 1);
+      const currentIdx = parent!.children.indexOf(n);
+      const clone = move(previousState, n, parent!, currentIdx - 1);
       return clone;
     }, n);
   }
   function moveDown(n: RaisinNode) {
     setNodeInternal(previousState => {
       const parent = parents.get(n);
-      const currentIdx = parent.children.indexOf(n);
-      const clone = move(previousState, n, parent, currentIdx + 1);
+      const currentIdx = parent!.children.indexOf(n);
+      const clone = move(previousState, n, parent!, currentIdx + 1);
       return clone;
     }, n);
   }
@@ -136,12 +133,12 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
       });
 
       const undoStack = [previous.current, ...previous.undoStack];
-      const newState = {
+      const newState: InternalState = {
+        // @ts-ignore
         selected: newSelection,
         current: nextRoot,
         undoStack,
         redoStack: [],
-        slots: getSlots(nextRoot, metamodel.getComponentMeta),
       };
       return newState;
     });
@@ -169,23 +166,25 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode) {
           event.preventDefault();
           redo();
           break;
-        case 'd':
-        case 'backspace':
+        // case 'd':
+        // case 'backspace':
         case 'delete':
           event.preventDefault();
           deleteSelected();
+          break;
         default:
       }
     });
   }, []);
 
   const parents = useMemo(() => getParents(state.current), [state.current]);
+  const slots = useMemo(() => getSlots(state.current, metamodel.getComponentMeta), [metamodel, state.current]);
+
   function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
     return getAncestryUtil(state.current, node, parents);
   }
-  
+
   const serialized = useMemo(() => serializer(state.current), [state.current]);
-  const slots = getSlots(state.current, metamodel.getComponentMeta);
   return {
     initial: serializer(initial),
 

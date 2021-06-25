@@ -9,22 +9,29 @@ import {
   RaisinStyleNode,
   RaisinTextNode,
 } from "./html-dom/RaisinNode";
-import { Model } from "./model/EditorModel";
 
 import htmlSerializer from "./html-dom/serializer";
 import htmlParser from "./html-dom/parser";
 import * as htmlUtil from "./html-dom/util";
 import { NodeVisitor as RaisinNodeVisitor } from "./html-dom/util";
 
+export { htmlSerializer, htmlParser, htmlUtil, RaisinNodeVisitor };
+
 import cssSerializer from "./css-om/serializer";
 import cssParser from "./css-om/parser";
+import * as cssUtil from "./css-om/util";
+import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
 
-export { htmlSerializer, htmlParser, htmlUtil };
-export { cssSerializer, cssParser };
+export {
+  cssSerializer,
+  cssParser,
+  cssUtil,
+  StyleNodeProps,
+  StyleNodeWithChildren,
+};
 
 export {
   RaisinNode,
-  RaisinNodeVisitor,
   RaisinDataNode,
   RaisinDocumentNode,
   RaisinCommentNode,
@@ -34,5 +41,3 @@ export {
   RaisinStyleNode,
   RaisinTextNode,
 };
-
-export { Model };

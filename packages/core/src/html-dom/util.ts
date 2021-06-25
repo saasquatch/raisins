@@ -1,4 +1,3 @@
-import { ElementType } from 'domelementtype';
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -10,6 +9,7 @@ import {
   RaisinTextNode,
 } from './RaisinNode';
 import cloneDeep from 'lodash.clonedeep';
+import { ElementType } from 'domelementtype';
 
 /**
  * Provides a WeakMap for parent lookups

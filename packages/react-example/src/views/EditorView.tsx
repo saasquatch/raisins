@@ -1,7 +1,8 @@
 import { css } from '@emotion/css';
+import { RaisinElementNode } from '@raisins/core';
 import '@shoelace-style/shoelace/dist/themes/dark.css';
 import React from "react";
-import { Model, RaisinElementNode } from '@raisins/core';
+import { Model } from "../model/EditorModel";
 import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
@@ -51,7 +52,7 @@ export const Main = css`
   display: grid;
   grid-template-areas:
     'header header header'
-    'edits canvas layers'
+    'layers canvas edits'
     'footer footer footer';
   grid-template-rows: auto 1fr auto;
   grid-template-columns: 20% 1fr 15%;
@@ -103,14 +104,6 @@ export function EditorView(model: Model) {
         <div className={LayersCss}>
           {' '}
           <Layers {...model} />
-          {/* <EditorPanel {...model} /> */}
-          {/* <h1>Editor</h1>
-       
-          <BlocksList {...model} />
-          <h1>Input</h1>
-          <pre style={{ wordWrap: 'break-word' }}>{model.initial}</pre>
-          <h1>Output</h1>
-          <pre style={{ wordWrap: 'break-word' }}>{serialized}</pre> */}
         </div>
         <div className={Footer}>Footer</div>
       </div>

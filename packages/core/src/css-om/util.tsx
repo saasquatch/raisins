@@ -1,6 +1,6 @@
 import { StateUpdater } from '../util/NewState';
 import * as Css from 'css-tree';
-import { StyleNodeProps } from './StyleNodeProps';
+import { StyleNodeProps, StyleNodeWithChildren } from './Types';
 
 /**
  * Creates an immutable state updater for child editors
@@ -31,7 +31,7 @@ export function createUpdater<Node extends Css.CssNodePlain, Child extends Css.C
  * @param idx
  * @returns
  */
-export function createChildUpdater(setNode: StateUpdater<HasChildren>, idx: number): StateUpdater<Css.CssNodePlain> {
+export function createChildUpdater(setNode: StateUpdater<StyleNodeWithChildren>, idx: number): StateUpdater<Css.CssNodePlain> {
   return next => {
     setNode(current => {
       const currentAtIdx = current.children[idx];
@@ -44,6 +44,3 @@ export function createChildUpdater(setNode: StateUpdater<HasChildren>, idx: numb
     });
   };
 }
-export type HasChildren = {
-  children: Css.CssNodePlain[];
-} & Css.CssNodePlain;

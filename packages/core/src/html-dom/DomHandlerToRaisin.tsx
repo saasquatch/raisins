@@ -1,5 +1,6 @@
-import { ElementType } from "domelementtype";
+
 import type * as DOMHandler from "domhandler";
+import { ElementType } from "htmlparser2";
 import cssParser from "../css-om/parser";
 
 import type {

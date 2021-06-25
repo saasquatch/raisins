@@ -1,7 +1,6 @@
-import { useMemo, useState } from '@saasquatch/universal-hooks';
-import { parse } from '../html-dom/parser';
-import { RaisinNode } from '../html-dom/RaisinNode';
-import { Model, NodeWithSlots } from '../model/EditorModel';
+import { useMemo, useState } from 'react';
+import { htmlParser as parse, RaisinNode } from "@raisins/core"
+import { Model } from '../model/EditorModel';
 import useCanvas from './useCanvas';
 import { useComponentModel } from './useComponentModel';
 import { useCore } from './useCore';
@@ -12,7 +11,6 @@ export type Mode = 'preview' | 'edit' | 'html';
 
 export type InternalState = {
   current: RaisinNode;
-  slots: NodeWithSlots;
   undoStack: RaisinNode[];
   redoStack: RaisinNode[];
   selected?: RaisinNode;
@@ -38,17 +36,17 @@ export function getId(node: RaisinNode): string {
   return id;
 }
 
-export function useEditor(host: HTMLElement): Model {
+export function useEditor(initialHTML:string): Model {
   const metamodel = useComponentModel();
   const initial = useMemo(() => {
-    const html = host.querySelectorAll('template')[0].innerHTML;
-    const raisinNode = parse(html);
+    const raisinNode = parse(initialHTML);
     return raisinNode;
-  }, []);
+  }, [initialHTML]);
 
   const core = useCore(metamodel, initial);
   const [mode, setMode] = useState<Mode>('edit');
 
+  // @ts-ignore
   return {
     ...core,
     getId,

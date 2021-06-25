@@ -1,5 +1,6 @@
 import { CssNodePlain } from 'css-tree';
 import { ElementType } from 'domelementtype';
+
 /**
  * This object will be used as the prototype for Nodes when creating a
  * DOM-Level-1-compliant structure.

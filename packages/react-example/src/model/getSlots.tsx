@@ -1,10 +1,11 @@
 import { DefaultSlot, Model, NodeWithSlots } from './EditorModel';
-import { visit } from '../html-dom/util';
-import { RaisinNode } from '../html-dom/RaisinNode';
+import { RaisinNode, htmlUtil } from '@raisins/core';
 
-export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponentMeta']) {
-  const noSlots = (_: RaisinNode) => undefined;
-  const noSlotsWChildren = (node: RaisinNode, children: NodeWithSlots[]) => ({
+const { visit } = htmlUtil
+
+export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponentMeta']):NodeWithSlots|undefined {
+  const noSlots = (_: RaisinNode):undefined => undefined;
+  const noSlotsWChildren = (node: RaisinNode, children: NodeWithSlots[]):NodeWithSlots => ({
     node,
     slots: [
       {

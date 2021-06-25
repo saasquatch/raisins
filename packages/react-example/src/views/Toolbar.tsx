@@ -1,11 +1,10 @@
 import { css } from '@emotion/css';
 import React from "react"
-import { Model } from '@raisins/core';
+import { Model } from "../model/EditorModel";
 
 import SlIcon from '@shoelace-style/react/dist/icon';
 import SlButton from '@shoelace-style/react/dist/button-group';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
-
 
 const ToolbarStyle = css`
   padding: 10px;
@@ -17,7 +16,7 @@ export function ToolbarView(props: Model) {
   return (
     <div className={ToolbarStyle}>
       Toolbar
-      <SlButtonGroup>
+      {/* <SlButtonGroup>
         <SlButton size="small" pill onClick={() => props.undo()} disabled={!props.hasUndo}>
           <SlIcon slot="prefix" name="arrow-90deg-left" />
           Undo
@@ -53,7 +52,7 @@ export function ToolbarView(props: Model) {
             {s.name}
           </SlButton>
         ))}
-      </SlButtonGroup>
+      </SlButtonGroup> */}
     </div>
   );
 }
