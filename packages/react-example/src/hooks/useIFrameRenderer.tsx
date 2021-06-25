@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
+
+type NPMDependency = {
+  package: string;
+  version?: string;
+  filePath?: string;
+}
+
 export type UseIframeProps<C, E> = {
   /**
    * A source document to use in the iframe
    */
   src: string;
+  dependencies?: NPMDependency[]
   /**
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */

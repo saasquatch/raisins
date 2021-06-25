@@ -228,8 +228,6 @@ export const WYSWIGCanvas: FunctionalComponent<Model> = props => {
       >
         <EditorPanel {...props} />
       </div> */}
-
-      {hasSelected && <div>Selected</div>}
     </div>
   );
 };

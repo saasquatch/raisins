@@ -11,6 +11,8 @@ import { useIframeRenderer } from './useIFrameRenderer';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { connectToChild } from 'penpal';
+
 export type Size = {
   name: string;
   width: string;
@@ -58,12 +60,10 @@ function useVirtualRef() {
 }
 
 const scripts = [
-  `    <script type="module" src="/build/raisins-js.esm.js"></script>
-<script nomodule src="/build/raisins-js.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.27/themes/dark.css" />
-<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
+  `
+<link rel="stylesheet" href="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
+<link rel="stylesheet" href="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.27/themes/dark.css" />
+<script type="module" src="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
 <style>body{margin:0;}</style>
 <!-- TODO: Script management -->
 <script type="text/javascript" src="https://fast.ssqt.io/npm/@saasquatch/vanilla-components@1.0.x/dist/widget-components.js"></script>
@@ -90,7 +90,7 @@ function useStencilIframeRenderer() {
   const renderer = (iframe: HTMLIFrameElement, Comp: React.FC) => {
     if (!Comp) return; // no Component yet
     if (!iframe.contentDocument) return;
-    const entryDiv = iframe.contentDocument!.body;
+    const entryDiv = iframe.contentDocument!.querySelector("#root");
     // iframe;
     //    stencilView.view = <Comp />;
     return ReactDOM.createPortal(<Comp />, entryDiv!);

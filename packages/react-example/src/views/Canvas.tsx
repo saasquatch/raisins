@@ -163,7 +163,7 @@ export const WYSWIGCanvas: FC<Model> = props => {
   const hasSelectedAncestry = props.selected && selectedAncestry && selectedAncestry.length > 1 ? true : false;
   const hasSelected = typeof props.selected !== 'undefined';
   const ContentComponent: FC = () => {
-    return <div>coontent {visit(props.node, CanvasVisitor)}</div>;
+    return <>{visit(props.node, CanvasVisitor)}</>;
   };
 
   const returnedPortal = props.renderInIframe(ContentComponent);
