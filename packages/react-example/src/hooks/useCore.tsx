@@ -10,6 +10,20 @@ import { CoreModel, HistoryModel } from '../model/EditorModel';
 
 const { duplicate, getParents, insertAt, move, remove, replace, getAncestry: getAncestryUtil } = htmlUtil;
 
+const nodeToId = new WeakMap<RaisinNode, string>();
+const idToNode = new Map<string, RaisinNode>();
+
+export function getId(node: RaisinNode): string {
+  const existing = nodeToId.get(node);
+  if (existing) {
+    return existing;
+  }
+  const id = 'node-' + Math.round(Math.random() * 10000);
+  nodeToId.set(node, id);
+  idToNode.set(id,node);
+  return id;
+}
+
 export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreModel & HistoryModel {
   // const [selected, setSelected] = useState<RaisinNode>(undefined);
   const [state, setState] = useState<InternalState>({
@@ -185,7 +199,9 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     return getAncestryUtil(state.current, node, parents);
   }
 
+
   const serialized = useMemo(() => serializer(state.current), [state.current]);
+  const setSelectedId = (id:string) => setSelected(idToNode.get(id)!);
   return {
     initial: serializer(initial),
 
@@ -198,6 +214,9 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     selected: state.selected,
     setSelected,
     selectParent,
+
+    getId,
+    setSelectedId,
 
     removeNode,
     duplicateNode,

@@ -24,17 +24,6 @@ export type DraggableState = Map<
   }
 >;
 
-const nodeToId = new WeakMap<RaisinNode, string>();
-
-export function getId(node: RaisinNode): string {
-  const existing = nodeToId.get(node);
-  if (existing) {
-    return existing;
-  }
-  const id = 'node-' + Math.round(Math.random() * 10000);
-  nodeToId.set(node, id);
-  return id;
-}
 
 export function useEditor(initialHTML:string): Model {
   const metamodel = useComponentModel();
@@ -49,7 +38,6 @@ export function useEditor(initialHTML:string): Model {
   // @ts-ignore
   return {
     ...core,
-    getId,
     mode,
     setMode,
     ...useStyleEditor({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),

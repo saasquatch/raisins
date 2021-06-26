@@ -26,6 +26,9 @@ export type CoreModel = {
   setSelected(node?: RaisinNode): void;
   selectParent(): void;
 
+  getId(node: RaisinNode): string;
+  setSelectedId(id: string): void;
+
   /*
    * Mutations
    */
@@ -49,7 +52,7 @@ export type HistoryModel = {
 
 export type Model = CoreModel &
   HistoryModel & {
-    getId(node: RaisinNode): string;
+
     /**
      * Canvas
      */
