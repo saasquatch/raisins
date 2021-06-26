@@ -47,22 +47,6 @@ const SelectedTitle = css`
   flex-grow: 1;
 `;
 
-const Selectable = css`
-  position: relative;
-  &:hover {
-    outline: 1px solid #ccc;
-  }
-  // &:hover::before {
-  //   content: attr(data-tagname);
-  //   position: absolute;
-  //   color: #fff;
-  //   background: blue;
-  //   top: -20px;
-  //   height: 20px;
-  //   z-index: 9;
-  // }
-`;
-
 export const Canvas: FC<Model> = props => {
   if (props.mode === 'html') {
     return <pre>{props.serialized}</pre>;
@@ -124,14 +108,13 @@ export const WYSWIGCanvas: FC<Model> = props => {
       const innerProps: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> = {
         // 'data-rjs-selected': element === props.selected,
         // 'data-tagname': element.tagName,
-        className: classNames({
-          [Selectable]: props.mode === 'edit',
-          [element.attribs.class]: true,
-        }),
+        className: element.attribs.class,
         onClick: props.mode === 'edit' ? onClick : () => {},
         ref: (el: HTMLElement | null) => props.registerRef(element, el as HTMLElement),
       };
-
+      const canvasStyle = {
+        outline: element === props.selected ? '1px solid red' : '',
+      };
       if (element.tagName === 'template') {
         return (
           <div {...innerProps}>
@@ -152,10 +135,8 @@ export const WYSWIGCanvas: FC<Model> = props => {
       const { style, ...rest } = element.attribs;
       const styleObj = styleToObject(style);
 
-      let p = { style: styleObj, ...rest, ...innerProps, children };
-      return (
-        <HTMLCompont as={element.tagName} inner={p} />
-      );
+      let p = { style: { ...styleObj, ...canvasStyle }, ...rest, ...innerProps, children };
+      return <HTMLCompont as={element.tagName} inner={p} />;
     },
   };
 
@@ -167,12 +148,11 @@ export const WYSWIGCanvas: FC<Model> = props => {
   };
 
   props.renderInIframe(ContentComponent);
-  
+
   return (
     <div>
       <div className={wrapper} onClick={() => props.setSelected(undefined as any)}>
-        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)}>
-        </div>
+        <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)}></div>
       </div>
       <div
         ref={el => (props.toolbarRef.current = el!)}

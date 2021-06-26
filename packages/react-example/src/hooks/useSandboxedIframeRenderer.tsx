@@ -117,8 +117,8 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent }: Us
           iframe,
           // Methods the parent is exposing to the child
           methods: {
-            resizeHeight(pixels:number) {
-              iframe.height = pixels + "px";
+            resizeHeight(pixels:string) {
+              iframe.height = pixels;
             },
           },
           timeout: 1000,
