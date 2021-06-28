@@ -14,6 +14,7 @@ const wrapper = css`
   padding: 50px;
 `;
 
+
 const content = css`
   background: white;
   margin: 0 auto;

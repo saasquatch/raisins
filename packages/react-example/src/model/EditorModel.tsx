@@ -1,6 +1,5 @@
 import useCanvas from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
-import { useDND } from '../hooks/useDragState';
 import { Mode } from '../hooks/useEditor';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { DragCoords } from './DragCoords';
@@ -58,17 +57,7 @@ export type Model = CoreModel &
      */
     mode: Mode;
     setMode: StateUpdater<Mode>;
-    /*
-     * Drag and drop
-     */
-    setDraggableRef(node: RaisinNode, element: HTMLElement): void;
-    setDroppableRef(node: RaisinNode, element: HTMLElement, idx: number, slot: string): void;
-    dragCoords: DragCoords;
-    dropTarget?: DropState;
-    isDragActive: boolean;
-    elementToNode: WeakMap<HTMLElement, RaisinNode>;
   } & ComponentModel &
-  ReturnType<typeof useDND> &
   ReturnType<typeof useCanvas> &
   ReturnType<typeof useStyleEditor>;
 

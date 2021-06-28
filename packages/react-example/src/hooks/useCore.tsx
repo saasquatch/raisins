@@ -82,7 +82,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
 
   const setSelected = (next: RaisinNode) => {
     setState(prev => {
-      // TODO: Allows for selecting nodes that aren't part of the current tree
+      // TODO: Allows for selecting nodes that aren't part of the current tree. That doesn't make sense and should be prevented
       return {
         ...prev,
         selected: next,
@@ -192,15 +192,16 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     });
   }, []);
 
-  const parents = useMemo(() => getParents(state.current), [state.current]);
-  const slots = useMemo(() => getSlots(state.current, metamodel.getComponentMeta), [metamodel, state.current]);
+  const {current} = state;
+  const serialized = useMemo(() => serializer(current), [current]);
+  const parents = useMemo(() => getParents(current), [current]);
+
+  const slots = useMemo(() => getSlots(current, metamodel.getComponentMeta), [metamodel, current]);
 
   function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
     return getAncestryUtil(state.current, node, parents);
   }
 
-
-  const serialized = useMemo(() => serializer(state.current), [state.current]);
   const setSelectedId = (id:string) => setSelected(idToNode.get(id)!);
   return {
     initial: serializer(initial),

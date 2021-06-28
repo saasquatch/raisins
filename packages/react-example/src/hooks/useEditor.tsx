@@ -4,7 +4,6 @@ import { Model } from '../model/EditorModel';
 import useCanvas from './useCanvas';
 import { useComponentModel } from './useComponentModel';
 import { useCore } from './useCore';
-import { useDND } from './useDragState';
 import { useStyleEditor } from './useStyleEditor';
 
 export type Mode = 'preview' | 'edit' | 'html';
@@ -43,6 +42,5 @@ export function useEditor(initialHTML:string): Model {
     ...useStyleEditor({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),
     ...metamodel,
     ...useCanvas(core),
-    ...useDND({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),
   };
 }
