@@ -10,6 +10,7 @@ import type {
 } from "./RaisinNode";
 import { getParents, visit } from "./util";
 import cssSerializer from "../css-om/serializer";
+import { CssNodePlain } from "css-tree";
 
 /**
  *
@@ -26,7 +27,7 @@ import cssSerializer from "../css-om/serializer";
  *  - `domhandler` nodes need to be linked up with a `parent` and `prev` and `next`, even though the serializer only relies on `parent`
  *  - `domhandler` constructors for creating instances of their classes have caused build errors in the Raisin.js repo
  *
- * 
+ *
  * This also adds a few features:
  *  - `style` tags have their CSS contents parsed and serialized
  *
@@ -206,6 +207,11 @@ function renderTag(
     tag += ` ${attribs}`;
   }
 
+  let style = formatStyle(elem.style);
+  if (style) {
+    tag += ` ${style}`;
+  }
+
   if (
     elem.children.length === 0 &&
     (opts.xmlMode
@@ -264,4 +270,10 @@ function renderCdata(elem: RaisinNodeWithChildren) {
 
 function renderComment(elem: RaisinCommentNode) {
   return `<!--${elem.data}-->`;
+}
+
+function formatStyle(style: CssNodePlain): string | undefined {
+  if (!style) return;
+  const content = cssSerializer(style);
+  return `style="${content}"`;
 }

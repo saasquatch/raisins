@@ -46,8 +46,9 @@ export interface RaisinStyleNode extends RaisinNode<ElementType.Style> {
 }
 
 export interface RaisinElementNode extends RaisinNodeWithChildren<ElementType.Tag | ElementType.Script> {
-  attribs: {
+  attribs: Omit<{
     [name: string]: string;
-  };
+  }, "style">;
+  style?: CssNodePlain;
   tagName: string;
 }

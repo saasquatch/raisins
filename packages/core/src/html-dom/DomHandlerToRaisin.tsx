@@ -1,4 +1,3 @@
-
 import type * as DOMHandler from "domhandler";
 import { ElementType } from "htmlparser2";
 import cssParser from "../css-om/parser";
@@ -54,13 +53,15 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
     },
     onElement(element, children): RaisinElementNode {
       const { tagName, type, attribs, nodeType } = element;
+      const { style, ...otherAttribs } = attribs;
       return {
         nodeType,
         tagName,
         // @ts-ignore -- raisin has stronger types than
         type,
         children,
-        attribs: { ...attribs },
+        attribs: { ...otherAttribs },
+        style: style && cssParser(style, { context: "declarationList" }),
       };
     },
     onRoot(node, children): RaisinDocumentNode {

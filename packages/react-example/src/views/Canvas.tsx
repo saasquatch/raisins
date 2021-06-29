@@ -64,27 +64,10 @@ export const WYSWIGCanvas: FC<Model> = props => {
       const canvasStyle = {
         outline: element === props.selected ? '2px solid red' : '',
       };
-      if (element.tagName === 'template') {
-        return (
-          <div {...innerProps}>
-            <h1>Template:</h1>
-            {children}
-          </div>
-        );
-      }
-      if (element.tagName === 'script') {
-        return (
-          <div {...innerProps}>
-            Script:
-            <br />
-            <textarea>{htmlSerializer(element.children)}</textarea>
-          </div>
-        );
-      }
-      const { style, ...rest } = element.attribs;
+      const { ...rest } = element.attribs;
       let styleObj;
       try {
-        styleObj = styleToObject(style);
+        styleObj = styleToObject(cssSerializer(element.style));
       } catch (e) {
         styleObj = {};
       }

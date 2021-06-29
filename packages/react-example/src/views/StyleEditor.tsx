@@ -38,6 +38,7 @@ export function StyleNodeEditor(props: StyleNodeProps) {
   if (type === 'Rule') return <RuleEditor {...(props as StyleNodeProps<Css.RulePlain>)} />;
   if (type === 'Block') return <BlockEditor {...(props as StyleNodeProps<Css.BlockPlain>)} />;
   if (type === 'Declaration') return <DeclarationEditor {...(props as StyleNodeProps<Css.DeclarationPlain>)} />;
+  if (type === 'DeclarationList') return <DeclarationListEditor {...(props as StyleNodeProps<Css.DeclarationListPlain>)} />;
   if (type === 'Raw') return <RawEditor {...(props as StyleNodeProps<Css.Raw>)} />;
   if (type === 'Value') return <ValueEditor {...(props as StyleNodeProps<Css.ValuePlain>)} />;
   if (type === 'Identifier') return <IdentifierEditor {...(props as StyleNodeProps<Css.Identifier>)} />;
@@ -144,6 +145,17 @@ function DeclarationEditor(props: StyleNodeProps<Css.DeclarationPlain>) {
     </div>
   );
 }
+
+function DeclarationListEditor(props: StyleNodeProps<Css.DeclarationListPlain>) {
+
+  return (
+    <div data-type={props.node.type}>
+      <Children {...(props as any)} />
+    </div>
+  );
+}
+
+
 
 function RawEditor(props: StyleNodeProps<Css.Raw>) {
   const onInput = (e: FormEvent<unknown>) => {
