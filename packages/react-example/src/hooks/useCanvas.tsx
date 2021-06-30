@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import React from 'react';
 import { Child, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
+// @ts-ignore
+import {html} from 'uhtml/esm/json';
+// @ts-ignore
+import {params} from 'tag-params';
 
 import ReactDOMServer from 'react-dom/server';
 import { CoreModel } from '../model/EditorModel';
+
 
 export type Size = {
   name: string;
@@ -27,7 +32,10 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     // //    stencilView.view = <Comp />;
     // return ReactDOM.createPortal(<Comp />, entryDiv!);
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
-    child.render(htmlContent);
+
+    // TODO: Build components
+    child.render(html.json(...params(model.serialized)));
+
     return htmlContent!;
   };
   const onClick = (id: string) => model.setSelectedId(id);

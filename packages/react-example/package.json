@@ -21,7 +21,9 @@
     "react-popper": "^2.2.5",
     "react-scripts": "4.0.3",
     "style-to-object": "^0.3.0",
+    "tag-params": "^1.0.6",
     "typescript": "^4.3.4",
+    "uhtml": "^2.7.6",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

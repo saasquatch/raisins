@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { connectToChild } from 'penpal';
+// @ts-ignore
+import { html } from 'uhtml/esm/json';
 import LayersStories from '../stories/Layers.stories';
 
 type NPMDependency = {
@@ -17,8 +19,8 @@ export type UseIframeProps<C> = {
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */
   renderer: (iframe: HTMLIFrameElement, child: Child, Component: C) => string;
-  
-  onClick(id:string):void;
+
+  onClick(id: string): void;
 
   /**
    * The component to render
@@ -31,19 +33,22 @@ export type Child = {
 
 const childApiSrc = `
 <script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
-<script>
+<script type="module">
+import { render, html } from 'https://cdn.skypack.dev/uhtml/json';
+
+window.addEventListener('DOMContentLoaded',function () {
+
 window.myConnection = window.Penpal.connectToParent({
   // Methods child is exposing to parent
   methods: {
     render(content) {
-      document.body.innerHTML = content;
+      render(document.body,content);
     },
   },
   debug: true
 });
 
 window.myConnection.promise.then(function(parent){
-  window.ppdebug = parent;
   const ro = new ResizeObserver(function(entries){
       // @ts-ignore -- number will be cast to string by browsers
       parent.resizeHeight(entries[0].contentRect.height);
@@ -57,6 +62,9 @@ window.myConnection.promise.then(function(parent){
     }
   });
 
+});
+
+// End event listener
 });
 
 
