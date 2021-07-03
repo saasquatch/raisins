@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import hotkeys from 'hotkeys-js';
 import { getSlots } from '../model/getSlots';
-import { RaisinNode, RaisinNodeWithChildren, htmlUtil, htmlSerializer as serializer } from '@raisins/core';
+import { RaisinNode, RaisinNodeWithChildren, htmlUtil, htmlSerializer as serializer, htmlParser } from '@raisins/core';
 
 import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
@@ -111,6 +111,12 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
   }
   const setNode: StateUpdater<RaisinNode> = n => setNodeInternal(n);
 
+  const setHtml: StateUpdater<string> = html => {
+    const nextHtml = typeof html === 'function' ? html(serialized) : html;
+    const nextNode = htmlParser(nextHtml);
+    setNodeInternal(nextNode);
+  };
+
   function removeNode(n: RaisinNode) {
     setNodeInternal(previous => remove(previous, n), undefined);
   }
@@ -208,6 +214,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
 
     node: state.current,
     serialized,
+    setHtml,
     parents,
     getAncestry,
     slots,

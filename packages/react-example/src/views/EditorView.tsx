@@ -97,7 +97,6 @@ export function EditorView(model: Model) {
           <EditorPanel {...model} />
         </div>
         <div className={CanvasCss}>
-          {model.mode}
           <Canvas {...model} />
         </div>
 

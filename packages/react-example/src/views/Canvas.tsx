@@ -14,7 +14,6 @@ const wrapper = css`
   padding: 50px;
 `;
 
-
 const content = css`
   background: white;
   margin: 0 auto;
@@ -22,10 +21,20 @@ const content = css`
 `;
 
 export const Canvas: FC<Model> = props => {
-  if (props.mode === 'html') {
-    return <pre>{props.serialized}</pre>;
-  }
-  return <WYSWIGCanvas {...props} />;
+  return (
+    <div>
+      <div style={{ display: props.mode === 'html' ? 'block' : 'none' }}>
+        <textarea
+          value={props.serialized}
+          onChange={e => props.setHtml((e.target as HTMLTextAreaElement).value)}
+          style={{ width: '100%', minHeight: '50vh', boxSizing: 'border-box', resize: 'vertical' }}
+        />
+      </div>
+      <div style={{ display: props.mode !== 'html' ? 'block' : 'none' }}>
+        <WYSWIGCanvas {...props} />
+      </div>
+    </div>
+  );
 };
 export const WYSWIGCanvas: FC<Model> = props => {
   const CanvasVisitor: NodeVisitor<ReactNode> = {
@@ -62,8 +71,9 @@ export const WYSWIGCanvas: FC<Model> = props => {
         'className': element.attribs.class,
       };
       const canvasStyle = {
+        cursor: 'pointer',
         outline: element === props.selected ? '2px solid red' : '',
-        outlineOffset: element === props.selected ? "-2px" : ''
+        outlineOffset: element === props.selected ? '-2px' : '',
       };
       const { ...rest } = element.attribs;
       let styleObj;

@@ -9,9 +9,12 @@ import { StateUpdater } from '../util/NewState';
 
 export type CoreModel = {
   node: RaisinNode;
-  serialized: string;
   slots?: NodeWithSlots;
   initial: string;
+
+
+  serialized: string;
+  setHtml: StateUpdater<string>;
 
   setNode: StateUpdater<RaisinNode>;
 

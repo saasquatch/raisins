@@ -13,6 +13,7 @@ const { clone, visit } = htmlUtil;
 const Layer = css`
   position: relative;
   user-select: none;
+  cursor: pointer;
   padding: 10px 0;
   background: var(--sl-color-gray-900);
   border: 1px solid #ccc;
@@ -25,8 +26,9 @@ const Label = css`
 
 const Selected = css`
   ${Layer};
-  background: var(--sl-color-gray-900);
-  outline: 1px solid red;
+  background: var(--sl-color-gray-800);
+  outline: 2px solid red;
+  outline-offset: -2px;
   & ${Label} {
     font-weight: bold;
   }
