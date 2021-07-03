@@ -63,6 +63,7 @@ export const WYSWIGCanvas: FC<Model> = props => {
       };
       const canvasStyle = {
         outline: element === props.selected ? '2px solid red' : '',
+        outlineOffset: element === props.selected ? "-2px" : ''
       };
       const { ...rest } = element.attribs;
       let styleObj;
