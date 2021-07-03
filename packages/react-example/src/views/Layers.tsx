@@ -3,7 +3,6 @@ import { htmlUtil, RaisinElementNode, RaisinNodeVisitor as NodeVisitor } from '@
 import { Model } from "../model/EditorModel";
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import SlDropdown from '@shoelace-style/react/dist/dropdown';
-import SlIcon from '@shoelace-style/react/dist/icon';
 import SlMenu from '@shoelace-style/react/dist/menu';
 import SlMenuItem from '@shoelace-style/react/dist/menu-item';
 import classNames from 'classnames';
@@ -19,21 +18,27 @@ const Layer = css`
   border: 1px solid #ccc;
 `;
 
-const Selected = css`
-  ${Layer};
-  background: var(--sl-color-gray-900);
-  outline: 1px solid red;
-`;
 const Label = css`
   cursor: pointer;
   line-height: 28px;
 `;
+
+const Selected = css`
+  ${Layer};
+  background: var(--sl-color-gray-900);
+  outline: 1px solid red;
+  & ${Label} {
+    font-weight: bold;
+  }
+`;
+
 const SlotContainer = css`
   margin-left: 3px;
   border-left: 3px solid green;
   padding: 5px 0 5px 5px;
   display: flex;
 `;
+
 const SlotName = css`
   writing-mode: vertical-lr;
   text-orientation: sideways;
@@ -99,18 +104,16 @@ export const Layers: FC<Model> = model => {
             })}
           >
             <button onClick={() => model.duplicateNode(element)}>
-              <SlIcon name="files"></SlIcon>
+              dupe
             </button>
             <button onClick={() => model.removeNode(element)}>
-              <SlIcon name="trash"></SlIcon>
+              del
             </button>
             <button onClick={() => model.moveUp(element)}>
-              {' '}
-              <SlIcon name="arrow-bar-up"></SlIcon>
+            ↑
             </button>
             <button onClick={() => model.moveDown(element)}>
-              {' '}
-              <SlIcon name="arrow-bar-down"></SlIcon>
+            ↓
             </button>
           </SlButtonGroup>
         </div>

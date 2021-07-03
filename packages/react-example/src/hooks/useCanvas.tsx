@@ -34,7 +34,7 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
     // TODO: Build components
-    child.render(html.json(...params(model.serialized)));
+    child.render(html.json(...params(htmlContent)));
 
     return htmlContent!;
   };
