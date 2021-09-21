@@ -1,10 +1,6 @@
 import { useState } from 'react';
 import React from 'react';
 import { Child, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
-// @ts-ignore
-import {html} from 'uhtml/esm/json';
-// @ts-ignore
-import {params} from 'tag-params';
 
 import ReactDOMServer from 'react-dom/server';
 import { CoreModel } from '../model/EditorModel';
@@ -33,8 +29,7 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     // return ReactDOM.createPortal(<Comp />, entryDiv!);
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
-    // TODO: Build components
-    child.render(html.json(...params(htmlContent)));
+    child.render(htmlContent);
 
     return htmlContent!;
   };

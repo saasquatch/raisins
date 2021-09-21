@@ -1,5 +1,5 @@
 import { css } from '@emotion/css';
-import { cssSerializer, htmlSerializer, htmlUtil, RaisinElementNode, RaisinStyleNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
+import { cssSerializer, htmlUtil, RaisinElementNode, RaisinStyleNode, RaisinNodeVisitor as NodeVisitor } from '@raisins/core';
 import { Model } from '../model/EditorModel';
 import React, { FC, ReactNode } from 'react';
 import styleToObject from 'style-to-object';
