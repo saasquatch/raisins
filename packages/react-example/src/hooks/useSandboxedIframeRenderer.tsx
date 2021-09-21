@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { connectToChild } from 'penpal';
-// @ts-ignore
-import { html } from 'uhtml/esm/json';
-import LayersStories from '../stories/Layers.stories';
 
 type NPMDependency = {
   package: string;
@@ -18,7 +15,7 @@ export type UseIframeProps<C> = {
   /**ould go away
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */
-  renderer: (iframe: HTMLIFrameElement, child: Child, Component: C) => string;
+  renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => string;
 
   onClick(id: string): void;
 
@@ -27,7 +24,13 @@ export type UseIframeProps<C> = {
    */
   initialComponent: C;
 };
-export type Child = {
+
+export type ParentRPC = {
+  resizeHeight(pixels: string): void;
+  clicked(id: string): void;
+};
+
+export type ChildRPC = {
   render(html: string): void;
 };
 
@@ -92,7 +95,7 @@ const iframeSrc = `
 }
 </style>
 <body>
-  <div id="root">I should go away</div>
+  <div id="root">Penpal loading...</div>
 </body>
 </html>`;
 
@@ -105,11 +108,15 @@ const iframeSrc = `
  * @returns
  */
 export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onClick }: UseIframeProps<C>) {
-  const initialComponentRef = useRef<C>(initialComponent);
+  // TODO: - allow canvas styles to be added externally (see hard-coded rjs-selected)
+  // TODO: - allow scripts to be added / removed / swapped. (should re-render entire frame on script update? otherwise version updates might not properly load?)
+  // TODO: 
+
+ const initialComponentRef = useRef<C>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
   const [loaded, setLoaded] = useState(false);
-  const childRef = useRef<Child>();
+  const childRef = useRef<ChildRPC>();
   useEffect(
     () => {
       if (container.current) {
@@ -123,18 +130,20 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onCl
         iframe.setAttribute('sandbox', 'allow-scripts');
 
         el.appendChild(iframe);
-        const connection = connectToChild<Child>({
+        const parentRPC: ParentRPC = {
+          resizeHeight(pixels) {
+            iframe.height = pixels;
+          },
+          clicked(id) {
+            onClick(id);
+          },
+        };
+
+        const connection = connectToChild<ChildRPC>({
           // The iframe to which a connection should be made
           iframe,
           // Methods the parent is exposing to the child
-          methods: {
-            resizeHeight(pixels: string) {
-              iframe.height = pixels;
-            },
-            clicked(id: string) {
-              onClick(id);
-            },
-          },
+          methods: parentRPC,
           timeout: 1000,
           childOrigin: 'null',
         });
@@ -159,7 +168,7 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onCl
   function renderInIframe(Component: C): void {
     initialComponentRef.current = Component;
     if (iframeRef.current && childRef.current && loaded) {
-      const out = renderer(iframeRef.current, childRef.current!, Component);
+      renderer(iframeRef.current, childRef.current!, Component);
     } else {
       // Render will be called when the iframe is loaded
     }

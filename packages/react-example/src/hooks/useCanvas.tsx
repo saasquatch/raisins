@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import React from 'react';
-import { Child, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
+import { ChildRPC, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
 
 import ReactDOMServer from 'react-dom/server';
 import { CoreModel } from '../model/EditorModel';
@@ -20,7 +20,7 @@ const sizes: Size[] = [
 ];
 
 function useInnerHtmlIframeRenderer(model: CoreModel) {
-  const renderer = (iframe: HTMLIFrameElement, child: Child, Comp: React.FC): string => {
+  const renderer = (iframe: HTMLIFrameElement, child: ChildRPC, Comp: React.FC): string => {
     if (!Comp) return ''; // no Component yet
     // if (!iframe.contentDocument) return;
     // const entryDiv = iframe.contentDocument!.querySelector("#root");
@@ -45,6 +45,7 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     containerRef: props.container,
   };
 }
+
 
 export default function useCanvas(props: CoreModel) {
   const frameProps = useInnerHtmlIframeRenderer(props);
