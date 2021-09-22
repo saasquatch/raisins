@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
 import { connectToChild } from 'penpal';
+import { useEffect, useRef, useState } from 'react';
+
 
 type NPMDependency = {
   package: string;
@@ -110,9 +111,9 @@ const iframeSrc = `
 export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onClick }: UseIframeProps<C>) {
   // TODO: - allow canvas styles to be added externally (see hard-coded rjs-selected)
   // TODO: - allow scripts to be added / removed / swapped. (should re-render entire frame on script update? otherwise version updates might not properly load?)
-  // TODO: 
+  // TODO:
 
- const initialComponentRef = useRef<C>(initialComponent);
+  const initialComponentRef = useRef<C>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
   const [loaded, setLoaded] = useState(false);
@@ -127,7 +128,7 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onCl
         iframe.width = '100%';
         iframe.scrolling = 'no';
         iframe.setAttribute('style', 'border: 0; background-color: none; width: 1px; min-width: 100%;');
-        iframe.setAttribute('sandbox', 'allow-scripts');
+        iframe.setAttribute('sandbox', 'allow-scripts');        
 
         el.appendChild(iframe);
         const parentRPC: ParentRPC = {
