@@ -29,7 +29,7 @@ export interface DHNodeVisitor<T> {
 }
 
 export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
-  return visit(node, {
+  const raisin = visit<RaisinNode>(node, {
     onText(text): RaisinTextNode {
       const { nodeType, data } = text;
       return { nodeType, type: ElementType.Text, data };
@@ -39,15 +39,15 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
       const textContent =
         children &&
         children
-          .filter((c) => c.type === ElementType.Text)
-          .map((c: RaisinTextNode) => c.data)
+          .filter((c) => c && c.type === ElementType.Text)
+          .map((c) => (c as RaisinTextNode)?.data)
           .join("\n");
       return {
         nodeType,
         tagName: "style",
         // @ts-ignore -- raisin has stronger types than DOMHandler
         type,
-        contents: textContent && cssParser(textContent),
+        contents: textContent ? cssParser(textContent) : undefined,
         attribs: { ...attribs },
       };
     },
@@ -59,9 +59,9 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
         tagName,
         // @ts-ignore -- raisin has stronger types than
         type,
-        children,
+        children: children ?? [],
         attribs: { ...otherAttribs },
-        style: style && cssParser(style, { context: "declarationList" }),
+        style: style ? cssParser(style, { context: "declarationList" }) : undefined,
       };
     },
     onRoot(node, children): RaisinDocumentNode {
@@ -69,7 +69,7 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
       return {
         type: ElementType.Root,
         nodeType,
-        children,
+        children: children ?? [],
       };
     },
     onDirective(directive): RaisinProcessingInstructionNode {
@@ -85,18 +85,20 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
       return {
         type,
         nodeType,
-        children,
+        children: children ?? [],
       };
     },
   });
+  // we know it's not undefined
+  return raisin!;
 }
 
 export function visit<T>(
   node: DOMHandler.Node,
   visitor: DHNodeVisitor<T>,
   recursive: boolean = true
-): T {
-  let result: T;
+): T | undefined {
+  let result: T | undefined;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
     return;
@@ -124,7 +126,7 @@ export function visit<T>(
         recursive && element.children
           ? element.children
               .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined)
+              .filter((c) => c !== undefined) as T[]
           : [];
       result = visitor.onElement(element, children);
       break;
@@ -136,7 +138,7 @@ export function visit<T>(
         recursive && element.children
           ? element.children
               .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined)
+              .filter((c) => c !== undefined) as T[]
           : [];
       result = visitor.onStyle(element, children);
       break;
@@ -148,7 +150,7 @@ export function visit<T>(
         recursive && cdata.children
           ? cdata.children
               .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined)
+              .filter((c) => c !== undefined) as T[]
           : [];
       result = visitor.onCData(cdata, children);
       break;
@@ -160,7 +162,7 @@ export function visit<T>(
         recursive && root.children
           ? root.children
               .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined)
+              .filter((c) => c !== undefined) as T[]
           : [];
       result = visitor.onRoot(root, children);
       break;

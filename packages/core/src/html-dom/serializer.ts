@@ -72,7 +72,7 @@ function formatAttributes(
 
       if (opts.xmlMode === "foreign") {
         /* Fix up mixed-case attribute names */
-        key = attributeNames[key] ?? key;
+        key = (attributeNames[key as keyof typeof attributeNames]) ?? key;
       }
 
       if (!opts.emptyAttrs && !opts.xmlMode && value === "") {
@@ -149,7 +149,7 @@ function renderNode(
     onText: (n) => renderText(n, options, parents),
     onElement: (n, children) => renderTag(n, options, parents, children),
     onRoot(_, children?: string[]) {
-      return children.join("");
+      return children?.join("");
     },
     onStyle(n) {
       const cssContents = n.contents ? cssSerializer(n.contents) : "";
@@ -159,7 +159,7 @@ function renderNode(
     onDirective: renderDirective,
     onComment: renderComment,
     onCData: renderCdata,
-  });
+  }) ?? "";
 }
 
 const foreignModeIntegrationPoints = new Set([
@@ -180,14 +180,14 @@ function renderTag(
   elem: RaisinElementNode,
   opts: DomSerializerOptions,
   parents: Parents,
-  children: string[]
+  children?: string[]
 ) {
   const parent = parents.get(elem);
   let { tagName } = elem;
   // Handle SVG / MathML in HTML
   if (opts.xmlMode === "foreign") {
     /* Fix up mixed-case element names */
-    tagName = elementNames[elem.tagName] ?? elem.tagName;
+    tagName = elementNames[elem.tagName as keyof typeof elementNames] ?? elem.tagName;
     /* Exit foreign mode at integration points */
     if (
       parent &&
@@ -207,7 +207,7 @@ function renderTag(
     tag += ` ${attribs}`;
   }
 
-  let style = formatStyle(elem.style);
+  let style = elem.style && formatStyle(elem.style);
   if (style) {
     tag += ` ${style}`;
   }
@@ -225,7 +225,7 @@ function renderTag(
   } else {
     tag += ">";
     if (elem.children.length > 0) {
-      tag += children.join("");
+      tag += children?.join("") ?? "";
     }
 
     if (opts.xmlMode || !singleTag.has(tagName)) {

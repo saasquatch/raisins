@@ -7,19 +7,21 @@ import {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode,
-} from './RaisinNode';
-import cloneDeep from 'lodash.clonedeep';
-import { ElementType } from 'domelementtype';
+} from "./RaisinNode";
+import cloneDeep from "lodash.clonedeep";
+import { ElementType } from "domelementtype";
 
 /**
  * Provides a WeakMap for parent lookups
  *
  * @param root
  */
-export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWithChildren> {
+export function getParents(
+  root: RaisinNode
+): WeakMap<RaisinNode, RaisinNodeWithChildren> {
   const map = new WeakMap<RaisinNode, RaisinNodeWithChildren>();
   function storeParent(elem: RaisinNodeWithChildren, children?: RaisinNode[]) {
-    children.forEach(c => map.set(c, elem));
+    children?.forEach((c) => map.set(c, elem));
     return elem;
   }
 
@@ -27,16 +29,20 @@ export function getParents(root: RaisinNode): WeakMap<RaisinNode, RaisinNodeWith
     onCData: storeParent,
     onElement: storeParent,
     onRoot: storeParent,
-    onStyle: n => n,
-    onComment: n => n,
-    onDirective: n => n,
-    onText: n => n,
+    onStyle: (n) => n,
+    onComment: (n) => n,
+    onDirective: (n) => n,
+    onText: (n) => n,
   });
   return map;
 }
 
-export function visit<T = unknown>(node: RaisinNode, visitor: Partial<NodeVisitor<T>>, recursive: boolean = true): T {
-  let result: T;
+export function visit<T = unknown>(
+  node: RaisinNode,
+  visitor: Partial<NodeVisitor<T>>,
+  recursive: boolean = true
+): T | undefined {
+  let result: T | undefined;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
     return;
@@ -47,17 +53,25 @@ export function visit<T = unknown>(node: RaisinNode, visitor: Partial<NodeVisito
       result = visitor.onText && visitor.onText(node as RaisinTextNode);
       break;
     case ElementType.Directive: {
-      result = visitor.onDirective && visitor.onDirective(node as RaisinProcessingInstructionNode);
+      result =
+        visitor.onDirective &&
+        visitor.onDirective(node as RaisinProcessingInstructionNode);
       break;
     }
     case ElementType.Comment:
-      result = visitor.onComment && visitor.onComment(node as RaisinCommentNode);
+      result =
+        visitor.onComment && visitor.onComment(node as RaisinCommentNode);
       break;
     case ElementType.Tag:
     case ElementType.Script: {
       if (!visitor.onElement) break;
       const element = node as RaisinElementNode;
-      const children = recursive && element.children ? element.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children =
+        recursive && element.children
+          ? (element.children
+              .map((c) => visit(c, visitor, recursive))
+              .filter((c) => c !== undefined) as T[])
+          : [];
       result = visitor.onElement(element, children);
       break;
     }
@@ -70,20 +84,30 @@ export function visit<T = unknown>(node: RaisinNode, visitor: Partial<NodeVisito
     case ElementType.CDATA: {
       if (!visitor.onCData) break;
       const cdata = node as RaisinNodeWithChildren;
-      const children = recursive && cdata.children ? cdata.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children =
+        recursive && cdata.children
+          ? (cdata.children
+              .map((c) => visit(c, visitor, recursive))
+              .filter((c) => c !== undefined) as T[])
+          : [];
       result = visitor.onCData(cdata, children);
       break;
     }
     case ElementType.Root: {
       if (!visitor.onRoot) break;
       const root = node as RaisinDocumentNode;
-      const children = recursive && root.children ? root.children.map(c => visit(c, visitor, recursive)).filter(c => c !== undefined) : [];
+      const children =
+        recursive && root.children
+          ? (root.children
+              .map((c) => visit(c, visitor, recursive))
+              .filter((c) => c !== undefined) as T[])
+          : [];
       result = visitor.onRoot(root, children);
       break;
     }
     case ElementType.Doctype: {
       // This type isn't used yet.
-      throw new Error('Not implemented yet: ElementType.Doctype case');
+      throw new Error("Not implemented yet: ElementType.Doctype case");
     }
   }
   return result;
@@ -96,12 +120,12 @@ export interface NodeVisitor<T> {
   skipNode?(node: RaisinNode): boolean;
   onText(text: RaisinTextNode): T | undefined;
   onStyle(element: RaisinStyleNode): T | undefined;
-  onElement(element: RaisinElementNode, children?: T[]): T | undefined;
-  onRoot(node: RaisinDocumentNode, children?: T[]): T | undefined;
+  onElement(element: RaisinElementNode, children: T[]): T | undefined;
+  onRoot(node: RaisinDocumentNode, children: T[]): T | undefined;
 
   onDirective(directive: RaisinProcessingInstructionNode): T | undefined;
   onComment(comment: RaisinCommentNode): T | undefined;
-  onCData(element: RaisinNodeWithChildren, children?: T[]): T | undefined;
+  onCData(element: RaisinNodeWithChildren, children: T[]): T | undefined;
 }
 
 /**
@@ -111,13 +135,18 @@ export interface NodeVisitor<T> {
  * @param node
  */
 export function remove(root: RaisinNode, node: RaisinNode): RaisinNode {
+  if (root === node) {
+    throw new Error("Can't remove node from itself");
+  }
+  const removed = visit(root, {
+    skipNode(n) {
+      return n === node;
+    },
+    ...CloneVisitor,
+  });
   return freeze(
-    visit(root, {
-      skipNode(n) {
-        return n === node;
-      },
-      ...CloneVisitor,
-    }),
+    // Would only be null if node removed itself
+    removed!
   );
 }
 
@@ -159,7 +188,7 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
 
   const nodes = visit(root, DuplicateVisitor);
   // Root node should not be duplicatable
-  return freeze(nodes[0]);
+  return freeze(nodes![0]);
 }
 
 /**
@@ -167,7 +196,12 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
  *
  * @param callback - used to notify of any changes anywhere in the tree
  */
-export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode, callback?: ReplacementCallback): RaisinNode {
+export function replace(
+  root: RaisinNode,
+  previous: RaisinNode,
+  next: RaisinNode,
+  callback?: ReplacementCallback
+): RaisinNode {
   function swap(n: RaisinNode): RaisinNode {
     if (n === previous) {
       callback && callback(n, next);
@@ -176,7 +210,10 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
     return n;
   }
 
-  function swapWithChildren(el: RaisinNodeWithChildren, children?: RaisinNode[]) {
+  function swapWithChildren(
+    el: RaisinNodeWithChildren,
+    children?: RaisinNode[]
+  ) {
     if (el === previous) {
       callback && callback(el, next);
       return next;
@@ -200,7 +237,7 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
     onCData: swapWithChildren,
     onElement: swapWithChildren,
     onRoot: swapWithChildren,
-  });
+  })!;
 }
 
 /**
@@ -208,24 +245,34 @@ export function replace(root: RaisinNode, previous: RaisinNode, next: RaisinNode
  *
  * The node will be removed from it's other location in the tree if it exists.
  */
-export function move(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, newIdx: number): RaisinNode {
+export function move(
+  root: RaisinNode,
+  node: RaisinNode,
+  newParent: RaisinNode,
+  newIdx: number
+): RaisinNode {
+  if (root === node) throw new Error("Can't root node");
+  if (node === newParent) throw new Error("Can't move node inside itself");
+
   const cloned = node;
-  return freeze(
-    visit(root, {
-      skipNode(n) {
-        return n === node;
-      },
-      ...IdentityVisitor,
-      onElement(el, children) {
-        const newChildren = el === newParent ? add(children, cloned, newIdx) : children;
-        return { ...el, children: newChildren };
-      },
-      onRoot(el, children) {
-        const newChildren = el === newParent ? add(children, cloned, newIdx) : children;
-        return { ...el, children: newChildren };
-      },
-    }),
-  );
+
+  const moved = visit(root, {
+    skipNode(n) {
+      return n === node;
+    },
+    ...IdentityVisitor,
+    onElement(el, children) {
+      const newChildren =
+        el === newParent ? add(children, cloned, newIdx) : children;
+      return { ...el, children: newChildren };
+    },
+    onRoot(el, children) {
+      const newChildren =
+        el === newParent ? add(children, cloned, newIdx) : children;
+      return { ...el, children: newChildren };
+    },
+  });
+  return freeze(moved!);
 }
 
 /**
@@ -234,20 +281,29 @@ export function move(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, 
  * When adding new elements make sure they are cloned or fresh elements before inserting them here.
  *
  */
-export function insertAt(root: RaisinNode, node: RaisinNode, newParent: RaisinNode, newIdx: number): RaisinNode {
-  return freeze(
-    visit(root, {
-      ...IdentityVisitor,
-      onElement(el, children) {
-        const newChildren = el === newParent ? add(children, node, newIdx) : children;
-        return { ...el, children: newChildren };
-      },
-      onRoot(el, children) {
-        const newChildren = el === newParent ? add(children, node, newIdx) : children;
-        return { ...el, children: newChildren };
-      },
-    }),
-  );
+export function insertAt(
+  root: RaisinNode,
+  node: RaisinNode,
+  newParent: RaisinNode,
+  newIdx: number
+): RaisinNode {
+  if (root === node) throw new Error("Can't root node");
+  if (node === newParent) throw new Error("Can't move node inside itself");
+
+  const moved = visit(root, {
+    ...IdentityVisitor,
+    onElement(el, children) {
+      const newChildren =
+        el === newParent ? add(children, node, newIdx) : children;
+      return { ...el, children: newChildren };
+    },
+    onRoot(el, children) {
+      const newChildren =
+        el === newParent ? add(children, node, newIdx) : children;
+      return { ...el, children: newChildren };
+    },
+  });
+  return freeze(moved!);
 }
 
 function isBlankOrEmpty(str: string) {
@@ -255,7 +311,7 @@ function isBlankOrEmpty(str: string) {
 }
 
 export function removeWhitespace(root: RaisinNode): RaisinNode {
-  return visit(root, {
+  const cleaned = visit(root, {
     ...CloneVisitor,
     onText(text) {
       if (isBlankOrEmpty(text.data.trim())) {
@@ -264,6 +320,11 @@ export function removeWhitespace(root: RaisinNode): RaisinNode {
       return text;
     },
   });
+  if (!cleaned)
+    throw new Error(
+      "Whitespace removal produced no content at all. Try this on a root node instead of a embedded text node"
+    );
+  return cleaned;
 }
 
 function add<T>(arr: T[], el: T, idx: number): T[] {
@@ -276,7 +337,10 @@ function freeze(node: RaisinNode) {
   return visitAll(node, Object.freeze);
 }
 
-function visitAll(node: RaisinNode, fn: (n: RaisinNode) => RaisinNode): RaisinNode {
+function visitAll(
+  node: RaisinNode,
+  fn: (n: RaisinNode) => RaisinNode
+): RaisinNode {
   return visit(node, {
     onCData: fn,
     onText: fn,
@@ -285,28 +349,31 @@ function visitAll(node: RaisinNode, fn: (n: RaisinNode) => RaisinNode): RaisinNo
     onComment: fn,
     onElement: fn,
     onRoot: fn,
-  });
+  })!;
 }
 
 export const IdentityVisitor: NodeVisitor<RaisinNode> = {
-  onText: n => n,
-  onDirective: n => n,
-  onComment: n => n,
-  onElement: n => n,
-  onStyle: n => n,
-  onCData: n => n,
-  onRoot: n => n,
+  onText: (n) => n,
+  onDirective: (n) => n,
+  onComment: (n) => n,
+  onElement: (n) => n,
+  onStyle: (n) => n,
+  onCData: (n) => n,
+  onRoot: (n) => n,
 };
 
 const CloneVisitor: NodeVisitor<RaisinNode> = {
-  onText: n => ({ ...n }),
-  onDirective: n => ({ ...n }),
-  onComment: n => ({ ...n }),
+  onText: (n) => ({ ...n }),
+  onDirective: (n) => ({ ...n }),
+  onComment: (n) => ({ ...n }),
   // TODO: deep clone CSS ast
-  onStyle: n => ({...n}),
-  onElement: (n, children) => ({ ...n, children: [...children] }),
-  onCData: (n, children) => ({ ...n, children: [...children] }),
-  onRoot: (n, children) => ({ ...n, children: [...children] }),
+  onStyle: (n) => ({ ...n }),
+  onElement: (n, children) => ({
+    ...n,
+    children: children ? [...children] : [],
+  }),
+  onCData: (n, children) => ({ ...n, children: children ? [...children] : [] }),
+  onRoot: (n, children) => ({ ...n, children: children ? [...children] : [] }),
 };
 
 /**
@@ -323,7 +390,15 @@ export function clone(n: RaisinNode): RaisinNode {
  */
 function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
   // @ts-ignore
-  return d > 0 ? arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val), []) : arr.slice();
+  return d > 0
+    ? // @ts-ignore
+      arr.reduce(
+        // @ts-ignore
+        (acc, val) =>
+          acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val),
+        []
+      )
+    : arr.slice();
 }
 
 /**
@@ -333,7 +408,7 @@ export function getAncestry(
   root: RaisinNode,
   node: RaisinNode,
   // Provide this for performance improvement
-  parents = getParents(root),
+  parents = getParents(root)
 ): RaisinNodeWithChildren[] {
   const ancestry: RaisinNodeWithChildren[] = [];
   let current = node;

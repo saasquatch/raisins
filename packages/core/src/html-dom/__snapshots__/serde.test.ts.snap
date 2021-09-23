@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Parse + serialize Can parse simple HTML 1`] = `
+Object {
+  "children": Array [
+    Object {
+      "attribs": Object {},
+      "children": Array [
+        Object {
+          "data": "Example",
+          "nodeType": 3,
+          "type": "text",
+        },
+      ],
+      "nodeType": 1,
+      "style": undefined,
+      "tagName": "div",
+      "type": "tag",
+    },
+  ],
+  "nodeType": 9,
+  "type": "root",
+}
+`;

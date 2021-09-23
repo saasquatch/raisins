@@ -1,46 +1,61 @@
 {
   "name": "@raisins/core",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "source": "src/raisins-core.ts",
-  "exports": "./dist/raisins-core.modern.js",
-  "main": "./dist/raisins-core.cjs",
-  "types": "./dist/raisins-core.d.ts",
-  "typings": "./dist/raisins-core.d.ts",
-  "module": "./dist/raisins-core.module.js",
-  "unpkg": "./dist/raisins-core.umd.js",
-  "scripts": {
-    "build": "microbundle",
-    "dev": "microbundle watch"
-  },
-  "author": "logvol",
+  "author": "Logan Volkers",
+  "version": "0.1.0",
   "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/raisins.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "test:watch": "tsdx test --watch",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "size-limit": [
+    {
+      "path": "dist/raisins.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/raisins.esm.js",
+      "limit": "10 KB"
+    }
+  ],
   "devDependencies": {
+    "@size-limit/preset-small-lib": "^5.0.4",
     "@types/css-tree": "^1.0.5",
     "@types/domelementtype": "^2.0.1",
+    "@types/jest": "^27.0.2",
     "@types/lodash.clonedeep": "^4.5.6",
-    "microbundle": "^0.13.3"
-  },
-  "peerDependencies": {
-    "@saasquatch/universal-hooks": "^1.0.0"
+    "husky": "^7.0.2",
+    "jest": "^25.5.4",
+    "size-limit": "^5.0.4",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@interactjs/core": "^1.10.11",
-    "@popperjs/core": "^2.9.2",
-    "@wry/equality": "^0.5.1",
     "css-tree": "*",
-    "dom-serializer": "^0.2.2",
     "domelementtype": "^2.2.0",
-    "hotkeys-js": "^3.8.7",
     "htmlparser2": "^6.1.0",
-    "interactjs": "^1.10.11",
-    "lodash.clonedeep": "^4.5.0",
-    "penpal": "^5.3.0",
-    "react-popper": "^2.2.5",
-    "style-to-object": "^0.3.0",
-    "tag-params": "^1.0.6",
-    "typescript": "^4.3.4",
-    "uhtml": "^2.7.6"
+    "lodash.clonedeep": "^4.5.0"
   }
 }
