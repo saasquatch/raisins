@@ -54,7 +54,10 @@ Feature: Selecting by CSS selectors
             | <div foo="three four">I am a div</div> | [foo~=two]  | undefined        |
 
 
-    Scenario Outline: Nested selectors
+    Scenario Outline: Descendant selectors
+        Descendant ( ) https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator
+        Child (>) https://developer.mozilla.org/en-US/docs/Web/CSS/Child_combinator
+
         Given an html document
             """
             <HTML>
@@ -63,8 +66,11 @@ Feature: Selecting by CSS selectors
         Then it should return "<JSONata>"
 
         Examples:
-            | HTML                         | Selector | JSONata                      |
-            | <div><span>Inner<span></div> | span     | node.children[0].children[0] |
+            | HTML                             | Selector        | JSONata                      |
+            | <div><span>Inner<span></div>     | span            | node.children[0].children[0] |
+            | <div><span>Inner<span></div>     | div span        | node.children[0].children[0] |
+            | <div><span>Inner<span></div>     | div > span      | node.children[0].children[0] |
+            | <div><span foo>Inner<span></div> | div > span[foo] | node.children[0].children[0] |
 
 
     Scenario Outline: Wildcard selector

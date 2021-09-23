@@ -91,18 +91,15 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    * as well as any of their children that match it.
    */
   findAll(test: Predicate<ElementNode>, nodes: Node[]) {
-    // return (nodes.filter((n) => n.type === "tag") as ElementNode[]).filter(
-    //   test
-    // );
     return (nodes.filter((n) => n.type === "tag") as ElementNode[]).reduce(
       (arr, n) => {
-        if (test(n)) {
-          const matchingChildren = (n.children.filter(
+        const matchingChildren = (n.children.filter(
             (n) => n.type === "tag"
           ) as ElementNode[]).filter(test);
+        if (test(n)) {
           return [...arr, n, ...matchingChildren];
         }
-        return [...arr];
+        return [...arr, ...matchingChildren];
       },
       [] as ElementNode[]
     );
@@ -148,5 +145,6 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
 export default function select(node: RaisinDocumentNode, query: string) {
   return selectAll(query, node, {
     adapter: new RaisinAdapter(node),
+    cacheResults: false,
   });
 }
