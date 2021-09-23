@@ -388,7 +388,7 @@ export function clone(n: RaisinNode): RaisinNode {
  *
  * use recursion with reduce and concat
  */
-function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
+export function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
   // @ts-ignore
   return d > 0
     ? // @ts-ignore
