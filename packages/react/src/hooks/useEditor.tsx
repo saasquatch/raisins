@@ -1,9 +1,10 @@
-import { htmlParser as parse, RaisinNode } from "@raisins/core";
+import { htmlParser as parse, RaisinNode } from '@raisins/core';
 import { useMemo, useState } from 'react';
 import { Model } from '../model/EditorModel';
 import useCanvas from './useCanvas';
 import { useComponentModel } from './useComponentModel';
 import { useCore } from './useCore';
+import { useHotkeys } from './useHotkeys';
 import { useStyleEditor } from './useStyleEditor';
 
 export type Mode = 'preview' | 'edit' | 'html';
@@ -23,8 +24,7 @@ export type DraggableState = Map<
   }
 >;
 
-
-export function useEditor(initialHTML:string): Model {
+export function useEditor(initialHTML: string): Model {
   const metamodel = useComponentModel();
   const initial = useMemo(() => {
     const raisinNode = parse(initialHTML);
@@ -34,12 +34,20 @@ export function useEditor(initialHTML:string): Model {
   const core = useCore(metamodel, initial);
   const [mode, setMode] = useState<Mode>('edit');
 
+  // Binds global event handlers
+  useHotkeys(core);
+
   // @ts-ignore
   return {
     ...core,
     mode,
     setMode,
-    ...useStyleEditor({ node: core.node, setNode: core.setNode, parents: core.parents, componentModel: metamodel }),
+    ...useStyleEditor({
+      node: core.node,
+      setNode: core.setNode,
+      parents: core.parents,
+      componentModel: metamodel,
+    }),
     ...metamodel,
     ...useCanvas(core),
   };

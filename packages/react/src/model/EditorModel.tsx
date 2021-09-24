@@ -12,6 +12,7 @@ export type CoreModel = {
 
 
   serialized: string;
+  html: string;
   setHtml: StateUpdater<string>;
 
   setNode: StateUpdater<RaisinNode>;
@@ -32,6 +33,7 @@ export type CoreModel = {
   /*
    * Mutations
    */
+  deleteSelected(): void;
   duplicateNode(node: RaisinNode): void;
   removeNode(node: RaisinNode): void;
   insert(node: RaisinNode, parent: RaisinNode, idx: number): void;

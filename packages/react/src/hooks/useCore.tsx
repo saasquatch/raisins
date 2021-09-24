@@ -1,6 +1,5 @@
 import { htmlParser, htmlSerializer as serializer, htmlUtil, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import hotkeys from 'hotkeys-js';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { CoreModel, HistoryModel } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
@@ -175,29 +174,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     });
   }
 
-  useEffect(() => {
-    // TODO: Scope so that backspace and delete only work depending on what is "focused"
-    // TODO: Cleanup listeners on onmount so that the shortcuts don't live forever (e.g. and mess up program engine installation)
-    hotkeys('ctrl+y,ctrl+z,delete,backspace,d', function (event, handler) {
-      switch (handler.key) {
-        case 'ctrl+z':
-          event.preventDefault();
-          undo();
-          break;
-        case 'ctrl+y':
-          event.preventDefault();
-          redo();
-          break;
-        // case 'd':
-        // case 'backspace':
-        case 'delete':
-          event.preventDefault();
-          deleteSelected();
-          break;
-        default:
-      }
-    });
-  }, []);
+
 
   const {current} = state;
   const serialized = useMemo(() => serializer(current), [current]);
@@ -215,6 +192,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
 
     node: state.current,
     serialized,
+    html:serialized,
     setHtml,
     parents,
     getAncestry,
@@ -227,6 +205,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     getId,
     setSelectedId,
 
+    deleteSelected,
     removeNode,
     duplicateNode,
     insert: insertNode,
