@@ -1,17 +1,11 @@
-import React, { FC, HTMLAttributes, ReactChild } from 'react';
-import {htmlParser} from "@raisins/core";
+import React from 'react';
 
-export interface Props extends HTMLAttributes<HTMLDivElement> {
-  /** custom content, defaults to 'the snozzberries taste like snozzberries' */
-  children?: ReactChild;
-}
+import useCanvas from './hooks/useCanvas';
+import { useComponentModel } from './hooks/useComponentModel';
+import { useCore } from './hooks/useCore';
+import { useEditor } from './hooks/useEditor';
 
-// Please do not use types off of a default export module or else Storybook Docs will suffer.
-// see: https://github.com/storybookjs/storybook/issues/9556
-/**
- * A custom Thing component. Neat!
- */
-export const Thing: FC<Props> = ({ children }) => {
-  const raisin = htmlParser("<div>I am a div</div>");
-  return <div>{children || JSON.stringify(raisin)}</div>;
+export { useCanvas, useComponentModel, useCore, useEditor };
+export const Thing: React.FC = () => {
+  return <div>I am a div</div>;
 };

@@ -44,7 +44,7 @@
     "json-pointer": "^0.6.1",
     "lodash.clonedeep": "^4.5.0",
     "microbundle": "^0.13.3",
-    "penpal": "^5.3.0",
+    "penpal": "^6.1.0",
     "react-popper": "^2.2.5",
     "style-to-object": "^0.3.0",
     "tag-params": "^1.0.6",
@@ -54,6 +54,7 @@
   "license": "MIT",
   "author": "",
   "devDependencies": {
-    "@rollup/plugin-alias": "^3.1.2"
+    "@rollup/plugin-alias": "^3.1.2",
+    "@types/css-tree": "^1.0.6"
   }
 }
