@@ -3,6 +3,9 @@ import { domHandlerToRaisin } from "./DomHandlerToRaisin";
 import type { RaisinDocumentNode } from "./RaisinNode";
 import { removeWhitespace } from "./util";
 
+type Options = {
+  cleanWhitespace?: boolean
+}
 /**
  * Parses HTML into a RaisinDocumentNode.
  *
@@ -14,11 +17,11 @@ import { removeWhitespace } from "./util";
  * @param html an HTML string
  * @returns a parsed RaisinDocumentNode
  */
-export function parse(html: string): RaisinDocumentNode {
+export function parse(html: string, {cleanWhitespace = true}:Options = {} ): RaisinDocumentNode {
   const DomNode = parseDocument(html);
   const raisinNode = domHandlerToRaisin(DomNode) as RaisinDocumentNode;
 
-  const clean = removeWhitespace(raisinNode);
+  const clean = cleanWhitespace ? removeWhitespace(raisinNode): raisinNode; 
   return clean as RaisinDocumentNode;
 }
 

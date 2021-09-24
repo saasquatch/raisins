@@ -3,6 +3,8 @@ Feature: Selecting by CSS selectors
     Raisin supports finding nodes in the document using CSS selectors.
 
     Scenario Outline: Tag selectors
+        Based on tag type https://developer.mozilla.org/en-US/docs/Web/CSS/Type_selectors
+        
         Given an html document
             """
             <HTML>
@@ -35,6 +37,11 @@ Feature: Selecting by CSS selectors
             | <div class="boo-too">I am a div</div> | .foo-too | undefined        |
 
     Scenario Outline: Attribute
+        Attribute ([attr=foo]), with supported comparisons https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors
+        [attr] (existential)
+        =       ~=         |=        *=        ^=        $=        !=
+        Also, i can be added after the comparison to make the comparison case-insensitive (eg. [attr=foo i])
+
         Given an html document
             """
             <HTML>
@@ -74,6 +81,8 @@ Feature: Selecting by CSS selectors
 
 
     Scenario Outline: Wildcard selector
+        Universal selector https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors
+
         Given an html document
             """
             <HTML>
