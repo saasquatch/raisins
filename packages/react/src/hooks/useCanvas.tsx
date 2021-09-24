@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
 import { raisintoSnabdom } from './raisinToSnabdom';
@@ -36,18 +37,22 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
     const vnode = raisintoSnabdom(model.node as RaisinDocumentNode, (d, n) => {
+
+      
+      const {delayed, remove, ...rest} = d.style || {};
+      const style:VNodeStyle = {
+        ...rest,
+        cursor: 'pointer',
+        outline: n === model.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
+        outlineOffset: n === model.selected ? '-2px' : '',
+      }
       return {
         ...d,
         attrs: {
           ...d.attrs,
           'raisins-id': model.getId(n),
         },
-        style: {
-          ...d.style,
-          cursor: 'pointer',
-          outline: n === model.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
-          outlineOffset: n === model.selected ? '-2px' : '',
-        },
+        style,
       };
     });
     child.render(vnode);

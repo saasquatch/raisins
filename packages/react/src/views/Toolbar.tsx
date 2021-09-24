@@ -2,7 +2,7 @@ import styled from "styled-components";
 import SlButton from '@shoelace-style/react/dist/button';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import SlIcon from '@shoelace-style/react/dist/icon';
-import React from "react";
+import React, { CSSProperties } from "react";
 import { Model } from "../model/EditorModel";
 
 
@@ -42,7 +42,7 @@ export function ToolbarView(props: Model) {
         </SlButton>
       </SlButtonGroup>
       <SlButtonGroup>
-        <SlButton size="small" pill type="default" disabled style={{ cursor: 'initial' }}>
+        <SlButton size="small" pill type="default" disabled style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}>
           <SlIcon slot="prefix" name="window"></SlIcon>
           Screen
         </SlButton>
