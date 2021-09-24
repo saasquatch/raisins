@@ -1,4 +1,4 @@
-import { css } from '@emotion/css';
+import styled from 'styled-components';
 import { cssSerializer, htmlUtil, RaisinElementNode, RaisinNodeVisitor as NodeVisitor, RaisinStyleNode } from '@raisins/core';
 import React, { FC, ReactNode } from 'react';
 import styleToObject from 'style-to-object';
@@ -6,7 +6,7 @@ import { Model } from '../model/EditorModel';
 
 const { visit } = htmlUtil;
 
-const wrapper = css`
+const Wrapper = styled.div`
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%), linear-gradient(-45deg, #cccccc 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #cccccc 75%), linear-gradient(-45deg, transparent 75%, #cccccc 75%);
   background-size: 20px 20px;
@@ -14,7 +14,7 @@ const wrapper = css`
   padding: 50px;
 `;
 
-const content = css`
+const Content = styled.div`
   background: white;
   margin: 0 auto;
   padding: 20px;
@@ -78,9 +78,11 @@ export const WYSWIGCanvas: FC<Model> = props => {
       const { ...rest } = element.attribs;
       let styleObj;
       try {
-        styleObj = styleToObject(cssSerializer(element.style));
-      } catch (e) {
-        styleObj = {};
+        if(element.style){
+          styleObj = styleToObject(cssSerializer(element.style));
+        }
+      } finally {
+        styleObj = styleObj || {};
       }
 
       let p = { style: { ...styleObj, ...canvasStyle }, ...rest, ...innerProps, children };
@@ -95,9 +97,9 @@ export const WYSWIGCanvas: FC<Model> = props => {
   props.renderInIframe(ContentComponent);
 
   return (
-    <div className={wrapper} onClick={() => props.setSelected(undefined as any)}>
-      <div className={content} data-content style={{ width: props.size.width }} ref={el => (props.containerRef.current = el!)}></div>
-    </div>
+    <Wrapper onClick={() => props.setSelected(undefined as any)}>
+      <Content data-content style={{ width: props.size.width }} ref={(el:HTMLDivElement) => (props.containerRef.current = el!)} />
+    </Wrapper>
   );
 };
 

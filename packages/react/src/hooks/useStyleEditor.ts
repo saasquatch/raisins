@@ -27,7 +27,7 @@ export function useStyleEditor(props: Props) {
 
   const updateSelectedSheet: StateUpdater<css.CssNodePlain> = next => {
     props.setNode(
-      // @ts-expect-error
+      // @ts-ignore
       (prev: RaisinDocumentNode) => {
         const nextVal = typeof next === 'function' ? next(selectedSheet!.contents!) : next;
         const newSheet: RaisinStyleNode = { ...selectedSheet!, contents: nextVal };

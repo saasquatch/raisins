@@ -1,6 +1,13 @@
 import { Model } from '../src/model/EditorModel';
 import { useEditor } from '../src/hooks/useEditor';
 import { EditorView } from '../src/views/EditorView';
+import { Meta, Story } from '@storybook/react';
+
+const meta: Meta = {
+  title: 'Editor',
+  component: Editor,
+};
+export default meta;
 
 export function Editor() {
   const model: Model = useEditor(`

@@ -1,40 +1,38 @@
-import { css } from '@emotion/css';
+import styled from 'styled-components';
 import { RaisinElementNode } from '@raisins/core';
 import '@shoelace-style/shoelace/dist/themes/dark.css';
-import React from "react";
-import { Model } from "../model/EditorModel";
+import React from 'react';
+import { Model } from '../model/EditorModel';
 import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { StyleEditor } from './StyleEditor';
 import { ToolbarView } from './Toolbar';
 
-
-
-export const Row = css`
+export const Row = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: no-wrap;
   width: 100%;
 `;
 
-const Header = css`
+const Header = styled.div`
   grid-area: header;
 `;
-const Footer = css`
+const Footer = styled.div`
   grid-area: footer;
 `;
-const Edits = css`
+const Edits = styled.div`
   grid-area: edits;
 `;
-const CanvasCss = css`
+const CanvasCss = styled.div`
   grid-area: canvas;
 `;
-const LayersCss = css`
+const LayersCss = styled.div`
   grid-area: layers;
 `;
 
-export const Main = css`
+export const Main = styled.div`
   font-family: var(--sl-font-sans);
   font-size: var(--sl-font-size-medium);
   font-weight: var(--sl-font-weight-normal);
@@ -87,25 +85,29 @@ export const Main = css`
 export function EditorView(model: Model) {
   return (
     <>
-      <div className={Main}>
-        <div className={Header}>
+      <Main>
+        <Header>
           <ToolbarView {...model} />
-        </div>
-        <div className={Edits}>
+        </Header>
+        <Edits>
           <StyleEditor {...model} />
-          {model.selected && `Attributes for ${model.getComponentMeta(model.selected as RaisinElementNode)?.title || 'Element'}`}
+          {model.selected &&
+            `Attributes for ${
+              model.getComponentMeta(model.selected as RaisinElementNode)
+                ?.title || 'Element'
+            }`}
           <EditorPanel {...model} />
-        </div>
-        <div className={CanvasCss}>
+        </Edits>
+        <CanvasCss>
           <Canvas {...model} />
-        </div>
+        </CanvasCss>
 
-        <div className={LayersCss}>
+        <LayersCss>
           {' '}
           <Layers {...model} />
-        </div>
-        <div className={Footer}>Footer</div>
-      </div>
+        </LayersCss>
+        <Footer>Footer</Footer>
+      </Main>
     </>
   );
 }

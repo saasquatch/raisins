@@ -1,5 +1,5 @@
 import { RaisinElementNode, StyleNodeProps } from '@raisins/core';
-import { CssNodePlain } from '@types/css-tree';
+import { CssNodePlain } from 'css-tree';
 import { ElementType } from 'domelementtype';
 import React from 'react';
 import { Model } from '../model/EditorModel';
@@ -13,7 +13,7 @@ export function EditorPanel(props: Model) {
     const styleProps: StyleNodeProps = {
       node: element.style as CssNodePlain,
       setNode: nextStyle => {
-        const nextStyleVal: CssNodePlain = typeof nextStyle === 'function' ? nextStyle(element.style) : nextStyle;
+        const nextStyleVal: CssNodePlain = typeof nextStyle === 'function' ? nextStyle(element.style!) : nextStyle;
         props.replaceNode(element, { ...element, style: nextStyleVal } as RaisinElementNode);
       },
     };

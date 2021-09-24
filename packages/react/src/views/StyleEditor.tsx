@@ -1,8 +1,8 @@
 import { cssUtil, StyleNodeProps } from '@raisins/core';
-import { StateUpdater } from '@raisins/core/dist/util/NewState';
 import * as Css from 'css-tree';
-import { FormEvent } from 'react';
+import React, { FormEvent } from 'react';
 import { Model } from "../model/EditorModel";
+import { StateUpdater } from '../util/NewState';
 
 const { createChildUpdater, createUpdater } = cssUtil;
 export function StyleEditor(model: Model) {
@@ -161,6 +161,7 @@ function RawEditor(props: StyleNodeProps<Css.Raw>) {
   const onInput = (e: FormEvent<unknown>) => {
     const next = (e.target as HTMLInputElement).value;
     props.setNode((current: Css.Raw | undefined) => {
+      current;
       return { type: 'Raw', value: next };
     });
   };
