@@ -32,23 +32,3 @@ export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
 };
 
 autoBindSteps([feature], [selectorSteps]);
-
-// describe("Parse + select", () => {
-//   test("Can parse simple HTML", () => {
-//     const source = `<div>Example</div>`;
-//     const select = "div";
-//     const jsSelector = "node.children[0]";
-//     const node = parse(source);
-//     const found = selector(node, select);
-//     expect(found[0]).toBe(jsonata(jsSelector).evaluate({ node }));
-//   });
-
-//   test("Nested div", () => {
-//     const source = `<div>Outer<div>Inner</div></div>`;
-//     const select = "div div";
-//     const jsSelector = "node.children[0].children[1]";
-//     const node = parse(source);
-//     const found = selector(node, select);
-//     expect(found[0]).toBe(jsonata(jsSelector).evaluate({ node }));
-//   });
-// });
