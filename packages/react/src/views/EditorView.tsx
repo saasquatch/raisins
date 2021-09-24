@@ -1,13 +1,13 @@
-import styled from 'styled-components';
 import { RaisinElementNode } from '@raisins/core';
-import '@shoelace-style/shoelace/dist/themes/dark.css';
 import React from 'react';
+import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
 import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { StyleEditor } from './StyleEditor';
 import { ToolbarView } from './Toolbar';
+
 
 export const Row = styled.div`
   display: flex;
@@ -94,7 +94,7 @@ export function EditorView(model: Model) {
           {model.selected &&
             `Attributes for ${
               model.getComponentMeta(model.selected as RaisinElementNode)
-                ?.title || 'Element'
+                ?.title || 'Untitled Element'
             }`}
           <EditorPanel {...model} />
         </Edits>

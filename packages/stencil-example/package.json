@@ -47,6 +47,7 @@
     "microbundle": "^0.13.3",
     "penpal": "^6.1.0",
     "react-popper": "^2.2.5",
+    "snabbdom": "^3.1.0",
     "style-to-object": "^0.3.0",
     "styled-components": "^5.3.1",
     "tag-params": "^1.0.6",

@@ -1,6 +1,6 @@
 import { connectToChild } from 'penpal';
 import { useEffect, useRef, useState } from 'react';
-
+import {VNode} from "snabbdom"
 
 type NPMDependency = {
   package: string;
@@ -13,7 +13,7 @@ export type UseIframeProps<C> = {
    * A source document to use in the iframe
    */
   dependencies?: NPMDependency[];
-  /**ould go away
+  /**
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */
   renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => string;
@@ -32,19 +32,35 @@ export type ParentRPC = {
 };
 
 export type ChildRPC = {
-  render(html: string): void;
+  render(html: VNode): void;
 };
 
 const childApiSrc = `
 <script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
 <script type="module">
+import { init, classModule, attributesModule, styleModule, datasetModule, h } from "https://unpkg.com/snabbdom@3.1.0/build/index.js"
+
+const patch = init([
+  // Init patch function with chosen modules
+  classModule, // makes it easy to toggle classes
+  attributesModule, // for setting attributes on DOM elements
+  styleModule, // handles styling on elements with support for animations
+  datasetModule
+]);
+
+let prev = document.body;
+function patchAndCache(next){
+	patch(prev, next);
+	prev = next;
+}
+
 window.addEventListener('DOMContentLoaded',function () {
 
   window.myConnection = window.Penpal.connectToParent({
     // Methods child is exposing to parent
     methods: {
       render(content) {
-        document.body.innerHTML = content;
+        patchAndCache(content);
       },
     },
     debug: true
@@ -60,7 +76,10 @@ window.addEventListener('DOMContentLoaded',function () {
       if(e.target.dataset.id){
         parent.clicked(e.target.dataset.id);
       }else{
-        parent.clicked(e.target.closest("[data-id]").dataset.id);
+        const closestParent = e.target.closest("[data-id]");
+        if(closestParent){
+          parent.clicked(e.target.closest("[data-id]").dataset.id);
+        }
       }
     });
 
@@ -90,14 +109,7 @@ const iframeSrc = `
   ${scripts}
   ${childApiSrc}
 </head>
-<style>
-[rjs-selected]{
-  outline: 1px solid red;
-}
-</style>
-<body>
-  <div id="root">Penpal loading...</div>
-</body>
+<body></body>
 </html>`;
 
 /**

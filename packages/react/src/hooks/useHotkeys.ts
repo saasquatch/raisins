@@ -13,6 +13,7 @@ export function useHotkeys(core: CoreModel & HistoryModel) {
           event.preventDefault();
           undo();
           break;
+        case 'ctrl+shift+z':
         case 'ctrl+y':
           event.preventDefault();
           redo();
@@ -27,7 +28,7 @@ export function useHotkeys(core: CoreModel & HistoryModel) {
       }
     };
 
-    const keys = 'ctrl+y,ctrl+z,delete,backspace,d';
+    const keys = 'ctrl+y,ctrl+shift+z,ctrl+z,delete,backspace,d';
     hotkeys(keys, fn);
     return () => hotkeys.unbind(keys, fn);
   }, [undo, redo, deleteSelected]);

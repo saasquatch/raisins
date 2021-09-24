@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { css } from '@emotion/css';
+import styled from "styled-components";
 import SlButton from '@shoelace-style/react/dist/button';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import SlIcon from '@shoelace-style/react/dist/icon';
@@ -7,7 +6,7 @@ import React from "react";
 import { Model } from "../model/EditorModel";
 
 
-const ToolbarStyle = css`
+const ToolbarStyle = styled.div`
   padding: 10px;
   & > * {
     margin-left: 5px;
@@ -15,7 +14,7 @@ const ToolbarStyle = css`
 `;
 export function ToolbarView(props: Model) {
   return (
-    <div className={ToolbarStyle}>
+    <ToolbarStyle>
       Toolbar
       <SlButtonGroup>
         <SlButton size="small" pill onClick={() => props.undo()} disabled={!props.hasUndo}>
@@ -54,6 +53,6 @@ export function ToolbarView(props: Model) {
           </SlButton>
         ))}
       </SlButtonGroup> 
-    </div>
+    </ToolbarStyle>
   );
 }

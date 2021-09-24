@@ -9,6 +9,10 @@ const meta: Meta = {
 };
 export default meta;
 
+export function Example(){
+  return <div>I can do things</div>
+}
+
 export function Editor() {
   const model: Model = useEditor(`
   <div style="--sl-color-primary-500: blue;">

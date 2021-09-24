@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import ReactDOMServer from 'react-dom/server';
+import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
-import { ChildRPC, useSandboxedIframeRenderer } from './useSandboxedIframeRenderer';
-
-
+import { raisintoSnabdom } from './raisinToSnabdom';
+import {
+  ChildRPC,
+  useSandboxedIframeRenderer,
+} from './useSandboxedIframeRenderer';
 
 export type Size = {
   name: string;
@@ -19,7 +22,11 @@ const sizes: Size[] = [
 ];
 
 function useInnerHtmlIframeRenderer(model: CoreModel) {
-  const renderer = (iframe: HTMLIFrameElement, child: ChildRPC, Comp: React.FC): string => {
+  const renderer = (
+    iframe: HTMLIFrameElement,
+    child: ChildRPC,
+    Comp: React.FC
+  ): string => {
     if (!Comp) return ''; // no Component yet
     // if (!iframe.contentDocument) return;
     // const entryDiv = iframe.contentDocument!.querySelector("#root");
@@ -28,10 +35,30 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     // return ReactDOM.createPortal(<Comp />, entryDiv!);
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
-    child.render(htmlContent);
+    const vnode = raisintoSnabdom(model.node as RaisinDocumentNode, (d, n) => {
+      if (n === model.selected) {
+        return {
+          ...d,
+          attrs: {
+            ...d.attrs,
+          },
+          dataset:{
+            id: model.getId(n),
+          },
+          style:{
+            cursor: 'pointer',
+            outline: n === model.selected ? '2px solid red' : '',
+            outlineOffset: n === model.selected ? '-2px' : '',
+          }
+        };
+      }
+      return d;
+    });
+    child.render(vnode);
 
     return htmlContent!;
   };
+
   const onClick = (id: string) => model.setSelectedId(id);
   const props = useSandboxedIframeRenderer<React.FC>({
     renderer,
@@ -44,7 +71,6 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     containerRef: props.container,
   };
 }
-
 
 export default function useCanvas(props: CoreModel) {
   const frameProps = useInnerHtmlIframeRenderer(props);
