@@ -14,6 +14,9 @@ export type Size = {
   width: string;
   height: number;
 };
+
+export type Mode = 'preview' | 'edit' | 'html';
+
 const sizes: Size[] = [
   { name: 'Auto', width: 'auto', height: 1080 },
   { name: 'Large', width: '992px', height: 1080 },
@@ -22,30 +25,25 @@ const sizes: Size[] = [
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
 
-function useInnerHtmlIframeRenderer(model: CoreModel) {
+function useInnerHtmlIframeRenderer(model: CoreModel, mode: Mode) {
   const renderer = (
     iframe: HTMLIFrameElement,
     child: ChildRPC,
     Comp: React.FC
   ): string => {
     if (!Comp) return ''; // no Component yet
-    // if (!iframe.contentDocument) return;
-    // const entryDiv = iframe.contentDocument!.querySelector("#root");
-    // // iframe;
-    // //    stencilView.view = <Comp />;
-    // return ReactDOM.createPortal(<Comp />, entryDiv!);
-    const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
     const vnode = raisintoSnabdom(model.node as RaisinDocumentNode, (d, n) => {
-
-      
-      const {delayed, remove, ...rest} = d.style || {};
-      const style:VNodeStyle = {
+      if (mode === 'preview') {
+        return d;
+      }
+      const { delayed, remove, ...rest } = d.style || {};
+      const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
         outline: n === model.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
         outlineOffset: n === model.selected ? '-2px' : '',
-      }
+      };
       return {
         ...d,
         attrs: {
@@ -57,7 +55,7 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     });
     child.render(vnode);
 
-    return htmlContent!;
+    return '';
   };
 
   const onClick = (id: string) => model.setSelectedId(id);
@@ -74,13 +72,16 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
 }
 
 export default function useCanvas(props: CoreModel) {
-  const frameProps = useInnerHtmlIframeRenderer(props);
+  const [mode, setMode] = useState<Mode>('edit');
+  const frameProps = useInnerHtmlIframeRenderer(props, mode);
   const [size, setSize] = useState<Size>(sizes[0]);
 
   return {
     sizes,
     size,
     setSize,
+    mode,
+    setMode,
     ...frameProps,
   };
 }

@@ -7,7 +7,6 @@ import { useCore } from './useCore';
 import { useHotkeys } from './useHotkeys';
 import { useStyleEditor } from './useStyleEditor';
 
-export type Mode = 'preview' | 'edit' | 'html';
 
 export type InternalState = {
   current: RaisinNode;
@@ -32,7 +31,7 @@ export function useEditor(initialHTML: string): Model {
   }, [initialHTML]);
 
   const core = useCore(metamodel, initial);
-  const [mode, setMode] = useState<Mode>('edit');
+
 
   // Binds global event handlers
   useHotkeys(core);
@@ -40,8 +39,6 @@ export function useEditor(initialHTML: string): Model {
   // @ts-ignore
   return {
     ...core,
-    mode,
-    setMode,
     ...useStyleEditor({
       node: core.node,
       setNode: core.setNode,
