@@ -1,36 +1,74 @@
 {
   "name": "@raisins/react",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "source": "src/raisins-react.ts",
-  "exports": "./dist/raisins-react.modern.js",
-  "main": "./dist/raisins-react.cjs",
-  "module": "./dist/raisins-react.module.js",
-  "unpkg": "./dist/raisins-react.umd.js",
-  "scripts": {
-    "build": "microbundle",
-    "dev": "microbundle watch"
-  },
-  "author": "logvol",
+  "author": "Logan Volkers",
+  "version": "0.1.0",
   "license": "MIT",
-  "devDependencies": {
-    "microbundle": "^0.13.3"
+  "main": "dist/index.js",
+  "module": "dist/react.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
   },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --passWithNoTests",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "size-limit": [
+    {
+      "path": "dist/react.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/react.esm.js",
+      "limit": "10 KB"
+    }
+  ],
   "dependencies": {
-    "@emotion/css": "^11.1.3",
-    "@interactjs/core": "^1.10.11",
-    "@raisins/core": "^1.0.0",
-    "@saasquatch/universal-hooks": "^1.0.0",
-    "@shoelace-style/shoelace": "^2.0.0-beta.44",
-    "@types/css-tree": "^1.0.5",
-    "hotkeys-js": "^3.8.7",
-    "interactjs": "^1.10.11",
-    "penpal": "^5.3.0",
-    "react-popper": "^2.2.5",
-    "style-to-object": "^0.3.0",
-    "tag-params": "^1.0.6",
-    "typescript": "^4.3.4",
-    "uhtml": "^2.7.6"
+    "@raisins/core": "^0.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@size-limit/preset-small-lib": "^5.0.4",
+    "@storybook/addon-essentials": "^6.3.8",
+    "@storybook/addon-info": "^5.3.21",
+    "@storybook/addon-links": "^6.3.8",
+    "@storybook/addons": "^6.3.8",
+    "@storybook/react": "^6.3.8",
+    "@types/react": "^17.0.24",
+    "@types/react-dom": "^17.0.9",
+    "babel-loader": "^8.2.2",
+    "husky": "^7.0.2",
+    "react": "*",
+    "react-dom": "^16.14.0",
+    "react-is": "^17.0.2",
+    "size-limit": "^5.0.4",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3"
   }
 }
