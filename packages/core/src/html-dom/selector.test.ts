@@ -20,9 +20,14 @@ export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
   });
 
   then(/^it should return "(.*)"$/, (jsSelector: string) => {
-    expect(found[0]).toBe(
-      jsonata(jsSelector).evaluate({ node, undefined: undefined })
-    );
+    
+    let expected = jsonata(jsSelector).evaluate({ node, undefined: undefined })
+    if(!Array.isArray(expected)){
+        expected = [expected];
+    }
+    found.forEach((f,idx)=>{
+        expect(f).toBe(expected[idx])
+    })
   });
 };
 

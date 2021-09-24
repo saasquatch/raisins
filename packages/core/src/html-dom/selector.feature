@@ -118,7 +118,24 @@ Feature: Selecting by CSS selectors
 
         Examples:
             | HTML                           | Selector   |
+            | <div></div><div></div>         | div + div  |
             | <div>one</div><div>two</div>   | div + div  |
             | <div>one</div><div>two</div>   | div ~ div  |
             | <span>one</span><div>two</div> | span + div |
             | <span>one</span><div>two</div> | span ~ div |
+
+    Scenario Outline: Match multiple tags selectors
+        Given an html document
+            """
+            <HTML>
+            <HTML>
+            """
+        When we select "<Selector>"
+        Then it should return "node.children"
+
+        Examples:
+            | HTML                     | Selector |
+            | <div>I am a div</div>    | div      |
+            | <span>I am a span</span> | span     |
+            | <h1>I am an h1</h1>      | h1       |
+            | <b>I am an b</b>         | b        |
