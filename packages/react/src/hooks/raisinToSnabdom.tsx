@@ -1,6 +1,7 @@
 import React from "react";
 import { h, VNode, VNodeData } from 'snabbdom';
-import { htmlUtil, RaisinNode, RaisinDocumentNode } from '@raisins/core';
+import { htmlUtil, RaisinNode, RaisinDocumentNode, cssSerializer } from '@raisins/core';
+import styleToObject from "style-to-object";
 const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';
@@ -20,7 +21,16 @@ export function raisintoSnabdom(
       return undefined;
     },
     onElement(el, children) {
-      return h(el.tagName, modifier({ attrs: el.attribs }, el), children);
+      let styleObj;
+      try {
+        if(el.style){
+          styleObj = styleToObject(cssSerializer(el.style));
+        }
+      } finally {
+        styleObj = styleObj || {};
+      }
+
+      return h(el.tagName, modifier({ attrs: el.attribs, style:styleObj }, el), children);
     },
     onText(text) {
       return text.data;

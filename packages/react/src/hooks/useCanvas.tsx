@@ -36,23 +36,19 @@ function useInnerHtmlIframeRenderer(model: CoreModel) {
     const htmlContent = ReactDOMServer.renderToStaticMarkup(<Comp />);
 
     const vnode = raisintoSnabdom(model.node as RaisinDocumentNode, (d, n) => {
-      if (n === model.selected) {
-        return {
-          ...d,
-          attrs: {
-            ...d.attrs,
-          },
-          dataset:{
-            id: model.getId(n),
-          },
-          style:{
-            cursor: 'pointer',
-            outline: n === model.selected ? '2px solid red' : '',
-            outlineOffset: n === model.selected ? '-2px' : '',
-          }
-        };
-      }
-      return d;
+      return {
+        ...d,
+        attrs: {
+          ...d.attrs,
+          'raisins-id': model.getId(n),
+        },
+        style: {
+          ...d.style,
+          cursor: 'pointer',
+          outline: n === model.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
+          outlineOffset: n === model.selected ? '-2px' : '',
+        },
+      };
     });
     child.render(vnode);
 

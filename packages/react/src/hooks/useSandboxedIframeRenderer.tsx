@@ -73,12 +73,12 @@ window.addEventListener('DOMContentLoaded',function () {
     });
     ro.observe(document.body);
     document.body.addEventListener('click', function(e){
-      if(e.target.dataset.id){
-        parent.clicked(e.target.dataset.id);
+      if(e.target.getAttribute("raisins-id")){
+        parent.clicked(e.target.getAttribute("raisins-id"));
       }else{
-        const closestParent = e.target.closest("[data-id]");
+        const closestParent = e.target.closest("[raisins-id]");
         if(closestParent){
-          parent.clicked(e.target.closest("[data-id]").dataset.id);
+          parent.clicked(closestParent.getAttribute("raisins-id"));
         }
       }
     });
