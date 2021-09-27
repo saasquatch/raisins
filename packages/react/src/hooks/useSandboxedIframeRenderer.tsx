@@ -16,7 +16,7 @@ export type UseIframeProps<C> = {
   /**
    * A function to call when the iframe is ready to render, and whenever a render occurs
    */
-  renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => string;
+  renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => void;
 
   onClick(id: string): void;
 
@@ -185,8 +185,6 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onCl
     } else {
       // Render will be called when the iframe is loaded
     }
-
-    // return createElement(initialComponentRef.current);
   }
 
   return {

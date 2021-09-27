@@ -1,9 +1,17 @@
-import { htmlParser as parse, htmlUtil, RaisinElementNode, RaisinTextNode } from '@raisins/core';
+import {
+  htmlParser as parse,
+  htmlUtil,
+  RaisinElementNode,
+  RaisinTextNode,
+} from '@raisins/core';
 import { ElementType } from 'domelementtype';
+import { useEffect, useMemo, useState } from 'react';
+import { NewState } from '../../../core/dist/util/NewState';
 import { ComponentType, SlotType } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
+import registry, { PackageJson, unpkgNpmRegistry } from '../util/NPMRegistry';
 
 const { visit } = htmlUtil;
 
@@ -35,7 +43,9 @@ const SquatchComponents: ComponentType[] = [
   {
     tagName: 'sqh-grid',
     title: '3 Col Grid',
-    slots: [{ ...DefaultSlot, orientation: 'left-right', childTags: ['sqh-column'] }],
+    slots: [
+      { ...DefaultSlot, orientation: 'left-right', childTags: ['sqh-column'] },
+    ],
   },
   {
     tagName: 'sqh-column',
@@ -59,7 +69,9 @@ const blocks: RaisinElementNode[] = [
     tagName: 'div',
     nodeType: 1,
     attribs: {},
-    children: [{ type: ElementType.Text, data: 'I am a div' } as RaisinTextNode],
+    children: [
+      { type: ElementType.Text, data: 'I am a div' } as RaisinTextNode,
+    ],
   },
   blockFromHtml(`<sqh-stat-component></sqh-stat-component>`),
   blockFromHtml(`<sqh-copy-link-button 
@@ -199,15 +211,64 @@ This kitten is as cute as he is playful. Bring him home today!<br>
 <sl-button submit>Submit</sl-button>
 </sl-form>
 `),
-].filter(x => typeof x !== 'undefined') as RaisinElementNode[];
+].filter((x) => typeof x !== 'undefined') as RaisinElementNode[];
 
-const components: ComponentType[] = [...Object.values(HTMLComponents), ...SquatchComponents, ...ShoelaceComponents];
+const components: ComponentType[] = [
+  ...Object.values(HTMLComponents),
+  ...SquatchComponents,
+  ...ShoelaceComponents,
+];
+
+type InternalState = {
+  modules: Module[];
+  loading: boolean;
+  moduleDetails: ModuleDetails[];
+};
+
 /**
  * For managing the types of components that are edited and their properties
  */
 export function useComponentModel() {
+  const [_internalState, _setInternal] = useState<InternalState>({
+    loading: false,
+    modules: [],
+    moduleDetails: [],
+  });
+  const setModules = (m: NewState<Module[]>) => {
+    _setInternal((i) => {
+      const next = typeof m === 'function' ? m(i.modules) : m;
+
+      (async () => {
+        const details: ModuleDetails[] = [];
+        for (const module of next) {
+          const detail = await unpkgNpmRegistry.getPackageJson(module);
+          details.push({
+            ...module,
+            'package.json': detail,
+          });
+        }
+        _setInternal({
+          loading: false,
+          modules: next,
+          moduleDetails: details,
+        });
+      })();
+      return {
+        modules: next,
+        loading: true,
+        moduleDetails: [],
+      };
+    });
+  };
+  const addModule: (module: Module) => void = (module) =>
+    setModules((modules) => [...modules, module]);
+  const removeModule: (module: Module) => void = (module) =>
+    setModules((modules) => modules.filter((e) => e !== module));
+  const removeModuleByName: (name: string) => void = (name) =>
+    setModules((modules) => modules.filter((e) => e.name !== name));
+
   function getComponentMeta(node: RaisinElementNode): ComponentType {
-    const found = components.find(c => c.tagName === node.tagName);
+    const found = components.find((c) => c.tagName === node.tagName);
     if (found) return found;
 
     return {
@@ -217,19 +278,26 @@ export function useComponentModel() {
     };
   }
 
-  function isValidChild(from: RaisinElementNode, to: RaisinElementNode, slot: string) {
+  function isValidChild(
+    from: RaisinElementNode,
+    to: RaisinElementNode,
+    slot: string
+  ) {
     if (from === to) {
       // Can't drop into yourself
       return false;
     }
     const slots = getComponentMeta(to)?.slots;
-    const slotMeta = slots?.find(s => s.key === slot);
+    const slotMeta = slots?.find((s) => s.key === slot);
     if (!slotMeta) return false;
 
     const element = visit(from, {
-      onElement: n => n,
+      onElement: (n) => n,
     });
-    const parentAllowsChild = slotMeta.childTags?.includes('*') || element?.tagName && slotMeta.childTags?.includes(element?.tagName) || false;
+    const parentAllowsChild =
+      slotMeta.childTags?.includes('*') ||
+      (element?.tagName && slotMeta.childTags?.includes(element?.tagName)) ||
+      false;
 
     const childMeta = getComponentMeta(from);
     const childAllowsParents = doesChildAllowParent(childMeta, to);
@@ -237,13 +305,16 @@ export function useComponentModel() {
     return parentAllowsChild && childAllowsParents;
   }
 
-  function getValidChildren(node: RaisinElementNode, slot: string): RaisinElementNode[] {
+  function getValidChildren(
+    node: RaisinElementNode,
+    slot: string
+  ): RaisinElementNode[] {
     const slots = getComponentMeta(node)?.slots;
     if (!slots) {
       // No documented slots
       return [];
     }
-    const slotMeta = slots.find(s => s.key === slot);
+    const slotMeta = slots.find((s) => s.key === slot);
     if (!slotMeta) {
       // No slot meta for slot
       return [];
@@ -254,7 +325,8 @@ export function useComponentModel() {
       return [];
     }
     const filter = (block: RaisinElementNode) => {
-      const parentAllowsChild = childTags?.includes('*') || childTags?.includes(block.tagName);
+      const parentAllowsChild =
+        childTags?.includes('*') || childTags?.includes(block.tagName);
       const childMeta = getComponentMeta(block);
       const childAllowsParents = doesChildAllowParent(childMeta, node);
       return parentAllowsChild && childAllowsParents;
@@ -275,6 +347,13 @@ export function useComponentModel() {
   }
 
   return {
+    loadingModules: _internalState.loading,
+    modules: _internalState.moduleDetails,
+    moduleDetails: _internalState.moduleDetails,
+    addModule,
+    removeModule,
+    removeModuleByName,
+    setModules,
     getComponentMeta,
     getSlots: getSlotsInternal,
     blocks,
@@ -284,12 +363,45 @@ export function useComponentModel() {
   };
 }
 
-export type ComponentModel = ReturnType<typeof useComponentModel>;
+export type Module = {
+  name: string;
+  version?: string;
+  filePath?: string;
+};
+
+export type ModuleDetails = {
+  'package.json': PackageJson;
+} & Module;
+
+export type ComponentModel = {
+  loadingModules: boolean;
+  modules: Module[];
+  moduleDetails: ModuleDetails[];
+  addModule(module: Module): void;
+  removeModule(module: Module): void;
+  removeModuleByName(name: string): void;
+  setModules(moduleS: Module[]): void;
+  getComponentMeta: (node: RaisinElementNode) => ComponentType;
+  getSlots: (node: RaisinElementNode) => NodeWithSlots;
+  blocks: RaisinElementNode[];
+  getValidChildren: (
+    node: RaisinElementNode,
+    slot: string
+  ) => RaisinElementNode[];
+  canHaveChildren: (node: RaisinElementNode, slot: string) => boolean;
+  isValidChild: (
+    from: RaisinElementNode,
+    to: RaisinElementNode,
+    slot: string
+  ) => boolean;
+};
 
 function doesChildAllowParent(childMeta: ComponentType, to: RaisinElementNode) {
-  const childHasRestrictions = Array.isArray(childMeta?.parentTags) && childMeta.parentTags.length > 0;
+  const childHasRestrictions =
+    Array.isArray(childMeta?.parentTags) && childMeta.parentTags.length > 0;
 
-  const childAllowsParents = !childHasRestrictions || childMeta.parentTags!.includes(to.tagName);
+  const childAllowsParents =
+    !childHasRestrictions || childMeta.parentTags!.includes(to.tagName);
   return childAllowsParents;
 }
 

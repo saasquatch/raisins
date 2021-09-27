@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import ReactDOMServer from 'react-dom/server';
-import { VNodeStyle } from 'snabbdom';
+import { h, VNode, VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
 import { raisintoSnabdom } from './raisinToSnabdom';
@@ -29,39 +28,18 @@ function useInnerHtmlIframeRenderer(model: CoreModel, mode: Mode) {
   const renderer = (
     iframe: HTMLIFrameElement,
     child: ChildRPC,
-    Comp: React.FC
-  ): string => {
-    if (!Comp) return ''; // no Component yet
+    Comp: VNode
+  ): void => {
+    if (!Comp) return; // no Component yet
 
-    const vnode = raisintoSnabdom(model.node as RaisinDocumentNode, (d, n) => {
-      if (mode === 'preview') {
-        return d;
-      }
-      const { delayed, remove, ...rest } = d.style || {};
-      const style: VNodeStyle = {
-        ...rest,
-        cursor: 'pointer',
-        outline: n === model.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
-        outlineOffset: n === model.selected ? '-2px' : '',
-      };
-      return {
-        ...d,
-        attrs: {
-          ...d.attrs,
-          'raisins-id': model.getId(n),
-        },
-        style,
-      };
-    });
-    child.render(vnode);
 
-    return '';
+    child.render(Comp);
   };
 
   const onClick = (id: string) => model.setSelectedId(id);
-  const props = useSandboxedIframeRenderer<React.FC>({
+  const props = useSandboxedIframeRenderer<VNode>({
     renderer,
-    initialComponent: () => <div />,
+    initialComponent: h("div",{}),
     onClick,
   });
 
@@ -76,6 +54,28 @@ export default function useCanvas(props: CoreModel) {
   const frameProps = useInnerHtmlIframeRenderer(props, mode);
   const [size, setSize] = useState<Size>(sizes[0]);
 
+  const vnode = raisintoSnabdom(props.node as RaisinDocumentNode, (d, n) => {
+    if (mode === 'preview') {
+      return d;
+    }
+    const { delayed, remove, ...rest } = d.style || {};
+    const style: VNodeStyle = {
+      ...rest,
+      cursor: 'pointer',
+      outline: n === props.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
+      outlineOffset: n === props.selected ? '-2px' : '',
+    };
+    return {
+      ...d,
+      attrs: {
+        ...d.attrs,
+        'raisins-id': props.getId(n),
+      },
+      style,
+    };
+  });
+
+  frameProps.renderInIframe(vnode);
   return {
     sizes,
     size,
