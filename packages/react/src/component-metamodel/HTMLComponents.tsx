@@ -1,22 +1,23 @@
-import { ComponentType, SlotType } from './Component';
+import { CustomElement, Slot } from './Component';
 
-const DefaultSlot: SlotType = {
-  key: '',
-  title: 'Default slot',
+const DefaultSlot: Slot = {
+  name: '',
+  summary: 'Default slot',
 };
 
-const COMMON_HTML_ATTRS_SCHEMA = {
-  properties: {
-    id: {
-      type: 'string',
-    },
-    title: {
-      type: 'string',
-    },
+const COMMON_HTML_ATTRS_SCHEMA = [
+  {
+    name: 'id',
+    type: 'string',
   },
-};
+  {
+    name: 'title',
+    type: 'string',
+  },
+];
+
 // 'a',
-export const A: ComponentType = {
+export const A: CustomElement = {
   title: 'Anchor',
   tagName: 'a',
 };
@@ -35,33 +36,38 @@ export const A: ComponentType = {
 // 'blockquote',
 // 'body',
 // 'br',
+export const BR: CustomElement = {
+  title: 'Line Break',
+  tagName: 'br',
+  slots: [{ ...DefaultSlot }],
+};
 // 'button',
 // 'canvas',
 // 'caption',
-export const CAPTION: ComponentType = {
+export const CAPTION: CustomElement = {
   title: 'Table Caption',
   tagName: 'caption',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  parentTags: ['table'],
+  validParents: ['table'],
   slots: [{ ...DefaultSlot }],
 };
 // 'cite',
 // 'code',
 // 'col',
-export const COL: ComponentType = {
+export const COL: CustomElement = {
   title: 'Table Column',
   tagName: 'col',
   // Could use `span` property
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  parentTags: ['colgroup'],
+  validParents: ['colgroup'],
 };
 // 'colgroup',
-export const COLGROUP: ComponentType = {
+export const COLGROUP: CustomElement = {
   title: 'Table Column Group',
   tagName: 'colgroup',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  parentTags: ['table'],
-  slots: [{ ...DefaultSlot, childTags: ['col'] }],
+  validParents: ['table'],
+  slots: [{ ...DefaultSlot, validChildren: ['col'] }],
 };
 // 'data',
 // 'datalist',
@@ -71,11 +77,11 @@ export const COLGROUP: ComponentType = {
 // 'dfn',
 // 'dialog',
 // 'div',
-export const DIV: ComponentType = {
+export const DIV: CustomElement = {
   title: 'Block',
   tagName: 'div',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot, childTags: ['*'] }],
+  slots: [{ ...DefaultSlot, validChildren: ['*'] }],
 };
 
 // 'dl',
@@ -88,38 +94,38 @@ export const DIV: ComponentType = {
 // 'footer',
 // 'form',
 // 'h1',
-export const H1: ComponentType = {
+export const H1: CustomElement = {
   title: 'Heading 1',
   tagName: 'h1',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
   slots: [DefaultSlot],
 };
 // 'h2',
-export const H2: ComponentType = {
+export const H2: CustomElement = {
   title: 'Heading 2',
   tagName: 'h2',
   slots: [DefaultSlot],
 };
 // 'h3',
-export const H3: ComponentType = {
+export const H3: CustomElement = {
   title: 'Heading 3',
   tagName: 'h3',
   slots: [DefaultSlot],
 };
 // 'h4',
-export const H4: ComponentType = {
+export const H4: CustomElement = {
   title: 'Heading 4',
   tagName: 'h4',
   slots: [DefaultSlot],
 };
 // 'h5',
-export const H5: ComponentType = {
+export const H5: CustomElement = {
   title: 'Heading 5',
   tagName: 'h5',
   slots: [DefaultSlot],
 };
 // 'h6',
-export const H6: ComponentType = {
+export const H6: CustomElement = {
   title: 'Heading 6',
   tagName: 'h6',
   slots: [DefaultSlot],
@@ -132,7 +138,7 @@ export const H6: ComponentType = {
 // 'i',
 // 'iframe',
 // 'img',
-export const IMG: ComponentType = {
+export const IMG: CustomElement = {
   title: 'Image',
   tagName: 'img',
 };
@@ -160,7 +166,7 @@ export const IMG: ComponentType = {
 // 'option',
 // 'output',
 // 'p',
-export const P: ComponentType = {
+export const P: CustomElement = {
   title: 'Paragraph',
   tagName: 'p',
   slots: [DefaultSlot],
@@ -179,106 +185,122 @@ export const P: ComponentType = {
 // 'section',
 // 'select',
 // 'small',
+export const SMALL: CustomElement = {
+  title: 'Small Text',
+  tagName: 'small',
+  attributes: COMMON_HTML_ATTRS_SCHEMA,
+  slots: [{ ...DefaultSlot }],
+};
 // 'source',
 // 'span',
-export const SPAN: ComponentType = {
+export const SPAN: CustomElement = {
   title: 'Text (span)',
   tagName: 'span',
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['span'],
+      validChildren: ['span'],
     },
   ],
 };
 // 'strong',
+export const STRONG: CustomElement = {
+  title: 'Text (strong)',
+  tagName: 'strong',
+  slots: [
+    {
+      ...DefaultSlot,
+      validChildren: ['span'],
+    },
+  ],
+};
 // 'style',
 // 'sub',
 // 'summary',
 // 'sup',
 // 'table',
-export const TABLE: ComponentType = {
+export const TABLE: CustomElement = {
   title: 'Table',
   tagName: 'table',
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['caption', 'colgroup', 'thead', 'tbody', 'tr', 'tfoot'],
+      validChildren: ['caption', 'colgroup', 'thead', 'tbody', 'tr', 'tfoot'],
     },
   ],
 };
 // 'tbody',
-export const TBODY: ComponentType = {
+export const TBODY: CustomElement = {
   title: 'Table Body',
   tagName: 'tbody',
-  parentTags: ['table'],
+  validParents: ['table'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['tr'],
+      validChildren: ['tr'],
     },
   ],
 };
 // 'td',
-export const TD: ComponentType = {
+export const TD: CustomElement = {
   title: 'Table Cell',
   tagName: 'td',
-  parentTags: ['tr'],
+  validParents: ['tr'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['*'],
+      validChildren: ['*'],
     },
   ],
 };
 // 'textarea',
 // 'tfoot',
-export const TFOOT: ComponentType = {
+export const TFOOT: CustomElement = {
   title: 'Table Footer',
   tagName: 'tfoot',
-  parentTags: ['table'],
+  validParents: ['table'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['tr'],
+      validChildren: ['tr'],
     },
   ],
 };
 // 'th',
-export const TH: ComponentType = {
+export const TH: CustomElement = {
   title: 'Table Header Cell',
   tagName: 'th',
-  parentTags: ['tr'],
+  validParents: ['tr'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['*'],
+      validChildren: ['*'],
     },
   ],
 };
 // 'thead',
-export const THEAD: ComponentType = {
+export const THEAD: CustomElement = {
   title: 'Table Header',
   tagName: 'thead',
-  parentTags: ['table'],
+  validParents: ['table'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['tr'],
+      validChildren: ['tr'],
     },
   ],
 };
 // 'time',
 // 'title',
 // 'tr',
-export const TR: ComponentType = {
+export const TR: CustomElement = {
   title: 'Table Row',
   tagName: 'tr',
-  parentTags: ['thead', 'tfoot', 'tbody'],
+  validParents: ['thead', 'tfoot', 'tbody'],
   slots: [
     {
       ...DefaultSlot,
-      childTags: ['td', 'th'],
+      validChildren: ['td', 'th'],
     },
   ],
 };

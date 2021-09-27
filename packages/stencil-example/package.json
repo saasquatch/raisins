@@ -27,6 +27,7 @@
     "@interactjs/core": "^1.10.11",
     "@interactjs/types": "^1.10.2",
     "@raisins/core": "^0.0.1",
+    "@raisins/schema": "^0.0.1",
     "@saasquatch/stencil-hooks": "^1.0.0",
     "@saasquatch/universal-hooks": "^1.0.0",
     "@shoelace-style/shoelace": "^2.0.0-beta.25",

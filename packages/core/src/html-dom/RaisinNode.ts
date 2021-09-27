@@ -2,8 +2,7 @@ import { CssNodePlain } from 'css-tree';
 import { ElementType } from 'domelementtype';
 
 /**
- * This object will be used as the prototype for Nodes when creating a
- * DOM-Level-1-compliant structure.
+ * The base used as the prototype for Nodes
  */
 export interface RaisinNode<T extends ElementType = ElementType> {
   type: T;

@@ -7,7 +7,7 @@ import {
 import { ElementType } from 'domelementtype';
 import { useState } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
-import { ComponentType, SlotType } from '../component-metamodel/Component';
+import { CustomElement, Slot } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
@@ -16,15 +16,15 @@ import { PackageJson, unpkgNpmRegistry } from '../util/NPMRegistry';
 
 const { visit } = htmlUtil;
 
-const DefaultSlot: SlotType = {
-  key: '',
-  title: 'Default slot',
+const DefaultSlot: Slot = {
+  name: '',
+  summary: 'Default slot',
 };
-const SquatchComponents: ComponentType[] = [
+const SquatchComponents: CustomElement[] = [
   {
     tagName: 'sqh-global-container',
     title: 'Container',
-    slots: [{ ...DefaultSlot, childTags: ['*'] }],
+    slots: [{ ...DefaultSlot, validChildren: ['*'] }],
   },
   { tagName: 'sqh-text-component', title: 'Text' },
   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
@@ -32,12 +32,12 @@ const SquatchComponents: ComponentType[] = [
   {
     tagName: 'sqh-stats-container',
     title: 'Stats',
-    slots: [{ ...DefaultSlot, childTags: ['sqh-stat-component'] }],
+    slots: [{ ...DefaultSlot, validChildren: ['sqh-stat-component'] }],
   },
   {
     tagName: 'sqh-stat-component',
     title: 'Stat',
-    parentTags: ['sqh-stats-container'],
+    validParents: ['sqh-stats-container'],
   },
   { tagName: 'sqh-referral-list', title: 'Referrals' },
   // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
@@ -45,18 +45,18 @@ const SquatchComponents: ComponentType[] = [
     tagName: 'sqh-grid',
     title: '3 Col Grid',
     slots: [
-      { ...DefaultSlot, orientation: 'left-right', childTags: ['sqh-column'] },
+      { ...DefaultSlot, orientation: 'left-right', validChildren: ['sqh-column'] },
     ],
   },
   {
     tagName: 'sqh-column',
     title: 'Column',
-    parentTags: ['sqh-grid'],
-    slots: [{ ...DefaultSlot, childTags: ['*'] }],
+    validParents: ['sqh-grid'],
+    slots: [{ ...DefaultSlot, validChildren: ['*'] }],
   },
 ];
 
-const ShoelaceComponents: ComponentType[] = [
+const ShoelaceComponents: CustomElement[] = [
   { tagName: 'sl-tab-group', title: 'Tab Group' },
   { tagName: 'sl-tab', title: 'Tab' },
   { tagName: 'sl-tab-panel', title: 'Tab Panel' },
@@ -214,7 +214,7 @@ This kitten is as cute as he is playful. Bring him home today!<br>
 `),
 ].filter((x) => typeof x !== 'undefined') as RaisinElementNode[];
 
-const components: ComponentType[] = [
+const components: CustomElement[] = [
   ...Object.values(HTMLComponents),
   ...SquatchComponents,
   ...ShoelaceComponents,
@@ -268,14 +268,14 @@ export function useComponentModel() {
   const removeModuleByName: (name: string) => void = (name) =>
     setModules((modules) => modules.filter((e) => e.name !== name));
 
-  function getComponentMeta(node: RaisinElementNode): ComponentType {
+  function getComponentMeta(node: RaisinElementNode): CustomElement {
     const found = components.find((c) => c.tagName === node.tagName);
     if (found) return found;
 
     return {
       tagName: node.tagName,
       title: node.tagName,
-      slots: [{ key: '', title: 'Default slot' }],
+      slots: [{ name: '', summary: 'Default slot' }],
     };
   }
 
@@ -289,15 +289,15 @@ export function useComponentModel() {
       return false;
     }
     const slots = getComponentMeta(to)?.slots;
-    const slotMeta = slots?.find((s) => s.key === slot);
+    const slotMeta = slots?.find((s) => s.name === slot);
     if (!slotMeta) return false;
 
     const element = visit(from, {
       onElement: (n) => n,
     });
     const parentAllowsChild =
-      slotMeta.childTags?.includes('*') ||
-      (element?.tagName && slotMeta.childTags?.includes(element?.tagName)) ||
+      slotMeta.validChildren?.includes('*') ||
+      (element?.tagName && slotMeta.validChildren?.includes(element?.tagName)) ||
       false;
 
     const childMeta = getComponentMeta(from);
@@ -315,12 +315,12 @@ export function useComponentModel() {
       // No documented slots
       return [];
     }
-    const slotMeta = slots.find((s) => s.key === slot);
+    const slotMeta = slots.find((s) => s.name === slot);
     if (!slotMeta) {
       // No slot meta for slot
       return [];
     }
-    const { childTags } = slotMeta;
+    const { validChildren: childTags } = slotMeta;
     if (!Array.isArray(childTags) || childTags.length < 1) {
       // No valid children
       return [];
@@ -382,7 +382,7 @@ export type ComponentModel = {
   removeModule(module: Module): void;
   removeModuleByName(name: string): void;
   setModules(moduleS: Module[]): void;
-  getComponentMeta: (node: RaisinElementNode) => ComponentType;
+  getComponentMeta: (node: RaisinElementNode) => CustomElement;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: RaisinElementNode[];
   getValidChildren: (
@@ -397,12 +397,12 @@ export type ComponentModel = {
   ) => boolean;
 };
 
-function doesChildAllowParent(childMeta: ComponentType, to: RaisinElementNode) {
+function doesChildAllowParent(childMeta: CustomElement, to: RaisinElementNode) {
   const childHasRestrictions =
-    Array.isArray(childMeta?.parentTags) && childMeta.parentTags.length > 0;
+    Array.isArray(childMeta?.validParents) && childMeta.validParents.length > 0;
 
   const childAllowsParents =
-    !childHasRestrictions || childMeta.parentTags!.includes(to.tagName);
+    !childHasRestrictions || childMeta.validParents!.includes(to.tagName);
   return childAllowsParents;
 }
 

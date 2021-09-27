@@ -63,6 +63,7 @@
     "typescript": "^3.9.10"
   },
   "dependencies": {
+    "@raisins/schema": "^0.0.1",
     "classnames": "^2.3.1",
     "css-select": "^4.1.3",
     "css-tree": "*",

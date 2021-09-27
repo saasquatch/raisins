@@ -24,15 +24,15 @@ export function getSlots(node: RaisinNode, getComponentMeta: Model['getComponent
       const meta = getComponentMeta(el);
       if (meta.slots?.length) {
         const slots = meta.slots.map(slot => {
-          if (slot.key === '') {
+          if (slot.name === '') {
           }
           // @ts-ignore -- add better type checking for node types
-          const myChildren = children.filter(x => x).filter(c => c.node?.attribs?.slot === slot.key || (slot.key === '' && c.node?.attribs?.slot === undefined));
+          const myChildren = children.filter(x => x).filter(c => c.node?.attribs?.slot === slot.name || (slot.name === '' && c.node?.attribs?.slot === undefined));
 
           // TODO: Filter slots so they don't show text nodes
           return {
-            key: slot.key,
-            name: slot.title,
+            key: slot.name,
+            name: slot.summary ?? slot.name,
             children: myChildren,
           };
         });

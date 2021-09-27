@@ -1,27 +1,4 @@
-type JSONSchema = Record<string, any>;
+import * as schema from "@raisins/schema/schema";
 
-
-export interface RaisinLibrary{
-  name: string;
-  components?: ComponentType[];
-}
-
-export interface ComponentType {
-  title: string;
-  tagName: string;
-  attributes?: JSONSchema;
-
-  parentTags?: string[];
-  slots?: SlotType[];
-}
-
-export interface SlotType {
-  title: string;
-  key: string;
-  /**
-   * Layout of the slot. Used for UI hints on layout
-   */
-  orientation?: 'up-down' | 'left-right' | 'right-left' | 'down-up';
-
-  childTags?: string[];
-}
+export type CustomElement = schema.CustomElement
+export type Slot = schema.Slot
