@@ -1,5 +1,11 @@
 type JSONSchema = Record<string, any>;
 
+
+export interface RaisinLibrary{
+  name: string;
+  components?: ComponentType[];
+}
+
 export interface ComponentType {
   title: string;
   tagName: string;

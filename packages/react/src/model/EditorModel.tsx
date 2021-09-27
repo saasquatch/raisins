@@ -1,7 +1,6 @@
 import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import useCanvas from '../hooks/useCanvas';
+import useCanvas, { Mode } from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
-import { Mode } from '../hooks/useEditor';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { StateUpdater } from '../util/NewState';
 

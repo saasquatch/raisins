@@ -8,6 +8,8 @@ const { IdentityVisitor, replace, visit } = htmlUtil;
 
 type Props = { node: RaisinNode; setNode: StateUpdater<RaisinNode>; parents: WeakMap<RaisinNode, RaisinNodeWithChildren>; componentModel: ComponentModel };
 
+
+// TODO: Color functions: https://github.com/scttcper/tinycolor
 export function useStyleEditor(props: Props) {
   const sheets = useMemo(() => {
     // Finds all style nodes.

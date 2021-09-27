@@ -2,16 +2,17 @@ import {
   htmlParser as parse,
   htmlUtil,
   RaisinElementNode,
-  RaisinTextNode,
+  RaisinTextNode
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
-import { useEffect, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
 import { ComponentType, SlotType } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
-import registry, { PackageJson, unpkgNpmRegistry } from '../util/NPMRegistry';
+import { PackageJson, unpkgNpmRegistry } from '../util/NPMRegistry';
+
 
 const { visit } = htmlUtil;
 
