@@ -40,6 +40,7 @@ export type ChildRPC = {
   render(html: VNode): void;
 };
 
+// TODO: Extract raisins-id as a constant -- also make configurable?
 const childApiSrc = `
 <script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
 <script type="module">
