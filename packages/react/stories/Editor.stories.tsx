@@ -15,8 +15,8 @@ export function Example(){
 
 export function Editor() {
   const model: Model = useEditor(`
-  <div style="--sl-color-primary-500: blue;">
-  <sl-card class="card-overview"  style="--sl-color-primary-500: blue;">
+  <div style="--sl-color-primary-600: pink;">
+  <sl-card class="card-overview"  style="--sl-color-primary-600: orange;">
 
   <strong>Mittens</strong>
   This kitten is as cute as he is playful. Bring him home today!
