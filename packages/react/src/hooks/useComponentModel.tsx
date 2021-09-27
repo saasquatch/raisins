@@ -256,7 +256,7 @@ export function useComponentModel() {
       return {
         modules: next,
         loading: true,
-        moduleDetails: [],
+        moduleDetails: i.moduleDetails,
       };
     });
   };

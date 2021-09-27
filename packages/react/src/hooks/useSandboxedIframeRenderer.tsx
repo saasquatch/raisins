@@ -1,6 +1,6 @@
 import { connectToChild } from 'penpal';
 import { useEffect, useRef, useState } from 'react';
-import {VNode} from "snabbdom"
+import { VNode } from 'snabbdom';
 
 type NPMDependency = {
   package: string;
@@ -19,6 +19,11 @@ export type UseIframeProps<C> = {
   renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => void;
 
   onClick(id: string): void;
+
+  /**
+   * The head, used for scripts and styles. When changed will reload the iframe.
+   */
+  head: string;
 
   /**
    * The component to render
@@ -91,22 +96,12 @@ window.addEventListener('DOMContentLoaded',function () {
 
 </script>
 `;
-const scripts = [
-  `
-<link rel="stylesheet" href="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css" />
-<link rel="stylesheet" href="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.27/themes/dark.css" />
-<script type="module" src="https://fast.ssqt.io/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
-<style>body{margin:0;}</style>
-<!-- TODO: Script management -->
-<script type="text/javascript" src="https://fast.ssqt.io/npm/@saasquatch/vanilla-components@1.0.x/dist/widget-components.js"></script>
-<link href="https://fast.ssqt.io/npm/@saasquatch/vanilla-components-assets@0.0.x/icons.css" type="text/css" rel="stylesheet" />`,
-];
 
-const iframeSrc = `
+const iframeSrc = (head: string) => `
 <!DOCTYPE html>
 <html>
 <head>
-  ${scripts}
+  ${head}
   ${childApiSrc}
 </head>
 <body></body>
@@ -120,10 +115,13 @@ const iframeSrc = `
  * @param props - controls for how to render the iframe
  * @returns
  */
-export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onClick }: UseIframeProps<C>) {
-  // TODO: - allow canvas styles to be added externally (see hard-coded rjs-selected)
+export function useSandboxedIframeRenderer<C>({
+  renderer,
+  initialComponent,
+  onClick,
+  head,
+}: UseIframeProps<C>) {
   // TODO: - allow scripts to be added / removed / swapped. (should re-render entire frame on script update? otherwise version updates might not properly load?)
-  // TODO:
 
   const initialComponentRef = useRef<C>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
@@ -131,52 +129,54 @@ export function useSandboxedIframeRenderer<C>({ renderer, initialComponent, onCl
   const [loaded, setLoaded] = useState(false);
   const childRef = useRef<ChildRPC>();
   useEffect(() => {
-      if (container.current) {
-        const el = container.current;
-        const iframe: HTMLIFrameElement = document.createElement('iframe');
-        iframeRef.current = iframe;
-        iframe.srcdoc = iframeSrc;
-        iframe.width = '100%';
-        iframe.scrolling = 'no';
-        iframe.setAttribute('style', 'border: 0; background-color: none; width: 1px; min-width: 100%;');
-        iframe.setAttribute('sandbox', 'allow-scripts');        
+    if (container.current) {
+      const el = container.current;
+      const iframe: HTMLIFrameElement = document.createElement('iframe');
+      iframeRef.current = iframe;
+      iframe.srcdoc = iframeSrc(head);
+      iframe.width = '100%';
+      iframe.scrolling = 'no';
+      iframe.setAttribute(
+        'style',
+        'border: 0; background-color: none; width: 1px; min-width: 100%;'
+      );
+      iframe.setAttribute('sandbox', 'allow-scripts');
 
-        el.appendChild(iframe);
-        const parentRPC: ParentRPC = {
-          resizeHeight(pixels) {
-            iframe.height = pixels;
-          },
-          clicked(id) {
-            onClick(id);
-          },
-        };
+      el.appendChild(iframe);
+      const parentRPC: ParentRPC = {
+        resizeHeight(pixels) {
+          iframe.height = pixels;
+        },
+        clicked(id) {
+          onClick(id);
+        },
+      };
 
-        const connection = connectToChild<ChildRPC>({
-          // The iframe to which a connection should be made
-          iframe,
-          // Methods the parent is exposing to the child
-          methods: parentRPC,
-          timeout: 1000,
-          childOrigin: 'null',
-        });
-        connection.promise
-          .then(async child => {
-            childRef.current = child;
-            setLoaded(true);
-          })
-          .catch(e => {});
+      const connection = connectToChild<ChildRPC>({
+        // The iframe to which a connection should be made
+        iframe,
+        // Methods the parent is exposing to the child
+        methods: parentRPC,
+        timeout: 1000,
+        childOrigin: 'null',
+      });
+      connection.promise
+        .then(async (child) => {
+          childRef.current = child;
+          renderer(iframe, childRef.current!, initialComponentRef.current);
+          setLoaded(true);
+        })
+        .catch((e) => {});
 
-        return () => {
-          iframeRef.current = undefined;
-          // iframe.removeEventListener('load', loadListener);
-          setLoaded(false);
-        };
-      }
-      return ()=>{}
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+      return () => {
+        iframeRef.current = undefined;
+        iframe.parentElement?.removeChild(iframe);
+        connection.destroy();
+        setLoaded(false);
+      };
+    }
+    return () => {};
+  }, [head]);
 
   function renderInIframe(Component: C): void {
     initialComponentRef.current = Component;

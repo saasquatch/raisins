@@ -46,6 +46,6 @@ export function useEditor(initialHTML: string): Model {
       componentModel: metamodel,
     }),
     ...metamodel,
-    ...useCanvas(core),
+    ...useCanvas({...core, ...metamodel}),
   };
 }

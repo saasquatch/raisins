@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
+import unpkgNpmRegistry from '../util/NPMRegistry';
 import { raisintoSnabdom } from './raisinToSnabdom';
+import { ComponentModel } from './useComponentModel';
 import {
   ChildRPC,
   useSandboxedIframeRenderer,
@@ -24,7 +26,7 @@ const sizes: Size[] = [
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
 
-function useInnerHtmlIframeRenderer(model: CoreModel, mode: Mode) {
+function useInnerHtmlIframeRenderer(model: CoreModel & ComponentModel) {
   const renderer = (
     iframe: HTMLIFrameElement,
     child: ChildRPC,
@@ -32,15 +34,37 @@ function useInnerHtmlIframeRenderer(model: CoreModel, mode: Mode) {
   ): void => {
     if (!Comp) return; // no Component yet
 
-
     child.render(Comp);
   };
 
   const onClick = (id: string) => model.setSelectedId(id);
+
+  const head = useMemo(() => {
+    const scripts =
+      model.moduleDetails?.map((m) => {
+        const { module, browser, main } = m['package.json'];
+        // Use the prescribed file path, if not then module, browser, or main or empty
+        const filePath = m.filePath ?? module ?? browser ?? main ?? '';
+        const useModule = filePath === module || filePath.endsWith('.esm.js');
+        const isCss = m.filePath && m.filePath.endsWith('.css');
+        if (isCss)
+          return ` <link rel="stylesheet" href="${unpkgNpmRegistry.resolvePath(
+            m,
+            m.filePath!
+          )}" />`;
+        return `<script src="${unpkgNpmRegistry.resolvePath(m, filePath)}" ${
+          useModule && `type="module"`
+        }></script>`;
+      }) ?? [];
+
+    return scripts.join('\n');
+  }, [model.moduleDetails]);
+
   const props = useSandboxedIframeRenderer<VNode>({
     renderer,
-    initialComponent: h("div",{}),
+    initialComponent: h('div', {}),
     onClick,
+    head,
   });
 
   return {
@@ -49,9 +73,9 @@ function useInnerHtmlIframeRenderer(model: CoreModel, mode: Mode) {
   };
 }
 
-export default function useCanvas(props: CoreModel) {
+export default function useCanvas(props: CoreModel & ComponentModel) {
   const [mode, setMode] = useState<Mode>('edit');
-  const frameProps = useInnerHtmlIframeRenderer(props, mode);
+  const frameProps = useInnerHtmlIframeRenderer(props);
   const [size, setSize] = useState<Size>(sizes[0]);
 
   const vnode = raisintoSnabdom(props.node as RaisinDocumentNode, (d, n) => {

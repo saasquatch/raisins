@@ -5,9 +5,9 @@ import { Model } from '../model/EditorModel';
 import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
+import { PackageEditorView } from './PackageEditorView';
 import { StyleEditor } from './StyleEditor';
 import { ToolbarView } from './Toolbar';
-
 
 export const Row = styled.div`
   display: flex;
@@ -97,6 +97,7 @@ export function EditorView(model: Model) {
                 ?.title || 'Untitled Element'
             }`}
           <EditorPanel {...model} />
+          <PackageEditorView {...model}/>
         </Edits>
         <CanvasCss>
           <Canvas {...model} />
