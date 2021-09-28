@@ -7,7 +7,9 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class MyComponent {
   /**
-   * The first name
+   * The first name of the user to display to their friends
+   * 
+   * @uiName First Name
    */
   @Prop() first: string;
 

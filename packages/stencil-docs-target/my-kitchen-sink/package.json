@@ -16,10 +16,12 @@
   ],
   "scripts": {
     "build": "stencil build --docs",
-    "start": "stencil build --dev --watch --serve",
+    "start": "stencil build --dev --watch --docs --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
-    "generate": "stencil generate"
+    "generate": "stencil generate",
+    "serve:package": "serve . ",
+    "start:raisins": "run-p start serve:package"
   },
   "dependencies": {
     "@stencil/core": "^2.7.0"
@@ -28,7 +30,9 @@
     "@types/jest": "^26.0.24",
     "jest": "^26.6.3",
     "jest-cli": "^26.6.3",
-    "puppeteer": "^10.0.0"
+    "npm-run-all": "^4.1.5",
+    "puppeteer": "^10.0.0",
+    "serve": "^12.0.1"
   },
   "license": "MIT"
 }

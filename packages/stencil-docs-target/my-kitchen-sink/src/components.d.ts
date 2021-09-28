@@ -8,7 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface MyComponent {
         /**
-          * The first name
+          * The first name of the user to display to their friends
+          * @uiName First Name
          */
         "first": string;
         /**
@@ -35,7 +36,8 @@ declare global {
 declare namespace LocalJSX {
     interface MyComponent {
         /**
-          * The first name
+          * The first name of the user to display to their friends
+          * @uiName First Name
          */
         "first"?: string;
         /**
