@@ -17,6 +17,8 @@ export class MyComponent {
 
   /**
    * The middle name
+   * 
+   * @uiName Middle Name
    */
   @Prop() middle: string;
 

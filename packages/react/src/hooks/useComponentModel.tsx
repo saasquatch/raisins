@@ -4,6 +4,8 @@ import {
   RaisinElementNode,
   RaisinTextNode,
 } from '@raisins/core';
+import * as schema from '@raisins/schema/schema';
+
 import { ElementType } from 'domelementtype';
 import React, { useContext } from 'react';
 import { useState } from 'react';
@@ -28,53 +30,53 @@ const DefaultSlot: Slot = {
   name: '',
   title: 'Default slot',
 };
-const SquatchComponents: CustomElement[] = [
-  {
-    tagName: 'sqh-global-container',
-    title: 'Container',
-    slots: [{ ...DefaultSlot, validChildren: ['*'] }],
-  },
-  { tagName: 'sqh-text-component', title: 'Text' },
-  { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
-  { tagName: 'sqh-share-button-container', title: 'Share Buttons' },
-  {
-    tagName: 'sqh-stats-container',
-    title: 'Stats',
-    slots: [{ ...DefaultSlot, validChildren: ['sqh-stat-component'] }],
-  },
-  {
-    tagName: 'sqh-stat-component',
-    title: 'Stat',
-    validParents: ['sqh-stats-container'],
-  },
-  { tagName: 'sqh-referral-list', title: 'Referrals' },
-  // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
-  {
-    tagName: 'sqh-grid',
-    title: '3 Col Grid',
-    slots: [
-      {
-        ...DefaultSlot,
-        orientation: 'left-right',
-        validChildren: ['sqh-column'],
-      },
-    ],
-  },
-  {
-    tagName: 'sqh-column',
-    title: 'Column',
-    validParents: ['sqh-grid'],
-    slots: [{ ...DefaultSlot, validChildren: ['*'] }],
-  },
-];
+// const SquatchComponents: CustomElement[] = [
+//   {
+//     tagName: 'sqh-global-container',
+//     title: 'Container',
+//     slots: [{ ...DefaultSlot, validChildren: ['*'] }],
+//   },
+//   { tagName: 'sqh-text-component', title: 'Text' },
+//   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
+//   { tagName: 'sqh-share-button-container', title: 'Share Buttons' },
+//   {
+//     tagName: 'sqh-stats-container',
+//     title: 'Stats',
+//     slots: [{ ...DefaultSlot, validChildren: ['sqh-stat-component'] }],
+//   },
+//   {
+//     tagName: 'sqh-stat-component',
+//     title: 'Stat',
+//     validParents: ['sqh-stats-container'],
+//   },
+//   { tagName: 'sqh-referral-list', title: 'Referrals' },
+//   // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
+//   {
+//     tagName: 'sqh-grid',
+//     title: '3 Col Grid',
+//     slots: [
+//       {
+//         ...DefaultSlot,
+//         orientation: 'left-right',
+//         validChildren: ['sqh-column'],
+//       },
+//     ],
+//   },
+//   {
+//     tagName: 'sqh-column',
+//     title: 'Column',
+//     validParents: ['sqh-grid'],
+//     slots: [{ ...DefaultSlot, validChildren: ['*'] }],
+//   },
+// ];
 
-const ShoelaceComponents: CustomElement[] = [
-  { tagName: 'sl-tab-group', title: 'Tab Group' },
-  { tagName: 'sl-tab', title: 'Tab' },
-  { tagName: 'sl-tab-panel', title: 'Tab Panel' },
-  { tagName: 'sl-details', title: 'Hide/Show' },
-  { tagName: 'sl-card', title: 'Card' },
-];
+// const ShoelaceComponents: CustomElement[] = [
+//   { tagName: 'sl-tab-group', title: 'Tab Group' },
+//   { tagName: 'sl-tab', title: 'Tab' },
+//   { tagName: 'sl-tab-panel', title: 'Tab Panel' },
+//   { tagName: 'sl-details', title: 'Hide/Show' },
+//   { tagName: 'sl-card', title: 'Card' },
+// ];
 
 const blocks: RaisinElementNode[] = [
   {
@@ -226,12 +228,6 @@ This kitten is as cute as he is playful. Bring him home today!<br>
 `),
 ].filter((x) => typeof x !== 'undefined') as RaisinElementNode[];
 
-const components: CustomElement[] = [
-  ...Object.values(HTMLComponents),
-  ...SquatchComponents,
-  ...ShoelaceComponents,
-];
-
 type InternalState = {
   modules: Module[];
   loading: boolean;
@@ -249,6 +245,21 @@ export function useComponentModel() {
     modules: [],
     moduleDetails: [],
   });
+  const components: CustomElement[] = [
+    ...Object.values(HTMLComponents),
+    ..._internalState.moduleDetails.reduce((acc, c) => {
+
+      // A raisins package can have multiple "modules", each with their own tags
+      const tags =
+        c.raisins?.modules.reduce(
+          (acc1, curr) => [...acc1, ...(curr.tags ?? [])],
+          [] as CustomElement[]
+        ) ?? [];
+
+      return [...acc, ...tags];
+    }, [] as CustomElement[]),
+  ];
+
   const setModules = (m: NewState<Module[]>) => {
     _setInternal((i) => {
       const next = typeof m === 'function' ? m(i.modules) : m;
@@ -261,9 +272,17 @@ export function useComponentModel() {
             registry = makeLocalRegistry(localUrl);
           }
           const detail = await registry.getPackageJson(module);
+          let raisinPkg: schema.Package | undefined = undefined;
+          if (detail.raisins) {
+            const resp = await fetch(
+              registry.resolvePath(module, detail.raisins)
+            );
+            raisinPkg = await resp.json();
+          }
           details.push({
             ...module,
             'package.json': detail,
+            raisins: raisinPkg,
           });
         }
         _setInternal({
@@ -293,7 +312,7 @@ export function useComponentModel() {
     return {
       tagName: node.tagName,
       title: node.tagName,
-      slots: [{ name: '', summary: 'Default slot' }],
+      slots: [{ name: '', title: 'Default slot' }],
     };
   }
 
@@ -391,6 +410,7 @@ export type Module = {
 
 export type ModuleDetails = {
   'package.json': PackageJson;
+  raisins?: schema.Package;
 } & Module;
 
 export type ComponentModel = {

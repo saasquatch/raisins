@@ -18,6 +18,7 @@ export namespace Components {
         "last": string;
         /**
           * The middle name
+          * @uiName Middle Name
          */
         "middle": string;
     }
@@ -46,6 +47,7 @@ declare namespace LocalJSX {
         "last"?: string;
         /**
           * The middle name
+          * @uiName Middle Name
          */
         "middle"?: string;
     }

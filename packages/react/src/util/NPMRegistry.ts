@@ -7,11 +7,19 @@ export type PackageJson = {
   name: string;
   version: string;
   description?: string;
+  /**
+   * Path to the raisins description file
+   *
+   * No leading slashes
+   *
+   * e.g. "dist/raisins.json"
+   */
+  raisins?: string;
   author?: string;
   license?: string;
   /**
    * The ES Module path. (de-factor standard)
-   * 
+   *
    * https://stackoverflow.com/questions/42708484/what-is-the-module-package-json-field-for
    */
   module?: string;
@@ -33,6 +41,12 @@ export type PackageJson = {
    * https://docs.npmjs.com/cli/v7/configuring-npm/package-json#main
    */
   main?: string;
+  /**
+   * For serving directly to the web from the CDN.
+   * 
+   * Stencil projects ship with this properly configured in their boilerplate
+   */
+  unpkg?: string;
 };
 export interface NPMRegistry {
   getPackageJson(module: Module): Promise<PackageJson>;
@@ -56,11 +70,11 @@ export const unpkgNpmRegistry: NPMRegistry = {
   },
 };
 
-export function makeLocalRegistry(url:string):NPMRegistry{
+export function makeLocalRegistry(url: string): NPMRegistry {
   return {
     async getPackageJson(m) {
       const path = this.resolvePath(m, 'package.json');
-  
+
       const resp = await fetch(path);
       const json = await resp.json();
       return json;
@@ -70,7 +84,7 @@ export function makeLocalRegistry(url:string):NPMRegistry{
       const resolved = `${url}/${path}`;
       return resolved;
     },
-  }
+  };
 }
 
 export default unpkgNpmRegistry;

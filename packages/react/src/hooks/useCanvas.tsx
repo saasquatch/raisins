@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
-import unpkgNpmRegistry from '../util/NPMRegistry';
+import unpkgNpmRegistry, { makeLocalRegistry } from '../util/NPMRegistry';
 import { raisintoSnabdom } from './raisinToSnabdom';
-import { ComponentModel } from './useComponentModel';
+import { ComponentModel, INTERNAL_CONTEXT } from './useComponentModel';
 import {
   ChildRPC,
   useSandboxedIframeRenderer,
@@ -39,20 +39,28 @@ function useInnerHtmlIframeRenderer(model: CoreModel & ComponentModel) {
 
   const onClick = (id: string) => model.setSelectedId(id);
 
+  let localUrl = useContext(INTERNAL_CONTEXT);
+
+
   const head = useMemo(() => {
     const scripts =
       model.moduleDetails?.map((m) => {
-        const { module, browser, main } = m['package.json'];
+        const { module, browser, main, unpkg } = m['package.json'];
         // Use the prescribed file path, if not then module, browser, or main or empty
-        const filePath = m.filePath ?? module ?? browser ?? main ?? '';
+        const filePath = m.filePath ?? unpkg ?? module ?? browser ?? main ?? '';
         const useModule = filePath === module || filePath.endsWith('.esm.js');
         const isCss = m.filePath && m.filePath.endsWith('.css');
+        // TODO: Centralize registry better
+        let registry = unpkgNpmRegistry;
+        if (m.name === '@local' && localUrl) {
+          registry = makeLocalRegistry(localUrl);
+        }
         if (isCss)
-          return ` <link rel="stylesheet" href="${unpkgNpmRegistry.resolvePath(
+          return ` <link rel="stylesheet" href="${registry.resolvePath(
             m,
             m.filePath!
           )}" />`;
-        return `<script src="${unpkgNpmRegistry.resolvePath(m, filePath)}" ${
+        return `<script src="${registry.resolvePath(m, filePath)}" ${
           useModule && `type="module"`
         }></script>`;
       }) ?? [];
