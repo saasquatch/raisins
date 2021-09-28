@@ -2,6 +2,7 @@ import React from 'react';
 import { ComponentModel, Module } from '../hooks/useComponentModel';
 
 export const PACKAGES = [
+  "@local",
   '@saasquatch/component-boilerplate',
   '@saasquatch/mint-components',
   '@saasquatch/vanilla-components',

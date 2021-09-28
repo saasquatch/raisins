@@ -56,4 +56,21 @@ export const unpkgNpmRegistry: NPMRegistry = {
   },
 };
 
+export function makeLocalRegistry(url:string):NPMRegistry{
+  return {
+    async getPackageJson(m) {
+      const path = this.resolvePath(m, 'package.json');
+  
+      const resp = await fetch(path);
+      const json = await resp.json();
+      return json;
+    },
+    resolvePath(module, path) {
+      const version = module.version ?? 'latest';
+      const resolved = `${url}/${path}`;
+      return resolved;
+    },
+  }
+}
+
 export default unpkgNpmRegistry;

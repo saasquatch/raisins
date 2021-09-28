@@ -1,5 +1,7 @@
 import { Component, Prop, h } from '@stencil/core';
-
+/**
+ * @uiName My Component
+ */
 @Component({
   tag: 'my-component',
   styleUrl: 'my-component.css',

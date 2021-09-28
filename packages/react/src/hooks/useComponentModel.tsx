@@ -2,23 +2,31 @@ import {
   htmlParser as parse,
   htmlUtil,
   RaisinElementNode,
-  RaisinTextNode
+  RaisinTextNode,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
+import React, { useContext } from 'react';
 import { useState } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
 import { CustomElement, Slot } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
-import { PackageJson, unpkgNpmRegistry } from '../util/NPMRegistry';
+import {
+  makeLocalRegistry,
+  PackageJson,
+  unpkgNpmRegistry,
+} from '../util/NPMRegistry';
 
+export const INTERNAL_CONTEXT = React.createContext<string | undefined>(
+  undefined
+);
 
 const { visit } = htmlUtil;
 
 const DefaultSlot: Slot = {
   name: '',
-  summary: 'Default slot',
+  title: 'Default slot',
 };
 const SquatchComponents: CustomElement[] = [
   {
@@ -45,7 +53,11 @@ const SquatchComponents: CustomElement[] = [
     tagName: 'sqh-grid',
     title: '3 Col Grid',
     slots: [
-      { ...DefaultSlot, orientation: 'left-right', validChildren: ['sqh-column'] },
+      {
+        ...DefaultSlot,
+        orientation: 'left-right',
+        validChildren: ['sqh-column'],
+      },
     ],
   },
   {
@@ -230,6 +242,8 @@ type InternalState = {
  * For managing the types of components that are edited and their properties
  */
 export function useComponentModel() {
+  let localUrl: string | undefined = useContext(INTERNAL_CONTEXT);
+
   const [_internalState, _setInternal] = useState<InternalState>({
     loading: false,
     modules: [],
@@ -242,7 +256,11 @@ export function useComponentModel() {
       (async () => {
         const details: ModuleDetails[] = [];
         for (const module of next) {
-          const detail = await unpkgNpmRegistry.getPackageJson(module);
+          let registry = unpkgNpmRegistry;
+          if (module.name === '@local' && localUrl) {
+            registry = makeLocalRegistry(localUrl);
+          }
+          const detail = await registry.getPackageJson(module);
           details.push({
             ...module,
             'package.json': detail,
@@ -297,7 +315,8 @@ export function useComponentModel() {
     });
     const parentAllowsChild =
       slotMeta.validChildren?.includes('*') ||
-      (element?.tagName && slotMeta.validChildren?.includes(element?.tagName)) ||
+      (element?.tagName &&
+        slotMeta.validChildren?.includes(element?.tagName)) ||
       false;
 
     const childMeta = getComponentMeta(from);
