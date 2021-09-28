@@ -1,6 +1,6 @@
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
-import splitOnFirst from 'split-on-first';
+import splitOnFirst from './split-on-first';
 
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
