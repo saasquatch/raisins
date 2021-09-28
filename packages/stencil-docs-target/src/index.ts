@@ -40,8 +40,10 @@ export function raisinsDocsTarget({
   outFile = "raisins.json",
   extraModules: extraPackages = [],
   postProcess= (m)=>m
-}: Partial<Config>): OutputTargetDocsCustom {
+}: Partial<Config> = {}): OutputTargetDocsCustom {
   async function generator(docsJson: JsonDocs) {
+    try{
+
     // Extracted from JSON / JSDocs Tags
     const stencilComponents = convertToGrapesJSMeta(docsJson);
     
@@ -57,7 +59,12 @@ export function raisinsDocsTarget({
 
     const stringifiedFile = JSON.stringify(pkg);
     await writeFile(outDir, outFile, stringifiedFile);
+  }catch(e){
+    console.error("Error in raisins docs target for stencil", e);
+    throw e;
   }
+  }
+  
   return {
     type: "docs-custom",
     generator,

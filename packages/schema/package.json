@@ -4,7 +4,7 @@
   "description": "Types (a.k.a. schema) for the Raisins ecosystem",
   "author": "Logan Volkers <logan@saasquat.ch>",
   "license": "MIT",
-  "main": "lib/schema.js",
+  "main": "schema.json",
   "files": [
     "schema.json",
     "schema.d.ts"
