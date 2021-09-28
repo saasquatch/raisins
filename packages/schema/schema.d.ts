@@ -29,9 +29,9 @@ export interface Package {
 // Custom element modules
 export type Module = {
   /**
-   * A markdown summary suitable for display in a listing.
+   * A markdown title suitable for display in a listing.
    */
-  summary?: string;
+  title?: string;
 
   /**
    * A markdown description of the module.
@@ -53,9 +53,14 @@ export type Module = {
  */
 export interface CustomElement {
   /**
-   * The human-readable name of the component
+   * A markdown title suitable for display in a listing.
    */
   title?: string;
+
+  /**
+   * A markdown description of the module.
+   */
+  description?: string;
 
   /**
    * The name of the registered custom element tag
@@ -86,12 +91,12 @@ export interface Attribute {
   name: string;
 
   /**
-   * A markdown summary suitable for display in a listing.
+   * A markdown title suitable for display in a listing.
    */
-  summary?: string;
+  title?: string;
 
   /**
-   * A markdown description.
+   * A markdown description of the module.
    */
   description?: string;
 
@@ -131,9 +136,9 @@ export interface Slot {
   name: string;
 
   /**
-   * A markdown summary suitable for display in a listing.
+   * A markdown title suitable for display in a listing.
    */
-  summary?: string;
+  title?: string;
 
   /**
    * A markdown description.
@@ -179,9 +184,9 @@ export interface CssCustomProperty {
   default?: string;
 
   /**
-   * A markdown summary suitable for display in a listing.
+   * A markdown title suitable for display in a listing.
    */
-  summary?: string;
+  title?: string;
 
   /**
    * A markdown description.

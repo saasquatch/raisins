@@ -7,7 +7,8 @@
   "main": "lib/schema.js",
   "files": [
     "schema.json",
-    "schema.d.ts"  ],
+    "schema.d.ts"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -23,5 +24,8 @@
   "devDependencies": {
     "typescript": "^4.4.3",
     "typescript-json-schema": "^0.51.0"
+  },
+  "dependencies": {
+    "split-on-first": "^3.0.0"
   }
 }

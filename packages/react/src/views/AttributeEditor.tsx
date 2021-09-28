@@ -4,7 +4,7 @@ import React from "react";
 import { Model } from "../model/EditorModel";
 
 export function AttributesEditor(props: { model: Model; node: RaisinElementNode }) {
-  const schema = props.model.getComponentMeta(props.node)?.attributes;
+  const attributeSchema = props.model.getComponentMeta(props.node)?.attributes ?? [];
   const attribs = props.node.attribs || {};
   const onchange = (key: string) => {
     return (value: string) => {
@@ -15,7 +15,7 @@ export function AttributesEditor(props: { model: Model; node: RaisinElementNode 
       props.model.replaceNode(props.node, clone);
     };
   };
-  const allProps = new Set([...Object.keys(attribs), ...Object.keys(schema?.properties || {})]);
+  const allProps = new Set([...Object.keys(attribs), ...attributeSchema?.map(a=>a.name)]);
   const allPropKeys = [...allProps.values()];
   return (
     <div data-attributes-editor>
@@ -44,8 +44,6 @@ export function AttributesEditor(props: { model: Model; node: RaisinElementNode 
         Attributes: <br />
         <pre style={{ overflow: 'scroll' }}>{JSON.stringify(props.node.attribs, null, 2)}</pre>
         Schema:
-        <br />
-        <pre>{JSON.stringify(schema)}</pre>
       </SlDetails>
     </div>
   );
