@@ -4,11 +4,10 @@ import React from 'react';
 import { Model } from '../model/EditorModel';
 import styled from 'styled-components';
 import { Attribute } from '@raisins/schema/schema';
-import { attachTo, attributesModule } from 'snabbdom';
 
 const Descr = styled.span`
   color: grey;
-  font-size: 0.6em;
+  font-size: 0.7em;
 `;
 export function AttributesEditor(props: {
   model: Model;
@@ -32,30 +31,19 @@ export function AttributesEditor(props: {
       props.model.replaceNode(props.node, clone);
     };
   };
-  const allProps = new Set([
-    ...Object.keys(attribs),
-    ...attributeSchema?.map((a) => a.name),
-  ]);
-  const allPropKeys = [...allProps.values()];
   return (
     <div data-attributes-editor>
       <table>
-        <thead>
-          <tr>
-            <th>Attribute</th>
-            <th>Value</th>
-          </tr>
-        </thead>
         <tbody>
           {attributeSchema?.map((attr) => {
             return (
               <>
                 <tr>
-                  <th>
-                    {attr.title ?? attr.name}
-                    <br />
-                  </th>
                   <td>
+                    <b>
+                    {attr.title ?? attr.name}
+                    </b>
+                    <br />
                     <AttributeEditor
                       schema={attr}
                       model={props.model}
@@ -75,7 +63,6 @@ export function AttributesEditor(props: {
             );
           })}
         </tbody>
-        <tbody></tbody>
       </table>
       <SlDetails summary="Debugging">
         Attributes: <br />
@@ -100,15 +87,19 @@ export function AttributeEditor(props: {
   if (props.attr.value === undefined) {
     return (
       <div>
-        {props.schema?.default}{' '}
-        <button onClick={() => props.onChange(props.schema?.default?.toString() ?? '')}>
+        {props.schema?.default ?? <i>Empty</i>}
+        <button
+          onClick={() =>
+            props.onChange(props.schema?.default?.toString() ?? '')
+          }
+        >
           Edit
         </button>
       </div>
     );
   }
   const Reset = () => (
-    <button onClick={() => props.onChange(undefined)}>Reset</button>
+    <button onClick={() => props.onChange(undefined)}>x</button>
   );
   if (props.schema?.type === 'boolean') {
     return (
@@ -132,6 +123,18 @@ export function AttributeEditor(props: {
     );
   }
   if (props.schema?.type === 'number') {
+    return (
+      <div>
+        <input
+          type="number"
+          value={props.attr.value}
+          onInput={(e) =>
+            props.onChange((e.target as HTMLInputElement).value.toString())
+          }
+        />
+        <Reset />
+      </div>
+    );
   }
   return (
     <div>
