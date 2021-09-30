@@ -1,4 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
+
+
 /**
  * @uiName My Component
  */
@@ -42,7 +44,7 @@ export class MyComponent {
   @Prop() reverse: boolean;
 
   private getText(): string {
-    let names = [this.first, this.middle, this.last].filter(x=>x);
+    let names = [this.first??"friend", this.middle, this.last].filter(x=>x);
     if(this.reverse){
       names = [...names,"reversed"].reverse()
     }
