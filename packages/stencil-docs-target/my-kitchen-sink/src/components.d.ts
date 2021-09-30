@@ -14,6 +14,7 @@ export namespace Components {
         "first": string;
         /**
           * The last name
+          * @uiName Last Name
          */
         "last": string;
         /**
@@ -21,6 +22,10 @@ export namespace Components {
           * @uiName Middle Name
          */
         "middle": string;
+        /**
+          * Should show backwards?
+         */
+        "reverse": boolean;
     }
 }
 declare global {
@@ -43,6 +48,7 @@ declare namespace LocalJSX {
         "first"?: string;
         /**
           * The last name
+          * @uiName Last Name
          */
         "last"?: string;
         /**
@@ -50,6 +56,10 @@ declare namespace LocalJSX {
           * @uiName Middle Name
          */
         "middle"?: string;
+        /**
+          * Should show backwards?
+         */
+        "reverse"?: boolean;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;

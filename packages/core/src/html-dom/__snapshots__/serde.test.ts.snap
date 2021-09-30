@@ -8,17 +8,14 @@ Object {
       "children": Array [
         Object {
           "data": "Example",
-          "nodeType": 3,
           "type": "text",
         },
       ],
-      "nodeType": 1,
       "style": undefined,
       "tagName": "div",
       "type": "tag",
     },
   ],
-  "nodeType": 9,
   "type": "root",
 }
 `;

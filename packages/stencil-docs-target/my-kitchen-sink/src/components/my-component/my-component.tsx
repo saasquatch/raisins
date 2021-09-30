@@ -13,7 +13,7 @@ export class MyComponent {
    * 
    * @uiName First Name
    */
-  @Prop() first: string;
+  @Prop() first: string = "Friend";
 
   /**
    * The middle name
@@ -24,11 +24,22 @@ export class MyComponent {
 
   /**
    * The last name
+   * 
+   * @uiName Last Name
    */
   @Prop() last: string;
 
+  /**
+   * Should show backwards?
+   */
+  @Prop() reverse: boolean;
+
   private getText(): string {
-    return this.first + ' ' + this.middle + ' ' + this.last;
+    let names = [this.first, this.middle, this.last].filter(x=>x);
+    if(this.reverse){
+      names = [...names,"reversed"].reverse()
+    }
+    return names.join(' ');
   }
 
   render() {

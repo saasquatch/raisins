@@ -31,11 +31,11 @@ export interface DHNodeVisitor<T> {
 export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
   const raisin = visit<RaisinNode>(node, {
     onText(text): RaisinTextNode {
-      const { nodeType, data } = text;
-      return { nodeType, type: ElementType.Text, data };
+      const { data } = text;
+      return { type: ElementType.Text, data };
     },
     onStyle(element, children): RaisinStyleNode {
-      const { type, attribs, nodeType } = element;
+      const { type, attribs } = element;
       const textContent =
         children &&
         children
@@ -43,7 +43,6 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
           .map((c) => (c as RaisinTextNode)?.data)
           .join("\n");
       return {
-        nodeType,
         tagName: "style",
         // @ts-ignore -- raisin has stronger types than DOMHandler
         type,
@@ -52,10 +51,9 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
       };
     },
     onElement(element, children): RaisinElementNode {
-      const { tagName, type, attribs, nodeType } = element;
+      const { tagName, type, attribs } = element;
       const { style, ...otherAttribs } = attribs;
       return {
-        nodeType,
         tagName,
         // @ts-ignore -- raisin has stronger types than
         type,
@@ -64,27 +62,24 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
         style: style ? cssParser(style, { context: "declarationList" }) : undefined,
       };
     },
-    onRoot(node, children): RaisinDocumentNode {
-      const { nodeType } = node;
+    onRoot(_, children): RaisinDocumentNode {
       return {
         type: ElementType.Root,
-        nodeType,
         children: children ?? [],
       };
     },
     onDirective(directive): RaisinProcessingInstructionNode {
-      const { nodeType, data, name } = directive;
-      return { nodeType, type: ElementType.Directive, data, name };
+      const { data, name } = directive;
+      return { type: ElementType.Directive, data, name };
     },
     onComment(comment): RaisinCommentNode {
-      const { nodeType, data } = comment;
-      return { nodeType, type: ElementType.Comment, data };
+      const { data } = comment;
+      return { type: ElementType.Comment, data };
     },
     onCData(element, children): RaisinNodeWithChildren {
-      const { type, nodeType } = element;
+      const { type } = element;
       return {
         type,
-        nodeType,
         children: children ?? [],
       };
     },

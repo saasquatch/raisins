@@ -76,6 +76,8 @@ function formatAttributes(
       }
 
       if (!opts.emptyAttrs && !opts.xmlMode && value === "") {
+        // For boolean attributes
+        // See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
         return key;
       }
 

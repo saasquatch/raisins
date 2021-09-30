@@ -6,7 +6,6 @@ import { ElementType } from 'domelementtype';
  */
 export interface RaisinNode<T extends ElementType = ElementType> {
   type: T;
-  nodeType: number;
 }
 type DataNodesTypes = ElementType.Comment | ElementType.Text | ElementType.Directive;
 

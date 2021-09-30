@@ -3,6 +3,7 @@ import SlDetails from '@shoelace-style/react/dist/details';
 import React from 'react';
 import { Model } from '../model/EditorModel';
 import styled from 'styled-components';
+import { Attribute } from '@raisins/schema/schema';
 
 const Descr = styled.span`
   color: grey;
@@ -17,9 +18,11 @@ export function AttributesEditor(props: {
   const attribs = props.node.attribs || {};
   const onchange = (key: string) => {
     return (value: string) => {
+      const attrbsClone = {...props.node.attribs};
+      attrbsClone[key] = value;
       const clone = {
         ...props.node,
-        attribs: { ...props.node.attribs, [key]: value },
+        attribs: attrbsClone,
       };
       props.model.replaceNode(props.node, clone);
     };
@@ -49,6 +52,7 @@ export function AttributesEditor(props: {
                   </th>
                   <td>
                     <AttributeEditor
+                      schema={attr}
                       model={props.model}
                       attr={{ key: attr.name, value: attribs[attr.name] }}
                       onChange={onchange(attr.name)}
@@ -57,7 +61,9 @@ export function AttributesEditor(props: {
                 </tr>
                 {attr.description && (
                   <tr>
-                    <td colSpan={2}><Descr>{attr.description}</Descr></td>
+                    <td colSpan={2}>
+                      <Descr>{attr.description}</Descr>
+                    </td>
                   </tr>
                 )}
               </>
@@ -83,8 +89,22 @@ export function AttributeEditor(props: {
     value: any;
   };
   onChange: (next: any) => void;
+  schema?: Attribute;
   model: Model;
 }) {
+  if (props.schema?.type === 'boolean') {
+    return (
+      <input
+        type="checkbox"
+        checked={props.attr.value !== undefined ? true : false}
+        onChange={(e) =>
+          props.onChange(
+            (e.target as HTMLInputElement).checked ? '' : undefined
+          )
+        }
+      />
+    );
+  }
   return (
     <input
       type="text"
