@@ -18,8 +18,12 @@ export function AttributesEditor(props: {
   const attribs = props.node.attribs || {};
   const onchange = (key: string) => {
     return (value: string) => {
-      const attrbsClone = {...props.node.attribs};
-      attrbsClone[key] = value;
+      const attrbsClone = { ...props.node.attribs };
+      if (value === undefined) {
+        delete attrbsClone[key];
+      }else{
+        attrbsClone[key] = value;
+      }
       const clone = {
         ...props.node,
         attribs: attrbsClone,
@@ -96,9 +100,14 @@ export function AttributeEditor(props: {
     return (
       <input
         type="checkbox"
-        checked={props.attr.value !== undefined ? true : false}
+        checked={
+          props.attr.value === undefined || props.attr.value === null
+            ? false
+            : true
+        }
         onChange={(e) =>
-          props.onChange(
+          props.onChange( 
+            // ''
             (e.target as HTMLInputElement).checked ? '' : undefined
           )
         }
