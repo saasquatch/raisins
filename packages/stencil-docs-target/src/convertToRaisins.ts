@@ -2,7 +2,6 @@ import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
 import splitOnFirst from './split-on-first';
 
-
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
 export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
@@ -10,11 +9,13 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
     .filter(isUndocumented)
     .map(comp => {
       const attributes = comp.props.filter(isUndocumented).map(p => {
+        console.log('Default', p.name, p.default);
         const attr: schema.Attribute = {
           name: p.attr ?? p.name,
           type: uiType(p) ?? p.type,
           title: uiName(p) ?? p.attr ?? p.name,
-          description: p.docs
+          description: p.docs,
+          default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
           // TODO: Support enums -- need to add to Raisins model
           // enum: jsonTagValue(p, 'uiEnum'),
           // enumNames: jsonTagValue(p, 'uiEnumNames'),
@@ -33,7 +34,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         tagName: comp.tag,
         title: uiName(comp) ?? comp.tag,
         slots: comp.slots.map(s => {
-          const [title, description] = splitOnFirst(s.docs," - ");
+          const [title, description] = splitOnFirst(s.docs, ' - ');
           const rSlot: schema.Slot = {
             name: s.name,
             title,
@@ -66,3 +67,4 @@ function hasTag(tagName: string) {
 const isUndocumented = () => hasTag('undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
+const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');

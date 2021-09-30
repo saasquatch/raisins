@@ -18,6 +18,11 @@ export namespace Components {
          */
         "last": string;
         /**
+          * Truncates names longer than this
+          * @uiName Max Length
+         */
+        "maxLength": number;
+        /**
           * The middle name
           * @uiName Middle Name
          */
@@ -51,6 +56,11 @@ declare namespace LocalJSX {
           * @uiName Last Name
          */
         "last"?: string;
+        /**
+          * Truncates names longer than this
+          * @uiName Max Length
+         */
+        "maxLength"?: number;
         /**
           * The middle name
           * @uiName Middle Name

@@ -30,6 +30,13 @@ export class MyComponent {
   @Prop() last: string;
 
   /**
+   * Truncates names longer than this
+   * 
+   * @uiName Max Length
+   */
+  @Prop() maxLength: number = 4;
+
+  /**
    * Should show backwards?
    */
   @Prop() reverse: boolean;
@@ -39,7 +46,9 @@ export class MyComponent {
     if(this.reverse){
       names = [...names,"reversed"].reverse()
     }
-    return names.join(' ');
+    const out = names.join(' ');
+    
+    return out.substring(0, out.length < this.maxLength ?  out.length : this.maxLength);
   }
 
   render() {

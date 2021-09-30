@@ -4,6 +4,7 @@ import React from 'react';
 import { Model } from '../model/EditorModel';
 import styled from 'styled-components';
 import { Attribute } from '@raisins/schema/schema';
+import { attachTo, attributesModule } from 'snabbdom';
 
 const Descr = styled.span`
   color: grey;
@@ -21,7 +22,7 @@ export function AttributesEditor(props: {
       const attrbsClone = { ...props.node.attribs };
       if (value === undefined) {
         delete attrbsClone[key];
-      }else{
+      } else {
         attrbsClone[key] = value;
       }
       const clone = {
@@ -96,29 +97,50 @@ export function AttributeEditor(props: {
   schema?: Attribute;
   model: Model;
 }) {
-  if (props.schema?.type === 'boolean') {
+  if (props.attr.value === undefined) {
     return (
-      <input
-        type="checkbox"
-        checked={
-          props.attr.value === undefined || props.attr.value === null
-            ? false
-            : true
-        }
-        onChange={(e) =>
-          props.onChange( 
-            // ''
-            (e.target as HTMLInputElement).checked ? '' : undefined
-          )
-        }
-      />
+      <div>
+        {props.schema?.default}{' '}
+        <button onClick={() => props.onChange(props.schema?.default?.toString() ?? '')}>
+          Edit
+        </button>
+      </div>
     );
   }
+  const Reset = () => (
+    <button onClick={() => props.onChange(undefined)}>Reset</button>
+  );
+  if (props.schema?.type === 'boolean') {
+    return (
+      <div>
+        <input
+          type="checkbox"
+          checked={
+            props.attr.value === undefined || props.attr.value === null
+              ? false
+              : true
+          }
+          onChange={(e) =>
+            props.onChange(
+              // ''
+              (e.target as HTMLInputElement).checked ? '' : undefined
+            )
+          }
+        />
+        <Reset />
+      </div>
+    );
+  }
+  if (props.schema?.type === 'number') {
+  }
   return (
-    <input
-      type="text"
-      value={props.attr.value}
-      onInput={(e) => props.onChange((e.target as HTMLInputElement).value)}
-    />
+    <div>
+      <input
+        type="text"
+        value={props.attr.value}
+        onInput={(e) => props.onChange((e.target as HTMLInputElement).value)}
+      />
+      <Reset />
+    </div>
   );
 }
