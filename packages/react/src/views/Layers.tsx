@@ -1,4 +1,3 @@
-import styled from 'styled-components';
 import {
   htmlUtil,
   RaisinElementNode,
@@ -9,6 +8,7 @@ import SlDropdown from '@shoelace-style/react/dist/dropdown';
 import SlMenu from '@shoelace-style/react/dist/menu';
 import SlMenuItem from '@shoelace-style/react/dist/menu-item';
 import React, { FC } from 'react';
+import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
 
 const { clone, visit } = htmlUtil;
@@ -33,6 +33,7 @@ const Layer = styled.div<{ selected: boolean }>`
 const SlotContainer = styled.div`
   margin-left: 3px;
   display: flex;
+  padding: 0 0 3px 0;
 `;
 
 const SlotName = styled.div`
@@ -41,7 +42,7 @@ const SlotName = styled.div`
   font-size: 0.7em;
   padding: 5px 0 5px 2px;
   color: grey;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.1);
 `;
 const SlotChildren = styled.div`
   width: 100%;
@@ -109,14 +110,13 @@ export const Layers: FC<Model> = (model) => {
         <Layer data-element selected={model.selected === element}>
           {!hasSlots && name}
           {hasSlots && (
-            // <details>
             <div>
               {name}
               {hasSlots && (
                 <div>
                   {slots.map((s) => (
                     <SlotContainer>
-                      <SlotName>{s.slot.title}</SlotName>
+                      <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
                       <SlotChildren>
                         {s
                           .children!.filter((x) => x)
@@ -132,7 +132,7 @@ export const Layers: FC<Model> = (model) => {
                         <AddNew
                           node={element}
                           idx={s.children!.length}
-                          slot={s.key}
+                          slot={s.slot.name}
                         />
                       </SlotChildren>
                     </SlotContainer>

@@ -1,5 +1,6 @@
+import { htmlUtil, RaisinElementNode, RaisinNode } from '@raisins/core';
+import { Slot } from '@raisins/schema/schema';
 import { DefaultSlot, Model, NodeWithSlots } from './EditorModel';
-import { RaisinNode, htmlUtil } from '@raisins/core';
 
 const { visit } = htmlUtil;
 
@@ -28,40 +29,40 @@ export function getSlots(
     onRoot: noSlotsWChildren,
     onElement(el, children) {
       const meta = getComponentMeta(el);
-      if (meta.slots?.length) {
-        const slots = meta.slots.map((slot) => {
-          if (slot.name === '') {
-          }
-          const myChildren = children
-            .filter((x) => x)
-            .filter(
-              (c) =>
-                // @ts-ignore -- add better type checking for node types
-                c.node?.attribs?.slot === slot.name ||
-                // @ts-ignore -- add better type checking for node types
-                (slot.name === '' && c.node?.attribs?.slot === undefined)
-            );
 
-          // TODO: Filter slots so they don't show text nodes
+      type Reduced = { [key: string]: NodeWithSlots[] };
+
+      const definedSlots: Reduced =
+        meta.slots?.reduce((acc, s) => {
           return {
-            slot: slot,
-            children: myChildren,
+            ...acc,
+            [s.name]: [],
           };
-        });
-        const nodeWithSlots = {
-          node: el,
-          slots,
+        }, {} as Reduced) ?? {};
+      const allSlots = children.reduce((acc, child) => {
+        const slotName = (child.node as RaisinElementNode)?.attribs?.slot ?? '';
+        const previous = acc[slotName] ?? [];
+
+        return {
+          ...acc,
+          [slotName]: [...previous, child],
         };
+      }, definedSlots);
 
-        return nodeWithSlots;
-      }
-
+      const allSlotsWithMeta = Object.keys(allSlots).map((k) => {
+        const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
+        return {
+          slot,
+          children: allSlots[k],
+        };
+      });
+      // TODO: Filter slots so they don't show text nodes?
       // TODO: Figure out how to deal with elements that shouldn't have childen but they do?
       //    -  maybe show the children, but don't allow drop targets or "Add New"
       //    - show RED validation?
       return {
         node: el,
-        slots: [{ ...DefaultSlot, children }],
+        slots: allSlotsWithMeta,
       };
     },
   })!;

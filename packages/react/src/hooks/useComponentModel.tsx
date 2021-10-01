@@ -248,7 +248,6 @@ export function useComponentModel() {
   const components: CustomElement[] = [
     ...Object.values(HTMLComponents),
     ..._internalState.moduleDetails.reduce((acc, c) => {
-
       // A raisins package can have multiple "modules", each with their own tags
       const tags =
         c.raisins?.modules.reduce(
@@ -312,7 +311,7 @@ export function useComponentModel() {
     return {
       tagName: node.tagName,
       title: node.tagName,
-      slots: [{ name: '', title: 'Default slot' }],
+      slots: [],
     };
   }
 
