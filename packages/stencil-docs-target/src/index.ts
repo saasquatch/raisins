@@ -2,11 +2,9 @@ import * as schema from "@raisins/schema/schema";
 import type {
   JsonDocs, OutputTargetDocsCustom
 } from "@stencil/core/internal";
-import fsSync from "fs";
 import { convertToGrapesJSMeta } from "./convertToRaisins";
 import { writeFile } from "./writeFile";
 
-export const fs = fsSync.promises;
 
 export type Config = {
   /** 

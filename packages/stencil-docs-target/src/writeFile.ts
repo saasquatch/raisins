@@ -1,6 +1,6 @@
-import fsSync from 'fs';
 import path from 'path';
-import { fs } from './index';
+import fsSync from "fs";
+export const fs = fsSync.promises;
 
 /**
  * Writes a file, ensuring that the directory exitss first

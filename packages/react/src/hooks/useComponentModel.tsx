@@ -5,12 +5,10 @@ import {
   RaisinTextNode,
 } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
-
 import { ElementType } from 'domelementtype';
-import React, { useContext } from 'react';
-import { useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
-import { CustomElement, Slot } from '../component-metamodel/Component';
+import { CustomElement } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
@@ -26,203 +24,20 @@ export const INTERNAL_CONTEXT = React.createContext<string | undefined>(
 
 const { visit } = htmlUtil;
 
-// const SquatchComponents: CustomElement[] = [
-//   {
-//     tagName: 'sqh-global-container',
-//     title: 'Container',
-//     slots: [{ ...DefaultSlot, validChildren: ['*'] }],
-//   },
-//   { tagName: 'sqh-text-component', title: 'Text' },
-//   { tagName: 'sqh-copy-link-button', title: 'Sharelink' },
-//   { tagName: 'sqh-share-button-container', title: 'Share Buttons' },
-//   {
-//     tagName: 'sqh-stats-container',
-//     title: 'Stats',
-//     slots: [{ ...DefaultSlot, validChildren: ['sqh-stat-component'] }],
-//   },
-//   {
-//     tagName: 'sqh-stat-component',
-//     title: 'Stat',
-//     validParents: ['sqh-stats-container'],
-//   },
-//   { tagName: 'sqh-referral-list', title: 'Referrals' },
-//   // TODO: Need a `getParentSlot` method to make `orientation` useful in UI
-//   {
-//     tagName: 'sqh-grid',
-//     title: '3 Col Grid',
-//     slots: [
-//       {
-//         ...DefaultSlot,
-//         orientation: 'left-right',
-//         validChildren: ['sqh-column'],
-//       },
-//     ],
-//   },
-//   {
-//     tagName: 'sqh-column',
-//     title: 'Column',
-//     validParents: ['sqh-grid'],
-//     slots: [{ ...DefaultSlot, validChildren: ['*'] }],
-//   },
-// ];
-
-// const ShoelaceComponents: CustomElement[] = [
-//   { tagName: 'sl-tab-group', title: 'Tab Group' },
-//   { tagName: 'sl-tab', title: 'Tab' },
-//   { tagName: 'sl-tab-panel', title: 'Tab Panel' },
-//   { tagName: 'sl-details', title: 'Hide/Show' },
-//   { tagName: 'sl-card', title: 'Card' },
-// ];
-
-const blocks: RaisinElementNode[] = [
+const DEFAULT_BLOCKS: Block[] = [
   {
-    type: ElementType.Tag,
-    tagName: 'div',
-    nodeType: 1,
-    attribs: {},
-    children: [
-      { type: ElementType.Text, data: 'I am a div' } as RaisinTextNode,
-    ],
+    title: 'Some Div',
+    content: {
+      type: ElementType.Tag,
+      tagName: 'div',
+      nodeType: 1,
+      attribs: {},
+      children: [
+        { type: ElementType.Text, data: 'I am a div' } as RaisinTextNode,
+      ],
+    },
   },
-  blockFromHtml(`<sqh-stat-component></sqh-stat-component>`),
-  blockFromHtml(`<sqh-copy-link-button 
-  ishidden="false"
-  copysuccess="copied!"
-  copyfailure="Press Ctrl+C to copy"
-  text="Copy"
-  buttoncolor="#5C6164"
-  textcolor="#FFFFFF">
-  </sqh-copy-link-button>`),
-  blockFromHtml(`<sqh-referral-list
-  ishidden="false"
-  showreferrer="true"
-  usefirstreward="false"
-  referralnamecolor="darkslategray"
-  referraltextcolor="lightgray"
-  rewardcolor="#4BB543"
-  pendingcolor="lightgray"
-  pendingvalue="Reward Pending"
-  referrervalue="Referred"
-  referrercontent="Referred you {date}"
-  convertedcontent="Signed up, referred {date}"
-  pendingcontent="Trial user, referred {date}"
-  valuecontent="and {extrarewards} more {extrarewards, plural, one {reward} other {rewards}}"
-  expiredcolor="lightgray"
-  expiredvalue="Expired Reward"
-  expiredcontent="Signed up, referred {date}"
-  cancelledcolor="#C81D05"
-  cancelledvalue="Cancelled Reward"
-  cancelledcontent="Signed up, referred {date}"
-  paginatemore="View More"
-  paginateless="Previous"
-  noreferralsyet="No Referrals Yet..."
-  unknownuser="Your Friend"
-  redeemedvalue="Redeemed"
->
-</sqh-referral-list>
-`),
-  blockFromHtml(`<sqh-stats-container ishidden="false" paddingtop="0" paddingbottom="0">
-  <sqh-stat-component ishidden="false" statcolor="#4caf50" stattype="/referralsCount" statdescription="Friends Referred" paddingtop="10" paddingbottom="10">
-  </sqh-stat-component>
-  <sqh-stat-component ishidden="false" stattype="/rewardsCount" statdescription="Total Rewards" paddingtop="10" paddingbottom="10" statcolor="#000000">
-  </sqh-stat-component>
-  <sqh-stat-component
-    ishidden="false"
-    stattype="/rewardBalance/CREDIT/CENTS/prettyAssignedCredit"
-    statdescription="Credit earned"
-    paddingtop="10"
-    paddingbottom="10"
-    statcolor="#000000"
-  >
-  </sqh-stat-component>
-</sqh-stats-container>`),
-  blockFromHtml(`<sqh-share-button-container
-  ishidden="false"
-  emaildisplayrule="mobile-and-desktop"
-  emailtext="Email"
-  emailtextcolor="#ffffff"
-  emailbackgroundcolor="#4b4d50"
-  facebookdisplayrule="mobile-and-desktop"
-  facebooktext="Facebook"
-  facebooktextcolor="#ffffff"
-  facebookbackgroundcolor="#234079"
-  twitterdisplayrule="mobile-and-desktop"
-  twittertext="Twitter"
-  twittertextcolor="#ffffff"
-  twitterbackgroundcolor="#4797d2"
-  smsdisplayrule="mobile-only"
-  smstext="SMS"
-  smstextcolor="#ffffff"
-  smsbackgroundcolor="#7bbf38"
-  whatsappdisplayrule="mobile-only"
-  whatsapptext="Whatspp"
-  whatsapptextcolor="#ffffff"
-  whatsappbackgroundcolor="#25D366"
-  linkedindisplayrule="hidden"
-  linkedintext="LinkedIn"
-  linkedintextcolor="#ffffff"
-  linkedinbackgroundcolor="#0084b9"
-  pinterestdisplayrule="hidden"
-  pinteresttext="Pinterest"
-  pinteresttextcolor="#ffffff"
-  pinterestbackgroundcolor="#cb2027"
-  messengerdisplayrule="hidden"
-  messengertext="Messenger"
-  messengertextcolor="#ffffff"
-  messengerbackgroundcolor="#0084ff"
-  linedisplayrule="mobile-only"
-  linetext="Line Messenger"
-  linetextcolor="#ffffff"
-  linebackgroundcolor="#00c300"
->
-</sqh-share-button-container>`),
-  blockFromHtml(`<sl-tab-group>
-<sl-tab slot="nav" panel="tab1">Tab 1</sl-tab>
-<sl-tab slot="nav" panel="tab2">Tab 2</sl-tab>
-
-<sl-tab-panel name="tab1"><span>This is the tab 1 panel.</span></sl-tab-panel>
-<sl-tab-panel name="tab2"><span>This is the tab 2 panel.</span></sl-tab-panel>
-</sl-tab-group>`),
-  blockFromHtml(`<sl-details summary="Toggle Me">
-<div>I am content inside of a thing</div></sl-details>`),
-  blockFromHtml(`<sl-card class="card-overview">
-<img 
-  slot="image" 
-  src="https://images.unsplash.com/photo-1559209172-0ff8f6d49ff7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80" 
-  alt="A kitten sits patiently between a terracotta pot and decorative grasses."
->
-
-<strong>Mittens</strong><br>
-This kitten is as cute as he is playful. Bring him home today!<br>
-<small>6 weeks old</small>
-
-<div slot="footer">
-  <sl-button type="primary" pill>More Info</sl-button>
-  <sl-rating></sl-rating>
-</div>
-</sl-card>`),
-  blockFromHtml(`<sqh-grid class="flex-grid-thirds">
-<sqh-column><span>This little piggy went to market.</span></sqh-column>
-<sqh-column><span>This little piggy went to market.</span></sqh-column>
-<sqh-column><span>This little piggy went to market.</span></sqh-column>
-</sqh-grid>`),
-  blockFromHtml(`<sl-form class="form-overview">
-<sl-input name="name" type="text" label="Name"></sl-input>
-<br>
-<sl-select name="favorite" label="Select your favorite">
-  <sl-menu-item value="birds">Birds</sl-menu-item>
-  <sl-menu-item value="cats">Cats</sl-menu-item>
-  <sl-menu-item value="dogs">Dogs</sl-menu-item>
-</sl-select>
-<br>
-<sl-checkbox name="agree" value="yes">
-  I totally agree
-</sl-checkbox>
-<br><br>
-<sl-button submit>Submit</sl-button>
-</sl-form>
-`),
-].filter((x) => typeof x !== 'undefined') as RaisinElementNode[];
+];
 
 type InternalState = {
   modules: Module[];
@@ -233,7 +48,7 @@ type InternalState = {
 /**
  * For managing the types of components that are edited and their properties
  */
-export function useComponentModel() {
+export function useComponentModel(): ComponentModel {
   let localUrl: string | undefined = useContext(INTERNAL_CONTEXT);
 
   const [_internalState, _setInternal] = useState<InternalState>({
@@ -311,6 +126,28 @@ export function useComponentModel() {
     };
   }
 
+  const blocks: Block[] = useMemo(() => {
+    return _internalState.moduleDetails.reduce((agg, npmMod) => {
+      // Adds each NPM modules list of `raisin` contents`
+      return (
+        npmMod.raisins?.modules?.reduce((modBlocks, mod) => {
+          // Adds examples from the top "module" level of the raisins schema
+          const moduleLevelExamples =
+            mod.examples?.reduce(reduceExamples, modBlocks) ?? modBlocks;
+
+          // Adds examples from the tag level
+          return (
+            mod.tags?.reduce((tagBlocks, tag) => {
+              return (
+                tag.examples?.reduce(reduceExamples, tagBlocks) ?? tagBlocks
+              );
+            }, moduleLevelExamples) ?? moduleLevelExamples
+          );
+        }, agg) ?? agg
+      );
+    }, DEFAULT_BLOCKS);
+  }, [_internalState.moduleDetails]);
+
   function isValidChild(
     from: RaisinElementNode,
     to: RaisinElementNode,
@@ -339,31 +176,30 @@ export function useComponentModel() {
     return parentAllowsChild && childAllowsParents;
   }
 
-  function getValidChildren(
-    node: RaisinElementNode,
-    slot: string
-  ): RaisinElementNode[] {
-    const slots = getComponentMeta(node)?.slots;
-    if (!slots) {
-      // No documented slots
-      return [];
-    }
-    const slotMeta = slots.find((s) => s.name === slot);
+  function getValidChildren(node: RaisinElementNode, slot: string): Block[] {
+    const allowedInParent = blocks.filter((block) => {
+      const childMeta = getComponentMeta(block.content);
+      const childAllowsParents = doesChildAllowParent(childMeta, node);
+      return childAllowsParents;
+    });
+
+    const slotMeta = getComponentMeta(node)?.slots?.find(
+      (s) => s.name === slot
+    );
     if (!slotMeta) {
-      // No slot meta for slot
-      return [];
+      // No meta for slot, so we assume anything is allowed
+      return allowedInParent;
     }
     const { validChildren: childTags } = slotMeta;
-    if (!Array.isArray(childTags) || childTags.length < 1) {
-      // No valid children
-      return [];
-    }
-    const filter = (block: RaisinElementNode) => {
+
+    const filter = (block: Block) => {
+      // TODO: Replace this with CSS selector implementation from core
+      // TODO: Add custom pseudo selector, e.g. `:inline` for text-only slots https://github.com/fb55/css-select/blob/493cca99cd075d7bf64451bbd518325f11da084e/test/qwery.ts#L18
       const parentAllowsChild =
-        childTags?.includes('*') || childTags?.includes(block.tagName);
-      const childMeta = getComponentMeta(block);
-      const childAllowsParents = doesChildAllowParent(childMeta, node);
-      return parentAllowsChild && childAllowsParents;
+        childTags === undefined ||
+        childTags?.includes('*') ||
+        childTags?.includes(block.content.tagName);
+      return parentAllowsChild;
     };
     const validChildren = blocks.filter(filter);
     if (!validChildren.length) {
@@ -408,6 +244,11 @@ export type ModuleDetails = {
   raisins?: schema.Package;
 } & Module;
 
+export type Block = {
+  title: string;
+  content: RaisinElementNode;
+};
+
 export type ComponentModel = {
   loadingModules: boolean;
   modules: Module[];
@@ -418,11 +259,8 @@ export type ComponentModel = {
   setModules(moduleS: Module[]): void;
   getComponentMeta: (node: RaisinElementNode) => CustomElement;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
-  blocks: RaisinElementNode[];
-  getValidChildren: (
-    node: RaisinElementNode,
-    slot: string
-  ) => RaisinElementNode[];
+  blocks: Block[];
+  getValidChildren: (node: RaisinElementNode, slot: string) => Block[];
   canHaveChildren: (node: RaisinElementNode, slot: string) => boolean;
   isValidChild: (
     from: RaisinElementNode,
@@ -431,13 +269,29 @@ export type ComponentModel = {
   ) => boolean;
 };
 
-function doesChildAllowParent(childMeta: CustomElement, to: RaisinElementNode) {
-  const childHasRestrictions =
-    Array.isArray(childMeta?.validParents) && childMeta.validParents.length > 0;
+function reduceExamples(
+  previousValue: Block[],
+  currentValue: schema.Example
+): Block[] {
+  const elm = blockFromHtml(currentValue.content);
+  if (!elm) return previousValue;
+  const blockExample = {
+    title: currentValue.title,
+    content: elm,
+  };
+  return [...previousValue, blockExample];
+}
 
-  const childAllowsParents =
-    !childHasRestrictions || childMeta.validParents!.includes(to.tagName);
-  return childAllowsParents;
+function doesChildAllowParent(
+  childMeta: CustomElement | undefined,
+  to: RaisinElementNode
+) {
+  const childAllowsParentTag =
+    childMeta?.validParents?.includes(to.tagName) ??
+    // If `validParents` doesn't exist, defaults to all parents
+    true;
+
+  return childAllowsParentTag;
 }
 
 function blockFromHtml(html: string): RaisinElementNode | undefined {

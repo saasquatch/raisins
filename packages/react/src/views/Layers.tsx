@@ -4,7 +4,7 @@ import {
   RaisinNodeVisitor as NodeVisitor,
 } from '@raisins/core';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
 
@@ -53,32 +53,58 @@ const Toolbar = styled(SlButtonGroup)`
   // order: -1;
 `;
 
+const AddBlock = styled.div`
+  flex: 1;
+  width: 100%;
+  justify-self: stretch;
+  align-self: stretch;
+  background: rgba(0, 0, 255, 0.1);
+  color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 export const Layers: FC<Model> = (model) => {
   function AddNew(props: {
     node: RaisinElementNode;
     idx: number;
     slot: string;
   }) {
+    const [open, setOpen] = useState(false);
     const validChildren = model.getValidChildren(props.node, props.slot);
-    if (!validChildren.length) {
-      return <div />;
+    if (validChildren.length <= 0) {
+      return <></>;
     }
     return (
-      <details>
-        <summary>Add New</summary>
-        <div style={{ display: 'flex', overflowX: 'scroll' }}>
-          {validChildren.map((b) => {
-            const meta = model.getComponentMeta(b);
-            return (
-              <button
-                onClick={() => model.insert(clone(b), props.node, props.idx)}
-              >
-                {meta.title}
-              </button>
-            );
-          })}
-        </div>
-      </details>
+      <>
+        {!open && (
+          <AddBlock onClick={() => setOpen(true)}>
+            <div>Insert</div>
+          </AddBlock>
+        )}
+        {open && (
+          <div style={{ display: 'flex', overflowX: 'auto' }}>
+            {validChildren.map((b) => {
+              const meta = model.getComponentMeta(b.content);
+              return (
+                <button
+                  onClick={() => {
+                    const cloned = clone(b.content) as RaisinElementNode;
+                    // TODO: add "insert into slot" into core model?
+                    cloned.attribs.slot = props.slot;
+                    model.insert(cloned, props.node, props.idx);
+                  }}
+                >
+                  {meta.title}
+                  <br />
+                  <small>{b.title}</small>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </>
     );
   }
 
@@ -109,29 +135,36 @@ export const Layers: FC<Model> = (model) => {
               {name}
               {hasSlots && (
                 <div>
-                  {slots.map((s) => (
-                    <SlotContainer>
-                      <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
-                      <SlotChildren>
-                        {s
-                          .children!.filter((x) => x)
-                          .map((c) => {
-                            const childElement = visit(
-                              c.node,
-                              ElementVisitor,
-                              false
-                            );
-                            // Doesn't render empty text nodes
-                            return childElement;
-                          })}
-                        <AddNew
-                          node={element}
-                          idx={s.children!.length}
-                          slot={s.slot.name}
-                        />
-                      </SlotChildren>
-                    </SlotContainer>
-                  ))}
+                  {slots.map((s) => {
+                    const isEmpty = (s.children?.length ?? 0) <= 0;
+                    return (
+                      <SlotContainer>
+                        <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
+                        {isEmpty && (
+                          <AddNew
+                            node={element}
+                            idx={s.children?.length ?? 0}
+                            slot={s.slot.name}
+                          />
+                        )}
+                        {!isEmpty && (
+                          <SlotChildren>
+                            {s.children
+                              ?.filter((x) => x)
+                              .map((c) => {
+                                const childElement = visit(
+                                  c.node,
+                                  ElementVisitor,
+                                  false
+                                );
+                                // Doesn't render empty text nodes
+                                return childElement;
+                              })}
+                          </SlotChildren>
+                        )}
+                      </SlotContainer>
+                    );
+                  })}
                 </div>
               )}{' '}
             </div>

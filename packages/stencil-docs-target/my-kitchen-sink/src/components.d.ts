@@ -10,6 +10,7 @@ export namespace Components {
         /**
           * The first name of the user to display to their friends
           * @uiName First Noah
+          * @uiDefault Friend
          */
         "first": string;
         /**
@@ -20,6 +21,7 @@ export namespace Components {
         /**
           * Truncates names longer than this
           * @uiName Max Length
+          * @uiDefault 4
          */
         "maxLength": number;
         /**
@@ -62,6 +64,7 @@ declare namespace LocalJSX {
         /**
           * The first name of the user to display to their friends
           * @uiName First Noah
+          * @uiDefault Friend
          */
         "first"?: string;
         /**
@@ -72,6 +75,7 @@ declare namespace LocalJSX {
         /**
           * Truncates names longer than this
           * @uiName Max Length
+          * @uiDefault 4
          */
         "maxLength"?: number;
         /**

@@ -16,13 +16,6 @@
 | `reverse`   | `reverse`    | Should show backwards?                                 | `boolean` | `undefined` |
 
 
-## Slots
-
-| Slot | Description                     |
-| ---- | ------------------------------- |
-|      | Text Content - too many dashed? |
-
-
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

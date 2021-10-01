@@ -2,7 +2,7 @@ import { Component, Prop, h } from '@stencil/core';
 
 /**
  * @uiName My Component
- * @slot - Text Content - too many dashed?
+ * @example Cool Kid - <my-component first=a middle=cool last=kid max-length=400></my-component>
  */
 @Component({
   tag: 'my-component',
@@ -14,6 +14,7 @@ export class MyComponent {
    * The first name of the user to display to their friends
    *
    * @uiName First Noah
+   * @uiDefault Friend
    */
   @Prop() first: string = 'Friend';
 
@@ -35,6 +36,7 @@ export class MyComponent {
    * Truncates names longer than this
    *
    * @uiName Max Length
+   * @uiDefault 4
    */
   @Prop() maxLength: number = 4;
 

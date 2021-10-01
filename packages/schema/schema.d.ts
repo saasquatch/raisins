@@ -26,6 +26,14 @@ export interface Package {
   modules: Array<Module>;
 }
 
+/**
+ * Examples that can be used for dropping in content into the raisins editor
+ */
+export type Example = {
+  title: string;
+  content: string;
+};
+
 // Custom element modules
 export type Module = {
   /**
@@ -46,6 +54,11 @@ export type Module = {
    * properties of exported objects, or passed as arguments to functions.
    */
   tags?: Array<CustomElement>;
+
+  /**
+   * Example content
+   */
+  examples?: Array<Example>;
 };
 
 /**
@@ -85,9 +98,17 @@ export interface CustomElement {
   validParents?: string[];
 
   cssProperties?: CssCustomProperty[];
+
+  /**
+   * HTML examples of how this content can be used
+   */
+  examples?: Array<Example>;
 }
 
 export interface Attribute {
+  /**
+   * The key used in HTML
+   */
   name: string;
 
   /**
@@ -110,13 +131,10 @@ export interface Attribute {
    *
    * As attributes are always strings, this is the actual value, not a human
    * readable description.
+   * 
+   * For boolean attributes this should be "" for true, and undefined for false
    */
   default?: string;
-
-  /**
-   * The name of the field this attribute is associated with, if any.
-   */
-  fieldName?: string;
 
   /**
    * The type of editor that should be used to edit this attribute
@@ -132,6 +150,8 @@ export interface Attribute {
 export interface Slot {
   /**
    * The slot name, or the empty string for an unnamed slot.
+   *
+   * The key used in HTML
    */
   name: string;
 
@@ -161,8 +181,20 @@ export interface Slot {
 export interface CssCustomProperty {
   /**
    * The name of the property, including leading `--`.
+   *
+   * The key used in CSS
    */
   name: string;
+
+  /**
+   * A markdown title suitable for display in a listing.
+   */
+  title?: string;
+
+  /**
+   * A markdown description.
+   */
+  description?: string;
 
   /**
    * The expected syntax of the defined property. Defaults to "*".
@@ -182,14 +214,4 @@ export interface CssCustomProperty {
   syntax?: string;
 
   default?: string;
-
-  /**
-   * A markdown title suitable for display in a listing.
-   */
-  title?: string;
-
-  /**
-   * A markdown description.
-   */
-  description?: string;
 }

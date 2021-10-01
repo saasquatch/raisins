@@ -49,7 +49,7 @@ export function getSlots(
         };
       }, definedSlots);
 
-      const allSlotsWithMeta = Object.keys(allSlots).map((k) => {
+      const allSlotsWithMeta = Object.keys(allSlots).sort().map((k) => {
         const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
         return {
           slot,
