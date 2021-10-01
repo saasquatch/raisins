@@ -53,6 +53,13 @@ export function ToolbarView(props: Model) {
           </SlButton>
         ))}
       </SlButtonGroup> 
+      <SlButtonGroup>
+        <SlButton size="small" pill type="default" onClick={()=>props.setOutlined(!props.outlined)} style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}>
+          <SlIcon slot="prefix" name="window"></SlIcon>
+          {props.outlined ? "Outlined" : "No Outline"}
+        </SlButton> 
+
+      </SlButtonGroup> 
     </ToolbarStyle>
   );
 }

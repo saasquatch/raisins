@@ -41,7 +41,6 @@ function useInnerHtmlIframeRenderer(model: CoreModel & ComponentModel) {
 
   let localUrl = useContext(INTERNAL_CONTEXT);
 
-
   const head = useMemo(() => {
     const scripts =
       model.moduleDetails?.map((m) => {
@@ -81,7 +80,22 @@ function useInnerHtmlIframeRenderer(model: CoreModel & ComponentModel) {
   };
 }
 
-export default function useCanvas(props: CoreModel & ComponentModel) {
+export type CanvasModel = {
+  renderInIframe: (Component: VNode) => void;
+  containerRef: React.MutableRefObject<HTMLElement | undefined>;
+  sizes: Size[];
+  size: Size;
+  setSize: React.Dispatch<Size>;
+  mode: Mode;
+  setMode: React.Dispatch<Mode>;
+  outlined: boolean;
+  setOutlined: React.Dispatch<boolean>;
+};
+
+export default function useCanvas(
+  props: CoreModel & ComponentModel
+): CanvasModel {
+  const [outlined, setOutlined] = useState<boolean>(true);
   const [mode, setMode] = useState<Mode>('edit');
   const frameProps = useInnerHtmlIframeRenderer(props);
   const [size, setSize] = useState<Size>(sizes[0]);
@@ -94,7 +108,12 @@ export default function useCanvas(props: CoreModel & ComponentModel) {
     const style: VNodeStyle = {
       ...rest,
       cursor: 'pointer',
-      outline: n === props.selected ? '2px dashed rgba(255,0,0,0.5)' : '',
+      outline:
+        n === props.selected
+          ? '2px dashed rgba(255,0,0,0.5)'
+          : outlined
+          ? '1px dashed rgba(0,0,0,0.2)'
+          : '',
       outlineOffset: n === props.selected ? '-2px' : '',
     };
     return {
@@ -115,5 +134,7 @@ export default function useCanvas(props: CoreModel & ComponentModel) {
     mode,
     setMode,
     ...frameProps,
+    outlined,
+    setOutlined,
   };
 }
