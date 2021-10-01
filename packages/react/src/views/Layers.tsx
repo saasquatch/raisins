@@ -4,9 +4,6 @@ import {
   RaisinNodeVisitor as NodeVisitor,
 } from '@raisins/core';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
-import SlDropdown from '@shoelace-style/react/dist/dropdown';
-import SlMenu from '@shoelace-style/react/dist/menu';
-import SlMenuItem from '@shoelace-style/react/dist/menu-item';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
@@ -67,23 +64,21 @@ export const Layers: FC<Model> = (model) => {
       return <div />;
     }
     return (
-      <SlDropdown>
-        <button slot="trigger">Add New</button>
-        <SlMenu>
+      <details>
+        <summary>Add New</summary>
+        <div style={{ display: 'flex', overflowX: 'scroll' }}>
           {validChildren.map((b) => {
             const meta = model.getComponentMeta(b);
             return (
-              <SlMenuItem>
-                <span
-                  onClick={() => model.insert(clone(b), props.node, props.idx)}
-                >
-                  {meta.title}
-                </span>
-              </SlMenuItem>
+              <button
+                onClick={() => model.insert(clone(b), props.node, props.idx)}
+              >
+                {meta.title}
+              </button>
             );
           })}
-        </SlMenu>
-      </SlDropdown>
+        </div>
+      </details>
     );
   }
 

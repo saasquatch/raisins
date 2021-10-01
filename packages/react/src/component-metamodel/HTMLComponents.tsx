@@ -2,7 +2,7 @@ import { CustomElement, Slot } from './Component';
 
 const DefaultSlot: Slot = {
   name: '',
-  summary: 'Default slot',
+  title: 'Content',
 };
 
 const COMMON_HTML_ATTRS_SCHEMA = [

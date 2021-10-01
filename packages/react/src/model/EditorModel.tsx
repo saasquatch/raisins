@@ -74,7 +74,7 @@ export type NamedSlot = {
 export const DefaultSlot:NamedSlot = {
   slot: {
     name: "",
-    title: "Default Slot"
+    title: "Content"
   }
 };
 

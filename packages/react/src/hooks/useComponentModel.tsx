@@ -26,10 +26,6 @@ export const INTERNAL_CONTEXT = React.createContext<string | undefined>(
 
 const { visit } = htmlUtil;
 
-const DefaultSlot: Slot = {
-  name: '',
-  title: 'Default slot',
-};
 // const SquatchComponents: CustomElement[] = [
 //   {
 //     tagName: 'sqh-global-container',
