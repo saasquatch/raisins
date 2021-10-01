@@ -1,4 +1,5 @@
 import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import { Slot } from '@raisins/schema/schema';
 import useCanvas, { Mode } from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
 import { useStyleEditor } from '../hooks/useStyleEditor';
@@ -8,7 +9,6 @@ export type CoreModel = {
   node: RaisinNode;
   slots?: NodeWithSlots;
   initial: string;
-
 
   serialized: string;
   html: string;
@@ -53,7 +53,6 @@ export type HistoryModel = {
 
 export type Model = CoreModel &
   HistoryModel & {
-
     /**
      * Canvas
      */
@@ -69,13 +68,14 @@ export type NodeWithSlots = {
 };
 
 export type NamedSlot = {
-  key: string;
-  name: string;
+  slot: Slot;
   children?: NodeWithSlots[];
 };
-export const DefaultSlot = {
-  key: '',
-  name: 'Default Slot',
+export const DefaultSlot:NamedSlot = {
+  slot: {
+    name: "",
+    title: "Default Slot"
+  }
 };
 
 export type Block = {

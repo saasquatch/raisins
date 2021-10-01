@@ -26,6 +26,12 @@ function Editor() {
   const model: Model = useEditor(`
   <div style="--sl-color-primary-600: pink;">
   <my-component></my-component>
+  <my-split>
+    <div slot="left">Left column</div>
+    <div slot="right">Right column</div>
+    <div slot="left">Left column 2</div>
+    <div slot="right">Right column 2</div>
+  </my-split>
   <sl-card class="card-overview"  style="--sl-color-primary-600: orange;">
 
   <strong>Mittens</strong>

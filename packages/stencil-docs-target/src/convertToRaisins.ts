@@ -9,7 +9,6 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
     .filter(isUndocumented)
     .map(comp => {
       const attributes = comp.props.filter(isUndocumented).map(p => {
-        console.log('Default', p.name, p.default);
         const attr: schema.Attribute = {
           name: p.attr ?? p.name,
           type: uiType(p) ?? p.type,

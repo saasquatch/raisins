@@ -23,7 +23,6 @@ const Layer = styled.div<{ selected: boolean }>`
   user-select: none;
   cursor: pointer;
   padding: 10px 0;
-  border: 1px solid #ccc;
 
   background: ${(props) =>
     props.selected ? 'var(--sl-color-gray-800)' : 'var(--sl-color-gray-900)'};
@@ -33,15 +32,16 @@ const Layer = styled.div<{ selected: boolean }>`
 
 const SlotContainer = styled.div`
   margin-left: 3px;
-  border-left: 3px solid green;
-  padding: 5px 0 5px 5px;
   display: flex;
 `;
 
 const SlotName = styled.div`
   writing-mode: vertical-lr;
   text-orientation: sideways;
-  display: none;
+  font-size: 0.7em;
+  padding: 5px 0 5px 2px;
+  color: grey;
+  background: rgba(0,0,0,0.1);
 `;
 const SlotChildren = styled.div`
   width: 100%;
@@ -116,7 +116,7 @@ export const Layers: FC<Model> = (model) => {
                 <div>
                   {slots.map((s) => (
                     <SlotContainer>
-                      <SlotName>{s.name}</SlotName>
+                      <SlotName>{s.slot.title}</SlotName>
                       <SlotChildren>
                         {s
                           .children!.filter((x) => x)

@@ -9,7 +9,7 @@ export namespace Components {
     interface MyComponent {
         /**
           * The first name of the user to display to their friends
-          * @uiName First Name
+          * @uiName First Noah
          */
         "first": string;
         /**
@@ -32,6 +32,12 @@ export namespace Components {
          */
         "reverse": boolean;
     }
+    interface MySplit {
+        /**
+          * Should show backwards?
+         */
+        "reverse": boolean;
+    }
 }
 declare global {
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
@@ -40,15 +46,22 @@ declare global {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    interface HTMLMySplitElement extends Components.MySplit, HTMLStencilElement {
+    }
+    var HTMLMySplitElement: {
+        prototype: HTMLMySplitElement;
+        new (): HTMLMySplitElement;
+    };
     interface HTMLElementTagNameMap {
         "my-component": HTMLMyComponentElement;
+        "my-split": HTMLMySplitElement;
     }
 }
 declare namespace LocalJSX {
     interface MyComponent {
         /**
           * The first name of the user to display to their friends
-          * @uiName First Name
+          * @uiName First Noah
          */
         "first"?: string;
         /**
@@ -71,8 +84,15 @@ declare namespace LocalJSX {
          */
         "reverse"?: boolean;
     }
+    interface MySplit {
+        /**
+          * Should show backwards?
+         */
+        "reverse"?: boolean;
+    }
     interface IntrinsicElements {
         "my-component": MyComponent;
+        "my-split": MySplit;
     }
 }
 export { LocalJSX as JSX };
@@ -80,6 +100,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-split": LocalJSX.MySplit & JSXBase.HTMLAttributes<HTMLMySplitElement>;
         }
     }
 }
