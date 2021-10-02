@@ -3,6 +3,7 @@ import { Component, Prop, h } from '@stencil/core';
 /**
  * @uiName My Component
  * @example Cool Kid - <my-component first=a middle=cool last=kid max-length=400></my-component>
+ * @example Nerd Bird - <my-component first=The middle=Nerd last=Bird max-length=400></my-component>
  */
 @Component({
   tag: 'my-component',

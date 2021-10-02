@@ -1,36 +1,45 @@
-import React from "react";
+import React from 'react';
 import { h, VNode, VNodeData } from 'snabbdom';
-import { htmlUtil, RaisinNode, RaisinDocumentNode, cssSerializer } from '@raisins/core';
-import styleToObject from "style-to-object";
+import {
+  htmlUtil,
+  RaisinNode,
+  RaisinDocumentNode,
+  cssSerializer,
+} from '@raisins/core';
+import styleToObject from 'style-to-object';
 const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';
 
 export function raisintoSnabdom(
   node: RaisinDocumentNode,
-  modifier: (d: VNodeData, n:RaisinNode) => VNodeData = (d,n) => d
+  modifier: (d: VNodeData, n: RaisinNode) => VNodeData = (d, n) => d
 ): VNode {
   const vnode = visit<VNode | string>(node, {
-    onCData(c){
-      return undefined
+    onCData(c) {
+      return undefined;
     },
-    onComment(c){
-      return undefined
+    onComment(c) {
+      return undefined;
     },
     onStyle(el) {
-      return undefined;
+      return h('style', {}, el.contents && cssSerializer(el.contents));
     },
     onElement(el, children) {
       let styleObj;
       try {
-        if(el.style){
+        if (el.style) {
           styleObj = styleToObject(cssSerializer(el.style));
         }
       } finally {
         styleObj = styleObj || {};
       }
 
-      return h(el.tagName, modifier({ attrs: el.attribs, style:styleObj }, el), children);
+      return h(
+        el.tagName,
+        modifier({ attrs: el.attribs, style: styleObj }, el),
+        children
+      );
     },
     onText(text) {
       return text.data;
