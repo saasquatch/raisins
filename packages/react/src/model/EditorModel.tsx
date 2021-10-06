@@ -1,6 +1,6 @@
 import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import useCanvas, { Mode } from '../hooks/useCanvas';
+import useCanvas, { CanvasModel, Mode } from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { StateUpdater } from '../util/NewState';
@@ -52,14 +52,9 @@ export type HistoryModel = {
 };
 
 export type Model = CoreModel &
-  HistoryModel & {
-    /**
-     * Canvas
-     */
-    mode: Mode;
-    setMode: StateUpdater<Mode>;
-  } & ComponentModel &
-  ReturnType<typeof useCanvas> &
+  HistoryModel &
+  ComponentModel &
+  CanvasModel &
   ReturnType<typeof useStyleEditor>;
 
 export type NodeWithSlots = {
@@ -71,11 +66,11 @@ export type NamedSlot = {
   slot: Slot;
   children?: NodeWithSlots[];
 };
-export const DefaultSlot:NamedSlot = {
+export const DefaultSlot: NamedSlot = {
   slot: {
-    name: "",
-    title: "Content"
-  }
+    name: '',
+    title: 'Content',
+  },
 };
 
 export type Block = {
