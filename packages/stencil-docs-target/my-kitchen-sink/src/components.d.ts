@@ -6,6 +6,12 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MyCard {
+        /**
+          * Should show backwards?
+         */
+        "label": string;
+    }
     interface MyComponent {
         /**
           * The first name of the user to display to their friends
@@ -42,6 +48,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLMyCardElement extends Components.MyCard, HTMLStencilElement {
+    }
+    var HTMLMyCardElement: {
+        prototype: HTMLMyCardElement;
+        new (): HTMLMyCardElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
@@ -55,11 +67,18 @@ declare global {
         new (): HTMLMySplitElement;
     };
     interface HTMLElementTagNameMap {
+        "my-card": HTMLMyCardElement;
         "my-component": HTMLMyComponentElement;
         "my-split": HTMLMySplitElement;
     }
 }
 declare namespace LocalJSX {
+    interface MyCard {
+        /**
+          * Should show backwards?
+         */
+        "label"?: string;
+    }
     interface MyComponent {
         /**
           * The first name of the user to display to their friends
@@ -95,6 +114,7 @@ declare namespace LocalJSX {
         "reverse"?: boolean;
     }
     interface IntrinsicElements {
+        "my-card": MyCard;
         "my-component": MyComponent;
         "my-split": MySplit;
     }
@@ -103,6 +123,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "my-card": LocalJSX.MyCard & JSXBase.HTMLAttributes<HTMLMyCardElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             "my-split": LocalJSX.MySplit & JSXBase.HTMLAttributes<HTMLMySplitElement>;
         }
