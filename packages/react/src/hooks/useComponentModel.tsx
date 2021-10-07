@@ -2,6 +2,7 @@ import {
   htmlParser as parse,
   htmlUtil,
   RaisinElementNode,
+  RaisinNodeWithChildren,
   RaisinTextNode,
 } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
@@ -17,6 +18,7 @@ import {
   PackageJson,
   unpkgNpmRegistry,
 } from '../util/NPMRegistry';
+import { isElementNode, isRoot } from '../views/isNode';
 
 export const INTERNAL_CONTEXT = React.createContext<string | undefined>(
   undefined
@@ -122,6 +124,7 @@ export function useComponentModel(): ComponentModel {
     return {
       tagName: node.tagName,
       title: node.tagName,
+      // Default slot meta assumes no children. We may want to assume a permissive default slot.
       slots: [],
     };
   }
@@ -152,7 +155,7 @@ export function useComponentModel(): ComponentModel {
     from: RaisinElementNode,
     to: RaisinElementNode,
     slot: string
-  ) {
+  ): boolean {
     if (from === to) {
       // Can't drop into yourself
       return false;
@@ -176,16 +179,24 @@ export function useComponentModel(): ComponentModel {
     return parentAllowsChild && childAllowsParents;
   }
 
-  function getValidChildren(node: RaisinElementNode, slot: string): Block[] {
+  function getValidChildren(
+    node: RaisinNodeWithChildren,
+    slot?: string
+  ): Block[] {
     const allowedInParent = blocks.filter((block) => {
       const childMeta = getComponentMeta(block.content);
       const childAllowsParents = doesChildAllowParent(childMeta, node);
       return childAllowsParents;
     });
 
-    const slotMeta = getComponentMeta(node)?.slots?.find(
-      (s) => s.name === slot
-    );
+    if (isRoot(node)) {
+      return allowedInParent;
+    }
+
+    const slotMeta = isElementNode(node)
+      ? getComponentMeta(node)?.slots?.find((s) => s.name === slot)
+      : undefined;
+
     if (!slotMeta) {
       // No meta for slot, so we assume anything is allowed
       return allowedInParent;
@@ -208,11 +219,14 @@ export function useComponentModel(): ComponentModel {
     return validChildren;
   }
 
-  function canHaveChildren(node: RaisinElementNode, slot: string): boolean {
+  function canHaveChildren(
+    node: RaisinNodeWithChildren,
+    slot?: string
+  ): boolean {
     return getValidChildren(node, slot).length > 0;
   }
 
-  function getSlotsInternal(node: RaisinElementNode): NodeWithSlots {
+  function getSlotsInternal(node: RaisinNodeWithChildren): NodeWithSlots {
     return getSlots(node, getComponentMeta)!;
   }
 
@@ -260,8 +274,8 @@ export type ComponentModel = {
   getComponentMeta: (node: RaisinElementNode) => CustomElement;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
-  getValidChildren: (node: RaisinElementNode, slot: string) => Block[];
-  canHaveChildren: (node: RaisinElementNode, slot: string) => boolean;
+  getValidChildren: (node: RaisinNodeWithChildren, slot?: string) => Block[];
+  canHaveChildren: (node: RaisinNodeWithChildren, slot?: string) => boolean;
   isValidChild: (
     from: RaisinElementNode,
     to: RaisinElementNode,
@@ -283,15 +297,37 @@ function reduceExamples(
 }
 
 function doesChildAllowParent(
-  childMeta: CustomElement | undefined,
-  to: RaisinElementNode
-) {
-  const childAllowsParentTag =
-    childMeta?.validParents?.includes(to.tagName) ??
-    // If `validParents` doesn't exist, defaults to all parents
-    true;
+  childMeta: CustomElement,
+  to: RaisinNodeWithChildren
+): boolean {
+  let tagName: string | undefined = undefined;
 
-  return childAllowsParentTag;
+  if (isRoot(to)) {
+    // Root element is always allowed.
+    // This allows editing for fragments, since Root !== body
+    return true;
+  }
+
+  if (isElementNode(to)) {
+    tagName = to.tagName;
+  }
+
+  const hasConstraints = childMeta?.validParents !== undefined;
+  if (!hasConstraints) {
+    // No constraints, so all parents are allowed.
+    return true;
+  }
+
+  if (hasConstraints && !tagName) {
+    // If a child specifies a set of valid parents, it will not allow it parent elements without tag names (e.g. comments)
+    return false;
+  }
+
+  if (tagName && childMeta?.validParents?.includes(tagName)) {
+    // Child allows parent
+    return true;
+  }
+  return false;
 }
 
 function blockFromHtml(html: string): RaisinElementNode | undefined {

@@ -6,6 +6,7 @@ import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { PackageEditorView } from './PackageEditorView';
+import RichTextEditor from './RichTextEditor';
 import { StyleEditor } from './StyleEditor';
 import { ToolbarView } from './Toolbar';
 
@@ -101,6 +102,7 @@ export function EditorView(model: Model) {
         </Edits>
         <CanvasCss>
           <Canvas {...model} />
+          <RichTextEditor {...model}/>
         </CanvasCss>
 
         <LayersCss>

@@ -2,11 +2,13 @@ import {
   htmlUtil,
   RaisinElementNode,
   RaisinNodeVisitor as NodeVisitor,
+  RaisinNodeWithChildren,
 } from '@raisins/core';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
+import { TextNodeEditor, TextNodesEditor } from './RichTextEditor';
 
 const { clone, visit } = htmlUtil;
 
@@ -59,7 +61,7 @@ const AddBlock = styled.div`
   justify-self: stretch;
   align-self: stretch;
   background: rgba(0, 0, 255, 0.1);
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -67,9 +69,9 @@ const AddBlock = styled.div`
 
 export const Layers: FC<Model> = (model) => {
   function AddNew(props: {
-    node: RaisinElementNode;
+    node: RaisinNodeWithChildren;
     idx: number;
-    slot: string;
+    slot?: string;
   }) {
     const [open, setOpen] = useState(false);
     const validChildren = model.getValidChildren(props.node, props.slot);
@@ -92,7 +94,7 @@ export const Layers: FC<Model> = (model) => {
                   onClick={() => {
                     const cloned = clone(b.content) as RaisinElementNode;
                     // TODO: add "insert into slot" into core model?
-                    cloned.attribs.slot = props.slot;
+                    props.slot && (cloned.attribs.slot = props.slot);
                     model.insert(cloned, props.node, props.idx);
                   }}
                 >
@@ -137,30 +139,41 @@ export const Layers: FC<Model> = (model) => {
                 <div>
                   {slots.map((s) => {
                     const isEmpty = (s.children?.length ?? 0) <= 0;
+                    const slotWidget = s.slot.editor;
+                    const hasEditor = slotWidget === 'inline';
                     return (
                       <SlotContainer>
                         <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
-                        {isEmpty && (
-                          <AddNew
-                            node={element}
-                            idx={s.children?.length ?? 0}
-                            slot={s.slot.name}
-                          />
+                        {hasEditor && (
+                          // Rich Text Editor<>
+                          <TextNodesEditor element={element} model={model} />
                         )}
-                        {!isEmpty && (
-                          <SlotChildren>
-                            {s.children
-                              ?.filter((x) => x)
-                              .map((c) => {
-                                const childElement = visit(
-                                  c.node,
-                                  ElementVisitor,
-                                  false
-                                );
-                                // Doesn't render empty text nodes
-                                return childElement;
-                              })}
-                          </SlotChildren>
+                        {!hasEditor && (
+                          // Block Editor
+                          <>
+                            {isEmpty && (
+                              <AddNew
+                                node={element}
+                                idx={s.children?.length ?? 0}
+                                slot={s.slot.name}
+                              />
+                            )}
+                            {!isEmpty && (
+                              <SlotChildren>
+                                {s.children
+                                  ?.filter((x) => x)
+                                  .map((c) => {
+                                    const childElement = visit(
+                                      c.node,
+                                      ElementVisitor,
+                                      false
+                                    );
+                                    // Doesn't render empty text nodes
+                                    return childElement;
+                                  })}
+                              </SlotChildren>
+                            )}
+                          </>
                         )}
                       </SlotContainer>
                     );
@@ -172,10 +185,16 @@ export const Layers: FC<Model> = (model) => {
         </Layer>
       );
     },
-    onRoot(_, children) {
-      return <div data-root>{children}</div>;
+    onRoot(root, children) {
+      const hasChildren = root.children.length > 0;
+      return (
+        <div layer-root>
+          {hasChildren && root.children.map((c) => visit(c, ElementVisitor))}
+          {!hasChildren && <AddNew node={root} idx={0} />}
+        </div>
+      );
     },
   };
 
-  return <div data-layers>{visit(model.node, ElementVisitor)}</div>;
+  return <div data-layers>{visit(model.node, ElementVisitor, false)}</div>;
 };

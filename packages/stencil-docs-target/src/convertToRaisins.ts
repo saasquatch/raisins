@@ -35,10 +35,15 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           title: uiName(comp) ?? comp.tag,
           slots: comp.slots.map(s => {
             const [title, description] = splitOnFirst(s.docs, ' - ');
+            let editor = undefined;
+            if(s.name === "" || !s.name){
+              editor = slotEditor(comp);
+            }
             const rSlot: schema.Slot = {
               name: s.name,
               title,
               description,
+              editor
             };
             return rSlot;
           }),
@@ -86,3 +91,4 @@ const isUndocumented = () => hasTag('undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
+const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');

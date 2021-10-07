@@ -176,6 +176,12 @@ export interface Slot {
    * Layout of the slot. Used for UI hints on layout
    */
   orientation?: "up-down" | "left-right" | "right-left" | "down-up";
+
+  /**
+   * Name of the editor used in the UI. Can be used for providing
+   * rich text editing of children.
+   */
+  editor?: string;
 }
 
 export interface CssCustomProperty {

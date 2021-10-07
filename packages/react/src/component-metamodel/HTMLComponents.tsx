@@ -200,6 +200,7 @@ export const SPAN: CustomElement = {
     {
       ...DefaultSlot,
       validChildren: ['span'],
+      editor: "inline"
     },
   ],
 };
