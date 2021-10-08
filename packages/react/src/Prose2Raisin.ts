@@ -1,4 +1,4 @@
-import { schema as defaultSchema } from 'prosemirror-schema-basic';
+import { inlineSchema as defaultSchema } from './ProseSchemas';
 import { htmlParser, htmlSerializer, RaisinNode } from '@raisins/core';
 import { DOMParser, DOMSerializer, Node, Fragment } from 'prosemirror-model';
 
@@ -41,16 +41,16 @@ export function proseFragmentToRaisin(
 }
 
 export function proseRichDocToRaisin(node: Fragment, schema = defaultSchema) {
-    const htmlElement = DOMSerializer.fromSchema(schema).serializeFragment(node)
-    const htmlString = nativeDomToString(htmlElement);
-    const raisinNode = htmlParser(htmlString);
-    return raisinNode;
+  const htmlElement = DOMSerializer.fromSchema(schema).serializeFragment(node);
+  const htmlString = nativeDomToString(htmlElement);
+  const raisinNode = htmlParser(htmlString);
+  return raisinNode;
 }
 
 function nativeDomToString(node: any) {
   const tmpl = document.createElement('template');
   tmpl.content.appendChild(node);
-  
+
   // Serializing happens here
   return tmpl.innerHTML;
 }

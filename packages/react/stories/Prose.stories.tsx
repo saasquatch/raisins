@@ -1,12 +1,7 @@
-import { Model } from '../src/model/EditorModel';
-import { useEditor } from '../src/hooks/useEditor';
-import { EditorView } from '../src/views/EditorView';
-import { Meta, Story } from '@storybook/react';
+import { htmlParser, RaisinNode } from '@raisins/core';
+import { Meta } from '@storybook/react';
 import React, { useState } from 'react';
-import { INTERNAL_CONTEXT } from '../src/hooks/useComponentModel';
-import { RaisinNode } from '@raisins/core';
-import { htmlParser } from '@raisins/core';
-import ProseEditor from '../src/ProseEditor';
+import { ControlledProseEditor, RaisinProseState } from '../src/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };
@@ -25,11 +20,7 @@ export const Span = () => (
 );
 
 export const TextWithBreaks = () => (
-  <Editor
-    initial={htmlParser(
-      `Text<br/>with<br/>breaks`
-    )}
-  />
+  <Editor initial={htmlParser(`Text<br/>with<br/>breaks`)} />
 );
 export const Paragraphs = () => (
   <Editor
@@ -38,12 +29,15 @@ export const Paragraphs = () => (
 );
 
 function Editor({ initial }: { initial: RaisinNode }) {
-  const [state, setState] = useState<RaisinNode>(initial);
+  const [state, setState] = useState<RaisinProseState>({
+    node: initial,
+    selection: undefined,
+  });
 
   return (
     <div>
-      <ProseEditor node={state} setNode={setState} />
-      <hr />I am a span editor
+      <ControlledProseEditor {...{ state, setState }} />
+      <hr />Here is my state:
       <pre>{JSON.stringify(state, null, 2)}</pre>
     </div>
   );
