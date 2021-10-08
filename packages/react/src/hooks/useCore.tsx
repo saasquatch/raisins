@@ -99,17 +99,17 @@ export function useCore(
   function generateNextState(
     previous: InternalState,
     nextNode: RaisinNode,
-    newSelection?: RaisinNode
+    clearSelection = false
   ) {
     const undoStack = [previous.current, ...previous.undoStack];
     const newState: InternalState = {
-      selected:
-        newSelection === undefined
-          ? undefined
-          : {
-              type: 'node',
-              path: getPath(nextNode, newSelection)!,
-            },
+      selected: clearSelection ? undefined : previous.selected,
+        // newSelection === undefined
+        //   ? undefined
+        //   : {
+        //       type: 'node',
+        //       path: getPath(nextNode, newSelection)!,
+        //     },
       current: nextNode,
       undoStack,
       redoStack: [],
@@ -131,12 +131,12 @@ export function useCore(
 
   function setNodeInternal(
     next: NewState<RaisinNode>,
-    newSelection?: RaisinNode
+    clearSelection = false
   ) {
     setState((previous) => {
       const nextNode =
         typeof next === 'function' ? next(previous.current) : next;
-      return generateNextState(previous, nextNode, newSelection);
+      return generateNextState(previous, nextNode, clearSelection);
     });
   }
   const setNode: StateUpdater<RaisinNode> = (n) => setNodeInternal(n);
@@ -152,23 +152,25 @@ export function useCore(
   }
   function duplicateNode(n: RaisinNode) {
     const clone = duplicate(state.current, n);
-    setNodeInternal(clone, n);
+    setNodeInternal(clone, true);
   }
   function moveUp(n: RaisinNode) {
+    // TODO: Move selection up at same time
     setNodeInternal((previousState: RaisinNode) => {
       const parent = parents.get(n);
       const currentIdx = parent!.children.indexOf(n);
       const clone = move(previousState, n, parent!, currentIdx - 1);
       return clone;
-    }, n);
+    });
   }
   function moveDown(n: RaisinNode) {
+    // TODO: Move selection down at same time
     setNodeInternal((previousState: RaisinNode) => {
       const parent = parents.get(n);
       const currentIdx = parent!.children.indexOf(n);
       const clone = move(previousState, n, parent!, currentIdx + 1);
       return clone;
-    }, n);
+    });
   }
   function insertNode(
     n: RaisinNode,
@@ -213,27 +215,15 @@ export function useCore(
   }
   function replacePathInternal(prev: NodePath, next: RaisinNodeWithChildren) {
     setState((previous) => {
-      let newSelection: RaisinNode;
       const nextRoot = replacePath(
         previous.current,
         prev,
-        next,
-        (old: RaisinNode, replacement: RaisinNode) => {
-          if (
-            previous.selected &&
-            old === getNode(previous.current, previous.selected.path)
-          ) {
-            newSelection = replacement;
-          }
-        }
+        next
       );
 
       const undoStack = [previous.current, ...previous.undoStack];
       const newState: InternalState = {
-        selected: {
-          type: 'node',
-          path: getPath(nextRoot, newSelection!)!,
-        },
+        selected: previous.selected,
         current: nextRoot,
         undoStack,
         redoStack: [],
@@ -276,7 +266,7 @@ export function useCore(
     getAncestry,
     slots,
 
-    selected: state.selected
+    selected: state.selected?.path
       ? getNode(state.current, state.selected.path)
       : undefined,
     setSelected,
