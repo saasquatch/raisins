@@ -1,12 +1,17 @@
-import { htmlParser, htmlSerializer as serializer, htmlUtil, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import { htmlParser, htmlSerializer as serializer, htmlUtil, RaisinNode, RaisinNodeWithChildren, NodeSelection } from '@raisins/core';
 import { useMemo, useState } from 'react';
 
 import { CoreModel, HistoryModel } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
 import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
-import { InternalState } from './useEditor';
 
+type InternalState = {
+  current: RaisinNode;
+  undoStack: RaisinNode[];
+  redoStack: RaisinNode[];
+  selected?: NodeSelection;
+};
 
 const { duplicate, getParents, insertAt, move, remove, replace, getAncestry: getAncestryUtil } = htmlUtil;
 

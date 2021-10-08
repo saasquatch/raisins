@@ -23,6 +23,15 @@ import cssParser from "./css-om/parser";
 import * as cssUtil from "./css-om/util";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
 
+import { NodePath, NodeSelection, getNode, getPath } from "./paths/Paths";
+
+export {
+  NodePath,
+  NodeSelection,
+  getNode,
+  getPath
+}
+
 export {
   cssSerializer,
   cssParser,

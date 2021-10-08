@@ -1,3 +1,6 @@
+import { ElementType } from "domelementtype";
+import cloneDeep from "lodash.clonedeep";
+import { getNode, NodePath } from "../paths/Paths";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -6,10 +9,8 @@ import {
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode,
+  RaisinTextNode
 } from "./RaisinNode";
-import cloneDeep from "lodash.clonedeep";
-import { ElementType } from "domelementtype";
 
 /**
  * Provides a WeakMap for parent lookups
@@ -149,6 +150,9 @@ export function remove(root: RaisinNode, node: RaisinNode): RaisinNode {
     removed!
   );
 }
+export function removePath(root: RaisinNode, path: NodePath): RaisinNode {
+  return remove(root, getNode(root, path));
+}
 
 /**
  * Returns a clone of `root` with `node` removed.
@@ -240,6 +244,15 @@ export function replace(
   })!;
 }
 
+export function replacePath(
+  root: RaisinNode,
+  previous: NodePath,
+  next: RaisinNode,
+  callback?: ReplacementCallback
+): RaisinNode {
+  return replace(root, getNode(root, previous), next, callback);
+}
+
 /**
  * Move a node to be a child of the parent at the given index.
  *
@@ -275,6 +288,15 @@ export function move(
   return freeze(moved!);
 }
 
+export function moveToPath(
+  root: RaisinNode,
+  node: NodePath,
+  newParent: NodePath,
+  newIdx: number
+): RaisinNode {
+  return move(root, getNode(root, node), getNode(root, newParent), newIdx);
+}
+
 /**
  * Inserts a new node as a child of the parent at the specified index.
  *
@@ -304,6 +326,14 @@ export function insertAt(
     },
   });
   return freeze(moved!);
+}
+export function insertAtPath(
+  root: RaisinNode,
+  node: RaisinNode,
+  newParent: NodePath,
+  newIdx: number
+): RaisinNode {
+  return insertAt(root, node, getNode(root, newParent), newIdx);
 }
 
 function isBlankOrEmpty(str: string) {
