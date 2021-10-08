@@ -1,21 +1,15 @@
-import { htmlParser, htmlSerializer, RaisinNode } from '@raisins/core';
-import { DOMParser, DOMSerializer } from 'prosemirror-model';
+import { RaisinNode } from '@raisins/core';
+import { DOMParser, Node } from 'prosemirror-model';
 import { schema } from 'prosemirror-schema-basic';
-import { EditorState } from 'prosemirror-state';
+import { EditorState, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
+import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 
-// TODO: Better memoization
-const nodeToString = new WeakMap<RaisinNode, string>();
-
-function memoizedStringify(node: RaisinNode): string {
-  if (nodeToString.has(node)) {
-    return nodeToString.get(node)!;
-  }
-  const str = htmlSerializer(node);
-  nodeToString.set(node, str);
-  return str;
-}
+type SerialState = {
+  selection?: { [key: string]: any };
+  doc: { [key: string]: any };
+};
 
 export default function ProseEditor({
   node,
@@ -24,63 +18,63 @@ export default function ProseEditor({
   node: RaisinNode;
   setNode: React.Dispatch<RaisinNode>;
 }) {
-  let content = memoizedStringify(node);
-  let initialState = useMemo(
-    () =>
-      EditorState.create({
-        schema,
-        doc: DOMParser.fromSchema(schema).parse(stringToNativeDom(content)),
-      }),
-    [schema]
-  );
+  let initialDoc = useMemo(() => raisinToProseDoc(node), [schema]);
+
+  let [sState, setSState] = useState<SerialState>({ doc: initialDoc });
+
+  function dispatchTransaction(trans: Transaction) {
+    setSState((current) => {
+      const currentState = hydratedState(current);
+      const nextState = currentState.applyTransaction(trans);
+      const nextDoc = nextState.state.doc.toJSON();
+      const nextRaisinNode = proseRichDocToRaisin(nextState.state.doc.content);
+      setNode(nextRaisinNode);
+      return {
+        selection: nextState.state.selection.toJSON(),
+        doc: nextDoc,
+      };
+    });
+  }
+
   const viewRef = useRef<EditorView>();
   function mountRef(el: HTMLDivElement) {
     const make = () =>
       new EditorView(el, {
-        state: initialState,
-        dispatchTransaction(trans) {
-          const nextState = initialState.applyTransaction(trans);
-
-          const node = nextState.state.doc.content.firstChild;
-          const html = DOMSerializer.fromSchema(schema).serializeNode(node!);
-          const raisinNode = htmlParser(nativeDomToString(html));
-          // @ts-ignore
-          setNode(raisinNode);
-          viewRef.current?.update(nextState);
-        },
+        state: hydratedState(sState),
+        dispatchTransaction,
+        domParser: DOMParser.fromSchema(schema),
+        clipboardParser: DOMParser.fromSchema(schema),
       });
 
     if (!viewRef.current && el) {
       viewRef.current = make();
     }
-    if (viewRef.current && el) {
-      // Destory and replace
-      viewRef.current.destroy();
-      viewRef.current = make();
-    }
   }
 
-  return <div ref={mountRef} />;
+  const state = hydratedState(sState);
+  viewRef.current?.updateState(state);
+
+  return (
+    <>
+      <div ref={mountRef} />
+
+      <hr />
+      <pre>{JSON.stringify(sState, null, 2)}</pre>
+    </>
+  );
 }
 
-/**
- * Parses a string into native DOM
- *
- * @param html
- * @returns
- */
-function stringToNativeDom(html: string) {
-  const tmpl = document.createElement('template');
+function hydratedState(sState: SerialState): EditorState {
+  const { doc, selection } = sState;
+  const richDoc = Node.fromJSON(schema, doc);
+  const richSelect = selection
+    ? Selection.fromJSON(richDoc, selection)
+    : undefined;
 
-  // Parsing happens here
-  tmpl.innerHTML = html;
-
-  return tmpl.content;
-}
-
-function nativeDomToString(node: any) {
-  const tmpl = document.createElement('template');
-  tmpl.content.appendChild(node);
-
-  return tmpl.innerHTML;
+  let state = EditorState.create({
+    doc: richDoc,
+    selection: richSelect,
+    schema,
+  });
+  return state;
 }
