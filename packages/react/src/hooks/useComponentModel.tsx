@@ -32,7 +32,6 @@ const DEFAULT_BLOCKS: Block[] = [
     content: {
       type: ElementType.Tag,
       tagName: 'div',
-      nodeType: 1,
       attribs: {},
       children: [
         { type: ElementType.Text, data: 'I am a div' } as RaisinTextNode,

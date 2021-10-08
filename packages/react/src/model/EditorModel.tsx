@@ -1,4 +1,4 @@
-import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import { RaisinNode, RaisinNodeWithChildren, NodePath } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import useCanvas, { CanvasModel, Mode } from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
@@ -24,7 +24,6 @@ export type CoreModel = {
    */
   selected?: RaisinNode;
   setSelected(node?: RaisinNode): void;
-  selectParent(): void;
 
   getId(node: RaisinNode): string;
   setSelectedId(id: string): void;
@@ -32,6 +31,8 @@ export type CoreModel = {
   /*
    * Mutations
    */
+  getPath(node:RaisinNode): NodePath;
+
   deleteSelected(): void;
   duplicateNode(node: RaisinNode): void;
   removeNode(node: RaisinNode): void;
@@ -39,6 +40,7 @@ export type CoreModel = {
   moveUp(node: RaisinNode): void;
   moveDown(node: RaisinNode): void;
   replaceNode(prev: RaisinNode, next: RaisinNode): void;
+  replacePath(prev: NodePath, next: RaisinNode): void;
 };
 
 export type HistoryModel = {

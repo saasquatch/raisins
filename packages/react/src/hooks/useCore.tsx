@@ -1,4 +1,14 @@
-import { htmlParser, htmlSerializer as serializer, htmlUtil, RaisinNode, RaisinNodeWithChildren, NodeSelection } from '@raisins/core';
+import {
+  htmlParser,
+  htmlSerializer as serializer,
+  htmlUtil,
+  RaisinNode,
+  RaisinNodeWithChildren,
+  NodeSelection,
+  NodePath,
+  getPath,
+  getNode,
+} from '@raisins/core';
 import { useMemo, useState } from 'react';
 
 import { CoreModel, HistoryModel } from '../model/EditorModel';
@@ -13,7 +23,17 @@ type InternalState = {
   selected?: NodeSelection;
 };
 
-const { duplicate, getParents, insertAt, move, remove, replace, getAncestry: getAncestryUtil } = htmlUtil;
+const {
+  duplicate,
+  getParents,
+  insertAt,
+  move,
+  remove,
+  removePath,
+  replace,
+  replacePath,
+  getAncestry: getAncestryUtil,
+} = htmlUtil;
 
 const nodeToId = new WeakMap<RaisinNode, string>();
 const idToNode = new Map<string, RaisinNode>();
@@ -25,12 +45,14 @@ export function getId(node: RaisinNode): string {
   }
   const id = 'node-' + Math.round(Math.random() * 10000);
   nodeToId.set(node, id);
-  idToNode.set(id,node);
+  idToNode.set(id, node);
   return id;
 }
 
-export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreModel & HistoryModel {
-  // const [selected, setSelected] = useState<RaisinNode>(undefined);
+export function useCore(
+  metamodel: ComponentModel,
+  initial: RaisinNode
+): CoreModel & HistoryModel {
   const [state, setState] = useState<InternalState>({
     redoStack: [],
     undoStack: [],
@@ -38,7 +60,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
   });
 
   const undo = () =>
-    setState(previous => {
+    setState((previous) => {
       if (!previous.undoStack.length) {
         return previous;
       }
@@ -56,7 +78,7 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     });
 
   const redo = () =>
-    setState(previous => {
+    setState((previous) => {
       if (!previous.redoStack.length) {
         return previous;
       }
@@ -74,10 +96,20 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
       return newState;
     });
 
-  function generateNextState(previous: InternalState, nextNode: RaisinNode, newSelection?: RaisinNode) {
+  function generateNextState(
+    previous: InternalState,
+    nextNode: RaisinNode,
+    newSelection?: RaisinNode
+  ) {
     const undoStack = [previous.current, ...previous.undoStack];
     const newState: InternalState = {
-      selected: newSelection,
+      selected:
+        newSelection === undefined
+          ? undefined
+          : {
+              type: 'node',
+              path: getPath(nextNode, newSelection)!,
+            },
       current: nextNode,
       undoStack,
       redoStack: [],
@@ -85,52 +117,45 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     return newState;
   }
 
-  const setSelected = (next: RaisinNode) => {
-    setState(prev => {
+  const setSelected = (next?: RaisinNode) => {
+    setState((prev: InternalState) => {
       // TODO: Allows for selecting nodes that aren't part of the current tree. That doesn't make sense and should be prevented
       return {
         ...prev,
-        selected: next,
+        selected: next
+          ? { type: 'node', path: getPath(prev.current, next)! }
+          : undefined,
       };
     });
   };
-  const selectParent = () => {
-    setState(prev => {
-      if (prev.selected) {
-        const parent = parents.get(prev.selected);
-        if (parent) {
-          return {
-            ...prev,
-            selected: parent,
-          };
-        }
-      }
-      return prev;
-    });
-  };
-  function setNodeInternal(next: NewState<RaisinNode>, newSelection?: RaisinNode) {
-    setState(previous => {
-      const nextNode = typeof next === 'function' ? next(previous.current) : next;
+
+  function setNodeInternal(
+    next: NewState<RaisinNode>,
+    newSelection?: RaisinNode
+  ) {
+    setState((previous) => {
+      const nextNode =
+        typeof next === 'function' ? next(previous.current) : next;
       return generateNextState(previous, nextNode, newSelection);
     });
   }
-  const setNode: StateUpdater<RaisinNode> = n => setNodeInternal(n);
+  const setNode: StateUpdater<RaisinNode> = (n) => setNodeInternal(n);
 
-  const setHtml: StateUpdater<string> = html => {
+  const setHtml: StateUpdater<string> = (html) => {
     const nextHtml = typeof html === 'function' ? html(serialized) : html;
     const nextNode = htmlParser(nextHtml);
     setNodeInternal(nextNode);
   };
 
   function removeNode(n: RaisinNode) {
-    setNodeInternal(previous => remove(previous, n), undefined);
+    setNodeInternal((previous: RaisinNode) => remove(previous, n), undefined);
   }
   function duplicateNode(n: RaisinNode) {
     const clone = duplicate(state.current, n);
     setNodeInternal(clone, n);
   }
   function moveUp(n: RaisinNode) {
-    setNodeInternal(previousState => {
+    setNodeInternal((previousState: RaisinNode) => {
       const parent = parents.get(n);
       const currentIdx = parent!.children.indexOf(n);
       const clone = move(previousState, n, parent!, currentIdx - 1);
@@ -138,30 +163,77 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     }, n);
   }
   function moveDown(n: RaisinNode) {
-    setNodeInternal(previousState => {
+    setNodeInternal((previousState: RaisinNode) => {
       const parent = parents.get(n);
       const currentIdx = parent!.children.indexOf(n);
       const clone = move(previousState, n, parent!, currentIdx + 1);
       return clone;
     }, n);
   }
-  function insertNode(n: RaisinNode, parent: RaisinNodeWithChildren, idx: number) {
+  function insertNode(
+    n: RaisinNode,
+    parent: RaisinNodeWithChildren,
+    idx: number
+  ) {
     const clone = insertAt(state.current, n, parent, idx);
     setNode(clone);
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
-    setState(previous => {
+    setState((previous) => {
       let newSelection: RaisinNode;
-      const nextRoot = replace(previous.current, prev, next, (old, replacement) => {
-        if (old === previous.selected) {
-          newSelection = replacement;
+      const nextRoot = replace(
+        previous.current,
+        prev,
+        next,
+        (old: RaisinNode, replacement: RaisinNode) => {
+          if (
+            previous.selected &&
+            old === getNode(previous.current, previous.selected.path)
+          ) {
+            newSelection = replacement;
+          }
         }
-      });
+      );
 
       const undoStack = [previous.current, ...previous.undoStack];
       const newState: InternalState = {
-        // @ts-ignore
-        selected: newSelection,
+        selected: {
+          type: 'node',
+          path: getPath(nextRoot, newSelection!)!,
+        },
+        current: nextRoot,
+        undoStack,
+        redoStack: [],
+      };
+      return newState;
+    });
+  }
+  function getPathInternal(node:RaisinNode):NodePath{
+    return getPath(state.current, node)!;
+  }
+  function replacePathInternal(prev: NodePath, next: RaisinNodeWithChildren) {
+    setState((previous) => {
+      let newSelection: RaisinNode;
+      const nextRoot = replacePath(
+        previous.current,
+        prev,
+        next,
+        (old: RaisinNode, replacement: RaisinNode) => {
+          if (
+            previous.selected &&
+            old === getNode(previous.current, previous.selected.path)
+          ) {
+            newSelection = replacement;
+          }
+        }
+      );
+
+      const undoStack = [previous.current, ...previous.undoStack];
+      const newState: InternalState = {
+        selected: {
+          type: 'node',
+          path: getPath(nextRoot, newSelection!)!,
+        },
         current: nextRoot,
         undoStack,
         redoStack: [],
@@ -170,42 +242,44 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     });
   }
   function deleteSelected() {
-    setState(previous => {
+    setState((previous) => {
       if (previous.selected) {
-        const clone = remove(previous.current, previous.selected);
+        const clone = removePath(previous.current, previous.selected.path);
         return generateNextState(previous, clone);
       }
       return previous;
     });
   }
 
-
-
-  const {current} = state;
+  const { current } = state;
   const serialized = useMemo(() => serializer(current), [current]);
   const parents = useMemo(() => getParents(current), [current]);
 
-  const slots = useMemo(() => getSlots(current, metamodel.getComponentMeta), [metamodel, current]);
+  const slots = useMemo(() => getSlots(current, metamodel.getComponentMeta), [
+    metamodel,
+    current,
+  ]);
 
   function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
     return getAncestryUtil(state.current, node, parents);
   }
 
-  const setSelectedId = (id:string) => setSelected(idToNode.get(id)!);
+  const setSelectedId = (id: string) => setSelected(idToNode.get(id)!);
   return {
     initial: serializer(initial),
 
     node: state.current,
     serialized,
-    html:serialized,
+    html: serialized,
     setHtml,
     parents,
     getAncestry,
     slots,
 
-    selected: state.selected,
+    selected: state.selected
+      ? getNode(state.current, state.selected.path)
+      : undefined,
     setSelected,
-    selectParent,
 
     getId,
     setSelectedId,
@@ -217,7 +291,9 @@ export function useCore(metamodel: ComponentModel, initial: RaisinNode):CoreMode
     moveDown,
     moveUp,
     replaceNode,
+    replacePath:replacePathInternal,
     setNode,
+    getPath: getPathInternal,
 
     undo,
     redo,

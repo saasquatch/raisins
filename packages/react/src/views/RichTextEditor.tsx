@@ -1,19 +1,19 @@
-import { ElementType } from 'domelementtype';
-import React, { ChangeEventHandler, useState } from 'react';
-import { propsModule } from 'snabbdom';
 import {
-  RaisinDocumentNode,
-  RaisinElementNode,
+  getNode, RaisinElementNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
-} from '../../../core/dist';
+  htmlUtil
+} from '@raisins/core';
+import { ElementType } from 'domelementtype';
+import React, { ChangeEventHandler, useState } from 'react';
 import { Model } from '../model/EditorModel';
 import ControlledProseEditor, {
   ProseTextSelection,
-  RaisinProseState,
+  RaisinProseState
 } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
 
+const {replacePath} = htmlUtil;
 export default function RichTextEditor(props: Model) {
   const { selected } = props;
 
@@ -55,32 +55,42 @@ export function WithSelectionEditor({
   model: Model;
 }) {
   const [selection, setSelect] = useState<ProseTextSelection>();
-  const rootNode: RaisinDocumentNode = {
-    type: ElementType.Root,
-    children: node.children,
-  };
+
+  const path = model.getPath(node);
 
   const setState: React.Dispatch<React.SetStateAction<RaisinProseState>> = (
     next
   ) => {
-    // TODO: This state rendering seems to suffer from selection bias.
-    const previousstate: RaisinProseState = {
-      selection,
-      node: rootNode,
-    };
-    const nextVal = typeof next === 'function' ? next(previousstate) : next;
 
-    const nextNode = {
-      ...node,
-      children: nextVal.node.children,
-    };
-    console.log("Replace node", node, nextNode)
-    model.replaceNode(node, nextNode);
-    setSelect(nextVal.selection);
+    model.setNode(prev=>{
+      const prevNode = getNode(prev, path);
+      const previousstate: RaisinProseState = {
+        selection,
+        node: {
+          type: ElementType.Root,
+          // @ts-ignore
+          children: prevNode.children,
+        },
+      };
+      const nextVal = typeof next === 'function' ? next(previousstate) : next;
+  
+      const nextNode = {
+        ...prevNode,
+        children: nextVal.node.children,
+      };
+      console.log("Replace node", prevNode, nextNode)
+      
+      setSelect(nextVal.selection);
+      return replacePath(prev, path, nextNode)
+    });
   };
+
   const state: RaisinProseState = {
     selection,
-    node: rootNode,
+    node: {
+      type: ElementType.Root,
+      children: node.children,
+    },
   };
   return <ControlledProseEditor {...{ state, setState }} />;
 }
