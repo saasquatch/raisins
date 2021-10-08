@@ -70,12 +70,13 @@ export function WithSelectionEditor({
     };
     const nextVal = typeof next === 'function' ? next(previousstate) : next;
 
-    setSelect(nextVal.selection);
     const nextNode = {
       ...node,
       children: nextVal.node.children,
     };
+    console.log("Replace node", node, nextNode)
     model.replaceNode(node, nextNode);
+    setSelect(nextVal.selection);
   };
   const state: RaisinProseState = {
     selection,

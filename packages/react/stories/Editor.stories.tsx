@@ -11,40 +11,37 @@ const meta: Meta = {
 };
 export default meta;
 
-export function Example() {
-  return <div>I can do things</div>;
-}
-
-export function EditorWrapper({ props }) {
+export function Span({ props }) {
   return (
     <INTERNAL_CONTEXT.Provider value="http://localhost:5000">
-      <Editor />
+      <Editor html={`<span>I am a thing with <b>bold content</b></span>`} />
     </INTERNAL_CONTEXT.Provider>
   );
 }
-function Editor() {
-  const model: Model = useEditor(`
-  <div style="--sl-color-primary-600: pink;">
-  <my-component></my-component>
-  <my-split>
-    <div slot="left">Left column</div>
-    <div slot="right">Right column</div>
-    <div slot="left">Left column 2</div>
-    <div slot="right">Right column 2</div>
-  </my-split>
-  <sl-card class="card-overview"  style="--sl-color-primary-600: orange;">
 
-  <strong>Mittens</strong>
-  This kitten is as cute as he is playful. Bring him home today!
-  <small>6 weeks old</small>
+export function Big({ props }) {
+  return (
+    <INTERNAL_CONTEXT.Provider value="http://localhost:5000">
+      <Editor html={big} />
+    </INTERNAL_CONTEXT.Provider>
+  );
+}
+function Editor({ html }: { html: string }) {
+  const model: Model = useEditor(html);
 
-  <div slot="footer">
-    <sl-button type="primary" pill>More Info</sl-button>
-    <sl-rating></sl-rating>
-  </div>
-</sl-card>
-<sl-card class="card-overview">
+  return <EditorView {...model} />;
+}
 
+const big = `
+<div style="--sl-color-primary-600: pink;">
+<my-component></my-component>
+<my-split>
+  <div slot="left">Left column</div>
+  <div slot="right">Right column</div>
+  <div slot="left">Left column 2</div>
+  <div slot="right">Right column 2</div>
+</my-split>
+<sl-card class="card-overview"  style="--sl-color-primary-600: orange;">
 
 <strong>Mittens</strong>
 This kitten is as cute as he is playful. Bring him home today!
@@ -55,34 +52,43 @@ This kitten is as cute as he is playful. Bring him home today!
   <sl-rating></sl-rating>
 </div>
 </sl-card>
+<sl-card class="card-overview">
+
+
+<strong>Mittens</strong>
+This kitten is as cute as he is playful. Bring him home today!
+<small>6 weeks old</small>
+
+<div slot="footer">
+<sl-button type="primary" pill>More Info</sl-button>
+<sl-rating></sl-rating>
+</div>
+</sl-card>
 <sl-details summary="Toggle Me">
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-  aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 </sl-details>
 <template>
- I am a template
- </template>
+I am a template
+</template>
 </div>
 
 <style>
-  .card-overview {
-    max-width: 300px;
-  }
-
-  .card-overview small {
-    color: var(--sl-color-gray-500);
-  }
-
-  .card-overview [slot="footer"] {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-  }
-</style>
-`);
-
-  return <EditorView {...model} />;
+.card-overview {
+  max-width: 300px;
 }
+
+.card-overview small {
+  color: var(--sl-color-gray-500);
+}
+
+.card-overview [slot="footer"] {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center;
+}
+</style>
+`;
 
 Editor.args = {
   /**

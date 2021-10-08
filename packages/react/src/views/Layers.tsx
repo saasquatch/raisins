@@ -8,7 +8,7 @@ import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { Model } from '../model/EditorModel';
-import { TextNodeEditor, TextNodesEditor } from './RichTextEditor';
+import { TextNodeEditor, TextNodesEditor, WithSelectionEditor } from './RichTextEditor';
 
 const { clone, visit } = htmlUtil;
 
@@ -146,7 +146,7 @@ export const Layers: FC<Model> = (model) => {
                         <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
                         {hasEditor && (
                           // Rich Text Editor<>
-                          <TextNodesEditor element={element} model={model} />
+                          <WithSelectionEditor node={element} model={model} />
                         )}
                         {!hasEditor && (
                           // Block Editor
