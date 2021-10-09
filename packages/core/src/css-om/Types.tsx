@@ -1,5 +1,5 @@
 import type { CssNodePlain } from 'css-tree';
-import { StateUpdater } from '../util/NewState';
+import type { StateUpdater } from '../util/NewState';
 
 
 export type StyleNodeProps<T extends CssNodePlain = CssNodePlain> = {
