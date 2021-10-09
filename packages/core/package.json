@@ -30,12 +30,12 @@
   },
   "size-limit": [
     {
-      "path": "dist/raisins.cjs.production.min.js",
-      "limit": "10 KB"
+      "path": "dist/core.cjs.production.min.js",
+      "limit": "120 KB"
     },
     {
-      "path": "dist/raisins.esm.js",
-      "limit": "10 KB"
+      "path": "dist/core.esm.js",
+      "limit": "120 KB"
     }
   ],
   "devDependencies": {

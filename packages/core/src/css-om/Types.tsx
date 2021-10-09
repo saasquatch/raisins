@@ -1,12 +1,12 @@
-import * as Css from 'css-tree';
+import type { CssNodePlain } from 'css-tree';
 import { StateUpdater } from '../util/NewState';
 
 
-export type StyleNodeProps<T extends Css.CssNodePlain = Css.CssNodePlain> = {
+export type StyleNodeProps<T extends CssNodePlain = CssNodePlain> = {
   node: T;
   setNode: StateUpdater<T>;
 };
 
 export type StyleNodeWithChildren = {
-  children: Css.CssNodePlain[];
-} & Css.CssNodePlain;
+  children: CssNodePlain[];
+} & CssNodePlain;
