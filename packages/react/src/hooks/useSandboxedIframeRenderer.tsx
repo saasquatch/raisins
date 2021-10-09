@@ -42,6 +42,9 @@ export type ChildRPC = {
 
 // TODO: Extract raisins-id as a constant -- also make configurable?
 const childApiSrc = `
+<style>
+body{ margin: 0 }
+</style>
 <script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
 <script type="module">
 import { init, classModule, attributesModule, styleModule, datasetModule, h } from "https://unpkg.com/snabbdom@3.1.0/build/index.js"
@@ -69,7 +72,6 @@ window.addEventListener('DOMContentLoaded',function () {
         patchAndCache(content);
       },
     },
-    debug: true
   });
 
   window.myConnection.promise.then(function(parent){
@@ -93,8 +95,6 @@ window.addEventListener('DOMContentLoaded',function () {
 
   // End event listener
 });
-
-
 </script>
 `;
 

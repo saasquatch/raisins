@@ -1,19 +1,20 @@
 import {
-  getNode, RaisinElementNode,
+  getNode,
+  RaisinElementNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
-  htmlUtil
+  htmlUtil,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
 import React, { ChangeEventHandler, useState } from 'react';
 import { Model } from '../model/EditorModel';
 import ControlledProseEditor, {
   ProseTextSelection,
-  RaisinProseState
+  RaisinProseState,
 } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
 
-const {replacePath} = htmlUtil;
+const { replacePath } = htmlUtil;
 export default function RichTextEditor(props: Model) {
   const { selected } = props;
 
@@ -54,6 +55,7 @@ export function WithSelectionEditor({
   node: RaisinNodeWithChildren;
   model: Model;
 }) {
+  // TODO: Pull this state up the tree / combine it with node selection?
   const [selection, setSelect] = useState<ProseTextSelection>();
 
   const path = model.getPath(node);
@@ -61,8 +63,7 @@ export function WithSelectionEditor({
   const setState: React.Dispatch<React.SetStateAction<RaisinProseState>> = (
     next
   ) => {
-
-    model.setNode(prev=>{
+    model.setNode((prev) => {
       const prevNode = getNode(prev, path);
       const previousstate: RaisinProseState = {
         selection,
@@ -73,15 +74,14 @@ export function WithSelectionEditor({
         },
       };
       const nextVal = typeof next === 'function' ? next(previousstate) : next;
-  
+
       const nextNode = {
         ...prevNode,
         children: nextVal.node.children,
       };
-      console.log("Replace node", prevNode, nextNode)
-      
+
       setSelect(nextVal.selection);
-      return replacePath(prev, path, nextNode)
+      return replacePath(prev, path, nextNode);
     });
   };
 
