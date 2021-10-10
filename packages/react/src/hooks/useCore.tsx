@@ -9,7 +9,7 @@ import {
   getPath,
   getNode,
 } from '@raisins/core';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { CoreModel, HistoryModel } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
@@ -22,6 +22,12 @@ type InternalState = {
   redoStack: RaisinNode[];
   selected?: NodeSelection;
 };
+
+/**
+ * Basis for plugins. Plugins can see what has changed, and then decide it they want to allow it.
+ *
+ */
+type StateReducer<T> = (previous: T, next: T) => T;
 
 const {
   duplicate,
@@ -53,11 +59,21 @@ export function useCore(
   metamodel: ComponentModel,
   initial: RaisinNode
 ): CoreModel & HistoryModel {
-  const [state, setState] = useState<InternalState>({
+  const [state, rawSetState] = useState<InternalState>({
     redoStack: [],
     undoStack: [],
     current: initial,
   });
+
+  const plugins = useRef<StateReducer<InternalState>[]>([]);
+  const setState:StateUpdater<InternalState> = (next)=>{
+
+   rawSetState(previous=>{
+     const nextValue = typeof next === "function" ? next(previous) : next;
+     const reduced = plugins.current.reduce((acc,r)=>r(previous, acc),nextValue)
+     return reduced;
+   })
+  }
 
   const undo = () =>
     setState((previous) => {
@@ -69,6 +85,7 @@ export function useCore(
 
       const nextCurrent = current;
       const newState = {
+        ...previous,
         current: nextCurrent,
         undoStack,
         redoStack,
@@ -87,6 +104,7 @@ export function useCore(
 
       const nextCurrent = current;
       const newState = {
+        ...previous,
         current: nextCurrent,
         immutableCopy: current,
         undoStack,
@@ -104,12 +122,12 @@ export function useCore(
     const undoStack = [previous.current, ...previous.undoStack];
     const newState: InternalState = {
       selected: clearSelection ? undefined : previous.selected,
-        // newSelection === undefined
-        //   ? undefined
-        //   : {
-        //       type: 'node',
-        //       path: getPath(nextNode, newSelection)!,
-        //     },
+      // newSelection === undefined
+      //   ? undefined
+      //   : {
+      //       type: 'node',
+      //       path: getPath(nextNode, newSelection)!,
+      //     },
       current: nextNode,
       undoStack,
       redoStack: [],
@@ -129,10 +147,7 @@ export function useCore(
     });
   };
 
-  function setNodeInternal(
-    next: NewState<RaisinNode>,
-    clearSelection = false
-  ) {
+  function setNodeInternal(next: NewState<RaisinNode>, clearSelection = false) {
     setState((previous) => {
       const nextNode =
         typeof next === 'function' ? next(previous.current) : next;
@@ -199,6 +214,7 @@ export function useCore(
 
       const undoStack = [previous.current, ...previous.undoStack];
       const newState: InternalState = {
+        ...previous,
         selected: {
           type: 'node',
           path: getPath(nextRoot, newSelection!)!,
@@ -210,19 +226,16 @@ export function useCore(
       return newState;
     });
   }
-  function getPathInternal(node:RaisinNode):NodePath{
+  function getPathInternal(node: RaisinNode): NodePath {
     return getPath(state.current, node)!;
   }
   function replacePathInternal(prev: NodePath, next: RaisinNodeWithChildren) {
     setState((previous) => {
-      const nextRoot = replacePath(
-        previous.current,
-        prev,
-        next
-      );
+      const nextRoot = replacePath(previous.current, prev, next);
 
       const undoStack = [previous.current, ...previous.undoStack];
       const newState: InternalState = {
+        ...previous,
         selected: previous.selected,
         current: nextRoot,
         undoStack,
@@ -281,7 +294,7 @@ export function useCore(
     moveDown,
     moveUp,
     replaceNode,
-    replacePath:replacePathInternal,
+    replacePath: replacePathInternal,
     setNode,
     getPath: getPathInternal,
 

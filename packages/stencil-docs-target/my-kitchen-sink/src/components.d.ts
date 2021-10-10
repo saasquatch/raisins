@@ -40,9 +40,9 @@ export namespace Components {
          */
         "middle": string;
         /**
-          * @demo No Name - {}
           * @demo Jeff - {"person": "Jeff"}
           * @demo Jess - {"person": "Jess"}
+          * @demo No Name - {}
          */
         "myDemoProp": {
     person: string;
@@ -119,9 +119,9 @@ declare namespace LocalJSX {
          */
         "middle"?: string;
         /**
-          * @demo No Name - {}
           * @demo Jeff - {"person": "Jeff"}
           * @demo Jess - {"person": "Jess"}
+          * @demo No Name - {}
          */
         "myDemoProp"?: {
     person: string;

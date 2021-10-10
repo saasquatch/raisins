@@ -53,9 +53,9 @@ export class MyComponent {
   @Prop() anonymousLabel: string = "Friend"
 
   /**
-   * @demo No Name - {}
    * @demo Jeff - {"person": "Jeff"}
    * @demo Jess - {"person": "Jess"}
+   * @demo No Name - {}
    */
   @Prop() myDemoProp: {
     person: string;

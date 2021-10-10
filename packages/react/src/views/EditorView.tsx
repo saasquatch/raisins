@@ -91,9 +91,9 @@ export function EditorView(model: Model) {
           <ToolbarView {...model} />
         </Header>
         <Edits>
-          <StyleEditor {...model} />
           <EditorPanel {...model} />
           <PackageEditorView {...model}/>
+          <StyleEditor {...model} />
         </Edits>
         <CanvasCss>
           <Canvas {...model} />
