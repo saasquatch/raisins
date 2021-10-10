@@ -92,11 +92,6 @@ export function EditorView(model: Model) {
         </Header>
         <Edits>
           <StyleEditor {...model} />
-          {model.selected &&
-            `Attributes for ${
-              model.getComponentMeta(model.selected as RaisinElementNode)
-                ?.title || 'Untitled Element'
-            }`}
           <EditorPanel {...model} />
           <PackageEditorView {...model}/>
         </Edits>

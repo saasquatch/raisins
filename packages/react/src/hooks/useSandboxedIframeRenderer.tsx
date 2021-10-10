@@ -47,14 +47,15 @@ body{ margin: 0 }
 </style>
 <script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
 <script type="module">
-import { init, classModule, attributesModule, styleModule, datasetModule, h } from "https://unpkg.com/snabbdom@3.1.0/build/index.js"
+import { init, classModule, propsModule, attributesModule, styleModule, datasetModule, h } from "https://unpkg.com/snabbdom@3.1.0/build/index.js"
 
 const patch = init([
   // Init patch function with chosen modules
+  propsModule, // Handles props, for demo states
   classModule, // makes it easy to toggle classes
   attributesModule, // for setting attributes on DOM elements
   styleModule, // handles styling on elements with support for animations
-  datasetModule
+  datasetModule,
 ]);
 
 let prev = document.body;

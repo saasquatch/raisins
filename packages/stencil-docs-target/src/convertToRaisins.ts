@@ -8,42 +8,62 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
   const tags: schema.CustomElement[] = docs.components
     .filter(isUndocumented)
     .map(comp => {
-      try{
-        const attributes = comp.props.filter(isUndocumented).map(p => {
-          const attr: schema.Attribute = {
-            name: p.attr ?? p.name,
-            type: uiType(p) ?? p.type,
-            title: uiName(p) ?? p.attr ?? p.name,
-            description: p.docs,
-            default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
-            // TODO: Support enums -- need to add to Raisins model
-            // enum: jsonTagValue(p, 'uiEnum'),
-            // enumNames: jsonTagValue(p, 'uiEnumNames'),
-          };
-          return attr;
-        });
-  
+      try {
+        const demos: schema.ComponentState[] = comp.props.reduce((arr, p) => {
+          const demosForProp = p.docsTags
+            .filter(t => t.name == 'demo')
+            .map(t => {
+              const [title, propsRaw] = splitOnFirst(t.text!, ' - ');
+              const componentState: schema.ComponentState = {
+                title: title!,
+                props: {
+                  [p.name]: JSON.parse(propsRaw!),
+                },
+              };
+              // Sorry future people for doing mutable.
+              return componentState;
+            });
+          return [...arr, ...demosForProp];
+        }, [] as schema.ComponentState[]);
+        const attributes = comp.props
+          .filter(p => typeof p.attr !== 'undefined')
+          .filter(isUndocumented)
+          .map(p => {
+            const attr: schema.Attribute = {
+              name: p.attr ?? p.name,
+              type: uiType(p) ?? p.type,
+              title: uiName(p) ?? p.attr ?? p.name,
+              description: p.docs,
+              default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
+              // TODO: Support enums -- need to add to Raisins model
+              // enum: jsonTagValue(p, 'uiEnum'),
+              // enumNames: jsonTagValue(p, 'uiEnumNames'),
+            };
+
+            return attr;
+          });
+
         // TODO: Widget, help, etc.
         // 'ui:widget': tagValue(prop.docsTags, 'uiWidget'),
         // 'ui:name': uiName(prop),
         // 'ui:help': prop.docs,
         // 'ui:options': jsonTagValue(prop, 'uiOptions'),
         // 'ui:order': jsonTagValue(comp, 'uiOrder'),
-  
+
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
           slots: comp.slots.map(s => {
             const [title, description] = splitOnFirst(s.docs, ' - ');
             let editor = undefined;
-            if(s.name === "" || !s.name){
+            if (s.name === '' || !s.name) {
               editor = slotEditor(comp);
             }
             const rSlot: schema.Slot = {
               name: s.name,
               title,
               description,
-              editor
+              editor,
             };
             return rSlot;
           }),
@@ -62,12 +82,13 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                 content,
               };
             }),
+            // 
+            demoStates: (demos.length > 0) ? demos : undefined
         };
         return elem;
-      }catch(e){
+      } catch (e) {
         throw new Error(`Invalid docs tag for ${comp.tag}. ` + e);
       }
-
     });
 
   return {

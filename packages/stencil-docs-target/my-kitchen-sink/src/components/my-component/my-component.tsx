@@ -16,36 +16,50 @@ export class MyComponent {
    * The first name of the user to display to their friends
    *
    * @uiName First Noah
-   * @uiDefault Friend
+   * @uiDefault Your
    */
-  @Prop() first: string = 'Friend';
+  @Prop() first: string = 'Your';
 
   /**
    * The middle name
    *
    * @uiName Middle Name
    */
-  @Prop() middle: string;
+  @Prop() middle: string = "Company";
 
   /**
    * The last name
    *
    * @uiName Last Name
    */
-  @Prop() last: string;
+  @Prop() last: string = "Rep";
 
   /**
    * Truncates names longer than this
    *
    * @uiName Max Length
-   * @uiDefault 4
+   * @uiDefault 6
    */
-  @Prop() maxLength: number = 4;
+  @Prop() maxLength: number = 6;
 
   /**
    * Should show backwards?
    */
   @Prop() reverse: boolean;
+
+  /**
+   * What to call people if we don't have their name
+   */
+  @Prop() anonymousLabel: string = "Friend"
+
+  /**
+   * @demo No Name - {}
+   * @demo Jeff - {"person": "Jeff"}
+   * @demo Jess - {"person": "Jess"}
+   */
+  @Prop() myDemoProp: {
+    person: string;
+  };
 
   private getText(): string {
     let names = [this.first ?? 'friend', this.middle, this.last].filter(x => x);
@@ -58,6 +72,10 @@ export class MyComponent {
   }
 
   render() {
-    return <div>Hello, World! I'm {this.getText()}</div>;
+    return (
+      <div>
+        Hello, {this.myDemoProp?.person ?? this.anonymousLabel}! I'm {this.getText()}
+      </div>
+    );
   }
 }

@@ -14,9 +14,13 @@ export namespace Components {
     }
     interface MyComponent {
         /**
+          * What to call people if we don't have their name
+         */
+        "anonymousLabel": string;
+        /**
           * The first name of the user to display to their friends
           * @uiName First Noah
-          * @uiDefault Friend
+          * @uiDefault Your
          */
         "first": string;
         /**
@@ -27,7 +31,7 @@ export namespace Components {
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 4
+          * @uiDefault 6
          */
         "maxLength": number;
         /**
@@ -35,6 +39,14 @@ export namespace Components {
           * @uiName Middle Name
          */
         "middle": string;
+        /**
+          * @demo No Name - {}
+          * @demo Jeff - {"person": "Jeff"}
+          * @demo Jess - {"person": "Jess"}
+         */
+        "myDemoProp": {
+    person: string;
+  };
         /**
           * Should show backwards?
          */
@@ -81,9 +93,13 @@ declare namespace LocalJSX {
     }
     interface MyComponent {
         /**
+          * What to call people if we don't have their name
+         */
+        "anonymousLabel"?: string;
+        /**
           * The first name of the user to display to their friends
           * @uiName First Noah
-          * @uiDefault Friend
+          * @uiDefault Your
          */
         "first"?: string;
         /**
@@ -94,7 +110,7 @@ declare namespace LocalJSX {
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 4
+          * @uiDefault 6
          */
         "maxLength"?: number;
         /**
@@ -102,6 +118,14 @@ declare namespace LocalJSX {
           * @uiName Middle Name
          */
         "middle"?: string;
+        /**
+          * @demo No Name - {}
+          * @demo Jeff - {"person": "Jeff"}
+          * @demo Jess - {"person": "Jess"}
+         */
+        "myDemoProp"?: {
+    person: string;
+  };
         /**
           * Should show backwards?
          */

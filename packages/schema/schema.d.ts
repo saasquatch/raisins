@@ -103,6 +103,11 @@ export interface CustomElement {
    * HTML examples of how this content can be used
    */
   examples?: Array<Example>;
+
+  /**
+   * States for previewing the internal state of components
+   */
+  demoStates?: Array<ComponentState>;
 }
 
 export interface Attribute {
@@ -131,7 +136,7 @@ export interface Attribute {
    *
    * As attributes are always strings, this is the actual value, not a human
    * readable description.
-   * 
+   *
    * For boolean attributes this should be "" for true, and undefined for false
    */
   default?: string;
@@ -145,6 +150,17 @@ export interface Attribute {
    * Additional data for the widget editor to use.
    */
   uiOptions?: object;
+}
+
+export interface ComponentState {
+  /**
+   * A name for displaying to end users
+   */
+  title: string;
+  /**
+   * Map of property names to values.
+   */
+  props: object;
 }
 
 export interface Slot {

@@ -3,6 +3,7 @@ import { h, VNode, VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
 import { CoreModel } from '../model/EditorModel';
 import unpkgNpmRegistry, { makeLocalRegistry } from '../util/NPMRegistry';
+import { isElementNode } from '../views/isNode';
 import { raisintoSnabdom } from './raisinToSnabdom';
 import { ComponentModel, INTERNAL_CONTEXT } from './useComponentModel';
 import {
@@ -116,13 +117,25 @@ export default function useCanvas(
           : '',
       outlineOffset: n === props.selected ? '-2px' : '',
     };
+    let propsToRender:Record<string,any> = {};
+    if (isElementNode(n)) {
+      const meta = props.getComponentMeta(n);
+      const demoLenght = meta.demoStates?.length ?? 0;
+      if (demoLenght > 0) {
+        // TODO: Allow a picker!
+        propsToRender = meta.demoStates![0].props;
+      }
+    }
+
     return {
       ...d,
       attrs: {
         ...d.attrs,
         'raisins-id': props.getId(n),
+        'raisins-thing': "yes"
       },
       style,
+      props: propsToRender,
     };
   });
 
