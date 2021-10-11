@@ -1,7 +1,13 @@
-import { htmlParser, RaisinNode } from '@raisins/core';
+import { htmlParser, RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import React, { useState } from 'react';
-import { ControlledProseEditor, RaisinProseState } from '../src/ProseEditor';
+import { atom, PrimitiveAtom, useAtom } from 'jotai';
+import React, { useRef, useState } from 'react';
+import {
+  AtomProseEditor,
+  ControlledProseEditor,
+  ProseTextSelection,
+  RaisinProseState,
+} from '../src/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };
@@ -12,33 +18,87 @@ const span: RaisinNode = htmlParser(
 );
 
 export const Span = () => (
-  <Editor
-    initial={htmlParser(
-      `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
-    )}
-  />
+  <div>
+    <AtomEditor
+      initial={htmlParser(
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
+      )}
+    />
+    <AtomEditor
+      initial={htmlParser(
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
+      )}
+    />
+  </div>
+);
+export const SpanUseState = () => (
+  <div>
+    <Editor
+      initial={htmlParser(
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
+      )}
+    />{' '}
+    <Editor
+      initial={htmlParser(
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
+      )}
+    />
+  </div>
 );
 
 export const TextWithBreaks = () => (
-  <Editor initial={htmlParser(`Text<br/>with<br/>breaks`)} />
+  <AtomEditor initial={htmlParser(`Text<br/>with<br/>breaks`)} />
 );
 export const Paragraphs = () => (
+  <AtomEditor
+    initial={htmlParser(`<p>First paragrpah</p><p>second paragrapj</p>`)}
+  />
+);
+export const ParagraphsUseState = () => (
   <Editor
     initial={htmlParser(`<p>First paragrpah</p><p>second paragrapj</p>`)}
   />
 );
 
 function Editor({ initial }: { initial: RaisinNode }) {
-  const [state, setState] = useState<RaisinProseState>({
-    node: initial,
-    selection: undefined,
-  });
-
+  const atomRef = useRef(
+    atom<RaisinProseState>({
+      node: initial as RaisinDocumentNode,
+      selection: undefined,
+    })
+  );
+  const [state, setState] = useAtom(atomRef.current);
   return (
     <div>
       <ControlledProseEditor {...{ state, setState }} />
-      <hr />Here is my state:
+      <hr />
+      Here is my state:
       <pre>{JSON.stringify(state, null, 2)}</pre>
+    </div>
+  );
+}
+
+function AtomEditor({ initial }: { initial: RaisinNode }) {
+  const nodeAtomRef = useRef(
+    atom<RaisinDocumentNode>(initial as RaisinDocumentNode)
+  );
+  const selectionAtomRef = useRef<
+    PrimitiveAtom<ProseTextSelection | undefined>
+  >(atom(undefined) as any);
+
+  const [selection] = useAtom(selectionAtomRef.current);
+  const [node] = useAtom(nodeAtomRef.current);
+  return (
+    <div>
+      <AtomProseEditor
+        {...{
+          nodeAtom: nodeAtomRef.current,
+          selectionAtom: selectionAtomRef.current,
+        }}
+      />
+      <hr />
+      Here is my state:
+      <pre>{JSON.stringify({ selection, node }, null, 2)}</pre>
     </div>
   );
 }

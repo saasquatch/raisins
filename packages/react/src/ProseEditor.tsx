@@ -5,6 +5,7 @@ import { EditorView } from 'prosemirror-view';
 import React, { SetStateAction, useMemo, useRef, useState } from 'react';
 import { inlineSchema as schema } from './ProseSchemas';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
+import { atom, PrimitiveAtom, useAtom } from 'jotai';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -39,6 +40,15 @@ export function ControlledProseEditor(props: ProseEditorProps) {
   return <ProseEditorView {...useExternalState(props.state, props.setState)} />;
 }
 
+export function AtomProseEditor(props: {
+  nodeAtom: PrimitiveAtom<RaisinDocumentNode>;
+  selectionAtom: PrimitiveAtom<ProseTextSelection | undefined>;
+}) {
+  return (
+    <ProseEditorView2 {...useAtomState(props.nodeAtom, props.selectionAtom)} />
+  );
+}
+
 /**
  * An [Uncontrolled Component](https://reactjs.org/docs/uncontrolled-components.html) for
  * doing rich text editing. Doesn't send state back in `setState`
@@ -53,6 +63,70 @@ export function UncontrollerProseEditor({ state, setState }: ProseEditorProps) {
       />
     </>
   );
+}
+
+function useAtomState(
+  node: PrimitiveAtom<RaisinDocumentNode>,
+  selection: PrimitiveAtom<ProseTextSelection | undefined>
+) {
+  // Memoize derived parsed doc
+  const proseDocAtom = useRef(atom((get) => raisinToProseDoc(get(node))));
+
+  // Build editor state
+  const editorStateAtom = useRef(
+    atom<EditorState>((get) => {
+      const sState: SerialState = {
+        doc: get(proseDocAtom.current),
+        selection: get(selection),
+      };
+      return hydratedState(sState);
+    })
+  );
+  const handleTransactionAtion = useRef(
+    atom<null, Transaction>(null, (get, set, trans) => {
+      const currentState = get(editorStateAtom.current);
+      const nextState = currentState.applyTransaction(trans);
+
+      const nextRaisinNode = proseRichDocToRaisin(nextState.state.doc.content);
+      const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
+      set(node, nextRaisinNode);
+      set(selection, neextSelection);
+    })
+  );
+
+  const elementRef = useRefAtom();
+
+  const editorAtom = useRef(
+    atom((get) => {
+      const el = get(elementRef);
+      if (el) {
+        return new EditorView(el, {
+          state: get(editorStateAtom.current),
+          dispatchTransaction: get(handleTransactionAtion.current),
+          domParser: DOMParser.fromSchema(schema),
+          clipboardParser: DOMParser.fromSchema(schema),
+        });
+      }
+      return;
+    })
+  );
+
+  const [, mountRef] = useAtom(elementRef);
+  const [editor] = useAtom(editorAtom.current);
+  const [editorState] = useAtom(editorStateAtom.current);
+
+  editor?.updateState(editorState);
+  return {
+    mountRef,
+  };
+}
+
+/**
+ * Like a useRef, but allows for derived memoized state thanks to Jotai
+ */
+function useRefAtom() {
+  const ref = useRef(atom<HTMLElement | null>(null));
+  return ref.current;
 }
 
 function useExternalState(
@@ -110,7 +184,20 @@ function useInternalState(node: RaisinNode) {
       };
     });
   }
+
   return { sState, dispatchTransaction };
+}
+
+function ProseEditorView2({
+  mountRef,
+}: {
+  mountRef: (el: HTMLElement | null) => void;
+}) {
+  return (
+    <>
+      <div ref={mountRef} />
+    </>
+  );
 }
 
 function ProseEditorView({
