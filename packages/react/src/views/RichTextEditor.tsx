@@ -1,17 +1,17 @@
 import {
   getNode,
+  htmlUtil,
+  RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
-  htmlUtil,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
-import React, { ChangeEventHandler, useState } from 'react';
+import { Atom, atom, SetStateAction } from 'jotai';
+import { useUpdateAtom } from 'jotai/utils';
+import React, { ChangeEventHandler, useEffect, useRef } from 'react';
 import { Model } from '../model/EditorModel';
-import ControlledProseEditor, {
-  ProseTextSelection,
-  RaisinProseState,
-} from '../ProseEditor';
+import { useAtomState, useSelectionAtom } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
 
 const { replacePath } = htmlUtil;
@@ -55,44 +55,58 @@ export function WithSelectionEditor({
   node: RaisinNodeWithChildren;
   model: Model;
 }) {
-  // TODO: Pull this state up the tree / combine it with node selection?
-  const [selection, setSelect] = useState<ProseTextSelection>();
-
+  const selection = useSelectionAtom();
+  const nodeAtom = useValueAtom(node);
   const path = model.getPath(node);
 
-  const setState: React.Dispatch<React.SetStateAction<RaisinProseState>> = (
-    next
-  ) => {
-    model.setNode((prev) => {
-      const prevNode = getNode(prev, path);
-      const previousstate: RaisinProseState = {
-        selection,
-        node: {
+  // Atom doesn't use get or set, so it's safe to be synthetic and different every render?
+  const docNodeAtom = useRef(
+    atom<RaisinDocumentNode, SetStateAction<RaisinDocumentNode>>(
+      (get) => {
+        return {
           type: ElementType.Root,
-          // @ts-ignore
-          children: prevNode.children,
-        },
-      };
-      const nextVal = typeof next === 'function' ? next(previousstate) : next;
+          children: get(nodeAtom).children,
+        };
+      },
+      (get, set, next) => {
+        model.setNode((prev) => {
+          const prevNode = getNode(prev, path);
+          const prevDocNode = {
+            type: ElementType.Root,
+            children: node.children,
+          } as RaisinDocumentNode;
+          const nextVal = typeof next === 'function' ? next(prevDocNode) : next;
+          const nextNode = {
+            ...prevNode,
+            children: nextVal.children,
+          };
+          return replacePath(prev, path, nextNode);
+        });
+      }
+    )
+  ).current;
 
-      const nextNode = {
-        ...prevNode,
-        children: nextVal.node.children,
-      };
+  const { mountRef } = useAtomState(docNodeAtom, selection);
 
-      setSelect(nextVal.selection);
-      return replacePath(prev, path, nextNode);
-    });
-  };
+  return <div ref={mountRef} />;
+}
 
-  const state: RaisinProseState = {
-    selection,
-    node: {
-      type: ElementType.Root,
-      children: node.children,
-    },
-  };
-  return <ControlledProseEditor {...{ state, setState }} />;
+/**
+ * Creates a derived atom from a react render value
+ *
+ * Useful for bridging between useState and Jotai Atoms
+ *
+ * @param value
+ * @returns
+ */
+function useValueAtom<T>(value: T): Atom<T> {
+  const nodeAtom = useRef(atom(value)).current;
+  const update = useUpdateAtom(nodeAtom);
+  useEffect(() => {
+    update(value);
+  }, [value, update]);
+
+  return nodeAtom;
 }
 
 export function TextNodeEditor({

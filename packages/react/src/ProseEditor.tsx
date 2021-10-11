@@ -1,6 +1,6 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { DOMParser, Node } from 'prosemirror-model';
-import { EditorState, Selection, Transaction } from 'prosemirror-state';
+import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import React, { SetStateAction, useMemo, useRef, useState } from 'react';
 import { inlineSchema as schema } from './ProseSchemas';
@@ -65,7 +65,7 @@ export function UncontrollerProseEditor({ state, setState }: ProseEditorProps) {
   );
 }
 
-function useAtomState(
+export function useAtomState(
   node: PrimitiveAtom<RaisinDocumentNode>,
   selection: PrimitiveAtom<ProseTextSelection | undefined>
 ) {
@@ -86,23 +86,35 @@ function useAtomState(
     atom<null, Transaction>(null, (get, set, trans) => {
       const currentState = get(editorStateAtom.current);
       const nextState = currentState.applyTransaction(trans);
+      if (nextState.state.doc !== currentState.doc) {
+        // Only lazily serializes changes
+        const nextRaisinNode = proseRichDocToRaisin(
+          nextState.state.doc.content
+        );
+        set(node, nextRaisinNode);
+      }
 
-      const nextRaisinNode = proseRichDocToRaisin(nextState.state.doc.content);
-      const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
-      set(node, nextRaisinNode);
-      set(selection, neextSelection);
+      if (nextState.state.selection !== currentState.selection) {
+        // Only lazily serializes changes
+        const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
+        set(selection, neextSelection);
+      }
     })
   );
 
   const elementRef = useRefAtom();
+
+  const [, mountRef] = useAtom(elementRef);
+  const [, dispatchTransaction] = useAtom(handleTransactionAtion.current);
+  const [editorState] = useAtom(editorStateAtom.current);
 
   const editorAtom = useRef(
     atom((get) => {
       const el = get(elementRef);
       if (el) {
         return new EditorView(el, {
-          state: get(editorStateAtom.current),
-          dispatchTransaction: get(handleTransactionAtion.current),
+          state: editorState,
+          dispatchTransaction,
           domParser: DOMParser.fromSchema(schema),
           clipboardParser: DOMParser.fromSchema(schema),
         });
@@ -110,11 +122,7 @@ function useAtomState(
       return;
     })
   );
-
-  const [, mountRef] = useAtom(elementRef);
   const [editor] = useAtom(editorAtom.current);
-  const [editorState] = useAtom(editorStateAtom.current);
-
   editor?.updateState(editorState);
   return {
     mountRef,
@@ -245,4 +253,15 @@ function hydratedState(sState: SerialState): EditorState {
     schema,
   });
   return state;
+}
+
+/**
+ * Use this to set up local selection state in a React component;
+ *
+ * @returns a selection state atom
+ */
+export function useSelectionAtom() {
+  return useRef<PrimitiveAtom<ProseTextSelection | undefined>>(
+    atom(undefined) as any
+  ).current;
 }

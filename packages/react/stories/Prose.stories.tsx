@@ -7,6 +7,7 @@ import {
   ControlledProseEditor,
   ProseTextSelection,
   RaisinProseState,
+  useSelectionAtom,
 } from '../src/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
@@ -79,21 +80,19 @@ function Editor({ initial }: { initial: RaisinNode }) {
 }
 
 function AtomEditor({ initial }: { initial: RaisinNode }) {
-  const nodeAtomRef = useRef(
+  const nodeAtom = useRef(
     atom<RaisinDocumentNode>(initial as RaisinDocumentNode)
-  );
-  const selectionAtomRef = useRef<
-    PrimitiveAtom<ProseTextSelection | undefined>
-  >(atom(undefined) as any);
+  ).current;
+  const selectionAtomRef = useSelectionAtom();
 
-  const [selection] = useAtom(selectionAtomRef.current);
-  const [node] = useAtom(nodeAtomRef.current);
+  const [selection] = useAtom(selectionAtomRef);
+  const [node] = useAtom(nodeAtom);
   return (
     <div>
       <AtomProseEditor
         {...{
-          nodeAtom: nodeAtomRef.current,
-          selectionAtom: selectionAtomRef.current,
+          nodeAtom: nodeAtom,
+          selectionAtom: selectionAtomRef,
         }}
       />
       <hr />
