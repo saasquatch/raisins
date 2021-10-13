@@ -1,12 +1,19 @@
+import { pathToId } from '@storybook/client-api';
 import React from 'react';
 
 export function NodeEditorView({
+  id,
+  path,
+  //
   selected,
   toggleSelected,
+  //
   attrs,
   setAttrs,
+  //
   nodeProps,
   setNodeProps,
+  //
   undo,
   redo,
   children = [],
@@ -15,6 +22,11 @@ export function NodeEditorView({
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
+          ID: {id.toString()}
+          <br />
+          Path: {path?.toString() ?? 'none'}
+          <br />
+          Selected:
           {selected ? 'selected' : 'not selected'}{' '}
           <button onClick={() => toggleSelected()}>Toggle Selected</button>
         </div>

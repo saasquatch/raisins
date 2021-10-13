@@ -4,8 +4,9 @@ import { focusAtom } from 'jotai/optics';
 import { OpticFor } from 'optics-ts';
 
 const childOptic = (o: OpticFor<RaisinNode>) =>
-  // @ts-expect-error - since this is an optic for all types of RaisinNode
-  o.prop('children').optional([]);
+  // @ts-expect-error
+  o.prop('children');
+
 export function atomForChildren(nodeAtom: PrimitiveAtom<RaisinNode>) {
   return focusAtom(nodeAtom, childOptic);
 }

@@ -7,12 +7,12 @@ import {
   RaisinTextNode,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
-import { Atom, atom, SetStateAction } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
-import React, { ChangeEventHandler, useEffect, useRef } from 'react';
+import { atom, SetStateAction } from 'jotai';
+import React, { ChangeEventHandler, useRef } from 'react';
 import { Model } from '../model/EditorModel';
 import { useAtomState, useSelectionAtom } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
+import { useValueAtom } from './useValueAtom';
 
 const { replacePath } = htmlUtil;
 export default function RichTextEditor(props: Model) {
@@ -89,24 +89,6 @@ export function WithSelectionEditor({
   const { mountRef } = useAtomState(docNodeAtom, selection);
 
   return <div ref={mountRef} />;
-}
-
-/**
- * Creates a derived atom from a react render value
- *
- * Useful for bridging between useState and Jotai Atoms
- *
- * @param value
- * @returns
- */
-function useValueAtom<T>(value: T): Atom<T> {
-  const nodeAtom = useRef(atom(value)).current;
-  const update = useUpdateAtom(nodeAtom);
-  useEffect(() => {
-    update(value);
-  }, [value, update]);
-
-  return nodeAtom;
 }
 
 export function TextNodeEditor({

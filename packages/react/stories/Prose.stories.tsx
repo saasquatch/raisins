@@ -1,13 +1,11 @@
 import { htmlParser, RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { atom, PrimitiveAtom, useAtom } from 'jotai';
-import React, { useRef, useState } from 'react';
+import { atom, useAtom } from 'jotai';
+import React, { useRef } from 'react';
 import {
   AtomProseEditor,
-  ControlledProseEditor,
-  ProseTextSelection,
-  RaisinProseState,
-  useSelectionAtom,
+  ControlledProseEditor, RaisinProseState,
+  useSelectionAtom
 } from '../src/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',

@@ -1,7 +1,6 @@
 import { NodePath, RaisinNode } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom } from 'jotai';
 import { atomWithNodePath } from './atomWithNodePath';
-import { isFunction } from './isFunction';
 import { createMemoizeAtom } from './weakCache';
 import { selection } from './_atoms';
 
