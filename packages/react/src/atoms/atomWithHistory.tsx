@@ -1,4 +1,5 @@
 import { atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
+import { atomWithSetStateListener } from './atomWithSetterListener';
 
 export type Action<T> = HistoryAction | { type: 'update'; value: T };
 export type HistoryAction = { type: 'undo' } | { type: 'redo' };
@@ -53,4 +54,43 @@ export function primitiveFromHistory<T>(
       set(atomWithHistory, { type: 'update', value: next });
     }
   );
+}
+
+export function atomWithHistoryListener<T>(
+  baseAtom: PrimitiveAtom<T>
+): [PrimitiveAtom<T>, HistoryAtom<T>] {
+  const history = atom({
+    undo: [] as T[],
+    redo: [] as T[],
+  });
+
+  const wrapped = atomWithSetStateListener(baseAtom, (get, set, prev, next) => {
+    // Mutates history when baseAtom is updated
+    set(history, (prevHistory) => {
+      return { ...prevHistory, undo: [...prevHistory.undo, next], redo: [] };
+    });
+  });
+
+  const atomWithHistory = atom<T, Action<T>>(
+    (get) => get(baseAtom),
+    (get, set, action) => {
+      const { undo, redo } = get(history);
+      const current = get(baseAtom);
+      if (action.type === 'update') {
+        set(wrapped, action.value);
+      } else if (action.type === 'undo' && undo.length > 0) {
+        const rest = [...undo];
+        const last = rest.pop()!;
+        set(history, { undo: [...rest], redo: [...redo, current] });
+        set(baseAtom, last);
+      } else if (action.type === 'redo' && redo.length > 0) {
+        const rest = [...redo];
+        const last = rest.pop()!;
+        set(history, { undo: [...rest, current], redo: [...redo] });
+        set(baseAtom, last);
+      }
+    }
+  );
+
+  return [wrapped, atomWithHistory];
 }

@@ -5,9 +5,10 @@ import { OpticFor } from 'optics-ts';
 import { atomWithId } from './atomWithId';
 
 const childOptic = (o: OpticFor<RaisinNode>) =>
-  // @ts-expect-error
-  o.prop('children');
+  o.prop('children' as any).optional();
 
-export function atomForChildren(nodeAtom: PrimitiveAtom<RaisinNode>) {
+export function atomForChildren(
+  nodeAtom: PrimitiveAtom<RaisinNode>
+): PrimitiveAtom<RaisinNode[]> {
   return focusAtom(atomWithId(nodeAtom), childOptic);
 }

@@ -11,6 +11,7 @@ import React, { useCallback, useEffect } from 'react';
 import { atomForChildren } from '../src/atoms/atomForChildren';
 import {
   atomWithHistory,
+  atomWithHistoryListener,
   primitiveFromHistory,
 } from '../src/atoms/atomWithHistory';
 import { atomWithId } from '../src/atoms/atomWithId';
@@ -73,11 +74,7 @@ const initialRoot: RaisinDocumentNode = {
 const nodeWithHistory = atomWithHistory(initialNode);
 const primitive = primitiveFromHistory<RaisinNode>(nodeWithHistory);
 
-const rootWithHistory = atomWithHistory<RaisinNode>(initialRoot);
-const rootPrimitive = primitiveFromHistory(rootWithHistory);
-
-// const selectedAtom = atomWithToggle(false);
-// const nodeProps = atom({});
+const [rootPrimitive, rootWithHistory] = atomWithHistoryListener(root);
 
 export function RootPlayground() {
   return (
@@ -236,15 +233,17 @@ function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
     splitAtom(atomForChildren(nodeAtom))
   );
 
+  const derivedChildAtoms = childAtoms
+    ?.map((c) => atomWithId(c as any))
+    .map((c) => ({
+      node: c,
+      selected: atomWithSelection(c),
+      nodeProps: atomWithNodeProps(c),
+      remove: () => removeChild(c),
+    }));
+
   return {
-    childAtoms: childAtoms
-      .map((c) => atomWithId(c as any))
-      .map((c) => ({
-        node: c,
-        selected: atomWithSelection(c),
-        nodeProps: atomWithNodeProps(c),
-        remove: () => removeChild(c),
-      })),
+    childAtoms: derivedChildAtoms ?? [],
     removeChild,
   };
 }
