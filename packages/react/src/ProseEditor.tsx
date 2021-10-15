@@ -72,43 +72,55 @@ export function useAtomState(
   selection: PrimitiveAtom<ProseTextSelection | undefined>
 ) {
   // Memoize derived parsed doc
-  const proseDocAtom = useRef(atom((get) => raisinToProseDoc(get(node))));
+  const proseDocAtom = useMemo(
+    () => atom((get) => raisinToProseDoc(get(node))),
+    [node]
+  );
 
   // Build editor state
-  const editorStateAtom = useRef(
-    atom<EditorState>((get) => {
-      const sState: SerialState = {
-        doc: get(proseDocAtom.current),
-        selection: get(selection),
-      };
-      return hydratedState(sState);
-    })
+  const editorStateAtom = useMemo(
+    () =>
+      atom<EditorState>((get) => {
+        const sState: SerialState = {
+          doc: get(proseDocAtom),
+          selection: get(selection),
+        };
+        return hydratedState(sState);
+      }),
+    [proseDocAtom, selection]
   );
-  const handleTransactionAtion = useRef(
-    atom<null, Transaction>(null, (get, set, trans) => {
-      const currentState = get(editorStateAtom.current);
-      const nextState = currentState.applyTransaction(trans);
-      if (nextState.state.doc !== currentState.doc) {
-        // Only lazily serializes changes
-        const nextRaisinNode = proseRichDocToRaisin(
-          nextState.state.doc.content
-        );
-        set(node, nextRaisinNode);
-      }
+  const handleTransactionAtion = useMemo(
+    () =>
+      atom<null, Transaction>(null, (get, set, trans) => {
+        const currentState = get(editorStateAtom);
+        const nextState = currentState.applyTransaction(trans);
 
-      if (nextState.state.selection !== currentState.selection) {
-        // Only lazily serializes changes
-        const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
-        set(selection, neextSelection);
-      }
-    })
+        // FIXME: Re-bundle this state. Since node and selection are independently updated,
+        // their derived state can become inconsistent.
+        // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
+        // NOTE: This currently works ONLY if selection is updated BEFORE document.
+        // Otherwise deleting from the end of the text will throw an error
+        if (nextState.state.selection !== currentState.selection) {
+          // Only lazily serializes changes
+          const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
+          set(selection, neextSelection);
+        }
+        if (nextState.state.doc !== currentState.doc) {
+          // Only lazily serializes changes
+          const nextRaisinNode = proseRichDocToRaisin(
+            nextState.state.doc.content
+          );
+          set(node, nextRaisinNode);
+        }
+      }),
+    [editorStateAtom, node, selection]
   );
 
   const elementRef = useRefAtom();
 
   const mountRef = useUpdateAtom(elementRef);
-  const dispatchTransaction = useUpdateAtom(handleTransactionAtion.current);
-  const editorState = useAtomValue(editorStateAtom.current);
+  const dispatchTransaction = useUpdateAtom(handleTransactionAtion);
+  const editorState = useAtomValue(editorStateAtom);
 
   const editorAtom = useRef(
     atom((get) => {

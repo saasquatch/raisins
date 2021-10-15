@@ -14,8 +14,9 @@ export function atomWithNodePath(
         const rootEl = get(root);
         const node = get(baseAtom);
         const path = getPath(rootEl, node);
-        if(!path){
-          throw new Error("Could not find node's path in root.")
+        if (!path) {
+          // TODO: Should never be null
+          // throw new Error("Could not find node's path in root.")
         }
         return path;
       }),

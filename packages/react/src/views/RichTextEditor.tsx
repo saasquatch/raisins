@@ -3,12 +3,13 @@ import {
   htmlUtil,
   RaisinDocumentNode,
   RaisinElementNode,
+  RaisinNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
-import { atom, SetStateAction } from 'jotai';
-import React, { ChangeEventHandler, useRef } from 'react';
+import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
+import React, { ChangeEventHandler, useMemo, useRef } from 'react';
 import { Model } from '../model/EditorModel';
 import { useAtomState, useSelectionAtom } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
@@ -55,8 +56,9 @@ export function WithSelectionEditor({
   node: RaisinNodeWithChildren;
   model: Model;
 }) {
-  const selection = useSelectionAtom();
   const nodeAtom = useValueAtom(node);
+
+  const selection = useSelectionAtom();
   const path = model.getPath(node);
 
   // Atom doesn't use get or set, so it's safe to be synthetic and different every render?
@@ -86,6 +88,42 @@ export function WithSelectionEditor({
     )
   ).current;
 
+  const { mountRef } = useAtomState(docNodeAtom, selection);
+
+  return <div ref={mountRef} />;
+}
+
+export function RichTextEditorForAtom({
+  nodeAtom,
+}: {
+  nodeAtom: PrimitiveAtom<RaisinElementNode>;
+}) {
+  const docNodeAtom = useMemo(
+    () =>
+      atom<RaisinDocumentNode, SetStateAction<RaisinDocumentNode>>(
+        (get) => {
+          return {
+            type: ElementType.Root,
+            children: get(nodeAtom).children,
+          };
+        },
+        (get, set, next) => {
+          const prevNode = get(nodeAtom);
+          const prevDocNode = {
+            type: ElementType.Root,
+            children: prevNode.children,
+          } as RaisinDocumentNode;
+          const nextVal = typeof next === 'function' ? next(prevDocNode) : next;
+          const nextNode = {
+            ...prevNode,
+            children: nextVal.children,
+          };
+          set(nodeAtom, nextNode);
+        }
+      ),
+    [nodeAtom]
+  );
+  const selection = useSelectionAtom();
   const { mountRef } = useAtomState(docNodeAtom, selection);
 
   return <div ref={mountRef} />;

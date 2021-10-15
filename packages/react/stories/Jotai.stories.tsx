@@ -5,25 +5,24 @@ import {
 } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { ElementType } from 'domelementtype';
-import { atom, PrimitiveAtom, Provider, useAtom } from 'jotai';
+import { PrimitiveAtom, Provider, useAtom } from 'jotai';
 import { splitAtom, useAtomValue, useUpdateAtom } from 'jotai/utils';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { atomForChildren } from '../src/atoms/atomForChildren';
 import {
   atomWithHistory,
   primitiveFromHistory,
 } from '../src/atoms/atomWithHistory';
 import { atomWithId } from '../src/atoms/atomWithId';
-import { atomWithNodePath } from '../src/atoms/atomWithNodePath';
 import { atomWithNodeProps } from '../src/atoms/atomWithNodeProps';
 import { atomWithSelection } from '../src/atoms/atomWithSelection';
-import { atomWithToggle } from '../src/atoms/atomWithToggle';
 import { root, selection } from '../src/atoms/_atoms';
+import { RichTextEditorForAtom } from '../src/views/RichTextEditor';
 import { NodeEditorView } from './NodeEditorView';
 import { useNodeEditor } from './useNodeEditor';
 
 const meta: Meta = {
-  title: 'Jotai',
+  title: 'Editor (via Jotai)',
 };
 export default meta;
 
@@ -204,6 +203,8 @@ function ChildNodeEditor({
             />
           );
         })}
+
+        <RichTextEditorForAtom nodeAtom={primitive} />
       </NodeEditorView>
       <button onClick={remove}>Remove child</button>
     </>
@@ -247,43 +248,3 @@ function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
     removeChild,
   };
 }
-
-const a = `{"google":"homepage"}`;
-const b = `{"google":"nomepage"}`;
-const str = atom(a);
-const node = atom<{ google: string }>((get) => JSON.parse(get(str)));
-
-export const JSONMemoized = () => {
-  const One = () => {
-    const [val, setVal] = useAtom(str);
-    return (
-      <div>
-        String: {val}
-        <button onClick={() => setVal((v) => (v === a ? b : a))}>swap</button>
-      </div>
-    );
-  };
-
-  const Two = () => {
-    const [obj] = useAtom(node);
-    const renderCount = useRef(0);
-    const [cnt, setCnt] = useState(0);
-    useEffect(() => {
-      renderCount.current++;
-    }, [obj]);
-
-    return (
-      <div>
-        Render count {renderCount.current} {obj.google} <br />
-        {cnt} <button onClick={() => setCnt((c) => c + 1)}>+1</button>
-      </div>
-    );
-  };
-
-  return (
-    <div>
-      <One />
-      <Two />
-    </div>
-  );
-};
