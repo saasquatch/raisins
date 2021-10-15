@@ -1,4 +1,4 @@
-import { atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { atomWithSetStateListener } from './atomWithSetterListener';
 
 export type Action<T> = HistoryAction | { type: 'update'; value: T };
@@ -6,68 +6,26 @@ export type HistoryAction = { type: 'undo' } | { type: 'redo' };
 
 export type HistoryAtom<T> = WritableAtom<T, Action<T>>;
 
-/**
- * Undo/Redo history atom
- *
- * Based on source: https://github.com/pmndrs/jotai/issues/645#issuecomment-894864968
- */
-export function atomWithHistory<T>(initialValue: T): HistoryAtom<T> {
-  const historyAtom = atom({
-    history: [initialValue],
-    index: 0,
-  });
-
-  const atomWithHistory = atom<T, Action<T>>(
-    (get) => {
-      const { history, index } = get(historyAtom);
-      return history[index];
-    },
-    (get, set, action) => {
-      const { history, index } = get(historyAtom);
-      if (action.type === 'update') {
-        set(historyAtom, {
-          history: [...history.slice(0, index + 1), action.value],
-          index: index + 1,
-        });
-      } else if (action.type === 'undo' && index > 0) {
-        set(historyAtom, { history, index: index - 1 });
-      } else if (action.type === 'redo' && index < history.length - 1) {
-        set(historyAtom, { history, index: index + 1 });
-      }
-    }
-  );
-
-  return atomWithHistory;
-}
-
-export function primitiveFromHistory<T>(
-  atomWithHistory: HistoryAtom<T>
-): PrimitiveAtom<T> {
-  // TODO: Memoize and fix TS error
-  return atom<T, SetStateAction<T>>(
-    (get) => get(atomWithHistory),
-    (get, set, action) => {
-      const prev = get(atomWithHistory);
-      // @ts-expect-error
-      const next = typeof action === 'function' ? action(prev) : action;
-
-      set(atomWithHistory, { type: 'update', value: next });
-    }
-  );
-}
-
 export function atomWithHistoryListener<T>(
   baseAtom: PrimitiveAtom<T>
-): [PrimitiveAtom<T>, HistoryAtom<T>] {
+): [PrimitiveAtom<T>, HistoryAtom<T>, Atom<{ undo: T[]; redo: T[] }>] {
+  /**
+   * Top-oriented stacks, so the first item in the array is the top of the stack
+   */
   const history = atom({
     undo: [] as T[],
     redo: [] as T[],
   });
 
   const wrapped = atomWithSetStateListener(baseAtom, (get, set, prev, next) => {
-    // Mutates history when baseAtom is updated
+    // Updates history when baseAtom is updated
     set(history, (prevHistory) => {
-      return { ...prevHistory, undo: [...prevHistory.undo, next], redo: [] };
+      return {
+        // Previous value gets added to the top of the undo stack
+        undo: [prev, ...prevHistory.undo],
+        // Redo gets cleared
+        redo: [],
+      };
     });
   });
 
@@ -77,20 +35,31 @@ export function atomWithHistoryListener<T>(
       const { undo, redo } = get(history);
       const current = get(baseAtom);
       if (action.type === 'update') {
+        // Delegates to the wrapped listener above
         set(wrapped, action.value);
       } else if (action.type === 'undo' && undo.length > 0) {
-        const rest = [...undo];
-        const last = rest.pop()!;
-        set(history, { undo: [...rest], redo: [...redo, current] });
-        set(baseAtom, last);
+        const [top, ...rest] = undo;
+        set(history, {
+          // Undo stack is shorter
+          undo: [...rest],
+          // Previous active value goes into redo
+          redo: [current, ...redo],
+        });
+        // Undo value pushed in
+        set(baseAtom, top);
       } else if (action.type === 'redo' && redo.length > 0) {
-        const rest = [...redo];
-        const last = rest.pop()!;
-        set(history, { undo: [...rest, current], redo: [...redo] });
-        set(baseAtom, last);
+        const [top, ...rest] = redo;
+        set(history, {
+          // Previous active value goes into redo
+          undo: [current, ...undo],
+          // redo stack is shorter
+          redo: [...rest],
+        });
+        // Undo value pushed in
+        set(baseAtom, top);
       }
     }
   );
 
-  return [wrapped, atomWithHistory];
+  return [wrapped, atomWithHistory, atom((get) => get(history))];
 }

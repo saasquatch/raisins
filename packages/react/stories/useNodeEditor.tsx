@@ -3,8 +3,8 @@ import { PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { useCallback } from 'react';
 import { atomForAttributes } from '../src/atoms/atomForAttributes';
-import { HistoryAction } from '../src/atoms/atomWithHistory';
-import { getId, atomWithId } from '../src/atoms/atomWithId';
+import { HistoryAtom } from '../src/atoms/atomWithHistory';
+import { atomWithId, getId } from '../src/atoms/atomWithId';
 import { atomWithNodePath } from '../src/atoms/atomWithNodePath';
 
 export type NodeProps = Record<string, any>;
@@ -13,7 +13,8 @@ export function useNodeEditor(
   nodeAtom: PrimitiveAtom<RaisinNode>,
   selectedAtom: WritableAtom<boolean, boolean | undefined>,
   nodePropsAtom: PrimitiveAtom<NodeProps>,
-  historyAtom: WritableAtom<unknown, HistoryAction>
+  historyAtom: HistoryAtom<RaisinNode>,
+  remove: () => void
 ) {
   // Derived from parent atom
   const baseAtom = atomWithId(nodeAtom);
@@ -32,6 +33,7 @@ export function useNodeEditor(
   return {
     id,
     path,
+    remove,
     selected,
     toggleSelected,
     attrs,
