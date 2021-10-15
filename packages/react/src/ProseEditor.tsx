@@ -6,6 +6,8 @@ import React, { SetStateAction, useMemo, useRef, useState } from 'react';
 import { inlineSchema as schema } from './ProseSchemas';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { useValueAtom } from './views/useValueAtom';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -104,9 +106,9 @@ export function useAtomState(
 
   const elementRef = useRefAtom();
 
-  const [, mountRef] = useAtom(elementRef);
-  const [, dispatchTransaction] = useAtom(handleTransactionAtion.current);
-  const [editorState] = useAtom(editorStateAtom.current);
+  const mountRef = useUpdateAtom(elementRef);
+  const dispatchTransaction = useUpdateAtom(handleTransactionAtion.current);
+  const editorState = useAtomValue(editorStateAtom.current);
 
   const editorAtom = useRef(
     atom((get) => {
@@ -122,6 +124,7 @@ export function useAtomState(
       return;
     })
   );
+
   const [editor] = useAtom(editorAtom.current);
   editor?.updateState(editorState);
   return {

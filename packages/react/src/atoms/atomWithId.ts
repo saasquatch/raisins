@@ -1,5 +1,4 @@
 import { Atom, atom, PrimitiveAtom } from 'jotai';
-import { isFunction } from '../util/isFunction';
 import { atomWithSetStateListener } from './atomWithSetterListener';
 import { createMemoizeAtom } from './weakCache';
 
@@ -18,35 +17,23 @@ const listener = (
     <Value>(atom: Atom<Promise<Value>>): Value;
     <Value>(atom: Atom<Value>): Value;
   },
+  set: unknown,
   prevValue: object,
   nextValue: object
 ): void => {
   if (idMap.has(prevValue)) {
     const prevId = idMap.get(prevValue)!;
+    // console.log('Transfering id', prevId, 'from', prevValue, 'to', nextValue);
     idMap.set(nextValue, prevId);
+  } else {
+    // console.log('No id to transfer for', prevValue);
   }
 };
 
-export function primitiveWithId<T extends object>(
+export function atomWithId<T extends object>(
   baseAtom: PrimitiveAtom<T>
 ): PrimitiveAtom<T> {
   return memoizeAtom(() => atomWithSetStateListener(baseAtom, listener), [
     baseAtom,
   ]);
-}
-
-export function atomWithId<T extends object>(
-  baseAtom: PrimitiveAtom<T>
-): Atom<string> {
-  return memoizeAtom(
-    () =>
-      atom<string>((get) => {
-        const obj = get(baseAtom);
-        if (!idMap.has(obj)) {
-          idMap.set(obj, 'id-' + Math.random());
-        }
-        return idMap.get(obj)!;
-      }),
-    [baseAtom]
-  );
 }

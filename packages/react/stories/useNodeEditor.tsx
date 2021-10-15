@@ -1,10 +1,10 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
-import { useUpdateAtom, useAtomValue } from 'jotai/utils';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { useCallback } from 'react';
 import { atomForAttributes } from '../src/atoms/atomForAttributes';
 import { HistoryAction } from '../src/atoms/atomWithHistory';
-import { atomWithId, getId, primitiveWithId } from '../src/atoms/atomWithId';
+import { getId, atomWithId } from '../src/atoms/atomWithId';
 import { atomWithNodePath } from '../src/atoms/atomWithNodePath';
 
 export type NodeProps = Record<string, any>;
@@ -16,16 +16,16 @@ export function useNodeEditor(
   historyAtom: WritableAtom<unknown, HistoryAction>
 ) {
   // Derived from parent atom
-  const [attrs, setAttrs] = useAtom(
-    atomForAttributes(primitiveWithId(nodeAtom))
-  );
+  const baseAtom = atomWithId(nodeAtom);
+  const [attrs, setAttrs] = useAtom(atomForAttributes(baseAtom));
 
-  const id = getId(useAtomValue(nodeAtom));
+  const node = useAtomValue(baseAtom);
+  const id = getId(node);
   const [selected, toggleSelected] = useAtom(selectedAtom);
   const [nodeProps, setNodeProps] = useAtom(nodePropsAtom);
-  const dispatch = useUpdateAtom(historyAtom);
-  const [path] = useAtom(atomWithNodePath(nodeAtom));
+  const path = useAtomValue(atomWithNodePath(baseAtom));
 
+  const dispatch = useUpdateAtom(historyAtom);
   const undo = useCallback(() => dispatch({ type: 'undo' }), [dispatch]);
   const redo = useCallback(() => dispatch({ type: 'redo' }), [dispatch]);
 

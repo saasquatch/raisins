@@ -24,7 +24,7 @@ export function NodeEditorView({
         <div>
           ID: {id.toString()}
           <br />
-          Path: {path?.toString() ?? 'none'}
+          Path: {JSON.stringify(path ?? 'none')}
           <br />
           Selected:
           {selected ? 'selected' : 'not selected'}{' '}

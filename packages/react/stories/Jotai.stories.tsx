@@ -5,18 +5,18 @@ import {
 } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { ElementType } from 'domelementtype';
-import { atom, Getter, PrimitiveAtom, Provider, Setter, useAtom } from 'jotai';
-import { splitAtom } from 'jotai/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import { atom, PrimitiveAtom, Provider, useAtom } from 'jotai';
+import { splitAtom, useAtomValue, useUpdateAtom } from 'jotai/utils';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { atomForChildren } from '../src/atoms/atomForChildren';
 import {
   atomWithHistory,
   primitiveFromHistory,
 } from '../src/atoms/atomWithHistory';
+import { atomWithId } from '../src/atoms/atomWithId';
 import { atomWithNodePath } from '../src/atoms/atomWithNodePath';
 import { atomWithNodeProps } from '../src/atoms/atomWithNodeProps';
 import { atomWithSelection } from '../src/atoms/atomWithSelection';
-import { atomWithSetStateListener } from '../src/atoms/atomWithSetterListener';
 import { atomWithToggle } from '../src/atoms/atomWithToggle';
 import { root, selection } from '../src/atoms/_atoms';
 import { NodeEditorView } from './NodeEditorView';
@@ -36,7 +36,27 @@ const initialNode: RaisinNode = {
       type: ElementType.Tag,
       tagName: 'my-child',
       attribs: {},
-      children: [],
+      children: [
+        {
+          type: ElementType.Tag,
+          tagName: 'span',
+          attribs: {},
+          children: [
+            {
+              type: ElementType.Tag,
+              tagName: 'my-child',
+              attribs: {},
+              children: [],
+            } as RaisinElementNode,
+            {
+              type: ElementType.Tag,
+              tagName: 'my-child',
+              attribs: {},
+              children: [],
+            } as RaisinElementNode,
+          ],
+        } as RaisinElementNode,
+      ],
     } as RaisinElementNode,
     {
       type: ElementType.Tag,
@@ -57,14 +77,29 @@ const primitive = primitiveFromHistory<RaisinNode>(nodeWithHistory);
 const rootWithHistory = atomWithHistory<RaisinNode>(initialRoot);
 const rootPrimitive = primitiveFromHistory(rootWithHistory);
 
-const selectedAtom = atomWithToggle(false);
-const nodeProps = atom({});
+// const selectedAtom = atomWithToggle(false);
+// const nodeProps = atom({});
 
 export function RootPlayground() {
   return (
     <Provider>
       <RootPlaygroundInner />
     </Provider>
+  );
+}
+
+function Toolbar() {
+  const dispatch = useUpdateAtom(rootWithHistory);
+  const undo = useCallback(() => dispatch({ type: 'undo' }), [dispatch]);
+  const redo = useCallback(() => dispatch({ type: 'redo' }), [dispatch]);
+  const selected = useAtomValue(selection);
+
+  return (
+    <div>
+      <button onClick={undo}>Undo</button>
+      <button onClick={redo}>Redo</button>
+      Selected: {JSON.stringify(selected)}
+    </div>
   );
 }
 function RootPlaygroundInner() {
@@ -76,12 +111,13 @@ function RootPlaygroundInner() {
   const props = useNodeEditor(
     rootPrimitive,
     atomWithSelection(rootPrimitive),
-    nodeProps,
+    atomWithNodeProps(rootPrimitive),
     rootWithHistory
   );
   const { childAtoms, removeChild } = useChildAtoms(rootPrimitive);
   return (
     <>
+      <Toolbar />
       <NodeEditorView {...props}>
         {childAtoms.map((childAtom) => {
           return (
@@ -104,18 +140,15 @@ function RootPlaygroundInner() {
   );
 }
 
-function Toolbar() {
-  const [selectedPath] = useAtom(selection);
-}
-
 export function NodePlayground() {
+  const primitiveWithId = atomWithId(primitive);
   const props = useNodeEditor(
-    primitive,
-    selectedAtom,
-    nodeProps,
+    primitiveWithId,
+    atomWithSelection(primitiveWithId),
+    atomWithNodeProps(primitiveWithId),
     nodeWithHistory
   );
-  const { childAtoms, removeChild } = useChildAtoms(primitive);
+  const { childAtoms, removeChild } = useChildAtoms(primitiveWithId);
   return (
     <NodeEditorView {...props}>
       {childAtoms.map((childAtom) => {
@@ -151,10 +184,27 @@ function ChildNodeEditor({
     nodeProps,
     nodeWithHistory
   );
-  //   const { childAtom } = useChildAtoms(primitive);
+  const { childAtoms, removeChild } = useChildAtoms(primitive);
   return (
     <>
-      <NodeEditorView {...props} />
+      <NodeEditorView {...props}>
+        {childAtoms.map((childAtom) => {
+          return (
+            <ChildNodeEditor
+              key={`${childAtom.node}`}
+              // Good - from the book
+              primitive={childAtom.node}
+              // Good - derived from parent
+              selectedAtom={childAtom.selected}
+              // Good - derived from parent
+              nodeProps={childAtom.nodeProps}
+              // OK - prop drilling could be smarter
+              nodeWithHistory={nodeWithHistory}
+              remove={childAtom.remove}
+            />
+          );
+        })}
+      </NodeEditorView>
       <button onClick={remove}>Remove child</button>
     </>
   );
@@ -186,12 +236,14 @@ function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
   );
 
   return {
-    childAtoms: childAtoms.map((c) => ({
-      node: c,
-      selected: atomWithSelection(c),
-      nodeProps: atomWithNodeProps(c),
-      remove: () => removeChild(c),
-    })),
+    childAtoms: childAtoms
+      .map((c) => atomWithId(c as any))
+      .map((c) => ({
+        node: c,
+        selected: atomWithSelection(c),
+        nodeProps: atomWithNodeProps(c),
+        remove: () => removeChild(c),
+      })),
     removeChild,
   };
 }
@@ -235,29 +287,3 @@ export const JSONMemoized = () => {
     </div>
   );
 };
-
-const historyAtom = atom([]);
-const countAtom = atom(0);
-const listener = (
-  get: Getter,
-  set: Setter,
-  prev: number,
-  next: number
-): void => {
-  const prevHistory = get(historyAtom);
-  set(historyAtom, [...prevHistory, [prev, next]]);
-};
-const countWithListener = atomWithSetStateListener(countAtom, listener);
-export function TestStateListener() {
-  const [state, setState] = useAtom(countWithListener);
-  const [history, setHistory] = useAtom(historyAtom);
-  return (
-    <div>
-      {state} <button onClick={() => setState((c) => c + 1)}>incr</button>
-      <button onClick={() => setState(0)}>reset</button>
-      <button onClick={() => setHistory([])}>clear history</button>
-      <hr />
-      <pre>{JSON.stringify(history, null, 2)}</pre>
-    </div>
-  );
-}
