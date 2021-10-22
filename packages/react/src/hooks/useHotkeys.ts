@@ -1,9 +1,15 @@
-import { useEffect } from 'react';
 import hotkeys from 'hotkeys-js';
-import { CoreModel, HistoryModel } from '../model/EditorModel';
+import { useUpdateAtom } from 'jotai/utils';
+import { useEffect } from 'react';
+import { DeleteSelectedAtom } from './useCore';
+import { RedoAtom, UndoAtom } from "./HistoryAtoms";
 
-export function useHotkeys(core: CoreModel & HistoryModel) {
-  const { undo, redo, deleteSelected } = core;
+export function useHotkeys() {
+
+  const undo = useUpdateAtom(UndoAtom);
+  const redo = useUpdateAtom(RedoAtom);
+  const deleteSelected = useUpdateAtom(DeleteSelectedAtom);
+
   useEffect(() => {
     // TODO: Scope so that backspace and delete only work depending on what is "focused"
     // TODO: Cleanup listeners on onmount so that the shortcuts don't live forever (e.g. and mess up program engine installation)

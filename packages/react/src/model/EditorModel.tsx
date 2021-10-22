@@ -1,6 +1,6 @@
-import { RaisinNode, RaisinNodeWithChildren, NodePath } from '@raisins/core';
+import { NodePath, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import useCanvas, { CanvasModel, Mode } from '../hooks/useCanvas';
+import { CanvasModel } from '../hooks/useCanvas';
 import { ComponentModel } from '../hooks/useComponentModel';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { StateUpdater } from '../util/NewState';
@@ -31,7 +31,7 @@ export type CoreModel = {
   /*
    * Mutations
    */
-  getPath(node:RaisinNode): NodePath;
+  getPath(node: RaisinNode): NodePath;
 
   deleteSelected(): void;
   duplicateNode(node: RaisinNode): void;
@@ -43,18 +43,7 @@ export type CoreModel = {
   replacePath(prev: NodePath, next: RaisinNode): void;
 };
 
-export type HistoryModel = {
-  /*
-   * History management
-   */
-  undo(): void;
-  redo(): void;
-  hasUndo: boolean;
-  hasRedo: boolean;
-};
-
 export type Model = CoreModel &
-  HistoryModel &
   ComponentModel &
   CanvasModel &
   ReturnType<typeof useStyleEditor>;

@@ -1,17 +1,18 @@
 import {
+  getNode,
+  getPath,
   htmlParser,
   htmlSerializer as serializer,
   htmlUtil,
+  NodePath,
+  NodeSelection,
   RaisinNode,
   RaisinNodeWithChildren,
-  NodeSelection,
-  NodePath,
-  getPath,
-  getNode,
 } from '@raisins/core';
-import { useMemo, useRef, useState } from 'react';
-
-import { CoreModel, HistoryModel } from '../model/EditorModel';
+import { atom, useAtom } from 'jotai';
+import { useUpdateAtom } from 'jotai/utils';
+import { useEffect, useMemo } from 'react';
+import { CoreModel } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
 import { NewState, StateUpdater } from '../util/NewState';
 import { ComponentModel } from './useComponentModel';
@@ -22,12 +23,6 @@ type InternalState = {
   redoStack: RaisinNode[];
   selected?: NodeSelection;
 };
-
-/**
- * Basis for plugins. Plugins can see what has changed, and then decide it they want to allow it.
- *
- */
-type StateReducer<T> = (previous: T, next: T) => T;
 
 const {
   duplicate,
@@ -55,85 +50,53 @@ export function getId(node: RaisinNode): string {
   return id;
 }
 
+export const InternalStateAtom = atom<InternalState>({
+  redoStack: [],
+  undoStack: [],
+  current: htmlParser('<div></div>'),
+});
+
+export const DeleteSelectedAtom = atom(null, (get, set) => {
+  set(InternalStateAtom, (previous) => {
+    if (previous.selected) {
+      const clone = removePath(previous.current, previous.selected.path);
+      return generateNextState(previous, clone);
+    }
+    return previous;
+  });
+});
+
+function generateNextState(
+  previous: InternalState,
+  nextNode: RaisinNode,
+  clearSelection = false
+) {
+  const undoStack = [previous.current, ...previous.undoStack];
+  const newState: InternalState = {
+    selected: clearSelection ? undefined : previous.selected,
+    // newSelection === undefined
+    //   ? undefined
+    //   : {
+    //       type: 'node',
+    //       path: getPath(nextNode, newSelection)!,
+    //     },
+    current: nextNode,
+    undoStack,
+    redoStack: [],
+  };
+  return newState;
+}
+
 export function useCore(
   metamodel: ComponentModel,
   initial: RaisinNode
-): CoreModel & HistoryModel {
-  const [state, rawSetState] = useState<InternalState>({
-    redoStack: [],
-    undoStack: [],
-    current: initial,
-  });
+): CoreModel {
+  const [state, setState] = useAtom(InternalStateAtom);
+  useEffect(() => {
+    setState({ redoStack: [], undoStack: [], current: initial });
+  }, [initial]);
 
-  const plugins = useRef<StateReducer<InternalState>[]>([]);
-  const setState:StateUpdater<InternalState> = (next)=>{
-
-   rawSetState(previous=>{
-     const nextValue = typeof next === "function" ? next(previous) : next;
-     const reduced = plugins.current.reduce((acc,r)=>r(previous, acc),nextValue)
-     return reduced;
-   })
-  }
-
-  const undo = () =>
-    setState((previous) => {
-      if (!previous.undoStack.length) {
-        return previous;
-      }
-      const [current, ...undoStack] = previous.undoStack;
-      const redoStack = [previous.current, ...previous.redoStack];
-
-      const nextCurrent = current;
-      const newState = {
-        ...previous,
-        current: nextCurrent,
-        undoStack,
-        redoStack,
-        selected: previous.selected,
-      };
-      return newState;
-    });
-
-  const redo = () =>
-    setState((previous) => {
-      if (!previous.redoStack.length) {
-        return previous;
-      }
-      const [current, ...redoStack] = previous.redoStack;
-      const undoStack = [previous.current, ...previous.undoStack];
-
-      const nextCurrent = current;
-      const newState = {
-        ...previous,
-        current: nextCurrent,
-        immutableCopy: current,
-        undoStack,
-        redoStack,
-        selected: previous.selected,
-      };
-      return newState;
-    });
-
-  function generateNextState(
-    previous: InternalState,
-    nextNode: RaisinNode,
-    clearSelection = false
-  ) {
-    const undoStack = [previous.current, ...previous.undoStack];
-    const newState: InternalState = {
-      selected: clearSelection ? undefined : previous.selected,
-      // newSelection === undefined
-      //   ? undefined
-      //   : {
-      //       type: 'node',
-      //       path: getPath(nextNode, newSelection)!,
-      //     },
-      current: nextNode,
-      undoStack,
-      redoStack: [],
-    };
-    return newState;
-  }
+  const deleteSelected = useUpdateAtom(DeleteSelectedAtom);
 
   const setSelected = (next?: RaisinNode) => {
     setState((prev: InternalState) => {
@@ -244,15 +207,6 @@ export function useCore(
       return newState;
     });
   }
-  function deleteSelected() {
-    setState((previous) => {
-      if (previous.selected) {
-        const clone = removePath(previous.current, previous.selected.path);
-        return generateNextState(previous, clone);
-      }
-      return previous;
-    });
-  }
 
   const { current } = state;
   const serialized = useMemo(() => serializer(current), [current]);
@@ -297,10 +251,5 @@ export function useCore(
     replacePath: replacePathInternal,
     setNode,
     getPath: getPathInternal,
-
-    undo,
-    redo,
-    hasRedo: state.redoStack.length > 0,
-    hasUndo: state.undoStack.length > 0,
   };
 }

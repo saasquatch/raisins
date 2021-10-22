@@ -2,11 +2,12 @@ import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { DOMParser, Node } from 'prosemirror-model';
-import { EditorState, Selection, Transaction } from 'prosemirror-state';
+import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import React, { SetStateAction, useMemo, useRef, useState } from 'react';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
+import { useRaisinHistoryPlugin } from './ProseToRaisinHistory';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -86,6 +87,8 @@ export function useProseEditorOnAtom(
   );
 
   // Build editor state
+
+  const historyPlugin = useRaisinHistoryPlugin();
   const editorStateAtom = useMemo(
     () =>
       atom<EditorState>((get) => {
@@ -93,9 +96,9 @@ export function useProseEditorOnAtom(
           doc: get(proseDocAtom),
           selection: get(selection),
         };
-        return hydratedState(sState);
+        return hydratedState(sState, [historyPlugin]);
       }),
-    [proseDocAtom, selection]
+    [proseDocAtom, selection, historyPlugin]
   );
   const handleTransactionAtion = useMemo(
     () =>
@@ -263,17 +266,25 @@ function ProseEditorView({
   );
 }
 
-function hydratedState(sState: SerialState): EditorState {
+function hydratedState(
+  sState: SerialState,
+  plugins: Plugin[] = []
+): EditorState {
   const { doc, selection } = sState;
   const richDoc = Node.fromJSON(schema, doc);
-  const richSelect = selection
-    ? Selection.fromJSON(richDoc, selection)
-    : undefined;
+  let richSelect: Selection | undefined = undefined;
+  try {
+    richSelect = selection ? Selection.fromJSON(richDoc, selection) : undefined;
+  } catch (e) {
+    // Selection out of range caught here
+    // TODO: There's probably a smarter way to validate and replace selections.
+  }
 
   let state = EditorState.create({
     doc: richDoc,
     selection: richSelect,
     schema,
+    plugins,
   });
   return state;
 }

@@ -24,9 +24,8 @@ export function useEditor(initialHTML: string): Model {
 
   const core = useCore(metamodel, initial);
 
-
   // Binds global event handlers
-  useHotkeys(core);
+  useHotkeys();
 
   // @ts-ignore
   return {
