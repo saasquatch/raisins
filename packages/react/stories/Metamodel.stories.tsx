@@ -1,5 +1,5 @@
+import { Meta } from '@storybook/react';
 import React from 'react';
-import { Meta, Story } from '@storybook/react';
 import { useComponentModel } from '../src/hooks/useComponentModel';
 import { PackageEditorView } from '../src/views/PackageEditorView';
 

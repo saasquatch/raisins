@@ -7,6 +7,8 @@ import {
 } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
 import { ElementType } from 'domelementtype';
+import { atom, useAtom } from 'jotai';
+import { useAtomValue } from 'jotai/utils';
 import React, { useContext, useMemo, useState } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
 import { CustomElement } from '../component-metamodel/Component';
@@ -19,10 +21,6 @@ import {
   unpkgNpmRegistry,
 } from '../util/NPMRegistry';
 import { isElementNode, isRoot } from '../views/isNode';
-
-export const INTERNAL_CONTEXT = React.createContext<string | undefined>(
-  undefined
-);
 
 const { visit } = htmlUtil;
 
@@ -46,20 +44,17 @@ type InternalState = {
   moduleDetails: ModuleDetails[];
 };
 
-/**
- * For managing the types of components that are edited and their properties
- */
-export function useComponentModel(): ComponentModel {
-  let localUrl: string | undefined = useContext(INTERNAL_CONTEXT);
+const InternalStateAtom = atom<InternalState>({
+  loading: false,
+  modules: [],
+  moduleDetails: [],
+});
 
-  const [_internalState, _setInternal] = useState<InternalState>({
-    loading: false,
-    modules: [],
-    moduleDetails: [],
-  });
-  const components: CustomElement[] = [
+const ComponentsAtom = atom((get) => {
+  const { moduleDetails } = get(InternalStateAtom);
+  return [
     ...Object.values(HTMLComponents),
-    ..._internalState.moduleDetails.reduce((acc, c) => {
+    ...moduleDetails.reduce((acc, c) => {
       // A raisins package can have multiple "modules", each with their own tags
       const tags =
         c.raisins?.modules.reduce(
@@ -70,45 +65,58 @@ export function useComponentModel(): ComponentModel {
       return [...acc, ...tags];
     }, [] as CustomElement[]),
   ];
+});
 
-  const setModules = (m: NewState<Module[]>) => {
-    _setInternal((i) => {
-      const next = typeof m === 'function' ? m(i.modules) : m;
+export const LocalURLAtom = atom<string | undefined>(undefined);
 
-      (async () => {
-        const details: ModuleDetails[] = [];
-        for (const module of next) {
-          let registry = unpkgNpmRegistry;
-          if (module.name === '@local' && localUrl) {
-            registry = makeLocalRegistry(localUrl);
-          }
-          const detail = await registry.getPackageJson(module);
-          let raisinPkg: schema.Package | undefined = undefined;
-          if (detail.raisins) {
-            const resp = await fetch(
-              registry.resolvePath(module, detail.raisins)
-            );
-            raisinPkg = await resp.json();
-          }
-          details.push({
-            ...module,
-            'package.json': detail,
-            raisins: raisinPkg,
-          });
+const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
+  set(InternalStateAtom, (i) => {
+    const next = typeof m === 'function' ? m(i.modules) : m;
+
+    const localUrl = get(LocalURLAtom);
+    (async () => {
+      const details: ModuleDetails[] = [];
+      for (const module of next) {
+        let registry = unpkgNpmRegistry;
+        if (module.name === '@local' && localUrl) {
+          registry = makeLocalRegistry(localUrl);
         }
-        _setInternal({
-          loading: false,
-          modules: next,
-          moduleDetails: details,
+        const detail = await registry.getPackageJson(module);
+        let raisinPkg: schema.Package | undefined = undefined;
+        if (detail.raisins) {
+          const resp = await fetch(
+            registry.resolvePath(module, detail.raisins)
+          );
+          raisinPkg = await resp.json();
+        }
+        details.push({
+          ...module,
+          'package.json': detail,
+          raisins: raisinPkg,
         });
-      })();
-      return {
+      }
+      set(InternalStateAtom, {
+        loading: false,
         modules: next,
-        loading: true,
-        moduleDetails: i.moduleDetails,
-      };
-    });
-  };
+        moduleDetails: details,
+      });
+    })();
+
+    return {
+      modules: next,
+      loading: true,
+      moduleDetails: i.moduleDetails,
+    };
+  });
+});
+/**
+ * For managing the types of components that are edited and their properties
+ */
+export function useComponentModel(): ComponentModel {
+  const [_internalState, _setInternal] = useAtom(InternalStateAtom);
+  const components: CustomElement[] = useAtomValue(ComponentsAtom);
+
+  const [, setModules] = useAtom(SetModulesAtom);
   const addModule: (module: Module) => void = (module) =>
     setModules((modules) => [...modules, module]);
   const removeModule: (module: Module) => void = (module) =>

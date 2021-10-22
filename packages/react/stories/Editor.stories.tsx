@@ -1,9 +1,9 @@
-import { Model } from '../src/model/EditorModel';
+import { Meta } from '@storybook/react';
+import { Provider } from 'jotai';
+import { LocalURLAtom } from '../src/hooks/useComponentModel';
 import { useEditor } from '../src/hooks/useEditor';
+import { Model } from '../src/model/EditorModel';
 import { EditorView } from '../src/views/EditorView';
-import { Meta, Story } from '@storybook/react';
-import { useState } from 'react';
-import { INTERNAL_CONTEXT } from '../src/hooks/useComponentModel';
 
 const meta: Meta = {
   title: 'Editor',
@@ -13,17 +13,27 @@ export default meta;
 
 export function Span({ props }) {
   return (
-    <INTERNAL_CONTEXT.Provider value="http://localhost:5000">
+    <Provider
+      initialValues={[
+        // Local atom
+        [LocalURLAtom, 'http://localhost:5000'],
+      ]}
+    >
       <Editor html={`<span>I am a thing with <b>bold content</b></span>`} />
-    </INTERNAL_CONTEXT.Provider>
+    </Provider>
   );
 }
 
 export function Big({ props }) {
   return (
-    <INTERNAL_CONTEXT.Provider value="http://localhost:5000">
+    <Provider
+      initialValues={[
+        // Local atom
+        [LocalURLAtom, 'http://localhost:5000'],
+      ]}
+    >
       <Editor html={big} />
-    </INTERNAL_CONTEXT.Provider>
+    </Provider>
   );
 }
 function Editor({ html }: { html: string }) {

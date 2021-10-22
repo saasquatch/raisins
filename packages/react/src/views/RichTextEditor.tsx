@@ -11,7 +11,10 @@ import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import React, { ChangeEventHandler, useMemo, useRef } from 'react';
 import { useNodeAtom } from '../atoms/node-context';
 import { Model } from '../model/EditorModel';
-import { useProseEditorOnAtom, useSelectionAtom } from '../ProseEditor';
+import {
+  useProseEditorOnAtom,
+  useSelectionAtom,
+} from '../prosemirror/ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
 import { useValueAtom } from './useValueAtom';
 

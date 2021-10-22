@@ -1,3 +1,4 @@
+import { useAtomValue } from 'jotai/utils';
 import React, { useContext, useMemo, useState } from 'react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { RaisinDocumentNode } from '../../../core/dist';
@@ -5,7 +6,7 @@ import { CoreModel } from '../model/EditorModel';
 import unpkgNpmRegistry, { makeLocalRegistry } from '../util/NPMRegistry';
 import { isElementNode } from '../views/isNode';
 import { raisintoSnabdom } from './raisinToSnabdom';
-import { ComponentModel, INTERNAL_CONTEXT } from './useComponentModel';
+import { ComponentModel, LocalURLAtom } from './useComponentModel';
 import {
   ChildRPC,
   useSandboxedIframeRenderer,
@@ -40,7 +41,7 @@ function useInnerHtmlIframeRenderer(model: CoreModel & ComponentModel) {
 
   const onClick = (id: string) => model.setSelectedId(id);
 
-  let localUrl = useContext(INTERNAL_CONTEXT);
+  let localUrl = useAtomValue(LocalURLAtom);
 
   const head = useMemo(() => {
     const scripts =
@@ -117,7 +118,7 @@ export default function useCanvas(
           : '',
       outlineOffset: n === props.selected ? '-2px' : '',
     };
-    let propsToRender:Record<string,any> = {};
+    let propsToRender: Record<string, any> = {};
     if (isElementNode(n)) {
       const meta = props.getComponentMeta(n);
       const demoLenght = meta.demoStates?.length ?? 0;
@@ -132,7 +133,7 @@ export default function useCanvas(
       attrs: {
         ...d.attrs,
         'raisins-id': props.getId(n),
-        'raisins-thing': "yes"
+        'raisins-thing': 'yes',
       },
       style,
       props: propsToRender,

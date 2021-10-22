@@ -1,9 +1,15 @@
 import { inlineSchema as defaultSchema } from './ProseSchemas';
 import { htmlParser, htmlSerializer, RaisinNode } from '@raisins/core';
 import { DOMParser, DOMSerializer, Node, Fragment } from 'prosemirror-model';
+import { stringToNativeDom, nativeDomToString } from './nativeDom';
 
 export type ProseRawNode = ProseRawDoc | ProseTextNode | ProseElementNode;
 
+/**
+ * Schema for a Raw prose doc.
+ *
+ * Obtained from `doc.toJSON()` https://prosemirror.net/docs/ref/#model.Node.toJSON
+ */
 export type ProseRawDoc = {
   type: 'doc';
   content?: (ProseTextNode | ProseElementNode)[];
@@ -20,6 +26,11 @@ export type ProseTextNode = {
   marks?: string[];
 };
 
+/**
+ * Converts a RaisinNode to a Prose raw document (i.e. using `doc.toJSON()`)
+ *
+ * Not performant, since it serializes and deserializes via an HTML string
+ */
 export function raisinToProseDoc(
   node: RaisinNode,
   schema = defaultSchema
@@ -40,31 +51,15 @@ export function proseFragmentToRaisin(
   return proseRichDocToRaisin(node, schema);
 }
 
+/**
+ * Converts a Prose Fragment to a RaisinNode
+ *
+ * Not performant, since it serializes and deserializes via an HTML string
+ */
 export function proseRichDocToRaisin(node: Fragment, schema = defaultSchema) {
   const htmlElement = DOMSerializer.fromSchema(schema).serializeFragment(node);
+  // converts via a trip to serialized HTML
   const htmlString = nativeDomToString(htmlElement);
   const raisinNode = htmlParser(htmlString);
   return raisinNode;
-}
-
-function nativeDomToString(node: any) {
-  const tmpl = document.createElement('template');
-  tmpl.content.appendChild(node);
-
-  // Serializing happens here
-  return tmpl.innerHTML;
-}
-
-/**
- * Parses a string into native DOM
- *
- * @param html
- * @returns
- */
-function stringToNativeDom(html: string): DocumentFragment {
-  const tmpl = document.createElement('template');
-
-  // Parsing happens here
-  tmpl.innerHTML = html;
-  return tmpl.content;
 }

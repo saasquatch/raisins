@@ -4,9 +4,10 @@ import { atom, useAtom } from 'jotai';
 import React, { useRef } from 'react';
 import {
   AtomProseEditor,
-  ControlledProseEditor, RaisinProseState,
-  useSelectionAtom
-} from '../src/ProseEditor';
+  ControlledProseEditor,
+  RaisinProseState,
+  useSelectionAtom,
+} from '../src/prosemirror/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };
