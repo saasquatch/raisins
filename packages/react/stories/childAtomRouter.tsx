@@ -29,17 +29,26 @@ export function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
     undefined,
   ];
 
-  const derivedChildAtoms = childAtoms?.map((base) => {
-    const c = atomWithId(base);
-    return {
-      node: c,
-      selected: atomWithSelection(c),
-      nodeProps: atomWithNodeProps(c),
-      remove: () => removeChild(base),
-    };
-  });
+  const derivedChildAtoms = childAtoms?.map((base) =>
+    getDerivedAtoms(base, removeChild)
+  );
 
   return {
     childAtoms: derivedChildAtoms ?? [],
+  };
+}
+
+type Remove = (update?: PrimitiveAtom<RaisinNode>) => void | Promise<void>;
+
+export function getDerivedAtoms(
+  base: PrimitiveAtom<RaisinNode>,
+  removeChild: Remove
+) {
+  const c = atomWithId(base);
+  return {
+    node: c,
+    selected: atomWithSelection(c),
+    nodeProps: atomWithNodeProps(c),
+    remove: () => removeChild(base),
   };
 }

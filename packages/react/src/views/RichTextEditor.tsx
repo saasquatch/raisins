@@ -3,15 +3,15 @@ import {
   htmlUtil,
   RaisinDocumentNode,
   RaisinElementNode,
-  RaisinNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import React, { ChangeEventHandler, useMemo, useRef } from 'react';
+import { useNodeAtom } from '../atoms/node-context';
 import { Model } from '../model/EditorModel';
-import { useAtomState, useSelectionAtom } from '../ProseEditor';
+import { useProseEditorOnAtom, useSelectionAtom } from '../ProseEditor';
 import { isElementNode, isTextNode } from './isNode';
 import { useValueAtom } from './useValueAtom';
 
@@ -88,16 +88,13 @@ export function WithSelectionEditor({
     )
   ).current;
 
-  const { mountRef } = useAtomState(docNodeAtom, selection);
+  const { mountRef } = useProseEditorOnAtom(docNodeAtom, selection);
 
   return <div ref={mountRef} />;
 }
 
-export function RichTextEditorForAtom({
-  nodeAtom,
-}: {
-  nodeAtom: PrimitiveAtom<RaisinElementNode>;
-}) {
+export function useRichTextEditorForAtom() {
+  const nodeAtom = (useNodeAtom() as unknown) as PrimitiveAtom<RaisinElementNode>;
   const docNodeAtom = useMemo(
     () =>
       atom<RaisinDocumentNode, SetStateAction<RaisinDocumentNode>>(
@@ -124,8 +121,17 @@ export function RichTextEditorForAtom({
     [nodeAtom]
   );
   const selection = useSelectionAtom();
-  const { mountRef } = useAtomState(docNodeAtom, selection);
+  const { mountRef } = useProseEditorOnAtom(docNodeAtom, selection);
+  return { mountRef };
+}
 
+/**
+ * A controller for editing rich text via a Prose Editor
+ *
+ * @returns
+ */
+export function RichTextEditorForAtom() {
+  const { mountRef } = useRichTextEditorForAtom();
   return <div ref={mountRef} />;
 }
 

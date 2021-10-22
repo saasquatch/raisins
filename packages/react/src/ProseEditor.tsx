@@ -1,13 +1,12 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
-import { DOMParser, Node } from 'prosemirror-model';
-import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
-import { EditorView } from 'prosemirror-view';
-import React, { SetStateAction, useMemo, useRef, useState } from 'react';
-import { inlineSchema as schema } from './ProseSchemas';
-import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import { useValueAtom } from './views/useValueAtom';
+import { DOMParser, Node } from 'prosemirror-model';
+import { EditorState, Selection, Transaction } from 'prosemirror-state';
+import { EditorView } from 'prosemirror-view';
+import React, { SetStateAction, useMemo, useRef, useState } from 'react';
+import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
+import { inlineSchema as schema } from './ProseSchemas';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -47,7 +46,9 @@ export function AtomProseEditor(props: {
   selectionAtom: PrimitiveAtom<ProseTextSelection | undefined>;
 }) {
   return (
-    <ProseEditorView2 {...useAtomState(props.nodeAtom, props.selectionAtom)} />
+    <ProseEditorView2
+      {...useProseEditorOnAtom(props.nodeAtom, props.selectionAtom)}
+    />
   );
 }
 
@@ -67,7 +68,14 @@ export function UncontrollerProseEditor({ state, setState }: ProseEditorProps) {
   );
 }
 
-export function useAtomState(
+/**
+ * A prose editor that stores it's state in the `node` and `selection` atoms that are provided to this hook.
+ *
+ * @param node
+ * @param selection
+ * @returns
+ */
+export function useProseEditorOnAtom(
   node: PrimitiveAtom<RaisinDocumentNode>,
   selection: PrimitiveAtom<ProseTextSelection | undefined>
 ) {

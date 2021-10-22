@@ -19,9 +19,10 @@ import {
   selection,
 } from '../src/atoms/_atoms';
 import { RichTextEditorForAtom } from '../src/views/RichTextEditor';
-import { useChildAtoms } from './childAtomRouter';
+import { getDerivedAtoms, useChildAtoms } from './childAtomRouter';
 import { NodeEditorView } from './NodeEditorView';
 import { useNodeEditor } from './useNodeEditor';
+import { useNodeAtom, NodeAtomProvider } from '../src/atoms/node-context';
 
 const meta: Meta = {
   title: 'Editor (via Jotai)',
@@ -125,18 +126,12 @@ function RootPlaygroundInner() {
       <NodeEditorView {...props}>
         {childAtoms.map((childAtom) => {
           return (
-            <ChildNodeEditor
+            <NodeAtomProvider
+              nodeAtom={childAtom.node}
               key={`${childAtom.node}`}
-              // Good - from the book
-              primitive={childAtom.node}
-              // Good - derived from parent
-              selectedAtom={childAtom.selected}
-              // Good - derived from parent
-              nodeProps={childAtom.nodeProps}
-              // OK - prop drilling could be smarter
-              nodeWithHistory={rootWithHistory}
-              remove={childAtom.remove}
-            />
+            >
+              <ChildNodeEditor remove={childAtom.remove} />
+            </NodeAtomProvider>
           );
         })}
       </NodeEditorView>
@@ -144,41 +139,35 @@ function RootPlaygroundInner() {
   );
 }
 
-function ChildNodeEditor({
-  primitive,
-  selectedAtom,
-  nodeProps,
-  nodeWithHistory,
-  remove,
-}) {
+function ChildNodeEditor({ remove }) {
+  const base = useNodeAtom();
+
+  const { node, selected, nodeProps } = getDerivedAtoms(base, remove);
   const props = useNodeEditor(
-    primitive,
-    selectedAtom,
+    node,
+    selected,
     nodeProps,
-    nodeWithHistory,
+    rootWithHistory,
     remove
   );
-  const { childAtoms } = useChildAtoms(primitive);
+  const { childAtoms } = useChildAtoms(node);
   return (
     <>
       <NodeEditorView {...props}>
         {childAtoms.map((childAtom) => {
           return (
-            <ChildNodeEditor
+            <NodeAtomProvider
+              nodeAtom={childAtom.node}
               key={`${childAtom.node}`}
-              // Good - from the book
-              primitive={childAtom.node}
-              // Good - derived from parent
-              selectedAtom={childAtom.selected}
-              // Good - derived from parent
-              nodeProps={childAtom.nodeProps}
-              // OK - prop drilling could be smarter
-              nodeWithHistory={nodeWithHistory}
-              remove={childAtom.remove}
-            />
+            >
+              <ChildNodeEditor
+                key={`${childAtom.node}`}
+                remove={childAtom.remove}
+              />
+            </NodeAtomProvider>
           );
         })}
-        <RichTextEditorForAtom nodeAtom={primitive} />
+        <RichTextEditorForAtom />
       </NodeEditorView>
     </>
   );

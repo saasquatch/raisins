@@ -5,7 +5,7 @@ import { OpticFor } from 'optics-ts';
 import { atomWithId } from './atomWithId';
 
 const childOptic = (o: OpticFor<RaisinNode>) =>
-  o.prop('children' as any).optional();
+  o.prop('children' as any).valueOr([]);
 
 export function atomForChildren(
   nodeAtom: PrimitiveAtom<RaisinNode>

@@ -12,11 +12,7 @@ export function getId<T extends object>(obj: T) {
   return idMap.get(obj);
 }
 const listener = (
-  get: {
-    <Value>(atom: Atom<Value | Promise<Value>>): Value;
-    <Value>(atom: Atom<Promise<Value>>): Value;
-    <Value>(atom: Atom<Value>): Value;
-  },
+  get: unknown,
   set: unknown,
   prevValue: object,
   nextValue: object
