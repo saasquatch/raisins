@@ -67,8 +67,14 @@ const ComponentsAtom = atom((get) => {
   ];
 });
 
+/**
+ * When an NPM package is just `@local` then it is loaded from this URL
+ */
 export const LocalURLAtom = atom<string | undefined>(undefined);
 
+/**
+ * Allows modules to be edited, with their additional details provided asynchronously
+ */
 const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
   set(InternalStateAtom, (i) => {
     const next = typeof m === 'function' ? m(i.modules) : m;
