@@ -1,9 +1,10 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom } from 'jotai';
-import React, { Context, useContext } from 'react';
-import { root } from './_atoms';
+import React, { useContext } from 'react';
+import { rootPrimitive } from './_atoms';
 
-const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(root);
+// TODO: allow this to be swapped out? There are likely more history listeners.
+const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(rootPrimitive);
 
 /**
  * Uses atom for the "current node"

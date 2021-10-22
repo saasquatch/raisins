@@ -4,7 +4,6 @@ import React from 'react';
 export function NodeEditorView({
   id,
   path,
-  remove,
   //
   selected,
   toggleSelected,
@@ -23,7 +22,7 @@ export function NodeEditorView({
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
-          ID: {id.toString()} <button onClick={remove}>x</button>
+          ID: {id.toString()}
           <br />
           Path: {JSON.stringify(path ?? 'none')}
           <br />

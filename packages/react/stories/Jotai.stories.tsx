@@ -11,6 +11,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { useCallback, useEffect } from 'react';
 import { atomWithNodeProps } from '../src/atoms/atomWithNodeProps';
 import { atomWithSelection } from '../src/atoms/atomWithSelection';
+import { useNodeAtom } from '../src/atoms/node-context';
 import {
   historyStack,
   root,
@@ -18,11 +19,11 @@ import {
   rootWithHistory,
   selection,
 } from '../src/atoms/_atoms';
+import { getDerivedAtoms } from '../src/controllers/childAtomRouter';
+import { ChildrenEditor } from '../src/controllers/ChildrenEditor';
 import { RichTextEditorForAtom } from '../src/views/RichTextEditor';
-import { getDerivedAtoms, useChildAtoms } from './childAtomRouter';
 import { NodeEditorView } from './NodeEditorView';
 import { useNodeEditor } from './useNodeEditor';
-import { useNodeAtom, NodeAtomProvider } from '../src/atoms/node-context';
 
 const meta: Meta = {
   title: 'Editor (via Jotai)',
@@ -115,58 +116,28 @@ function RootPlaygroundInner() {
     rootPrimitive,
     atomWithSelection(rootPrimitive),
     atomWithNodeProps(rootPrimitive),
-    rootWithHistory,
-    // No-op remove on root? Could set to empty document.
-    () => {}
+    rootWithHistory
   );
-  const { childAtoms } = useChildAtoms(rootPrimitive);
   return (
     <>
       <Toolbar />
       <NodeEditorView {...props}>
-        {childAtoms.map((childAtom) => {
-          return (
-            <NodeAtomProvider
-              nodeAtom={childAtom.node}
-              key={`${childAtom.node}`}
-            >
-              <ChildNodeEditor remove={childAtom.remove} />
-            </NodeAtomProvider>
-          );
-        })}
+        <ChildrenEditor Component={ChildNodeEditor} />
+        <></>
       </NodeEditorView>
     </>
   );
 }
 
-function ChildNodeEditor({ remove }) {
+function ChildNodeEditor() {
   const base = useNodeAtom();
 
-  const { node, selected, nodeProps } = getDerivedAtoms(base, remove);
-  const props = useNodeEditor(
-    node,
-    selected,
-    nodeProps,
-    rootWithHistory,
-    remove
-  );
-  const { childAtoms } = useChildAtoms(node);
+  const { node, selected, nodeProps } = getDerivedAtoms(base);
+  const props = useNodeEditor(node, selected, nodeProps, rootWithHistory);
   return (
     <>
       <NodeEditorView {...props}>
-        {childAtoms.map((childAtom) => {
-          return (
-            <NodeAtomProvider
-              nodeAtom={childAtom.node}
-              key={`${childAtom.node}`}
-            >
-              <ChildNodeEditor
-                key={`${childAtom.node}`}
-                remove={childAtom.remove}
-              />
-            </NodeAtomProvider>
-          );
-        })}
+        <ChildrenEditor Component={ChildNodeEditor} />
         <RichTextEditorForAtom />
       </NodeEditorView>
     </>

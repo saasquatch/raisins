@@ -1,6 +1,5 @@
-import { RaisinNode } from '@raisins/core';
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { createMemoizeAtom } from '../src/atoms/weakCache';
+import { createMemoizeAtom } from './weakCache';
 
 const memoizeAtom = createMemoizeAtom();
 
@@ -27,7 +26,7 @@ export function polymorphicAtom<T, V, A>(
         (get, set, action: A) => {
           const value = get(nodeAtom);
           const atomForType = router(value, nodeAtom);
-          if (!atomForType) return undefined;
+          if (!atomForType) return;
           set(atomForType, action);
         }
       ),

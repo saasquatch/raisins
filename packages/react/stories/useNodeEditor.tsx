@@ -13,8 +13,7 @@ export function useNodeEditor(
   nodeAtom: PrimitiveAtom<RaisinNode>,
   selectedAtom: WritableAtom<boolean, boolean | undefined>,
   nodePropsAtom: PrimitiveAtom<NodeProps>,
-  historyAtom: HistoryAtom<RaisinNode>,
-  remove: () => void
+  historyAtom: HistoryAtom<RaisinNode>
 ) {
   // Derived from parent atom
   const baseAtom = atomWithId(nodeAtom);
@@ -33,7 +32,6 @@ export function useNodeEditor(
   return {
     id,
     path,
-    remove,
     selected,
     toggleSelected,
     attrs,
