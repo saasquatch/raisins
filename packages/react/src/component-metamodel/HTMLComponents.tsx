@@ -1,5 +1,15 @@
 import { CustomElement, Slot } from './Component';
 
+/**
+ * Standard HTML library of components
+ *
+ * These may need updating over time, and should allow for customization.
+ *
+ *
+ *
+ */
+undefined;
+
 const DefaultSlot: Slot = {
   name: '',
   title: 'Content',
@@ -200,7 +210,7 @@ export const SPAN: CustomElement = {
     {
       ...DefaultSlot,
       validChildren: ['span'],
-      editor: "inline"
+      editor: 'inline',
     },
   ],
 };

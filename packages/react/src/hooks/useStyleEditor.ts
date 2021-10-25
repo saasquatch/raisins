@@ -7,7 +7,7 @@ import {
 import * as css from 'css-tree';
 import { useMemo, useState } from 'react';
 import { StateUpdater } from '../util/NewState';
-import { ComponentModel } from './useComponentModel';
+import { ComponentModel } from '../component-metamodel/useComponentModel';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
 

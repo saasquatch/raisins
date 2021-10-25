@@ -1,8 +1,7 @@
 import { htmlParser as parse, RaisinNode, NodeSelection } from '@raisins/core';
 import { useMemo, useState } from 'react';
 import { Model } from '../model/EditorModel';
-import useCanvas from './useCanvas';
-import { useComponentModel } from './useComponentModel';
+import { useComponentModel } from '../component-metamodel/useComponentModel';
 import { useCore } from './useCore';
 import { useHotkeys } from './useHotkeys';
 import { useStyleEditor } from './useStyleEditor';
@@ -35,6 +34,5 @@ export function useEditor(initialHTML: string): Model {
       componentModel: metamodel,
     }),
     ...metamodel,
-    ...useCanvas({ ...core, ...metamodel }),
   };
 }

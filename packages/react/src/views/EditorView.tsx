@@ -1,8 +1,7 @@
-import { RaisinElementNode } from '@raisins/core';
 import React from 'react';
 import styled from 'styled-components';
+import { CanvasController } from '../canvas/CanvasController';
 import { Model } from '../model/EditorModel';
-import { Canvas } from './Canvas';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { PackageEditorView } from './PackageEditorView';
@@ -88,16 +87,17 @@ export function EditorView(model: Model) {
     <>
       <Main>
         <Header>
-          <ToolbarView {...model} />
+          <ToolbarView />
         </Header>
         <Edits>
           <EditorPanel {...model} />
-          <PackageEditorView {...model}/>
+          <PackageEditorView {...model} />
           <StyleEditor {...model} />
         </Edits>
         <CanvasCss>
-          <Canvas {...model} />
-          <RichTextEditor {...model}/>
+          <CanvasController />
+          <CanvasController />
+          <RichTextEditor {...model} />
         </CanvasCss>
 
         <LayersCss>

@@ -1,7 +1,6 @@
 import { NodePath, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { CanvasModel } from '../hooks/useCanvas';
-import { ComponentModel } from '../hooks/useComponentModel';
+import { ComponentModel } from '../component-metamodel/useComponentModel';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { StateUpdater } from '../util/NewState';
 
@@ -25,7 +24,6 @@ export type CoreModel = {
   setSelected(node?: RaisinNode): void;
 
   getId(node: RaisinNode): string;
-  setSelectedId(id: string): void;
 
   /*
    * Mutations
@@ -42,7 +40,6 @@ export type CoreModel = {
 
 export type Model = CoreModel &
   ComponentModel &
-  CanvasModel &
   ReturnType<typeof useStyleEditor>;
 
 export type NodeWithSlots = {

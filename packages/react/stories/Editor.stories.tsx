@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import { Provider } from 'jotai';
-import { LocalURLAtom } from '../src/hooks/useComponentModel';
+import { LocalURLAtom } from '../src/component-metamodel/useComponentModel';
 import { useEditor } from '../src/hooks/useEditor';
 import { Model } from '../src/model/EditorModel';
 import { EditorView } from '../src/views/EditorView';
@@ -11,7 +11,7 @@ const meta: Meta = {
 };
 export default meta;
 
-export function Span({ props }) {
+export function Span() {
   return (
     <Provider
       initialValues={[
@@ -24,7 +24,7 @@ export function Span({ props }) {
   );
 }
 
-export function Big({ props }) {
+export function Big() {
   return (
     <Provider
       initialValues={[

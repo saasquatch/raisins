@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import React from 'react';
-import { useComponentModel } from '../src/hooks/useComponentModel';
+import { useComponentModel } from '../src/component-metamodel/useComponentModel';
 import { PackageEditorView } from '../src/views/PackageEditorView';
 
 const meta: Meta = {

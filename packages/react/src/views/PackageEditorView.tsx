@@ -1,8 +1,9 @@
 import React from 'react';
-import { ComponentModel, Module } from '../hooks/useComponentModel';
+import { Module } from '../component-metamodel/ModuleManagement';
+import { ComponentModel } from '../component-metamodel/useComponentModel';
 
 export const PACKAGES = [
-  "@local",
+  '@local',
   '@saasquatch/component-boilerplate',
   '@saasquatch/mint-components',
   '@saasquatch/vanilla-components',
@@ -24,10 +25,10 @@ const setOfThings: Module[] = [
   {
     name: '@shoelace-style/shoelace',
   },
-//   {
-//     name: '@shoelace-style/shoelace',
-//     filePath: 'dist/shoelace/shoelace.css',
-//   },
+  //   {
+  //     name: '@shoelace-style/shoelace',
+  //     filePath: 'dist/shoelace/shoelace.css',
+  //   },
   {
     name: '@shoelace-style/shoelace',
     filePath: 'dist/themes/light.css',

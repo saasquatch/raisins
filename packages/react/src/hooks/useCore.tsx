@@ -13,9 +13,8 @@ import { atom, useAtom } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect, useMemo } from 'react';
 import { CoreModel } from '../model/EditorModel';
-import { getSlots } from '../model/getSlots';
 import { NewState, StateUpdater } from '../util/NewState';
-import { ComponentModel } from './useComponentModel';
+import { ComponentModel } from '../component-metamodel/useComponentModel';
 
 type InternalState = {
   current: RaisinNode;
@@ -59,7 +58,7 @@ export const InternalStateAtom = atom<InternalState>({
 
 export const SelectedAtom = atom(
   (get) => get(InternalStateAtom).selected,
-  (get, set, next: RaisinNode) => {
+  (get, set, next?: RaisinNode) => {
     set(InternalStateAtom, (prev: InternalState) => {
       // TODO: Allows for selecting nodes that aren't part of the current tree. That doesn't make sense and should be prevented
       return {
@@ -70,6 +69,18 @@ export const SelectedAtom = atom(
       };
     });
   }
+);
+
+export const RootNodeAtom = atom((get) => get(InternalStateAtom).current);
+
+export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
+  const { current } = get(InternalStateAtom);
+  const selected = get(SelectedAtom);
+  return selected?.path ? getNode(current, selected.path) : undefined;
+});
+
+export const SetSelectedIdAtom = atom(null, (get, set, id: string) =>
+  set(SelectedAtom, idToNode.get(id)!)
 );
 
 /**
@@ -212,7 +223,6 @@ export function useCore(
     return getAncestryUtil(current, node, parents);
   }
 
-  const setSelectedId = (id: string) => setSelected(idToNode.get(id)!);
   return {
     initial: serializer(initial),
 
@@ -226,7 +236,6 @@ export function useCore(
     setSelected,
 
     getId,
-    setSelectedId,
 
     deleteSelected,
     removeNode,

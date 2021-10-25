@@ -1,12 +1,12 @@
-import styled from 'styled-components';
 import SlButton from '@shoelace-style/react/dist/button';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
 import SlIcon from '@shoelace-style/react/dist/icon';
-import React, { CSSProperties } from 'react';
-import { Model } from '../model/EditorModel';
 import { useAtom } from 'jotai';
-import { HistorySizeAtom, RedoAtom, UndoAtom } from "../hooks/HistoryAtoms";
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { useUpdateAtom } from 'jotai/utils';
+import React, { CSSProperties } from 'react';
+import styled from 'styled-components';
+import { HistorySizeAtom, RedoAtom, UndoAtom } from '../hooks/HistoryAtoms';
+import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 
 const ToolbarStyle = styled.div`
   padding: 10px;
@@ -15,12 +15,13 @@ const ToolbarStyle = styled.div`
   }
 `;
 
-function useToolbar() {}
-
-export function ToolbarView(props: Model) {
-  const sizes = useAtom(HistorySizeAtom)[0];
+export function ToolbarView() {
+  const historySize = useAtom(HistorySizeAtom)[0];
   const undo = useUpdateAtom(UndoAtom);
   const redo = useUpdateAtom(RedoAtom);
+  const [mode, setMode] = useAtom(ModeAtom);
+  const [size, setSize] = useAtom(SizeAtom);
+  const [outlined, setOutlined] = useAtom(OutlineAtom);
 
   return (
     <ToolbarStyle>
@@ -30,28 +31,28 @@ export function ToolbarView(props: Model) {
           size="small"
           pill
           onClick={undo}
-          disabled={sizes.undoSize <= 0}
+          disabled={historySize.undoSize <= 0}
         >
           <SlIcon slot="prefix" name="arrow-90deg-left" />
-          Undo ({sizes.undoSize})
+          Undo ({historySize.undoSize})
         </SlButton>
         <SlButton
           size="small"
           pill
           onClick={redo}
-          disabled={sizes.redoSize <= 0}
+          disabled={historySize.redoSize <= 0}
         >
           <SlIcon slot="prefix" name="arrow-90deg-right" />
-          Redo ({sizes.redoSize})
+          Redo ({historySize.redoSize})
         </SlButton>
       </SlButtonGroup>
       <SlButtonGroup>
-        {props.mode}
+        {mode}
         <SlButton
           size="small"
           pill
-          type={props.mode === 'edit' ? 'success' : 'default'}
-          onClick={() => props.setMode('edit')}
+          disabled={mode === 'edit'}
+          onClick={() => setMode('edit')}
         >
           <SlIcon slot="prefix" name="pencil" />
           Edit
@@ -59,8 +60,8 @@ export function ToolbarView(props: Model) {
         <SlButton
           size="small"
           pill
-          type={props.mode === 'preview' ? 'success' : 'default'}
-          onClick={() => props.setMode('preview')}
+          disabled={mode === 'preview'}
+          onClick={() => setMode('preview')}
         >
           <SlIcon slot="prefix" name="eye"></SlIcon>
           Preview
@@ -68,8 +69,8 @@ export function ToolbarView(props: Model) {
         <SlButton
           size="small"
           pill
-          type={props.mode === 'html' ? 'success' : 'default'}
-          onClick={() => props.setMode('html')}
+          disabled={mode === 'html'}
+          onClick={() => setMode('html')}
         >
           <SlIcon slot="prefix" name="eye"></SlIcon>
           HTML
@@ -87,12 +88,12 @@ export function ToolbarView(props: Model) {
           Screen
         </SlButton>
 
-        {props.sizes.map((s) => (
+        {sizes.map((s) => (
           <SlButton
             size="small"
             pill
-            onClick={() => props.setSize(s)}
-            type={props.size === s ? 'success' : 'default'}
+            onClick={() => setSize(s)}
+            disabled={size === s}
           >
             {s.name}
           </SlButton>
@@ -103,11 +104,11 @@ export function ToolbarView(props: Model) {
           size="small"
           pill
           type="default"
-          onClick={() => props.setOutlined(!props.outlined)}
+          onClick={() => setOutlined((o) => !o)}
           style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}
         >
           <SlIcon slot="prefix" name="window"></SlIcon>
-          {props.outlined ? 'Outlined' : 'No Outline'}
+          {outlined ? 'Outlined' : 'No Outline'}
         </SlButton>
       </SlButtonGroup>
     </ToolbarStyle>
