@@ -50,10 +50,34 @@ export function getId(node: RaisinNode): string {
   return id;
 }
 
+// Should be made private
 export const InternalStateAtom = atom<InternalState>({
   redoStack: [],
   undoStack: [],
   current: htmlParser('<div></div>'),
+});
+
+export const SelectedAtom = atom(
+  (get) => get(InternalStateAtom).selected,
+  (get, set, next: RaisinNode) => {
+    set(InternalStateAtom, (prev: InternalState) => {
+      // TODO: Allows for selecting nodes that aren't part of the current tree. That doesn't make sense and should be prevented
+      return {
+        ...prev,
+        selected: next
+          ? { type: 'node', path: getPath(prev.current, next)! }
+          : undefined,
+      };
+    });
+  }
+);
+
+/**
+ * Derived map of parents
+ */
+export const ParentsAtom = atom((get) => {
+  const doc = get(InternalStateAtom).current;
+  return getParents(doc);
 });
 
 export const DeleteSelectedAtom = atom(null, (get, set) => {
@@ -91,24 +115,14 @@ export function useCore(
   metamodel: ComponentModel,
   initial: RaisinNode
 ): CoreModel {
-  const [state, setState] = useAtom(InternalStateAtom);
+  const [{ current }, setState] = useAtom(InternalStateAtom);
+
   useEffect(() => {
     setState({ redoStack: [], undoStack: [], current: initial });
   }, [initial]);
 
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom);
-
-  const setSelected = (next?: RaisinNode) => {
-    setState((prev: InternalState) => {
-      // TODO: Allows for selecting nodes that aren't part of the current tree. That doesn't make sense and should be prevented
-      return {
-        ...prev,
-        selected: next
-          ? { type: 'node', path: getPath(prev.current, next)! }
-          : undefined,
-      };
-    });
-  };
+  const [selected, setSelected] = useAtom(SelectedAtom);
 
   function setNodeInternal(next: NewState<RaisinNode>, clearSelection = false) {
     setState((previous) => {
@@ -129,33 +143,16 @@ export function useCore(
     setNodeInternal((previous: RaisinNode) => remove(previous, n), undefined);
   }
   function duplicateNode(n: RaisinNode) {
-    const clone = duplicate(state.current, n);
+    const clone = duplicate(current, n);
     setNodeInternal(clone, true);
   }
-  function moveUp(n: RaisinNode) {
-    // TODO: Move selection up at same time
-    setNodeInternal((previousState: RaisinNode) => {
-      const parent = parents.get(n);
-      const currentIdx = parent!.children.indexOf(n);
-      const clone = move(previousState, n, parent!, currentIdx - 1);
-      return clone;
-    });
-  }
-  function moveDown(n: RaisinNode) {
-    // TODO: Move selection down at same time
-    setNodeInternal((previousState: RaisinNode) => {
-      const parent = parents.get(n);
-      const currentIdx = parent!.children.indexOf(n);
-      const clone = move(previousState, n, parent!, currentIdx + 1);
-      return clone;
-    });
-  }
+
   function insertNode(
     n: RaisinNode,
     parent: RaisinNodeWithChildren,
     idx: number
   ) {
-    const clone = insertAt(state.current, n, parent, idx);
+    const clone = insertAt(current, n, parent, idx);
     setNode(clone);
   }
   function replaceNode(prev: RaisinNode, next: RaisinNodeWithChildren) {
@@ -190,7 +187,7 @@ export function useCore(
     });
   }
   function getPathInternal(node: RaisinNode): NodePath {
-    return getPath(state.current, node)!;
+    return getPath(current, node)!;
   }
   function replacePathInternal(prev: NodePath, next: RaisinNodeWithChildren) {
     setState((previous) => {
@@ -208,34 +205,24 @@ export function useCore(
     });
   }
 
-  const { current } = state;
   const serialized = useMemo(() => serializer(current), [current]);
-  const parents = useMemo(() => getParents(current), [current]);
 
-  const slots = useMemo(() => getSlots(current, metamodel.getComponentMeta), [
-    metamodel,
-    current,
-  ]);
-
+  const [parents] = useAtom(ParentsAtom);
   function getAncestry(node: RaisinNode): RaisinNodeWithChildren[] {
-    return getAncestryUtil(state.current, node, parents);
+    return getAncestryUtil(current, node, parents);
   }
 
   const setSelectedId = (id: string) => setSelected(idToNode.get(id)!);
   return {
     initial: serializer(initial),
 
-    node: state.current,
+    node: current,
     serialized,
     html: serialized,
     setHtml,
-    parents,
     getAncestry,
-    slots,
 
-    selected: state.selected?.path
-      ? getNode(state.current, state.selected.path)
-      : undefined,
+    selected: selected?.path ? getNode(current, selected.path) : undefined,
     setSelected,
 
     getId,
@@ -245,8 +232,6 @@ export function useCore(
     removeNode,
     duplicateNode,
     insert: insertNode,
-    moveDown,
-    moveUp,
     replaceNode,
     replacePath: replacePathInternal,
     setNode,

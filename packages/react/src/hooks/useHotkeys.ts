@@ -2,10 +2,9 @@ import hotkeys from 'hotkeys-js';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect } from 'react';
 import { DeleteSelectedAtom } from './useCore';
-import { RedoAtom, UndoAtom } from "./HistoryAtoms";
+import { RedoAtom, UndoAtom } from './HistoryAtoms';
 
 export function useHotkeys() {
-
   const undo = useUpdateAtom(UndoAtom);
   const redo = useUpdateAtom(RedoAtom);
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom);

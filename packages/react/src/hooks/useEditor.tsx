@@ -27,16 +27,14 @@ export function useEditor(initialHTML: string): Model {
   // Binds global event handlers
   useHotkeys();
 
-  // @ts-ignore
   return {
     ...core,
     ...useStyleEditor({
       node: core.node,
       setNode: core.setNode,
-      parents: core.parents,
       componentModel: metamodel,
     }),
     ...metamodel,
-    ...useCanvas({...core, ...metamodel}),
+    ...useCanvas({ ...core, ...metamodel }),
   };
 }

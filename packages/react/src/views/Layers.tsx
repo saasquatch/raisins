@@ -119,8 +119,6 @@ export const Layers: FC<Model> = (model) => {
           <Toolbar>
             <button onClick={() => model.duplicateNode(element)}>dupe</button>
             <button onClick={() => model.removeNode(element)}>del</button>
-            <button onClick={() => model.moveUp(element)}>↑</button>
-            <button onClick={() => model.moveDown(element)}>↓</button>
           </Toolbar>
         </TitleBar>
       );

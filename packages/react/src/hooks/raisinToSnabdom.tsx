@@ -1,11 +1,10 @@
-import React from 'react';
-import { h, VNode, VNodeData } from 'snabbdom';
 import {
-  htmlUtil,
-  RaisinNode,
-  RaisinDocumentNode,
   cssSerializer,
+  htmlUtil,
+  RaisinDocumentNode,
+  RaisinNode,
 } from '@raisins/core';
+import { h, VNode, VNodeData } from 'snabbdom';
 import styleToObject from 'style-to-object';
 const { visit } = htmlUtil;
 
