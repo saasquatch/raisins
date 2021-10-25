@@ -9,7 +9,7 @@ import * as schema from '@raisins/schema/schema';
 import { ElementType } from 'domelementtype';
 import { atom, useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import React, { useContext, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
 import { CustomElement } from '../component-metamodel/Component';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';

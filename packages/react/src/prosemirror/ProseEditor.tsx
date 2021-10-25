@@ -5,6 +5,7 @@ import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import React, { SetStateAction, useMemo, useRef, useState } from 'react';
+import { NewLinePlugin } from './NewLineBreak';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
 import { useRaisinHistoryPlugin } from './ProseToRaisinHistory';
@@ -89,6 +90,7 @@ export function useProseEditorOnAtom(
   // Build editor state
 
   const historyPlugin = useRaisinHistoryPlugin();
+
   const editorStateAtom = useMemo(
     () =>
       atom<EditorState>((get) => {
@@ -96,7 +98,12 @@ export function useProseEditorOnAtom(
           doc: get(proseDocAtom),
           selection: get(selection),
         };
-        return hydratedState(sState, [historyPlugin]);
+        return hydratedState(sState, [
+          //
+          NewLinePlugin(),
+          //
+          historyPlugin,
+        ]);
       }),
     [proseDocAtom, selection, historyPlugin]
   );
