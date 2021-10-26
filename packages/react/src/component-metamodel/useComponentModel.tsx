@@ -1,5 +1,4 @@
 import {
-  htmlUtil,
   RaisinElementNode,
   RaisinNodeWithChildren,
   RaisinTextNode,
@@ -21,8 +20,6 @@ import { Module, ModuleDetails, ModuleManagement } from './ModuleManagement';
 import { doesChildAllowParent } from './rules/doesChildAllowParent';
 import { doesParentAllowChild } from './rules/doesParentAllowChild';
 import { isNodeAllowed } from './rules/isNodeAllowed';
-
-const { visit } = htmlUtil;
 
 export const DEFAULT_BLOCKS: Block[] = [
   {

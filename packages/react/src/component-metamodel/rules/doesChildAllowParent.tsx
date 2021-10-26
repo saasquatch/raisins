@@ -41,6 +41,7 @@ export function doesChildAllowParent(
     return false;
   }
 
+  // TODO: Use CSS selectors engine or ProseMirror content engine
   if (tagName && childMeta?.validParents?.includes(tagName)) {
     // Child allows parent
     return true;
