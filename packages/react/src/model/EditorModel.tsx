@@ -24,12 +24,11 @@ export type CoreModel = {
   setSelected(node?: RaisinNode): void;
 
   getId(node: RaisinNode): string;
+  getPath(node: RaisinNode): NodePath;
 
   /*
    * Mutations
    */
-  getPath(node: RaisinNode): NodePath;
-
   deleteSelected(): void;
   duplicateNode(node: RaisinNode): void;
   removeNode(node: RaisinNode): void;

@@ -7,7 +7,6 @@ import { CustomElement, Slot } from '@raisins/schema/schema';
 import { ElementType } from 'domelementtype';
 import { atom, useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import { useMemo } from 'react';
 import { NewState } from '../../../core/dist/util/NewState';
 import * as HTMLComponents from '../component-metamodel/HTMLComponents';
 import { NodeWithSlots } from '../model/EditorModel';
@@ -63,6 +62,9 @@ export const ComponentsAtom = atom((get) => {
  * When an NPM package is just `@local` then it is loaded from this URL
  */
 export const LocalURLAtom = atom<string | undefined>(undefined);
+export const BlocksAtom = atom((get) =>
+  moduleDetailsToBlocks(get(ModuleDetailsAtom))
+);
 
 /**
  * Allows modules to be edited, with their additional details provided asynchronously
@@ -87,21 +89,9 @@ const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
     };
   });
 });
-/**
- * For managing the types of components that are edited and their properties
- */
-export function useComponentModel(): ComponentModel {
-  const [_internalState, _setInternal] = useAtom(InternalStateAtom);
-  const components: CustomElement[] = useAtomValue(ComponentsAtom);
 
-  const [, setModules] = useAtom(SetModulesAtom);
-  const addModule: (module: Module) => void = (module) =>
-    setModules((modules) => [...modules, module]);
-  const removeModule: (module: Module) => void = (module) =>
-    setModules((modules) => modules.filter((e) => e !== module));
-  const removeModuleByName: (name: string) => void = (name) =>
-    setModules((modules) => modules.filter((e) => e.name !== name));
-
+const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
+  const components = get(ComponentsAtom);
   function getComponentMeta(node: RaisinElementNode): CustomElement {
     const found = components.find((c) => c.tagName === node.tagName);
     if (found) return found;
@@ -113,25 +103,12 @@ export function useComponentModel(): ComponentModel {
       slots: [],
     };
   }
+  return getComponentMeta;
+});
 
-  const blocks: Block[] = useMemo(() => {
-    const moduleDetails = _internalState.moduleDetails;
-    return moduleDetailsToBlocks(moduleDetails);
-  }, [_internalState.moduleDetails]);
-
-  function isValidChild(
-    child: RaisinElementNode,
-    parent: RaisinElementNode,
-    slot: string
-  ): boolean {
-    if (child === parent) {
-      // Can't drop into yourself
-      return false;
-    }
-    const parentMeta = getComponentMeta(parent);
-    const childMeta = getComponentMeta(child);
-    return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
-  }
+export const ValidChildrenAtom = atom((get) => {
+  const blocks = get(BlocksAtom);
+  const getComponentMeta = get(ComponentMetaAtom);
 
   function getValidChildren(
     node: RaisinNodeWithChildren,
@@ -167,11 +144,39 @@ export function useComponentModel(): ComponentModel {
     return validChildren;
   }
 
-  function canHaveChildren(
-    node: RaisinNodeWithChildren,
-    slot?: string
+  return getValidChildren;
+});
+
+/**
+ * For managing the types of components that are edited and their properties
+ */
+export function useComponentModel(): ComponentModel {
+  const [_internalState, _setInternal] = useAtom(InternalStateAtom);
+
+  const [, setModules] = useAtom(SetModulesAtom);
+  const addModule: (module: Module) => void = (module) =>
+    setModules((modules) => [...modules, module]);
+  const removeModule: (module: Module) => void = (module) =>
+    setModules((modules) => modules.filter((e) => e !== module));
+  const removeModuleByName: (name: string) => void = (name) =>
+    setModules((modules) => modules.filter((e) => e.name !== name));
+
+  const getComponentMeta = useAtomValue(ComponentMetaAtom);
+  const blocks: Block[] = useAtomValue(BlocksAtom);
+  const getValidChildren = useAtomValue(ValidChildrenAtom);
+
+  function isValidChild(
+    child: RaisinElementNode,
+    parent: RaisinElementNode,
+    slot: string
   ): boolean {
-    return getValidChildren(node, slot).length > 0;
+    if (child === parent) {
+      // Can't drop into yourself
+      return false;
+    }
+    const parentMeta = getComponentMeta(parent);
+    const childMeta = getComponentMeta(child);
+    return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
   }
 
   function getSlotsInternal(node: RaisinNodeWithChildren): NodeWithSlots {
@@ -179,6 +184,7 @@ export function useComponentModel(): ComponentModel {
   }
 
   return {
+    // Module management
     loadingModules: _internalState.loading,
     modules: _internalState.moduleDetails,
     moduleDetails: _internalState.moduleDetails,
@@ -186,11 +192,12 @@ export function useComponentModel(): ComponentModel {
     removeModule,
     removeModuleByName,
     setModules,
+
+    // Component metadata
     getComponentMeta,
     getSlots: getSlotsInternal,
     blocks,
     getValidChildren,
-    canHaveChildren,
     isValidChild,
   };
 }
@@ -201,16 +208,17 @@ export type Block = {
 };
 
 export type ComponentDetails = {
-  getComponentMeta: (node: RaisinElementNode) => CustomElement;
+  getComponentMeta: ComponentMetaProvider;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
   getValidChildren: (node: RaisinNodeWithChildren, slot?: string) => Block[];
-  canHaveChildren: (node: RaisinNodeWithChildren, slot?: string) => boolean;
   isValidChild: (
     from: RaisinElementNode,
     to: RaisinElementNode,
     slot: string
   ) => boolean;
 };
+
+export type ComponentMetaProvider = (node: RaisinElementNode) => CustomElement;
 
 export type ComponentModel = ComponentDetails & ModuleManagement;
