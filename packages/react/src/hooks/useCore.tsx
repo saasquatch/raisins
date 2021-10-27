@@ -14,7 +14,6 @@ import { useUpdateAtom } from 'jotai/utils';
 import { useEffect, useMemo } from 'react';
 import { CoreModel } from '../model/EditorModel';
 import { NewState, StateUpdater } from '../util/NewState';
-import { ComponentModel } from '../component-metamodel/useComponentModel';
 
 type InternalState = {
   current: RaisinNode;
@@ -122,10 +121,7 @@ function generateNextState(
   return newState;
 }
 
-export function useCore(
-  metamodel: ComponentModel,
-  initial: RaisinNode
-): CoreModel {
+export function useCore(initial: RaisinNode): CoreModel {
   const [{ current }, setState] = useAtom(InternalStateAtom);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { CanvasController } from '../canvas/CanvasController';
 import { Model } from '../model/EditorModel';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
-import { PackageEditorView } from './PackageEditorView';
+import { PackageEditorController } from './PackageEditorView';
 import RichTextEditor from './RichTextEditor';
 import { StyleEditor } from './StyleEditor';
 import { ToolbarView } from './Toolbar';
@@ -91,7 +91,7 @@ export function EditorView(model: Model) {
         </Header>
         <Edits>
           <EditorPanel {...model} />
-          <PackageEditorView {...model} />
+          <PackageEditorController />
           <StyleEditor {...model} />
         </Edits>
         <CanvasCss>

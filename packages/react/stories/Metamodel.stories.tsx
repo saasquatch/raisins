@@ -1,14 +1,13 @@
 import { Meta } from '@storybook/react';
 import React from 'react';
-import { useComponentModel } from '../src/component-metamodel/useComponentModel';
-import { PackageEditorView } from '../src/views/PackageEditorView';
+import { PackageEditorController } from '../src/views/PackageEditorView';
 
 const meta: Meta = {
   title: 'Metamodel',
-  component: PackageEditor,
+  component: PackageEditorController,
 };
 export default meta;
 
 export function PackageEditor() {
-  return <PackageEditorView {...useComponentModel()} />;
+  return <PackageEditorController />;
 }

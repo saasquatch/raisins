@@ -4,6 +4,8 @@ import React from 'react';
 import { Model } from '../model/EditorModel';
 import styled from 'styled-components';
 import { Attribute } from '@raisins/schema/schema';
+import { useAtomValue } from 'jotai/utils';
+import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 
 const Descr = styled.span`
   color: grey;
@@ -13,8 +15,9 @@ export function AttributesEditor(props: {
   model: Model;
   node: RaisinElementNode;
 }) {
-  const attributeSchema =
-    props.model.getComponentMeta(props.node)?.attributes ?? [];
+  const comp = useAtomValue(ComponentModelAtom);
+
+  const attributeSchema = comp.getComponentMeta(props.node)?.attributes ?? [];
   const attribs = props.node.attribs || {};
   const onchange = (key: string) => {
     return (value: string) => {
@@ -40,9 +43,7 @@ export function AttributesEditor(props: {
               <>
                 <tr>
                   <td>
-                    <b>
-                    {attr.title ?? attr.name}
-                    </b>
+                    <b>{attr.title ?? attr.name}</b>
                     <br />
                     <AttributeEditor
                       schema={attr}

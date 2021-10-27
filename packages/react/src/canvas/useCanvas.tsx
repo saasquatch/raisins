@@ -6,7 +6,7 @@ import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleD
 import {
   LocalURLAtom,
   ModuleDetailsAtom,
-} from '../component-metamodel/useComponentModel';
+} from '../component-metamodel/ComponentModel';
 import { raisintoSnabdom } from '../hooks/raisinToSnabdom';
 import {
   getId,

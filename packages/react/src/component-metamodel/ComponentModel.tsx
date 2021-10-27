@@ -3,19 +3,18 @@ import {
   RaisinNodeWithChildren,
   RaisinTextNode,
 } from '@raisins/core';
+import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { ElementType } from 'domelementtype';
-import { atom, useAtom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
-import { NewState } from '../../../core/dist/util/NewState';
-import * as HTMLComponents from '../component-metamodel/HTMLComponents';
+import { atom } from 'jotai';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
 import { isElementNode, isRoot } from '../views/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { Module, ModuleDetails, ModuleManagement } from './ModuleManagement';
+import * as HTMLComponents from './HTMLComponents';
+import { Module, ModuleDetails } from './ModuleManagement';
 import { doesChildAllowParent } from './rules/doesChildAllowParent';
 import { doesParentAllowChild } from './rules/doesParentAllowChild';
 import { isNodeAllowed } from './rules/isNodeAllowed';
@@ -40,18 +39,18 @@ type InternalState = {
   moduleDetails: ModuleDetails[];
 };
 
-const InternalStateAtom = atom<InternalState>({
+const Ste = atom<InternalState>({
   loading: false,
   modules: [],
   moduleDetails: [],
 });
 
-export const ModuleDetailsAtom = atom(
-  (get) => get(InternalStateAtom).moduleDetails
-);
+export const ModulesAtom = atom((get) => get(Ste).modules ?? []);
+export const ModuleDetailsAtom = atom((get) => get(Ste).moduleDetails ?? []);
+export const ModulesLoadingAtom = atom((get) => get(Ste).loading);
 
 export const ComponentsAtom = atom((get) => {
-  const { moduleDetails } = get(InternalStateAtom);
+  const { moduleDetails } = get(Ste);
   return [
     ...Object.values(HTMLComponents),
     ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
@@ -66,16 +65,26 @@ export const BlocksAtom = atom((get) =>
   moduleDetailsToBlocks(get(ModuleDetailsAtom))
 );
 
+export const AddModuleAtom = atom(null, (_, set, next: Module) =>
+  set(SetModulesAtom, (modules) => [...modules, next])
+);
+export const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
+  set(SetModulesAtom, (modules) => modules.filter((e) => e !== next))
+);
+export const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
+  set(SetModulesAtom, (modules) => modules.filter((e) => e.name !== name))
+);
+
 /**
  * Allows modules to be edited, with their additional details provided asynchronously
  */
-const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
-  set(InternalStateAtom, (i) => {
+export const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
+  set(Ste, (i) => {
     const next = typeof m === 'function' ? m(i.modules) : m;
 
     const localUrl = get(LocalURLAtom);
     (async () => {
-      set(InternalStateAtom, {
+      set(Ste, {
         loading: false,
         modules: next,
         moduleDetails: await modulesToDetails(next, localUrl),
@@ -147,23 +156,10 @@ export const ValidChildrenAtom = atom((get) => {
   return getValidChildren;
 });
 
-/**
- * For managing the types of components that are edited and their properties
- */
-export function useComponentModel(): ComponentModel {
-  const [_internalState, _setInternal] = useAtom(InternalStateAtom);
-
-  const [, setModules] = useAtom(SetModulesAtom);
-  const addModule: (module: Module) => void = (module) =>
-    setModules((modules) => [...modules, module]);
-  const removeModule: (module: Module) => void = (module) =>
-    setModules((modules) => modules.filter((e) => e !== module));
-  const removeModuleByName: (name: string) => void = (name) =>
-    setModules((modules) => modules.filter((e) => e.name !== name));
-
-  const getComponentMeta = useAtomValue(ComponentMetaAtom);
-  const blocks: Block[] = useAtomValue(BlocksAtom);
-  const getValidChildren = useAtomValue(ValidChildrenAtom);
+export const ComponentModelAtom = atom<ComponentModel>((get) => {
+  const getComponentMeta = get(ComponentMetaAtom);
+  const blocks: Block[] = get(BlocksAtom);
+  const getValidChildren = get(ValidChildrenAtom);
 
   function isValidChild(
     child: RaisinElementNode,
@@ -184,15 +180,6 @@ export function useComponentModel(): ComponentModel {
   }
 
   return {
-    // Module management
-    loadingModules: _internalState.loading,
-    modules: _internalState.moduleDetails,
-    moduleDetails: _internalState.moduleDetails,
-    addModule,
-    removeModule,
-    removeModuleByName,
-    setModules,
-
     // Component metadata
     getComponentMeta,
     getSlots: getSlotsInternal,
@@ -200,7 +187,11 @@ export function useComponentModel(): ComponentModel {
     getValidChildren,
     isValidChild,
   };
-}
+});
+
+/**
+ * For managing the types of components that are edited and their properties
+ */
 
 export type Block = {
   title: string;
@@ -221,4 +212,4 @@ export type ComponentDetails = {
 
 export type ComponentMetaProvider = (node: RaisinElementNode) => CustomElement;
 
-export type ComponentModel = ComponentDetails & ModuleManagement;
+export type ComponentModel = ComponentDetails;

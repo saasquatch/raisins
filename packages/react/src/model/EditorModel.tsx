@@ -1,6 +1,6 @@
 import { NodePath, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { ComponentModel } from '../component-metamodel/useComponentModel';
+import { ComponentModel } from '../component-metamodel/ComponentModel';
 import { useStyleEditor } from '../hooks/useStyleEditor';
 import { StateUpdater } from '../util/NewState';
 
@@ -37,9 +37,7 @@ export type CoreModel = {
   replacePath(prev: NodePath, next: RaisinNode): void;
 };
 
-export type Model = CoreModel &
-  ComponentModel &
-  ReturnType<typeof useStyleEditor>;
+export type Model = CoreModel & ReturnType<typeof useStyleEditor>;
 
 export type NodeWithSlots = {
   node: RaisinNode;

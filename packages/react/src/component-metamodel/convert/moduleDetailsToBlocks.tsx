@@ -1,7 +1,7 @@
 import { htmlParser as parse, RaisinElementNode } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
+import { Block, DEFAULT_BLOCKS } from '../ComponentModel';
 import { ModuleDetails } from '../ModuleManagement';
-import { Block, DEFAULT_BLOCKS } from '../useComponentModel';
 
 /**
  * Converts module details into a set of `Block`

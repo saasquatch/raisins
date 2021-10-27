@@ -1,6 +1,14 @@
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { Module } from '../component-metamodel/ModuleManagement';
-import { ComponentModel } from '../component-metamodel/useComponentModel';
+import {
+  AddModuleAtom,
+  ModuleDetailsAtom,
+  ModulesAtom,
+  ModulesLoadingAtom,
+  RemoveModuleAtom,
+  RemoveModuleByNameAtom,
+} from '../component-metamodel/ComponentModel';
+import { Module, ModuleDetails } from '../component-metamodel/ModuleManagement';
 
 export const PACKAGES = [
   '@local',
@@ -35,7 +43,31 @@ const setOfThings: Module[] = [
   },
 ];
 
-export function PackageEditorView(props: ComponentModel) {
+function usePackageEditor(): ModuleManagement {
+  return {
+    loadingModules: useAtomValue(ModulesLoadingAtom),
+    modules: useAtomValue(ModulesAtom),
+    moduleDetails: useAtomValue(ModuleDetailsAtom),
+    addModule: useUpdateAtom(AddModuleAtom),
+    removeModule: useUpdateAtom(RemoveModuleAtom),
+    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom),
+  };
+}
+
+export function PackageEditorController() {
+  return <PackageEditorView {...usePackageEditor()} />;
+}
+
+export type ModuleManagement = {
+  loadingModules: boolean;
+  modules: Module[];
+  moduleDetails: ModuleDetails[];
+  addModule(module: Module): void;
+  removeModule(module: Module): void;
+  removeModuleByName(name: string): void;
+};
+
+export function PackageEditorView(props: ModuleManagement) {
   return (
     <div>
       <div>Loading: {props.loadingModules}</div>

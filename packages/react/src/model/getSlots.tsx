@@ -1,12 +1,13 @@
 import { htmlUtil, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
+import { ComponentMetaProvider } from '../component-metamodel/ComponentModel';
 import { DefaultSlot, Model, NodeWithSlots } from './EditorModel';
 
 const { visit } = htmlUtil;
 
 export function getSlots(
   node: RaisinNode,
-  getComponentMeta: Model['getComponentMeta']
+  getComponentMeta: ComponentMetaProvider
 ): NodeWithSlots | undefined {
   const noSlots = (_: RaisinNode): undefined => undefined;
   const noSlotsWChildren = (

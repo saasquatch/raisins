@@ -5,10 +5,12 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
+import { useAtomValue } from 'jotai/utils';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { Model } from '../model/EditorModel';
-import { TextNodeEditor, TextNodesEditor, WithSelectionEditor } from './RichTextEditor';
+import { WithSelectionEditor } from './RichTextEditor';
 
 const { clone, visit } = htmlUtil;
 
@@ -68,13 +70,18 @@ const AddBlock = styled.div`
 `;
 
 export const Layers: FC<Model> = (model) => {
+  const comp = useAtomValue(ComponentModelAtom);
+
+  // TODO: Extract LayersView
+
+
   function AddNew(props: {
     node: RaisinNodeWithChildren;
     idx: number;
     slot?: string;
   }) {
     const [open, setOpen] = useState(false);
-    const validChildren = model.getValidChildren(props.node, props.slot);
+    const validChildren = comp.getValidChildren(props.node, props.slot);
     if (validChildren.length <= 0) {
       return <></>;
     }
@@ -88,7 +95,7 @@ export const Layers: FC<Model> = (model) => {
         {open && (
           <div style={{ display: 'flex', overflowX: 'auto' }}>
             {validChildren.map((b) => {
-              const meta = model.getComponentMeta(b.content);
+              const meta = comp.getComponentMeta(b.content);
               return (
                 <button
                   onClick={() => {
@@ -112,7 +119,7 @@ export const Layers: FC<Model> = (model) => {
 
   const ElementVisitor: Partial<NodeVisitor<React.ReactNode>> = {
     onElement(element, _) {
-      const meta = model.getComponentMeta(element);
+      const meta = comp.getComponentMeta(element);
       const name = (
         <TitleBar onClick={() => model.setSelected(element)}>
           <Label>{meta?.title || element.tagName}</Label>
@@ -123,7 +130,7 @@ export const Layers: FC<Model> = (model) => {
         </TitleBar>
       );
       // const hasChildren = children?.length > 0;
-      const nodeWithSlots = model.getSlots(element);
+      const nodeWithSlots = comp.getSlots(element);
 
       const slots = nodeWithSlots.slots || [];
       const hasSlots = slots?.length > 0;

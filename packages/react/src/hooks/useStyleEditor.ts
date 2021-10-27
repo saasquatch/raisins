@@ -5,20 +5,21 @@ import {
   RaisinStyleNode,
 } from '@raisins/core';
 import * as css from 'css-tree';
+import { useAtomValue } from 'jotai/utils';
 import { useMemo, useState } from 'react';
+import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { StateUpdater } from '../util/NewState';
-import { ComponentModel } from '../component-metamodel/useComponentModel';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
 
 type Props = {
   node: RaisinNode;
   setNode: StateUpdater<RaisinNode>;
-  componentModel: ComponentModel;
 };
 
 // TODO: Color functions: https://github.com/scttcper/tinycolor
 export function useStyleEditor(props: Props) {
+  const componentModel = useAtomValue(ComponentModelAtom);
   const sheets = useMemo(() => {
     // Finds all style nodes.
     const nodes: RaisinStyleNode[] = [];

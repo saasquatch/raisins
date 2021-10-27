@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import { Provider } from 'jotai';
-import { LocalURLAtom } from '../src/component-metamodel/useComponentModel';
+import { LocalURLAtom } from '../src/component-metamodel/ComponentModel';
 import { useEditor } from '../src/hooks/useEditor';
 import { Model } from '../src/model/EditorModel';
 import { EditorView } from '../src/views/EditorView';
