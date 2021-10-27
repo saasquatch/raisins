@@ -5,7 +5,7 @@ import { atomForChildren } from '../atoms/atomForChildren';
 import { atomWithId } from '../atoms/atomWithId';
 import { atomWithNodeProps } from '../atoms/atomWithNodeProps';
 import { atomWithSelection } from '../atoms/atomWithSelection';
-import { isElementNode, isRoot } from '../views/isNode';
+import { isElementNode, isRoot } from '../util/isNode';
 import { polymorphicAtom } from '../atoms/polymorphicAtom';
 
 /**

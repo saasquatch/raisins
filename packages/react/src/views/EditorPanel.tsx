@@ -4,7 +4,7 @@ import { ElementType } from 'domelementtype';
 import React from 'react';
 import { Model } from '../model/EditorModel';
 import { AttributesEditor } from './AttributeEditor';
-import { StyleNodeEditor } from './StyleEditor';
+import { StyleNodeEditor } from '../stylesheets/StyleEditor';
 
 export function EditorPanel(props: Model) {
   if (props.selected?.type === ElementType.Tag) {

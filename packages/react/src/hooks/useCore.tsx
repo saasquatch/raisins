@@ -70,7 +70,16 @@ export const SelectedAtom = atom(
   }
 );
 
-export const RootNodeAtom = atom((get) => get(InternalStateAtom).current);
+export const RootNodeAtom = atom(
+  (get) => get(InternalStateAtom).current,
+  (_, set, next) => {
+    set(InternalStateAtom, (previous) => {
+      const nextNode =
+        typeof next === 'function' ? next(previous.current) : next;
+      return generateNextState(previous, nextNode, false);
+    });
+  }
+);
 
 export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
   const { current } = get(InternalStateAtom);

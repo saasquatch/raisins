@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import { Model } from '../model/EditorModel';
 import { useCore } from './useCore';
 import { useHotkeys } from './useHotkeys';
-import { useStyleEditor } from './useStyleEditor';
 
 export type DraggableState = Map<
   RaisinNode,
@@ -26,9 +25,5 @@ export function useEditor(initialHTML: string): Model {
 
   return {
     ...core,
-    ...useStyleEditor({
-      node: core.node,
-      setNode: core.setNode,
-    }),
   };
 }

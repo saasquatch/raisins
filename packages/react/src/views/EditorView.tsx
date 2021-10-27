@@ -6,7 +6,7 @@ import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { PackageEditorController } from './PackageEditorView';
 import RichTextEditor from './RichTextEditor';
-import { StyleEditor } from './StyleEditor';
+import { StyleEditor } from '../stylesheets/StyleEditor';
 import { ToolbarView } from './Toolbar';
 
 export const Row = styled.div`
@@ -92,7 +92,7 @@ export function EditorView(model: Model) {
         <Edits>
           <EditorPanel {...model} />
           <PackageEditorController />
-          <StyleEditor {...model} />
+          <StyleEditor />
         </Edits>
         <CanvasCss>
           <CanvasController />

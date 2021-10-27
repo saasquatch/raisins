@@ -15,8 +15,8 @@ import {
   useProseEditorOnAtom,
   useSelectionAtom,
 } from '../prosemirror/ProseEditor';
-import { isElementNode, isTextNode } from './isNode';
-import { useValueAtom } from './useValueAtom';
+import { isElementNode, isTextNode } from '../util/isNode';
+import { useValueAtom } from '../atoms/useValueAtom';
 
 const { replacePath } = htmlUtil;
 export default function RichTextEditor(props: Model) {

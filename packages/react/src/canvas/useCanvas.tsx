@@ -7,7 +7,7 @@ import {
   LocalURLAtom,
   ModuleDetailsAtom,
 } from '../component-metamodel/ComponentModel';
-import { raisintoSnabdom } from '../hooks/raisinToSnabdom';
+import { raisintoSnabdom } from './raisinToSnabdom';
 import {
   getId,
   RootNodeAtom,

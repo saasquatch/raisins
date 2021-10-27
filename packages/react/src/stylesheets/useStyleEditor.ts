@@ -5,9 +5,9 @@ import {
   RaisinStyleNode,
 } from '@raisins/core';
 import * as css from 'css-tree';
-import { useAtomValue } from 'jotai/utils';
+import { useAtom } from 'jotai';
 import { useMemo, useState } from 'react';
-import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
+import { RootNodeAtom } from '../hooks/useCore';
 import { StateUpdater } from '../util/NewState';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
@@ -18,12 +18,13 @@ type Props = {
 };
 
 // TODO: Color functions: https://github.com/scttcper/tinycolor
-export function useStyleEditor(props: Props) {
-  const componentModel = useAtomValue(ComponentModelAtom);
+export function useStyleEditor() {
+  const [node, setNode] = useAtom(RootNodeAtom);
+  // const componentModel = useAtomValue(ComponentModelAtom);
   const sheets = useMemo(() => {
     // Finds all style nodes.
     const nodes: RaisinStyleNode[] = [];
-    visit(props.node, {
+    visit(node, {
       ...IdentityVisitor,
       onStyle: (n) => {
         nodes.push(n);
@@ -31,7 +32,7 @@ export function useStyleEditor(props: Props) {
       },
     });
     return nodes;
-  }, [props.node]);
+  }, [node]);
 
   // TOOD: This is volatile to Undo / Redo. It should reset based on Undo/Redo, but instead is cached
   const [selectedSheet, setSelectedsheet] = useState<
@@ -39,7 +40,7 @@ export function useStyleEditor(props: Props) {
   >(undefined);
 
   const updateSelectedSheet: StateUpdater<css.CssNodePlain> = (next) => {
-    props.setNode(
+    setNode(
       // @ts-ignore
       (prev: RaisinDocumentNode) => {
         const nextVal =

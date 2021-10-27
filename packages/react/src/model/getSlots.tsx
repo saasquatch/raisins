@@ -1,7 +1,7 @@
 import { htmlUtil, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { ComponentMetaProvider } from '../component-metamodel/ComponentModel';
-import { DefaultSlot, Model, NodeWithSlots } from './EditorModel';
+import { DefaultSlot, NodeWithSlots } from './EditorModel';
 
 const { visit } = htmlUtil;
 

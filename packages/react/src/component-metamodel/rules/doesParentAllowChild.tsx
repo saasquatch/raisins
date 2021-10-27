@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
 import { CustomElement } from '../Component';
-import { isElementNode } from '../../views/isNode';
+import { isElementNode } from '../../util/isNode';
 
 /**
  * Given a child and it's parent's metadata

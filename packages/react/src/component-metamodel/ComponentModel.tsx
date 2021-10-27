@@ -9,7 +9,7 @@ import { ElementType } from 'domelementtype';
 import { atom } from 'jotai';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
-import { isElementNode, isRoot } from '../views/isNode';
+import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
