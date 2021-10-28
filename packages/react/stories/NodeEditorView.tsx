@@ -1,4 +1,3 @@
-import { pathToId } from '@storybook/client-api';
 import React from 'react';
 
 export function NodeEditorView({

@@ -12,7 +12,7 @@ import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { RootNodeAtom } from '../hooks/useCore';
 import { useCoreEditingApi } from "../editting/CoreEditingAPI";
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
-import { WithSelectionEditor } from './RichTextEditor';
+import { WithSelectionEditor } from '../rich-text/RichTextEditor';
 
 const { clone, visit } = htmlUtil;
 

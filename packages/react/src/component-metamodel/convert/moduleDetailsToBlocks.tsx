@@ -1,6 +1,6 @@
 import { htmlParser as parse, RaisinElementNode } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
-import { Block, DEFAULT_BLOCKS } from '../ComponentModel';
+import { Block } from '../ComponentModel';
 import { ModuleDetails } from '../ModuleManagement';
 
 /**
@@ -28,7 +28,7 @@ export function moduleDetailsToBlocks(moduleDetails: ModuleDetails[]): Block[] {
         );
       }, agg) ?? agg
     );
-  }, DEFAULT_BLOCKS);
+  }, [] as Block[]);
 }
 
 function reduceExamples(

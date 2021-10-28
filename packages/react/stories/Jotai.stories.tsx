@@ -21,7 +21,7 @@ import {
 } from '../src/atoms/_atoms';
 import { getDerivedAtoms } from '../src/controllers/childAtomRouter';
 import { ChildrenEditor } from '../src/controllers/ChildrenEditor';
-import { RichTextEditorForAtom } from '../src/views/RichTextEditor';
+import { RichTextEditorForAtom } from '../src/rich-text/RichTextEditor';
 import { NodeEditorView } from './NodeEditorView';
 import { useNodeEditor } from './useNodeEditor';
 

@@ -1,11 +1,6 @@
-import {
-  RaisinElementNode,
-  RaisinNodeWithChildren,
-  RaisinTextNode,
-} from '@raisins/core';
+import { RaisinElementNode, RaisinNodeWithChildren } from '@raisins/core';
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { ElementType } from 'domelementtype';
 import { atom } from 'jotai';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
@@ -19,19 +14,7 @@ import { doesChildAllowParent } from './rules/doesChildAllowParent';
 import { doesParentAllowChild } from './rules/doesParentAllowChild';
 import { isNodeAllowed } from './rules/isNodeAllowed';
 
-export const DEFAULT_BLOCKS: Block[] = [
-  {
-    title: 'Some Div',
-    content: {
-      type: ElementType.Tag,
-      tagName: 'div',
-      attribs: {},
-      children: [
-        { type: ElementType.Text, data: 'I am a div' } as RaisinTextNode,
-      ],
-    },
-  },
-];
+export const GlobalBlocksAtom = atom([] as Block[]);
 
 type InternalState = {
   modules: Module[];
@@ -61,9 +44,11 @@ export const ComponentsAtom = atom((get) => {
  * When an NPM package is just `@local` then it is loaded from this URL
  */
 export const LocalURLAtom = atom<string | undefined>(undefined);
-export const BlocksAtom = atom((get) =>
-  moduleDetailsToBlocks(get(ModuleDetailsAtom))
-);
+export const BlocksAtom = atom((get) => {
+  const globalBlocks = get(GlobalBlocksAtom);
+  const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
+  return [...blocksFromModules, ...globalBlocks];
+});
 
 export const AddModuleAtom = atom(null, (_, set, next: Module) =>
   set(SetModulesAtom, (modules) => [...modules, next])

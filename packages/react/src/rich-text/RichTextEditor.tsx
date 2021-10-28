@@ -4,25 +4,20 @@ import {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
-  RaisinTextNode,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import React, { ChangeEventHandler, useMemo, useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useNodeAtom } from '../atoms/node-context';
 import { useValueAtom } from '../atoms/useValueAtom';
-import {
-  IdentifierModelAtom,
-  RootNodeAtom,
-} from '../hooks/useCore';
-import { useCoreEditingApi } from "../editting/CoreEditingAPI";
+import { IdentifierModelAtom, RootNodeAtom } from '../hooks/useCore';
 import {
   useProseEditorOnAtom,
   useSelectionAtom,
 } from '../prosemirror/ProseEditor';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
-import { isElementNode, isTextNode } from '../util/isNode';
+import { isElementNode } from '../util/isNode';
 
 const { replacePath } = htmlUtil;
 
@@ -35,16 +30,7 @@ export default function RichTextEditor() {
 }
 
 export function TextNodesEditor({ element }: { element: RaisinElementNode }) {
-  return (
-    <div>
-      <WithSelectionEditor node={element} />
-      <ul>
-        {element.children.filter(isTextNode).map((c) => {
-          return <TextNodeEditor node={c} />;
-        })}
-      </ul>
-    </div>
-  );
+  return <WithSelectionEditor node={element} />;
 }
 
 /**
@@ -134,21 +120,4 @@ export function useRichTextEditorForAtom() {
 export function RichTextEditorForAtom() {
   const { mountRef } = useRichTextEditorForAtom();
   return <div ref={mountRef} />;
-}
-
-export function TextNodeEditor({ node }: { node: RaisinTextNode }) {
-  const model = useCoreEditingApi();
-  const onChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    const nextValue: RaisinTextNode = {
-      type: ElementType.Text,
-      data: e.target.value,
-    };
-    model.replaceNode({ prev: node, next: nextValue });
-  };
-
-  return (
-    <li>
-      <input type="text" value={node.data} onChange={onChange} />
-    </li>
-  );
 }
