@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
-import { PrimitiveAtom } from 'jotai';
-import React, { useContext } from 'react';
+import { Atom, PrimitiveAtom, WritableAtom } from 'jotai';
+import React, { useContext, useMemo } from 'react';
 import { rootPrimitive } from './_atoms';
 
 // TODO: allow this to be swapped out? There are likely more history listeners.
@@ -30,3 +30,14 @@ export const NodeAtomProvider = ({
   const Pro = CONTEXT.Provider;
   return <Pro value={nodeAtom}>{children}</Pro>;
 };
+
+export type ScopedAtomCreator<R, W> = (
+  atom: PrimitiveAtom<RaisinNode>
+) => WritableAtom<R, W> | Atom<R>;
+
+export function useScopedAtom<R, W>(scopeFn: ScopedAtomCreator<R, W>) {
+  const scopedAtom = useNodeAtom();
+  if (!scopedAtom) throw new Error('Undefined scope');
+  const memoized = useMemo(() => scopeFn(scopedAtom), [scopedAtom, scopeFn]);
+  return memoized;
+}

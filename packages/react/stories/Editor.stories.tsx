@@ -36,9 +36,9 @@ export function Big() {
   );
 }
 function Editor({ html }: { html: string }) {
-  const model: Model = useEditor(html);
+  useEditor(html);
 
-  return <EditorView {...model} />;
+  return <EditorView />;
 }
 
 const big = `

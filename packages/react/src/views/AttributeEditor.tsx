@@ -1,35 +1,34 @@
-import { RaisinElementNode } from '@raisins/core';
 import { Attribute } from '@raisins/schema/schema';
-import SlDetails from '@shoelace-style/react/dist/details';
+import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
-import styled from 'styled-components';
+import { atomForAttributes } from '../atoms/atomForAttributes';
+import { useNodeAtom } from '../atoms/node-context';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { useCoreEditingApi } from "../editting/CoreEditingAPI";
+import { isElementNode } from '../util/isNode';
 
-const Descr = styled.span`
-  color: grey;
-  font-size: 0.7em;
-`;
-export function AttributesEditor(props: { node: RaisinElementNode }) {
+export function AttributesEditor() {
+  const nodeAtom = useNodeAtom();
+  const [node] = useAtom(nodeAtom);
+  const [attributes, setAttributes] = useAtom(atomForAttributes(nodeAtom));
   const comp = useAtomValue(ComponentModelAtom);
-  const model = useCoreEditingApi();
 
-  const attributeSchema = comp.getComponentMeta(props.node)?.attributes ?? [];
-  const attribs = props.node.attribs || {};
+  const attributeSchema = isElementNode(node)
+    ? comp.getComponentMeta(node)?.attributes ?? []
+    : [];
+  const attribs = attributes ?? {};
+
   const onchange = (key: string) => {
     return (value: string) => {
-      const attrbsClone = { ...props.node.attribs };
-      if (value === undefined) {
-        delete attrbsClone[key];
-      } else {
-        attrbsClone[key] = value;
-      }
-      const clone = {
-        ...props.node,
-        attribs: attrbsClone,
-      };
-      model.replaceNode({ prev: props.node, next: clone });
+      setAttributes((prev) => {
+        const attrbsClone = { ...prev };
+        if (value === undefined) {
+          delete attrbsClone[key];
+        } else {
+          attrbsClone[key] = value;
+        }
+        return attrbsClone;
+      });
     };
   };
   return (
@@ -53,7 +52,7 @@ export function AttributesEditor(props: { node: RaisinElementNode }) {
                 {attr.description && (
                   <tr>
                     <td colSpan={2}>
-                      <Descr>{attr.description}</Descr>
+                      <span style={{color:"grey"}}>{attr.description}</span>
                     </td>
                   </tr>
                 )}
@@ -62,13 +61,14 @@ export function AttributesEditor(props: { node: RaisinElementNode }) {
           })}
         </tbody>
       </table>
-      <SlDetails summary="Debugging">
+      <details>
+        <summary>Debugging</summary>
         Attributes: <br />
         <pre style={{ overflow: 'scroll' }}>
-          {JSON.stringify(props.node.attribs, null, 2)}
+          {JSON.stringify(attribs, null, 2)}
         </pre>
         Schema:
-      </SlDetails>
+      </details>
     </div>
   );
 }

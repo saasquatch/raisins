@@ -1,18 +1,17 @@
-import {
-  htmlUtil,
-  RaisinElementNode,
-  RaisinNodeVisitor as NodeVisitor,
-  RaisinNodeWithChildren,
-} from '@raisins/core';
-import SlButtonGroup from '@shoelace-style/react/dist/button-group';
+import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
+import { atom, useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import { NodeAtomProvider, useNodeAtom } from '../atoms/node-context';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
+import { ChildrenEditor } from '../controllers/ChildrenEditor';
+import { useCoreEditingApi } from '../editting/CoreEditingAPI';
 import { RootNodeAtom } from '../hooks/useCore';
-import { useCoreEditingApi } from "../editting/CoreEditingAPI";
+import { NamedSlot } from '../model/EditorModel';
+import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
-import { WithSelectionEditor } from '../rich-text/RichTextEditor';
+import { isElementNode } from '../util/isNode';
 
 const { clone, visit } = htmlUtil;
 
@@ -55,7 +54,7 @@ const TitleBar = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-const Toolbar = styled(SlButtonGroup)`
+const Toolbar = styled.div`
   // order: -1;
 `;
 
@@ -71,147 +70,150 @@ const AddBlock = styled.div`
   justify-content: center;
 `;
 
+const RootHasChildren = atom(
+  (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+);
 export const Layers: FC<{}> = () => {
+  const hasChildren = useAtomValue(RootHasChildren);
+
+  return (
+    <div data-layers>
+      {' '}
+      Don't re-render unless number of children changes!
+      <div layer-root>
+        <NodeAtomProvider nodeAtom={RootNodeAtom}>
+          {hasChildren && <ChildrenEditor Component={ElementLayer} />}
+          {!hasChildren && <AddNew idx={0} />}
+        </NodeAtomProvider>
+      </div>
+    </div>
+  );
+};
+
+function AddNew(props: { idx: number; slot?: string }) {
+  const node = useAtomValue(useNodeAtom());
   const model = useCoreEditingApi();
   const comp = useAtomValue(ComponentModelAtom);
 
-  const node = useAtomValue(RootNodeAtom);
-  const selected = useAtomValue(SelectedNodeAtom);
-  const setSelected = useUpdateAtom(SelectedAtom);
-
-  //
-  // TODO: Extract LayersView
-  //
-
-  function AddNew(props: {
-    node: RaisinNodeWithChildren;
-    idx: number;
-    slot?: string;
-  }) {
-    const [open, setOpen] = useState(false);
-    const validChildren = comp.getValidChildren(props.node, props.slot);
-    if (validChildren.length <= 0) {
-      return <></>;
-    }
-    return (
-      <>
-        {!open && (
-          <AddBlock onClick={() => setOpen(true)}>
-            <div>Insert</div>
-          </AddBlock>
-        )}
-        {open && (
-          <div style={{ display: 'flex', overflowX: 'auto' }}>
-            {validChildren.map((b) => {
-              const meta = comp.getComponentMeta(b.content);
-              return (
-                <button
-                  onClick={() => {
-                    const cloned = clone(b.content) as RaisinElementNode;
-                    // TODO: add "insert into slot" into core model?
-                    props.slot && (cloned.attribs.slot = props.slot);
-                    model.insert({
-                      node: cloned,
-                      parent: props.node,
-                      idx: props.idx,
-                    });
-                  }}
-                >
-                  {meta.title}
-                  <br />
-                  <small>{b.title}</small>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </>
-    );
+  const [open, setOpen] = useState(false);
+  const validChildren = comp.getValidChildren(node, props.slot);
+  if (validChildren.length <= 0) {
+    return <></>;
   }
-
-  const ElementVisitor: Partial<NodeVisitor<React.ReactNode>> = {
-    onElement(element, _) {
-      const meta = comp.getComponentMeta(element);
-      const name = (
-        <TitleBar onClick={() => setSelected(element)}>
-          <Label>{meta?.title || element.tagName}</Label>
-          <Toolbar>
-            <button onClick={() => model.duplicateNode(element)}>dupe</button>
-            <button onClick={() => model.removeNode(element)}>del</button>
-          </Toolbar>
-        </TitleBar>
-      );
-      // const hasChildren = children?.length > 0;
-      const nodeWithSlots = comp.getSlots(element);
-
-      const slots = nodeWithSlots.slots || [];
-      const hasSlots = slots?.length > 0;
-      return (
-        <Layer data-element selected={selected === element}>
-          {!hasSlots && name}
-          {hasSlots && (
-            <div>
-              {name}
-              {hasSlots && (
-                <div>
-                  {slots.map((s) => {
-                    const isEmpty = (s.children?.length ?? 0) <= 0;
-                    const slotWidget = s.slot.editor;
-                    const hasEditor = slotWidget === 'inline';
-                    return (
-                      <SlotContainer>
-                        <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
-                        {hasEditor && (
-                          // Rich Text Editor<>
-                          <WithSelectionEditor node={element} />
-                        )}
-                        {!hasEditor && (
-                          // Block Editor
-                          <>
-                            {isEmpty && (
-                              <AddNew
-                                node={element}
-                                idx={s.children?.length ?? 0}
-                                slot={s.slot.name}
-                              />
-                            )}
-                            {!isEmpty && (
-                              <SlotChildren>
-                                {s.children
-                                  ?.filter((x) => x)
-                                  .map((c) => {
-                                    const childElement = visit(
-                                      c.node,
-                                      ElementVisitor,
-                                      false
-                                    );
-                                    // Doesn't render empty text nodes
-                                    return childElement;
-                                  })}
-                              </SlotChildren>
-                            )}
-                          </>
-                        )}
-                      </SlotContainer>
-                    );
-                  })}
-                </div>
-              )}{' '}
-            </div>
-          )}
-        </Layer>
-      );
-    },
-    onRoot(root, children) {
-      const hasChildren = root.children.length > 0;
-      return (
-        <div layer-root>
-          {hasChildren && root.children.map((c) => visit(c, ElementVisitor))}
-          {!hasChildren && <AddNew node={root} idx={0} />}
+  return (
+    <>
+      {!open && (
+        <AddBlock onClick={() => setOpen(true)}>
+          <div>Insert</div>
+        </AddBlock>
+      )}
+      {open && (
+        <div style={{ display: 'flex', overflowX: 'auto' }}>
+          {validChildren.map((b) => {
+            const meta = comp.getComponentMeta(b.content);
+            return (
+              <button
+                onClick={() => {
+                  const cloned = clone(b.content) as RaisinElementNode;
+                  // TODO: add "insert into slot" into core model?
+                  props.slot && (cloned.attribs.slot = props.slot);
+                  model.insert({
+                    node: cloned,
+                    parent: node,
+                    idx: props.idx,
+                  });
+                }}
+              >
+                {meta.title}
+                <br />
+                <small>{b.title}</small>
+              </button>
+            );
+          })}
         </div>
-      );
-    },
-  };
+      )}
+    </>
+  );
+}
 
-  return <div data-layers>{visit(node, ElementVisitor, false)}</div>;
-};
+function ElementLayer() {
+  const [selected] = useAtom(SelectedNodeAtom);
+  const setSelected = useUpdateAtom(SelectedAtom);
+  const model = useCoreEditingApi();
+  const comp = useAtomValue(ComponentModelAtom);
+  const [node] = useAtom(useNodeAtom());
+
+  // Don't render non-element layers
+  if (!isElementNode(node)) return <></>;
+
+  const element = node as RaisinElementNode;
+
+  const meta = comp.getComponentMeta(element);
+
+  const name = (
+    <TitleBar onClick={() => setSelected(element)}>
+      <Label>{meta?.title || element.tagName}</Label>
+      <Toolbar>
+        <button onClick={() => model.duplicateNode(element)}>dupe</button>
+        <button onClick={() => model.removeNode(element)}>del</button>
+      </Toolbar>
+    </TitleBar>
+  );
+  // const hasChildren = children?.length > 0;
+  const nodeWithSlots = comp.getSlots(element);
+
+  const slots = nodeWithSlots.slots || [];
+  const hasSlots = slots?.length > 0;
+  return (
+    <Layer data-element selected={selected === element}>
+      {!hasSlots && name}
+      {hasSlots && (
+        <div>
+          {name}
+          {hasSlots && <div>{slots.map((s) => <SlotWidget s={s}/>)}</div>}{' '}
+        </div>
+      )}
+    </Layer>
+  );
+}
+
+function SlotWidget({ s }: { s: NamedSlot }) {
+  const isEmpty = (s.children?.length ?? 0) <= 0;
+  const slotWidget = s.slot.editor;
+  const hasEditor = slotWidget === 'inline';
+  return (
+    <SlotContainer>
+      <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
+      {hasEditor && (
+        // Rich Text Editor<>
+        <RichTextEditorForAtom />
+      )}
+      {!hasEditor && (
+        // Block Editor
+        <>
+          {isEmpty && (
+            <AddNew idx={s.children?.length ?? 0} slot={s.slot.name} />
+          )}
+          {!isEmpty && (
+            <SlotChildren>
+              {
+                // TODO: Split atoms
+                // s.children
+                //   ?.filter((x) => x)
+                //   .map((c) => {
+                //     const childElement = visit(
+                //       c.node,
+                //       ElementVisitor,
+                //       false
+                //     );
+                //     // Doesn't render empty text nodes
+                //     return childElement;
+                //   })
+              }
+            </SlotChildren>
+          )}
+        </>
+      )}
+    </SlotContainer>
+  );
+}

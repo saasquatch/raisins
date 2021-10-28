@@ -1,4 +1,4 @@
-import { RaisinElementNode, RaisinNodeWithChildren } from '@raisins/core';
+import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
@@ -105,9 +105,12 @@ export const ValidChildrenAtom = atom((get) => {
   const getComponentMeta = get(ComponentMetaAtom);
 
   function getValidChildren(
-    node: RaisinNodeWithChildren,
+    node: RaisinNode,
     slot?: string
   ): Block[] {
+    // Non-documents and elements aren't allowed children
+    if(!isElementNode(node) || !isRoot(node)) return [];
+
     const allowedInParent = blocks.filter((block) => {
       const childMeta = getComponentMeta(block.content);
       const childAllowsParents = doesChildAllowParent(childMeta, node);
@@ -160,7 +163,7 @@ export const ComponentModelAtom = atom<ComponentModel>((get) => {
     return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
   }
 
-  function getSlotsInternal(node: RaisinNodeWithChildren): NodeWithSlots {
+  function getSlotsInternal(node: RaisinNode): NodeWithSlots {
     return getSlots(node, getComponentMeta)!;
   }
 
@@ -187,7 +190,7 @@ export type ComponentDetails = {
   getComponentMeta: ComponentMetaProvider;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
-  getValidChildren: (node: RaisinNodeWithChildren, slot?: string) => Block[];
+  getValidChildren: (node: RaisinNode, slot?: string) => Block[];
   isValidChild: (
     from: RaisinElementNode,
     to: RaisinElementNode,

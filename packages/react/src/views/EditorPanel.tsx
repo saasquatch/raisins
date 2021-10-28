@@ -1,17 +1,33 @@
-import { RaisinElementNode, StyleNodeProps } from '@raisins/core';
+import { RaisinElementNode, RaisinNode, StyleNodeProps } from '@raisins/core';
 import { CssNodePlain } from 'css-tree';
+import { atom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
-import { useCoreEditingApi } from "../editting/CoreEditingAPI";
+import { NodeAtomProvider } from '../atoms/node-context';
+import { useCoreEditingApi } from '../editting/CoreEditingAPI';
+import { ReplaceNodeAtom } from '../editting/EditAtoms';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 import { StyleNodeEditor } from '../stylesheets/StyleEditor';
+import { isFunction } from '../util/isFunction';
 import { isElementNode } from '../util/isNode';
 import { AttributesEditor } from './AttributeEditor';
+
+const EditSelectedNodeAtom = atom(
+  (get) => get(SelectedNodeAtom)!,
+  (get, set, next: SetStateAction<RaisinNode>) => {
+    const selected = get(SelectedNodeAtom);
+    if (!selected) return; // Don't allow editing if nothing selected
+    const nextValue = isFunction(next) ? next(selected) : next;
+    set(ReplaceNodeAtom, {
+      prev: selected,
+      next: nextValue,
+    });
+  }
+);
 
 export function EditorPanel() {
   const props = useCoreEditingApi();
   const selected = useAtomValue(SelectedNodeAtom);
-
   if (isElementNode(selected)) {
     const element = selected;
 
@@ -34,7 +50,9 @@ export function EditorPanel() {
 
     return (
       <div>
-        <AttributesEditor node={element} />
+        <NodeAtomProvider nodeAtom={EditSelectedNodeAtom}>
+          <AttributesEditor />
+        </NodeAtomProvider>
         {element.style && <StyleNodeEditor {...styleProps} />}
       </div>
     );
