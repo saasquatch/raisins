@@ -1,21 +1,19 @@
 import { RaisinElementNode } from '@raisins/core';
-import SlDetails from '@shoelace-style/react/dist/details';
-import React from 'react';
-import { Model } from '../model/EditorModel';
-import styled from 'styled-components';
 import { Attribute } from '@raisins/schema/schema';
+import SlDetails from '@shoelace-style/react/dist/details';
 import { useAtomValue } from 'jotai/utils';
+import React from 'react';
+import styled from 'styled-components';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
+import { useCoreEditingApi } from "../editting/CoreEditingAPI";
 
 const Descr = styled.span`
   color: grey;
   font-size: 0.7em;
 `;
-export function AttributesEditor(props: {
-  model: Model;
-  node: RaisinElementNode;
-}) {
+export function AttributesEditor(props: { node: RaisinElementNode }) {
   const comp = useAtomValue(ComponentModelAtom);
+  const model = useCoreEditingApi();
 
   const attributeSchema = comp.getComponentMeta(props.node)?.attributes ?? [];
   const attribs = props.node.attribs || {};
@@ -31,7 +29,7 @@ export function AttributesEditor(props: {
         ...props.node,
         attribs: attrbsClone,
       };
-      props.model.replaceNode(props.node, clone);
+      model.replaceNode({ prev: props.node, next: clone });
     };
   };
   return (
@@ -47,7 +45,6 @@ export function AttributesEditor(props: {
                     <br />
                     <AttributeEditor
                       schema={attr}
-                      model={props.model}
                       attr={{ key: attr.name, value: attribs[attr.name] }}
                       onChange={onchange(attr.name)}
                     />
@@ -83,7 +80,6 @@ export function AttributeEditor(props: {
   };
   onChange: (next: any) => void;
   schema?: Attribute;
-  model: Model;
 }) {
   if (props.attr.value === undefined) {
     return (

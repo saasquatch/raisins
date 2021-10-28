@@ -5,7 +5,7 @@ import { useAtom } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
 import styled from 'styled-components';
-import { HistorySizeAtom, RedoAtom, UndoAtom } from '../hooks/HistoryAtoms';
+import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 
 const ToolbarStyle = styled.div`

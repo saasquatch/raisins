@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { CanvasController } from '../canvas/CanvasController';
-import { Model } from '../model/EditorModel';
+import { StyleEditor } from '../stylesheets/StyleEditor';
 import { EditorPanel } from './EditorPanel';
 import { Layers } from './Layers';
 import { PackageEditorController } from './PackageEditorView';
 import RichTextEditor from './RichTextEditor';
-import { StyleEditor } from '../stylesheets/StyleEditor';
 import { ToolbarView } from './Toolbar';
 
 export const Row = styled.div`
@@ -82,7 +81,7 @@ export const Main = styled.div`
   }
 `;
 
-export function EditorView(model: Model) {
+export function EditorView() {
   return (
     <>
       <Main>
@@ -90,19 +89,19 @@ export function EditorView(model: Model) {
           <ToolbarView />
         </Header>
         <Edits>
-          <EditorPanel {...model} />
+          <EditorPanel />
           <PackageEditorController />
           <StyleEditor />
         </Edits>
         <CanvasCss>
           <CanvasController />
           <CanvasController />
-          <RichTextEditor {...model} />
+          <RichTextEditor />
         </CanvasCss>
 
         <LayersCss>
           {' '}
-          <Layers {...model} />
+          <Layers />
         </LayersCss>
         <Footer>Footer</Footer>
       </Main>

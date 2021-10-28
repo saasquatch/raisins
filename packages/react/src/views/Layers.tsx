@@ -5,11 +5,13 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import SlButtonGroup from '@shoelace-style/react/dist/button-group';
-import { useAtomValue } from 'jotai/utils';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { Model } from '../model/EditorModel';
+import { RootNodeAtom } from '../hooks/useCore';
+import { useCoreEditingApi } from "../editting/CoreEditingAPI";
+import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { WithSelectionEditor } from './RichTextEditor';
 
 const { clone, visit } = htmlUtil;
@@ -69,11 +71,17 @@ const AddBlock = styled.div`
   justify-content: center;
 `;
 
-export const Layers: FC<Model> = (model) => {
+export const Layers: FC<{}> = () => {
+  const model = useCoreEditingApi();
   const comp = useAtomValue(ComponentModelAtom);
 
-  // TODO: Extract LayersView
+  const node = useAtomValue(RootNodeAtom);
+  const selected = useAtomValue(SelectedNodeAtom);
+  const setSelected = useUpdateAtom(SelectedAtom);
 
+  //
+  // TODO: Extract LayersView
+  //
 
   function AddNew(props: {
     node: RaisinNodeWithChildren;
@@ -102,7 +110,11 @@ export const Layers: FC<Model> = (model) => {
                     const cloned = clone(b.content) as RaisinElementNode;
                     // TODO: add "insert into slot" into core model?
                     props.slot && (cloned.attribs.slot = props.slot);
-                    model.insert(cloned, props.node, props.idx);
+                    model.insert({
+                      node: cloned,
+                      parent: props.node,
+                      idx: props.idx,
+                    });
                   }}
                 >
                   {meta.title}
@@ -121,7 +133,7 @@ export const Layers: FC<Model> = (model) => {
     onElement(element, _) {
       const meta = comp.getComponentMeta(element);
       const name = (
-        <TitleBar onClick={() => model.setSelected(element)}>
+        <TitleBar onClick={() => setSelected(element)}>
           <Label>{meta?.title || element.tagName}</Label>
           <Toolbar>
             <button onClick={() => model.duplicateNode(element)}>dupe</button>
@@ -135,7 +147,7 @@ export const Layers: FC<Model> = (model) => {
       const slots = nodeWithSlots.slots || [];
       const hasSlots = slots?.length > 0;
       return (
-        <Layer data-element selected={model.selected === element}>
+        <Layer data-element selected={selected === element}>
           {!hasSlots && name}
           {hasSlots && (
             <div>
@@ -151,7 +163,7 @@ export const Layers: FC<Model> = (model) => {
                         <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
                         {hasEditor && (
                           // Rich Text Editor<>
-                          <WithSelectionEditor node={element} model={model} />
+                          <WithSelectionEditor node={element} />
                         )}
                         {!hasEditor && (
                           // Block Editor
@@ -201,5 +213,5 @@ export const Layers: FC<Model> = (model) => {
     },
   };
 
-  return <div data-layers>{visit(model.node, ElementVisitor, false)}</div>;
+  return <div data-layers>{visit(node, ElementVisitor, false)}</div>;
 };

@@ -1,15 +1,7 @@
 import { keymap } from 'prosemirror-keymap';
 import { useMemo } from 'react';
 import { useUpdateAtom } from 'jotai/utils';
-import { UndoAtom, RedoAtom } from '../hooks/HistoryAtoms';
-
-// let state = EditorState.create({
-//   schema,
-//   plugins: [
-//     keymap({"Mod-z": undo, "Mod-y": redo}),
-//     keymap(baseKeymap)
-//   ]
-// });
+import { UndoAtom, RedoAtom } from '../editting/HistoryAtoms';
 
 export function useRaisinHistoryPlugin() {
   const undo = useUpdateAtom(UndoAtom);

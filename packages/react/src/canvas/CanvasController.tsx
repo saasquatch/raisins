@@ -1,7 +1,7 @@
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import useCanvas, { SizeAtom } from './useCanvas';
-import { SelectedAtom } from '../hooks/useCore';
+import { SelectedAtom } from "../selection/SelectedAtom";
 import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
 
 export function useWYSIWYGCanvas(): WYSWIGCanvasProps {

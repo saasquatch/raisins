@@ -1,8 +1,8 @@
 import hotkeys from 'hotkeys-js';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect } from 'react';
-import { DeleteSelectedAtom } from './useCore';
-import { RedoAtom, UndoAtom } from './HistoryAtoms';
+import { DeleteSelectedAtom } from '../editting/EditAtoms';
+import { RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 
 export function useHotkeys() {
   const undo = useUpdateAtom(UndoAtom);

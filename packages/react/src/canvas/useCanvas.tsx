@@ -11,9 +11,11 @@ import { raisintoSnabdom } from './raisinToSnabdom';
 import {
   getId,
   RootNodeAtom,
-  SelectedNodeAtom,
-  SetSelectedIdAtom,
 } from '../hooks/useCore';
+import {
+  SelectedNodeAtom,
+  SetSelectedIdAtom
+} from "../selection/SelectedAtom";
 import {
   ChildRPC,
   useSandboxedIframeRenderer,
