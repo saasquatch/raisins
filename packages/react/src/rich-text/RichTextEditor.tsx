@@ -26,12 +26,9 @@ export default function RichTextEditor() {
   if (!isElementNode(selected)) return <div>Not an element</div>;
 
   const element = selected;
-  return <TextNodesEditor element={element} />;
-}
-
-export function TextNodesEditor({ element }: { element: RaisinElementNode }) {
   return <WithSelectionEditor node={element} />;
 }
+
 
 /**
  * Manage prose selection state locally (for the time being).

@@ -1,8 +1,17 @@
 import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { atom, useAtom } from 'jotai';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { atom } from 'jotai';
+import { useAtomValue } from 'jotai/utils';
 import React, { FC, useState } from 'react';
 import styled from 'styled-components';
+import {
+  duplicateForNode,
+  isNodeAnElement,
+  isSelectedForNode,
+  nameForNode,
+  removeForNode,
+  setSelectedForNode,
+  slotsForNode,
+} from '../atoms/AtomsForNode';
 import { NodeAtomProvider, useNodeAtom } from '../atoms/node-context';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { ChildrenEditor } from '../controllers/ChildrenEditor';
@@ -10,10 +19,8 @@ import { useCoreEditingApi } from '../editting/CoreEditingAPI';
 import { RootNodeAtom } from '../hooks/useCore';
 import { NamedSlot } from '../model/EditorModel';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
-import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
-import { isElementNode } from '../util/isNode';
 
-const { clone, visit } = htmlUtil;
+const { clone } = htmlUtil;
 
 const Label = styled.div`
   cursor: pointer;
@@ -80,7 +87,7 @@ export const Layers: FC<{}> = () => {
     <div data-layers>
       {' '}
       Don't re-render unless number of children changes!
-      <div layer-root>
+      <div data-layers-root>
         <NodeAtomProvider nodeAtom={RootNodeAtom}>
           {hasChildren && <ChildrenEditor Component={ElementLayer} />}
           {!hasChildren && <AddNew idx={0} />}
@@ -137,40 +144,43 @@ function AddNew(props: { idx: number; slot?: string }) {
 }
 
 function ElementLayer() {
-  const [selected] = useAtom(SelectedNodeAtom);
-  const setSelected = useUpdateAtom(SelectedAtom);
-  const model = useCoreEditingApi();
-  const comp = useAtomValue(ComponentModelAtom);
-  const [node] = useAtom(useNodeAtom());
+  const setSelected = setSelectedForNode.useUpdate();
+  const isAnElement = isNodeAnElement.useValue();
+  const isSelected = isSelectedForNode.useValue();
+  const nodeWithSlots = slotsForNode.useValue();
 
+  const removeNode = removeForNode.useUpdate();
+  const duplicate = duplicateForNode.useUpdate();
+  const title = nameForNode.useValue();
   // Don't render non-element layers
-  if (!isElementNode(node)) return <></>;
-
-  const element = node as RaisinElementNode;
-
-  const meta = comp.getComponentMeta(element);
+  if (!isAnElement) return <></>;
 
   const name = (
-    <TitleBar onClick={() => setSelected(element)}>
-      <Label>{meta?.title || element.tagName}</Label>
+    <TitleBar onClick={setSelected}>
+      <Label>{title}</Label>
       <Toolbar>
-        <button onClick={() => model.duplicateNode(element)}>dupe</button>
-        <button onClick={() => model.removeNode(element)}>del</button>
+        <button onClick={duplicate}>dupe</button>
+        <button onClick={removeNode}>del</button>
       </Toolbar>
     </TitleBar>
   );
   // const hasChildren = children?.length > 0;
-  const nodeWithSlots = comp.getSlots(element);
 
-  const slots = nodeWithSlots.slots || [];
+  const slots = nodeWithSlots.slots ?? [];
   const hasSlots = slots?.length > 0;
   return (
-    <Layer data-element selected={selected === element}>
+    <Layer data-element selected={isSelected}>
       {!hasSlots && name}
       {hasSlots && (
         <div>
           {name}
-          {hasSlots && <div>{slots.map((s) => <SlotWidget s={s}/>)}</div>}{' '}
+          {hasSlots && (
+            <div>
+              {slots.map((s) => (
+                <SlotWidget s={s} />
+              ))}
+            </div>
+          )}{' '}
         </div>
       )}
     </Layer>

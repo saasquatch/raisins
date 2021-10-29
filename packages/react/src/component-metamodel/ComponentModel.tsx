@@ -84,7 +84,7 @@ export const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
   });
 });
 
-const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
+export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   const components = get(ComponentsAtom);
   function getComponentMeta(node: RaisinElementNode): CustomElement {
     const found = components.find((c) => c.tagName === node.tagName);
