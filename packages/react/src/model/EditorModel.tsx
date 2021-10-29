@@ -17,6 +17,11 @@ export type NamedSlot = {
   children?: NodeWithSlots[];
 };
 
+export const DefaultSlotMeta: Slot = {
+  name: '',
+  title: 'Content',
+};
+
 export const DefaultSlot: NamedSlot = {
   slot: {
     name: '',

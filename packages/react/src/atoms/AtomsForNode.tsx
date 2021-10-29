@@ -1,12 +1,14 @@
 import { RaisinElementNode } from '@raisins/core';
+import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import {
   ComponentMetaAtom,
   ComponentModelAtom,
 } from '../component-metamodel/ComponentModel';
 import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
+import { DefaultSlot, DefaultSlotMeta } from '../model/EditorModel';
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
-import { isElementNode } from '../util/isNode';
+import { isElementNode, isRoot } from '../util/isNode';
 import { atomForNode } from './node-context';
 
 export const isSelectedForNode = atomForNode((n) =>
@@ -31,7 +33,30 @@ export const slotsForNode = atomForNode((n) =>
   atom((get) => {
     const comp = get(ComponentModelAtom);
     const node = get(n);
-    return comp.getSlots(node as RaisinElementNode);
+
+    // Root has just one slot
+    if (isRoot(node)) return [DefaultSlotMeta] as Slot[];
+    if (!isElementNode(node)) return [] as Slot[];
+
+    const meta = comp.getComponentMeta(node);
+
+    const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
+
+    const childSlots = node.children.map((child) => {
+      const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
+      return slotName;
+    });
+    const allSlots = [...definedSlots, ...childSlots];
+    const dedupedSet = new Set(allSlots);
+    const allSlotsWithMeta = [...dedupedSet.keys()].sort().map((k) => {
+      const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
+      return slot;
+    });
+    // TODO: Filter slots so they don't show text nodes?
+    // TODO: Figure out how to deal with elements that shouldn't have childen but they do?
+    //    -  maybe show the children, but don't allow drop targets or "Add New"
+    //    - show RED validation?
+    return allSlotsWithMeta;
   })
 );
 export const removeForNode = atomForNode((n) =>

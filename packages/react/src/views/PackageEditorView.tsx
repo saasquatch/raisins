@@ -74,7 +74,7 @@ export function PackageEditorView(props: ModuleManagement) {
       Modules:
       <ul>
         {props.modules.map((m) => (
-          <li>
+          <li key={m.name + "@" + m.version + "/" + m.filePath}>
             {m.name} @ {m.version} for {m.filePath}
           </li>
         ))}
@@ -82,7 +82,7 @@ export function PackageEditorView(props: ModuleManagement) {
       Details:
       <ul>
         {props.moduleDetails?.map((m) => (
-          <li>
+          <li key={m.name}>
             <b>{m['package.json'].description}</b>
             <br />
             <div style={{ fontSize: '0.8em', color: 'grey' }}>
@@ -102,7 +102,7 @@ export function PackageEditorView(props: ModuleManagement) {
       <ul>
         {PACKAGES.map((m) => {
           return (
-            <li>
+            <li key={m}>
               <button
                 onClick={(e) => {
                   props.addModule({
@@ -120,7 +120,7 @@ export function PackageEditorView(props: ModuleManagement) {
       <ul>
         {PACKAGES.map((m) => {
           return (
-            <li>
+            <li key={m}>
               <button onClick={() => props.removeModuleByName(m)}>{m}</button>
             </li>
           );

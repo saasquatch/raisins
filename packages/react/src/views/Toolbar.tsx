@@ -38,7 +38,7 @@ export function ToolbarView() {
         Screen
       </button>
       {sizes.map((s) => (
-        <button onClick={() => setSize(s)} disabled={size === s}>
+        <button onClick={() => setSize(s)} disabled={size === s} key={s.name}>
           {s.name}
         </button>
       ))}

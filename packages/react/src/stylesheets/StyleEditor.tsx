@@ -1,8 +1,9 @@
 import { cssUtil, StyleNodeProps } from '@raisins/core';
 import * as Css from 'css-tree';
 import React, { FormEvent } from 'react';
-import { useStyleEditor } from './useStyleEditor';
+import { getId } from '../hooks/useCore';
 import { StateUpdater } from '../util/NewState';
+import { useStyleEditor } from './useStyleEditor';
 
 const { createChildUpdater, createUpdater } = cssUtil;
 export function StyleEditor() {
@@ -20,6 +21,7 @@ export function StyleEditor() {
           <div
             onClick={() => model.setSelectedsheet(s)}
             style={{ fontWeight: isSelected ? 'bold' : 'normal' }}
+            key={getId(s)}
           >
             Sheet {i}
           </div>
@@ -268,13 +270,16 @@ export function Children<T extends Css.CssNodePlain & HasChildrenNodes>(
   const { setNode } = props;
   return (
     <>
-      {props.node.children.map((n: Css.CssNodePlain, idx: number) => {
-        const subUpdate: StateUpdater<Css.CssNodePlain> = createChildUpdater(
-          setNode as any,
-          idx
-        );
-        return <StyleNodeEditor node={n} setNode={subUpdate} />;
-      })}
+      {
+        // TODO: Add React Key by using atoms
+        props.node.children.map((n: Css.CssNodePlain, idx: number) => {
+          const subUpdate: StateUpdater<Css.CssNodePlain> = createChildUpdater(
+            setNode as any,
+            idx
+          );
+          return <StyleNodeEditor node={n} setNode={subUpdate} />;
+        })
+      }
     </>
   );
 }

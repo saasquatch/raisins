@@ -1,7 +1,16 @@
-import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
+import {
+  htmlUtil,
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
+} from '@raisins/core';
+import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
-import React, { FC, useState } from 'react';
+import { focusAtom } from 'jotai/optics';
+import { splitAtom, useAtomValue } from 'jotai/utils';
+import { optic_ } from 'optics-ts';
+import React, { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import {
   duplicateForNode,
@@ -14,11 +23,14 @@ import {
 } from '../atoms/AtomsForNode';
 import { NodeAtomProvider, useNodeAtom } from '../atoms/node-context';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { ChildrenEditor } from '../controllers/ChildrenEditor';
+import {
+  ChildrenEditor,
+  ChildrenEditorForAtoms,
+} from '../controllers/ChildrenEditor';
 import { useCoreEditingApi } from '../editting/CoreEditingAPI';
 import { RootNodeAtom } from '../hooks/useCore';
-import { NamedSlot } from '../model/EditorModel';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
+import { isElementNode, isRoot } from '../util/isNode';
 
 const { clone } = htmlUtil;
 
@@ -166,7 +178,7 @@ function ElementLayer() {
   );
   // const hasChildren = children?.length > 0;
 
-  const slots = nodeWithSlots.slots ?? [];
+  const slots = nodeWithSlots ?? [];
   const hasSlots = slots?.length > 0;
   return (
     <Layer data-element selected={isSelected}>
@@ -177,7 +189,7 @@ function ElementLayer() {
           {hasSlots && (
             <div>
               {slots.map((s) => (
-                <SlotWidget s={s} />
+                <SlotWidget s={s} key={s.name} />
               ))}
             </div>
           )}{' '}
@@ -187,13 +199,16 @@ function ElementLayer() {
   );
 }
 
-function SlotWidget({ s }: { s: NamedSlot }) {
-  const isEmpty = (s.children?.length ?? 0) <= 0;
-  const slotWidget = s.slot.editor;
+function SlotWidget({ s }: { s: Slot }) {
+  const childNodes = useSlotChildNodes(s.name);
+
+  const slotWidget = s.editor;
   const hasEditor = slotWidget === 'inline';
+  const isEmpty = (childNodes?.length ?? 0) <= 0;
+
   return (
     <SlotContainer>
-      <SlotName>{s.slot.title ?? s.slot.name}</SlotName>
+      <SlotName>{s.title ?? s.name} ({childNodes.length})</SlotName>
       {hasEditor && (
         // Rich Text Editor<>
         <RichTextEditorForAtom />
@@ -201,29 +216,43 @@ function SlotWidget({ s }: { s: NamedSlot }) {
       {!hasEditor && (
         // Block Editor
         <>
-          {isEmpty && (
-            <AddNew idx={s.children?.length ?? 0} slot={s.slot.name} />
-          )}
+          {isEmpty && <AddNew idx={childNodes?.length ?? 0} slot={s.name} />}
           {!isEmpty && (
             <SlotChildren>
-              {
-                // TODO: Split atoms
-                // s.children
-                //   ?.filter((x) => x)
-                //   .map((c) => {
-                //     const childElement = visit(
-                //       c.node,
-                //       ElementVisitor,
-                //       false
-                //     );
-                //     // Doesn't render empty text nodes
-                //     return childElement;
-                //   })
-              }
+              <ChildrenEditorForAtoms
+                childAtoms={childNodes}
+                Component={ElementLayer}
+              />
             </SlotChildren>
           )}
         </>
       )}
     </SlotContainer>
   );
+}
+
+function useSlotChildNodes(slotName: string) {
+  const nodeAtom = useNodeAtom();
+  const slotChildrenAtom = useMemo(() => {
+    return splitAtom(
+      focusAtom(nodeAtom, (o) =>
+        optic_<RaisinNodeWithChildren>()
+          .prop('children')
+          .filter((c) => isInSlot(c, slotName))
+      )
+    );
+  }, [slotName, nodeAtom]);
+  const childNodes = useAtomValue(slotChildrenAtom);
+  return childNodes;
+}
+
+// TODO: Move this util functions
+function isInSlot(c: RaisinNode, slotName: string): boolean {
+  const slotNameForNode = isElementNode(c) ? c.attribs.slot : undefined;
+  if (!slotName && !slotNameForNode) {
+    // Default slot (might not have a slot attributes)
+    // Have to hanlde undefined.
+    return true;
+  }
+  return slotName === slotNameForNode;
 }
