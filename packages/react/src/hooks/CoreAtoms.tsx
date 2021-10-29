@@ -1,19 +1,18 @@
 import {
   getPath,
   htmlParser,
+  htmlSerializer,
   htmlUtil,
   NodePath,
   NodeSelection,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, SetStateAction, useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
-import { useEffect } from 'react';
-import {
-  generateNextState,
-} from '../editting/EditAtoms';
+import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { HTMLAtom } from '../atoms/RaisinScope';
+import { generateNextState } from '../editting/EditAtoms';
 import { IdentifierModel } from '../model/EditorModel';
+import { isFunction } from '../util/isFunction';
 
 export type InternalState = {
   current: RaisinNode;
@@ -38,11 +37,36 @@ export function getId(node: RaisinNode): string {
   return id;
 }
 
+const NodeFromHtml = atom(get=>htmlParser(get(HTMLAtom)));
+const getDerivedInternal = (get: Getter) => {
+  const current = get(NodeFromHtml);
+  const historyState = get(HistoryAtom);
+  return {
+    current,
+    ...historyState,
+  };
+};
+
+
 // Should be made private
-export const InternalStateAtom = atom<InternalState>({
+export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
+  getDerivedInternal,
+  (get, set, next: SetStateAction<InternalState>) => {
+    const iState = getDerivedInternal(get);
+    const { current, ...rest } = isFunction(next) ? next(iState) : next;
+
+    if(current !== iState.current){
+      const htmlString = htmlSerializer(current);
+      set(HTMLAtom, htmlString);        
+    }
+    set(HistoryAtom, rest);
+  }
+);
+
+export const HistoryAtom = atom<Omit<InternalState, 'current'>>({
   redoStack: [],
   undoStack: [],
-  current: htmlParser('<div></div>'),
+  selected: undefined
 });
 
 export const RootNodeAtom = atom(
@@ -82,15 +106,3 @@ export const ParentsAtom = atom((get) => {
   const doc = get(InternalStateAtom).current;
   return getParents(doc);
 });
-
-export function useCore(initial: RaisinNode) {
-  const setState = useUpdateAtom(InternalStateAtom);
-
-  useEffect(() => {
-    // Resets undo/redo stacks if the inbound value changes
-    // TODO: find a place for this in the atom flow of HTML->raisinNode->HTML
-    setState({ redoStack: [], undoStack: [], current: initial });
-  }, [initial]);
-}
-
-

@@ -2,16 +2,17 @@ import { Attribute } from '@raisins/schema/schema';
 import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
-import { atomForAttributes } from '../atoms/atomForAttributes';
-import { useNodeAtom } from '../atoms/node-context';
+import { attributesForNode } from '../node/AtomsForNode';
+import { useNodeAtom } from '../node/node-context';
+import { RaisinScope } from '../atoms/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { isElementNode } from '../util/isNode';
 
 export function AttributesEditor() {
   const nodeAtom = useNodeAtom();
-  const [node] = useAtom(nodeAtom);
-  const [attributes, setAttributes] = useAtom(atomForAttributes(nodeAtom));
-  const comp = useAtomValue(ComponentModelAtom);
+  const [node] = useAtom(nodeAtom, RaisinScope);
+  const [attributes, setAttributes] = attributesForNode.useAtom();
+  const comp = useAtomValue(ComponentModelAtom, RaisinScope);
 
   const attributeSchema = isElementNode(node)
     ? comp.getComponentMeta(node)?.attributes ?? []
@@ -52,7 +53,7 @@ export function AttributesEditor() {
                 {attr.description && (
                   <tr>
                     <td colSpan={2}>
-                      <span style={{color:"grey"}}>{attr.description}</span>
+                      <span style={{ color: 'grey' }}>{attr.description}</span>
                     </td>
                   </tr>
                 )}

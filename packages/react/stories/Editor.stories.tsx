@@ -1,8 +1,9 @@
 import { Meta } from '@storybook/react';
-import { Provider } from 'jotai';
-import { LocalURLAtom } from '../src/component-metamodel/ComponentModel';
-import { useEditor } from '../src/hooks/useEditor';
+import React, { useState } from 'react';
+import { RaisinsProvider } from '../src/atoms/RaisinScope';
+import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
+import { useHotkeys } from '../src/hooks/useHotkeys';
 
 const meta: Meta = {
   title: 'Editor',
@@ -11,32 +12,41 @@ const meta: Meta = {
 export default meta;
 
 export function Span() {
+  const stateTuple = useState(
+    `<span>I am a thing with <b>bold content</b></span>`
+  );
   return (
-    <Provider
-      initialValues={[
-        // Local atom
-        [LocalURLAtom, 'http://localhost:5000'],
-      ]}
-    >
-      <Editor html={`<span>I am a thing with <b>bold content</b></span>`} />
-    </Provider>
+    <RaisinsProvider state={stateTuple}>
+      <Editor />
+    </RaisinsProvider>
   );
 }
 
 export function Big() {
+  const stateTuple = useState(big);
   return (
-    <Provider
-      initialValues={[
-        // Local atom
-        [LocalURLAtom, 'http://localhost:5000'],
-      ]}
-    >
-      <Editor html={big} />
-    </Provider>
+    <>
+      <RaisinsProvider state={stateTuple}>
+        <Editor />
+      </RaisinsProvider>
+      <pre>{stateTuple[0]}</pre>
+    </>
   );
 }
-function Editor({ html }: { html: string }) {
-  useEditor(html);
+
+export function CanvasOnly() {
+  const stateTuple = useState(big);
+  return (
+    <>
+      <RaisinsProvider state={stateTuple}>
+        <CanvasController />
+      </RaisinsProvider>
+      <pre>{stateTuple[0]}</pre>
+    </>
+  );
+}
+function Editor() {
+  useHotkeys();
 
   return <EditorView />;
 }

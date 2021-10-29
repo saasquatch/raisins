@@ -9,13 +9,14 @@ import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React, { useMemo, useRef } from 'react';
-import { useNodeAtom } from '../atoms/node-context';
-import { useValueAtom } from '../atoms/useValueAtom';
-import { IdentifierModelAtom, RootNodeAtom } from '../hooks/useCore';
+import { useNodeAtom } from '../node/node-context';
+import { RaisinScope } from '../atoms/RaisinScope';
+import { useAtomFromRenderValue } from '../atoms/useValueAtom';
+import { IdentifierModelAtom, RootNodeAtom } from '../hooks/CoreAtoms';
 import {
   useProseEditorOnAtom,
-  useSelectionAtom,
 } from '../prosemirror/ProseEditor';
+import { useSelectionAtom } from "../prosemirror/useSelectionAtom";
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 
@@ -29,7 +30,6 @@ export default function RichTextEditor() {
   return <WithSelectionEditor node={element} />;
 }
 
-
 /**
  * Manage prose selection state locally (for the time being).
  *
@@ -40,9 +40,9 @@ export function WithSelectionEditor({
 }: {
   node: RaisinNodeWithChildren;
 }) {
-  const nodeAtom = useValueAtom(node);
+  const nodeAtom = useAtomFromRenderValue(node, RaisinScope);
   const selection = useSelectionAtom();
-  const { getPath } = useAtomValue(IdentifierModelAtom);
+  const { getPath } = useAtomValue(IdentifierModelAtom, RaisinScope);
   const path = getPath(node);
 
   // Atom doesn't use get or set, so it's safe to be synthetic and different every render?

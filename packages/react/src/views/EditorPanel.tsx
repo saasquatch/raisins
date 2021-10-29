@@ -3,14 +3,15 @@ import { CssNodePlain } from 'css-tree';
 import { atom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
-import { NodeAtomProvider } from '../atoms/node-context';
-import { useCoreEditingApi } from '../editting/CoreEditingAPI';
+import { NodeAtomProvider } from '../node/node-context';
+import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
 import { ReplaceNodeAtom } from '../editting/EditAtoms';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 import { StyleNodeEditor } from '../stylesheets/StyleEditor';
 import { isFunction } from '../util/isFunction';
 import { isElementNode } from '../util/isNode';
 import { AttributesEditor } from './AttributeEditor';
+import { RaisinScope } from '../atoms/RaisinScope';
 
 const EditSelectedNodeAtom = atom(
   (get) => get(SelectedNodeAtom)!,
@@ -27,7 +28,7 @@ const EditSelectedNodeAtom = atom(
 
 export function EditorPanel() {
   const props = useCoreEditingApi();
-  const selected = useAtomValue(SelectedNodeAtom);
+  const selected = useAtomValue(SelectedNodeAtom, RaisinScope);
   if (isElementNode(selected)) {
     const element = selected;
 

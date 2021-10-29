@@ -1,6 +1,9 @@
+import { useAtomValue } from 'jotai/utils';
 import { connectToChild } from 'penpal';
 import { useEffect, useRef, useState } from 'react';
 import { VNode } from 'snabbdom';
+import { RaisinScope } from '../atoms/RaisinScope';
+import { NPMRegistry, NPMRegistryAtom } from '../util/NPMRegistry';
 
 type NPMDependency = {
   package: string;
@@ -26,6 +29,11 @@ export type UseIframeProps<C> = {
   head: string;
 
   /**
+   * Registry (for loading the required inner iframe dependencies)
+   */
+  registry: NPMRegistry;
+
+  /**
    * The component to render
    */
   initialComponent: C;
@@ -41,13 +49,25 @@ export type ChildRPC = {
 };
 
 // TODO: Extract raisins-id as a constant -- also make configurable?
-const childApiSrc = `
+const childApiSrc = (registry: NPMRegistry) => `
 <style>
 body{ margin: 0 }
 </style>
-<script src="https://unpkg.com/penpal/dist/penpal.min.js"></script>
+<script src="${registry.resolvePath(
+  {
+    name: 'penpal',
+    version: '6.2.1',
+  },
+  'dist/penpal.min.js'
+)}"></script>
 <script type="module">
-import { init, classModule, propsModule, attributesModule, styleModule, datasetModule, h } from "https://unpkg.com/snabbdom@3.1.0/build/index.js"
+import { init, classModule, propsModule, attributesModule, styleModule, datasetModule, h } from "${registry.resolvePath(
+  {
+    name: 'snabbdom',
+    version: '3.1.0',
+  },
+  'build/index.js'
+)}"
 
 const patch = init([
   // Init patch function with chosen modules
@@ -66,7 +86,7 @@ function patchAndCache(next){
 
 window.addEventListener('DOMContentLoaded',function () {
 
-  window.myConnection = window.Penpal.connectToParent({
+  let myConnection = window.Penpal.connectToParent({
     // Methods child is exposing to parent
     methods: {
       render(content) {
@@ -75,7 +95,7 @@ window.addEventListener('DOMContentLoaded',function () {
     },
   });
 
-  window.myConnection.promise.then(function(parent){
+  myConnection.promise.then(function(parent){
     const ro = new ResizeObserver(function(entries){
         // @ts-ignore -- number will be cast to string by browsers
         parent.resizeHeight(entries[0].contentRect.height);
@@ -99,12 +119,12 @@ window.addEventListener('DOMContentLoaded',function () {
 </script>
 `;
 
-const iframeSrc = (head: string) => `
+const iframeSrc = (head: string, registry: NPMRegistry) => `
 <!DOCTYPE html>
 <html>
 <head>
   ${head}
-  ${childApiSrc}
+  ${childApiSrc(registry)}
 </head>
 <body></body>
 </html>`;
@@ -122,6 +142,7 @@ export function useSandboxedIframeRenderer<C>({
   initialComponent,
   onClick,
   head,
+  registry,
 }: UseIframeProps<C>) {
   // TODO: - allow scripts to be added / removed / swapped. (should re-render entire frame on script update? otherwise version updates might not properly load?)
 
@@ -130,12 +151,13 @@ export function useSandboxedIframeRenderer<C>({
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
   const [loaded, setLoaded] = useState(false);
   const childRef = useRef<ChildRPC>();
+
   useEffect(() => {
     if (container.current) {
       const el = container.current;
       const iframe: HTMLIFrameElement = document.createElement('iframe');
       iframeRef.current = iframe;
-      iframe.srcdoc = iframeSrc(head);
+      iframe.srcdoc = iframeSrc(head, registry);
       iframe.width = '100%';
       iframe.scrolling = 'no';
       iframe.setAttribute(
@@ -178,7 +200,7 @@ export function useSandboxedIframeRenderer<C>({
       };
     }
     return () => {};
-  }, [head]);
+  }, [head, registry]);
 
   function renderInIframe(Component: C): void {
     initialComponentRef.current = Component;

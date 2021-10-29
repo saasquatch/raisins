@@ -2,9 +2,10 @@ import { RaisinNode } from '@raisins/core';
 import { Atom, PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
 import type { SetAtom } from 'jotai/core/atom';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import React, { useContext, useMemo } from 'react';
-import { createMemoizeAtom } from './weakCache';
-import { rootPrimitive } from './_atoms';
+import React, { useContext } from 'react';
+import { RaisinScope } from '../atoms/RaisinScope';
+import { createMemoizeAtom } from '../atoms/weakCache';
+import { rootPrimitive } from '../atoms/_atoms';
 
 // TODO: allow this to be swapped out? There are likely more history listeners.
 const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(rootPrimitive);
@@ -21,8 +22,7 @@ export const useNodeAtom = () => useContext(CONTEXT);
 
 /**
  * Provides the "current node" context.
-
-*/
+ */
 export const NodeAtomProvider = ({
   nodeAtom,
   children,
@@ -38,26 +38,6 @@ export type ScopedAtomCreator<R> = (atom: PrimitiveAtom<RaisinNode>) => Atom<R>;
 export type WriteableScopedAtomCreator<R, W> = (
   atom: PrimitiveAtom<RaisinNode>
 ) => WritableAtom<R, W>;
-
-/**
- * For writeable atoms
- */
-export function useScopedAtom<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W>
-): WritableAtom<R, W>;
-/**
- * For read-only atoms
- */
-export function useScopedAtom<R>(scopeFn: ScopedAtomCreator<R>): Atom<R>;
-
-export function useScopedAtom<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W> | ScopedAtomCreator<R>
-) {
-  const scopedAtom = useNodeAtom();
-  if (!scopedAtom) throw new Error('Undefined scope');
-  const memoized = useMemo(() => scopeFn(scopedAtom), [scopedAtom, scopeFn]);
-  return memoized;
-}
 
 /**
  * For writeable atoms
@@ -88,8 +68,8 @@ export function atomForNode<R, W>(
     memoized(() => scopeFn(base), [scopeFn, base]);
 
   return {
-    useValue: () => useAtomValue(useScopedAtom(getAtom)),
-    useUpdate: () => useUpdateAtom(useScopedAtom(getAtom) as any),
-    useAtom: () => useAtom(useScopedAtom(getAtom)),
+    useValue: () => useAtomValue(getAtom(useNodeAtom()), RaisinScope),
+    useUpdate: () => useUpdateAtom(getAtom(useNodeAtom()) as any, RaisinScope),
+    useAtom: () => useAtom(getAtom(useNodeAtom()), RaisinScope),
   };
 }

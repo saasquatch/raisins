@@ -10,9 +10,17 @@ const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';
 
+/**
+ * Modifies a Snabbdom node
+ * 
+ * Useful for adding additional styling (e.g. selected styling) and props
+ * 
+ */
+export type SnabdomRenderer = (d: VNodeData, n: RaisinNode) => VNodeData;
+
 export function raisintoSnabdom(
   node: RaisinDocumentNode,
-  modifier: (d: VNodeData, n: RaisinNode) => VNodeData = (d, n) => d
+  modifier: SnabdomRenderer = (d, n) => d
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onCData(c) {

@@ -7,7 +7,8 @@ import {
 import * as css from 'css-tree';
 import { useAtom } from 'jotai';
 import { useMemo, useState } from 'react';
-import { RootNodeAtom } from '../hooks/useCore';
+import { RaisinScope } from '../atoms/RaisinScope';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
@@ -19,7 +20,7 @@ type Props = {
 
 // TODO: Color functions: https://github.com/scttcper/tinycolor
 export function useStyleEditor() {
-  const [node, setNode] = useAtom(RootNodeAtom);
+  const [node, setNode] = useAtom(RootNodeAtom, RaisinScope);
   // const componentModel = useAtomValue(ComponentModelAtom);
   const sheets = useMemo(() => {
     // Finds all style nodes.

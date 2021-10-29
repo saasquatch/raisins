@@ -11,7 +11,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { useCallback, useEffect } from 'react';
 import { atomWithNodeProps } from '../src/atoms/atomWithNodeProps';
 import { atomWithSelection } from '../src/atoms/atomWithSelection';
-import { useNodeAtom } from '../src/atoms/node-context';
+import { useNodeAtom } from '../src/node/node-context';
 import {
   historyStack,
   root,

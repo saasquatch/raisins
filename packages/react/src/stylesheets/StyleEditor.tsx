@@ -1,7 +1,7 @@
 import { cssUtil, StyleNodeProps } from '@raisins/core';
 import * as Css from 'css-tree';
 import React, { FormEvent } from 'react';
-import { getId } from '../hooks/useCore';
+import { getId } from '../hooks/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
 import { useStyleEditor } from './useStyleEditor';
 

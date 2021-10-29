@@ -11,7 +11,7 @@ import {
   InternalState,
   InternalStateAtom,
   RootNodeAtom,
-} from '../hooks/useCore';
+} from '../hooks/CoreAtoms';
 
 const {
   duplicate,

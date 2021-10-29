@@ -1,5 +1,5 @@
 import { ModuleDetails } from '../ModuleManagement';
-import unpkgNpmRegistry, { makeLocalRegistry } from '../../util/NPMRegistry';
+import { makeLocalRegistry, NPMRegistry } from '../../util/NPMRegistry';
 import { LOCAL_REPO } from './LOCAL_REPO';
 
 /**
@@ -11,7 +11,8 @@ import { LOCAL_REPO } from './LOCAL_REPO';
  */
 export function moduleDetailsToScriptSrc(
   moduleDetails: ModuleDetails[],
-  localUrl: string | undefined
+  localUrl: string | undefined,
+  registry: NPMRegistry
 ) {
   const scripts =
     moduleDetails?.map((m) => {
@@ -21,16 +22,16 @@ export function moduleDetailsToScriptSrc(
       const useModule = filePath === module || filePath.endsWith('.esm.js');
       const isCss = m.filePath && m.filePath.endsWith('.css');
       // TODO: Centralize registry better
-      let registry = unpkgNpmRegistry;
+      let registryToUse = registry;
       if (m.name === LOCAL_REPO && localUrl) {
-        registry = makeLocalRegistry(localUrl);
+        registryToUse = makeLocalRegistry(localUrl);
       }
       if (isCss)
-        return ` <link rel="stylesheet" href="${registry.resolvePath(
+        return ` <link rel="stylesheet" href="${registryToUse.resolvePath(
           m,
           m.filePath!
         )}" />`;
-      return `<script src="${registry.resolvePath(m, filePath)}" ${
+      return `<script src="${registryToUse.resolvePath(m, filePath)}" ${
         useModule && `type="module"`
       }></script>`;
     }) ?? [];

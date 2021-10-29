@@ -7,19 +7,15 @@ import {
   LocalURLAtom,
   ModuleDetailsAtom,
 } from '../component-metamodel/ComponentModel';
-import { raisintoSnabdom } from './raisinToSnabdom';
-import {
-  getId,
-  RootNodeAtom,
-} from '../hooks/useCore';
-import {
-  SelectedNodeAtom,
-  SetSelectedIdAtom
-} from "../selection/SelectedAtom";
+import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
+import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
+import { SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
 import {
   ChildRPC,
   useSandboxedIframeRenderer,
 } from './useSandboxedIframeRenderer';
+import { NPMRegistryAtom } from '../util/NPMRegistry';
+import { RaisinScope } from '../atoms/RaisinScope';
 
 export type Size = {
   name: string;
@@ -40,7 +36,8 @@ export const sizes: Size[] = [
 const HeadAtom = atom((get) => {
   const localUrl = get(LocalURLAtom);
   const moduleDetails = get(ModuleDetailsAtom);
-  return moduleDetailsToScriptSrc(moduleDetails, localUrl);
+  const registry = get(NPMRegistryAtom);
+  return moduleDetailsToScriptSrc(moduleDetails, localUrl, registry);
 });
 
 function useInnerHtmlIframeRenderer() {
@@ -54,15 +51,16 @@ function useInnerHtmlIframeRenderer() {
     child.render(Comp);
   };
 
-  const setSelectedId = useUpdateAtom(SetSelectedIdAtom);
+  const setSelectedId = useUpdateAtom(SetSelectedIdAtom, RaisinScope);
   const onClick = (id: string) => setSelectedId(id);
-
-  const head = useAtomValue(HeadAtom);
+  const head = useAtomValue(HeadAtom, RaisinScope);
+  const registry = useAtomValue(NPMRegistryAtom, RaisinScope);
   const props = useSandboxedIframeRenderer<VNode>({
     renderer,
     initialComponent: h('div', {}),
     onClick,
     head,
+    registry
   });
 
   return {
@@ -81,7 +79,7 @@ const VnodeAtom = atom((get) => {
   const outlined = get(OutlineAtom);
   const node = get(RootNodeAtom);
 
-  const vnode = raisintoSnabdom(node as RaisinDocumentNode, (d, n) => {
+  const renderer: SnabdomRenderer = (d, n) => {
     if (mode === 'preview') {
       return d;
     }
@@ -109,7 +107,8 @@ const VnodeAtom = atom((get) => {
       style,
       props: propsToRender,
     };
-  });
+  };
+  const vnode = raisintoSnabdom(node as RaisinDocumentNode, renderer);
 
   return vnode;
 });
@@ -117,7 +116,7 @@ const VnodeAtom = atom((get) => {
 export default function useCanvas() {
   const frameProps = useInnerHtmlIframeRenderer();
 
-  const vnode = useAtomValue(VnodeAtom);
+  const vnode = useAtomValue(VnodeAtom, RaisinScope);
   frameProps.renderInIframe(vnode);
   return {
     ...frameProps,

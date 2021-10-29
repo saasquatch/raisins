@@ -1,6 +1,6 @@
 import { getNode, getPath, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { InternalStateAtom, InternalState, idToNode } from '../hooks/useCore';
+import { InternalStateAtom, InternalState, idToNode } from '../hooks/CoreAtoms';
 
 export const SelectedAtom = atom(
   (get) => get(InternalStateAtom).selected,

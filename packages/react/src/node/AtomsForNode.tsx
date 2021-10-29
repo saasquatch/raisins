@@ -6,29 +6,53 @@ import {
   ComponentModelAtom,
 } from '../component-metamodel/ComponentModel';
 import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
-import { DefaultSlot, DefaultSlotMeta } from '../model/EditorModel';
+import { DefaultSlotMeta } from '../model/EditorModel';
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode, isRoot } from '../util/isNode';
+import { atomForAttributes } from '../atoms/atomForAttributes';
 import { atomForNode } from './node-context';
 
+/**
+ * Is the node in context currently selected?
+ */
 export const isSelectedForNode = atomForNode((n) =>
   atom((get) => get(SelectedNodeAtom) === get(n))
 );
+
+/**
+ * Selects the node in context
+ */
 export const setSelectedForNode = atomForNode((n) =>
   atom(null, (get, set) => {
     set(SelectedAtom, get(n));
   })
 );
+/**
+ * Gets details on the type of node
+ */
 export const isNodeAnElement = atomForNode((n) =>
   atom((get) => isElementNode(get(n)))
 );
-const componentMetaForNode = atomForNode((n) =>
+
+/**
+ * Attributes for node
+ */
+export const attributesForNode = atomForNode(atomForAttributes);
+
+/**
+ * Gets component meta for the node in context
+ */
+export const componentMetaForNode = atomForNode((n) =>
   atom((get) => {
     const comp = get(ComponentModelAtom);
     const node = get(n);
     return comp.getComponentMeta(node as RaisinElementNode);
   })
 );
+
+/**
+ * Gets slots for the node in context
+ */
 export const slotsForNode = atomForNode((n) =>
   atom((get) => {
     const comp = get(ComponentModelAtom);
@@ -59,12 +83,24 @@ export const slotsForNode = atomForNode((n) =>
     return allSlotsWithMeta;
   })
 );
+
+/**
+ * Removes the node in context from the document
+ */
 export const removeForNode = atomForNode((n) =>
   atom(null, (get, set) => set(RemoveNodeAtom, get(n)))
 );
+
+/**
+ * Duplicates the node in context from the document
+ */
 export const duplicateForNode = atomForNode((n) =>
   atom(null, (get, set) => set(DuplicateNodeAtom, get(n)))
 );
+
+/**
+ * Gets the human readable name for the next in context
+ */
 export const nameForNode = atomForNode((n) =>
   atom((get) => {
     const node = get(n);

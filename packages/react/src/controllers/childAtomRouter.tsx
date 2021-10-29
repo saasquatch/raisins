@@ -7,6 +7,7 @@ import { atomWithNodeProps } from '../atoms/atomWithNodeProps';
 import { atomWithSelection } from '../atoms/atomWithSelection';
 import { isElementNode, isRoot } from '../util/isNode';
 import { polymorphicAtom } from '../atoms/polymorphicAtom';
+import { RaisinScope } from '../atoms/RaisinScope';
 
 /**
  * Returns a child atom when children exist. Prevents exceptions by returning undefined when not.
@@ -28,7 +29,7 @@ export function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
     childAtoms,
     // TODO: At some point, figure out how to provide `removeChild` down the tree.
     removeChild,
-  ] = useAtom(childrenOrUndefined) ?? [undefined, undefined];
+  ] = useAtom(childrenOrUndefined, RaisinScope) ?? [undefined, undefined];
 
   return {
     childAtoms: childAtoms?.map(atomWithId) ?? [],

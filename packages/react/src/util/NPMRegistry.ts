@@ -1,3 +1,5 @@
+import { atom } from "jotai";
+
 export type Module = {
   name: string;
   version?: string;
@@ -53,6 +55,8 @@ export interface NPMRegistry {
   resolvePath(module: Module, path: string): string;
 }
 
+
+
 const UNPKG_BASE = 'https://unpkg.com';
 
 export const unpkgNpmRegistry: NPMRegistry = {
@@ -87,4 +91,4 @@ export function makeLocalRegistry(url: string): NPMRegistry {
   };
 }
 
-export default unpkgNpmRegistry;
+export const NPMRegistryAtom = atom(unpkgNpmRegistry);

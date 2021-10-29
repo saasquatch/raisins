@@ -1,5 +1,6 @@
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
+import { RaisinScope } from '../atoms/RaisinScope';
 import {
   AddModuleAtom,
   ModuleDetailsAtom,
@@ -45,12 +46,12 @@ const setOfThings: Module[] = [
 
 function usePackageEditor(): ModuleManagement {
   return {
-    loadingModules: useAtomValue(ModulesLoadingAtom),
-    modules: useAtomValue(ModulesAtom),
-    moduleDetails: useAtomValue(ModuleDetailsAtom),
-    addModule: useUpdateAtom(AddModuleAtom),
-    removeModule: useUpdateAtom(RemoveModuleAtom),
-    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom),
+    loadingModules: useAtomValue(ModulesLoadingAtom, RaisinScope),
+    modules: useAtomValue(ModulesAtom, RaisinScope),
+    moduleDetails: useAtomValue(ModuleDetailsAtom, RaisinScope),
+    addModule: useUpdateAtom(AddModuleAtom, RaisinScope),
+    removeModule: useUpdateAtom(RemoveModuleAtom, RaisinScope),
+    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom, RaisinScope),
   };
 }
 
@@ -74,7 +75,7 @@ export function PackageEditorView(props: ModuleManagement) {
       Modules:
       <ul>
         {props.modules.map((m) => (
-          <li key={m.name + "@" + m.version + "/" + m.filePath}>
+          <li key={m.name + '@' + m.version + '/' + m.filePath}>
             {m.name} @ {m.version} for {m.filePath}
           </li>
         ))}

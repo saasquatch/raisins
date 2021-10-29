@@ -20,15 +20,16 @@ import {
   removeForNode,
   setSelectedForNode,
   slotsForNode,
-} from '../atoms/AtomsForNode';
-import { NodeAtomProvider, useNodeAtom } from '../atoms/node-context';
+} from '../node/AtomsForNode';
+import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import { RaisinScope } from '../atoms/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
 } from '../controllers/ChildrenEditor';
-import { useCoreEditingApi } from '../editting/CoreEditingAPI';
-import { RootNodeAtom } from '../hooks/useCore';
+import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode, isRoot } from '../util/isNode';
 
@@ -93,7 +94,7 @@ const RootHasChildren = atom(
   (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
 );
 export const Layers: FC<{}> = () => {
-  const hasChildren = useAtomValue(RootHasChildren);
+  const hasChildren = useAtomValue(RootHasChildren, RaisinScope);
 
   return (
     <div data-layers>
@@ -110,9 +111,9 @@ export const Layers: FC<{}> = () => {
 };
 
 function AddNew(props: { idx: number; slot?: string }) {
-  const node = useAtomValue(useNodeAtom());
+  const node = useAtomValue(useNodeAtom(), RaisinScope);
   const model = useCoreEditingApi();
-  const comp = useAtomValue(ComponentModelAtom);
+  const comp = useAtomValue(ComponentModelAtom, RaisinScope);
 
   const [open, setOpen] = useState(false);
   const validChildren = comp.getValidChildren(node, props.slot);
@@ -242,7 +243,7 @@ function useSlotChildNodes(slotName: string) {
       )
     );
   }, [slotName, nodeAtom]);
-  const childNodes = useAtomValue(slotChildrenAtom);
+  const childNodes = useAtomValue(slotChildrenAtom, RaisinScope);
   return childNodes;
 }
 

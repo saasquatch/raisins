@@ -1,6 +1,6 @@
 import React from 'react';
 import { useChildAtoms } from './childAtomRouter';
-import { useNodeAtom, NodeAtomProvider } from '../atoms/node-context';
+import { useNodeAtom, NodeAtomProvider } from '../node/node-context';
 import { PrimitiveAtom } from 'jotai';
 import { RaisinNode } from '@raisins/core';
 

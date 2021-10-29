@@ -1,13 +1,14 @@
 import hotkeys from 'hotkeys-js';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect } from 'react';
+import { RaisinScope } from '../atoms/RaisinScope';
 import { DeleteSelectedAtom } from '../editting/EditAtoms';
 import { RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 
 export function useHotkeys() {
-  const undo = useUpdateAtom(UndoAtom);
-  const redo = useUpdateAtom(RedoAtom);
-  const deleteSelected = useUpdateAtom(DeleteSelectedAtom);
+  const undo = useUpdateAtom(UndoAtom, RaisinScope);
+  const redo = useUpdateAtom(RedoAtom, RaisinScope);
+  const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
 
   useEffect(() => {
     // TODO: Scope so that backspace and delete only work depending on what is "focused"

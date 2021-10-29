@@ -3,14 +3,15 @@ import { useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
 import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
+import { RaisinScope } from '../atoms/RaisinScope';
 
 export function ToolbarView() {
-  const historySize = useAtom(HistorySizeAtom)[0];
-  const undo = useUpdateAtom(UndoAtom);
-  const redo = useUpdateAtom(RedoAtom);
-  const [mode, setMode] = useAtom(ModeAtom);
-  const [size, setSize] = useAtom(SizeAtom);
-  const [outlined, setOutlined] = useAtom(OutlineAtom);
+  const historySize = useAtom(HistorySizeAtom, RaisinScope)[0];
+  const undo = useUpdateAtom(UndoAtom, RaisinScope);
+  const redo = useUpdateAtom(RedoAtom, RaisinScope);
+  const [mode, setMode] = useAtom(ModeAtom, RaisinScope);
+  const [size, setSize] = useAtom(SizeAtom, RaisinScope);
+  const [outlined, setOutlined] = useAtom(OutlineAtom, RaisinScope);
 
   return (
     <div>

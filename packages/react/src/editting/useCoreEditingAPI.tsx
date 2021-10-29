@@ -9,6 +9,7 @@ import {
   SetNodeInternalAtom
 } from './EditAtoms';
 import { StateUpdater } from '../util/NewState';
+import { RaisinScope } from '../atoms/RaisinScope';
 
 /*
  * Mutations
@@ -26,12 +27,12 @@ export type CoreEditingAPI = {
 
 export function useCoreEditingApi(): CoreEditingAPI {
   return {
-    setNode: useUpdateAtom(SetNodeInternalAtom),
-    deleteSelected: useUpdateAtom(DeleteSelectedAtom),
-    removeNode: useUpdateAtom(RemoveNodeAtom),
-    duplicateNode: useUpdateAtom(DuplicateNodeAtom),
-    insert: useUpdateAtom(InsertNodeAtom),
-    replaceNode: useUpdateAtom(ReplaceNodeAtom),
-    replacePath: useUpdateAtom(ReplacePathAtom),
+    setNode: useUpdateAtom(SetNodeInternalAtom, RaisinScope),
+    deleteSelected: useUpdateAtom(DeleteSelectedAtom, RaisinScope),
+    removeNode: useUpdateAtom(RemoveNodeAtom, RaisinScope),
+    duplicateNode: useUpdateAtom(DuplicateNodeAtom, RaisinScope),
+    insert: useUpdateAtom(InsertNodeAtom, RaisinScope),
+    replaceNode: useUpdateAtom(ReplaceNodeAtom, RaisinScope),
+    replacePath: useUpdateAtom(ReplacePathAtom, RaisinScope),
   };
 }

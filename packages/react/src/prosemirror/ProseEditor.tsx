@@ -8,7 +8,7 @@ import React, { SetStateAction, useMemo, useRef, useState } from 'react';
 import { NewLinePlugin } from './NewLineBreak';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
-import { useRaisinHistoryPlugin } from './ProseToRaisinHistory';
+import { useRaisinHistoryPlugin } from '../rich-text/useRaisinHistoryPlugin';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -26,23 +26,6 @@ export type RaisinProseState = {
   selection?: ProseTextSelection;
 };
 
-type ProseEditorProps = {
-  state: RaisinProseState;
-  setState: React.Dispatch<SetStateAction<RaisinProseState>>;
-};
-export default ControlledProseEditor;
-
-/**
- * A [Controlled Component](https://reactjs.org/docs/forms.html#controlled-components) for
- * doing rich text editing. Uses external state (no internal state)
- *
- * @param props
- * @returns
- */
-export function ControlledProseEditor(props: ProseEditorProps) {
-  return <ProseEditorView {...useExternalState(props.state, props.setState)} />;
-}
-
 export function AtomProseEditor(props: {
   nodeAtom: PrimitiveAtom<RaisinDocumentNode>;
   selectionAtom: PrimitiveAtom<ProseTextSelection | undefined>;
@@ -53,23 +36,6 @@ export function AtomProseEditor(props: {
     />
   );
 }
-
-/**
- * An [Uncontrolled Component](https://reactjs.org/docs/uncontrolled-components.html) for
- * doing rich text editing. Doesn't send state back in `setState`
- */
-export function UncontrollerProseEditor({ state, setState }: ProseEditorProps) {
-  const { sState, dispatchTransaction } = useInternalState(state.node);
-  return (
-    <>
-      <ProseEditorView
-        sState={sState}
-        dispatchTransaction={dispatchTransaction}
-      />
-    </>
-  );
-}
-
 /**
  * A prose editor that stores it's state in the `node` and `selection` atoms that are provided to this hook.
  *
@@ -170,65 +136,6 @@ function useRefAtom() {
   return ref.current;
 }
 
-function useExternalState(
-  state: RaisinProseState,
-  setState: React.Dispatch<SetStateAction<RaisinProseState>>
-) {
-  // TODO: Measure and optimize the HTML conversion step here.
-  let doc = raisinToProseDoc(state.node);
-  let selection = state.selection;
-  let sState = {
-    doc,
-    selection,
-  };
-
-  function dispatchTransaction(trans: Transaction) {
-    try {
-      setState((current: RaisinProseState) => {
-        const sState = {
-          // TODO: Measure and optimize the HTML conversion step here.
-          doc: raisinToProseDoc(current.node),
-          selection: current.selection,
-        };
-        const currentState = hydratedState(sState);
-        const nextState = currentState.applyTransaction(trans);
-        // TODO: Measure and optimize the HTML conversion step here.
-        const nextRaisinNode = proseRichDocToRaisin(
-          nextState.state.doc.content
-        );
-        const next: RaisinProseState = {
-          selection: nextState.state.selection.toJSON() as ProseTextSelection,
-          node: nextRaisinNode,
-        };
-        return next;
-      });
-    } catch (e) {
-      console.error('Error dispatching transaction from Prose to React', e);
-    }
-  }
-  return { sState, dispatchTransaction };
-}
-
-function useInternalState(node: RaisinNode) {
-  let initialDoc = useMemo(() => raisinToProseDoc(node), [schema]);
-  let [sState, setSState] = useState<SerialState>({ doc: initialDoc });
-  function dispatchTransaction(trans: Transaction) {
-    setSState((current) => {
-      const currentState = hydratedState(current);
-      const nextState = currentState.applyTransaction(trans);
-      const nextDoc = nextState.state.doc.toJSON();
-      const nextRaisinNode = proseRichDocToRaisin(nextState.state.doc.content);
-      // setNode(nextRaisinNode);
-      return {
-        selection: nextState.state.selection.toJSON() as ProseTextSelection,
-        doc: nextDoc,
-      };
-    });
-  }
-
-  return { sState, dispatchTransaction };
-}
-
 function ProseEditorView2({
   mountRef,
 }: {
@@ -294,15 +201,4 @@ function hydratedState(
     plugins,
   });
   return state;
-}
-
-/**
- * Use this to set up local selection state in a React component;
- *
- * @returns a selection state atom
- */
-export function useSelectionAtom() {
-  return useRef<PrimitiveAtom<ProseTextSelection | undefined>>(
-    atom(undefined) as any
-  ).current;
 }
