@@ -1,14 +1,15 @@
-import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
+import { RaisinDocumentNode } from '@raisins/core';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React, { SetStateAction, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef } from 'react';
+import { RaisinScope } from '../atoms/RaisinScope';
+import { useRaisinHistoryPlugin } from '../rich-text/useRaisinHistoryPlugin';
 import { NewLinePlugin } from './NewLineBreak';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
-import { useRaisinHistoryPlugin } from '../rich-text/useRaisinHistoryPlugin';
 
 type SerialState = {
   selection?: ProseTextSelection;
@@ -102,9 +103,9 @@ export function useProseEditorOnAtom(
 
   const elementRef = useRefAtom();
 
-  const mountRef = useUpdateAtom(elementRef);
-  const dispatchTransaction = useUpdateAtom(handleTransactionAtion);
-  const editorState = useAtomValue(editorStateAtom);
+  const mountRef = useUpdateAtom(elementRef, RaisinScope);
+  const dispatchTransaction = useUpdateAtom(handleTransactionAtion, RaisinScope);
+  const editorState = useAtomValue(editorStateAtom, RaisinScope);
 
   const editorAtom = useRef(
     atom((get) => {
@@ -121,7 +122,7 @@ export function useProseEditorOnAtom(
     })
   );
 
-  const [editor] = useAtom(editorAtom.current);
+  const [editor] = useAtom(editorAtom.current, RaisinScope);
   editor?.updateState(editorState);
   return {
     mountRef,

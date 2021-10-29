@@ -4,6 +4,7 @@ import { RaisinsProvider } from '../src/atoms/RaisinScope';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
 import { useHotkeys } from '../src/hooks/useHotkeys';
+import { Layers } from '../src/views/Layers';
 
 const meta: Meta = {
   title: 'Editor',
@@ -39,9 +40,27 @@ export function CanvasOnly() {
   return (
     <>
       <RaisinsProvider state={stateTuple}>
-        <CanvasController />
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '50%' }}>
+            <CanvasController />
+          </div>
+          <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>
+        </div>
       </RaisinsProvider>
-      <pre>{stateTuple[0]}</pre>
+    </>
+  );
+}
+
+export function LayersOnly() {
+  const stateTuple = useState(big);
+  return (
+    <>
+      <RaisinsProvider state={stateTuple}>
+        <div style={{ display: 'flex' }}>
+          <Layers />
+          <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>
+        </div>
+      </RaisinsProvider>
     </>
   );
 }

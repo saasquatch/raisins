@@ -23,7 +23,7 @@ import { isElementNode } from '../util/isNode';
 const { replacePath } = htmlUtil;
 
 export default function RichTextEditor() {
-  const selected = useAtomValue(SelectedNodeAtom);
+  const selected = useAtomValue(SelectedNodeAtom, RaisinScope);
   if (!isElementNode(selected)) return <div>Not an element</div>;
 
   const element = selected;
