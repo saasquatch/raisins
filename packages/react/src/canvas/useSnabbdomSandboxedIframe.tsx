@@ -126,7 +126,7 @@ const iframeSrc = (head: string, registry: NPMRegistry) => `
 /**
  * Creates a renderer that will render a Component into an iframe.
  *
- * This was written to be generic and not rely on Stencil in any way, and focus just on the specifics of how to create a useful iframe element.
+ * This was written to be independent of Raisins.
  *
  * @param props - controls for how to render the iframe
  * @returns

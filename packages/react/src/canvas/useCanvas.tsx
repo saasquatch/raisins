@@ -12,7 +12,7 @@ import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
-import { useSnabbdomSandboxedIframe } from './useSandboxedIframeRenderer';
+import { useSnabbdomSandboxedIframe } from './useSnabbdomSandboxedIframe';
 
 export type Size = {
   name: string;
