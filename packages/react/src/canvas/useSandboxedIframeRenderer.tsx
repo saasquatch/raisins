@@ -1,9 +1,7 @@
-import { useAtomValue } from 'jotai/utils';
 import { connectToChild } from 'penpal';
 import { useEffect, useRef, useState } from 'react';
 import { VNode } from 'snabbdom';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { NPMRegistry, NPMRegistryAtom } from '../util/NPMRegistry';
+import { NPMRegistry } from '../util/NPMRegistry';
 
 type NPMDependency = {
   package: string;
@@ -11,15 +9,11 @@ type NPMDependency = {
   filePath?: string;
 };
 
-export type UseIframeProps<C> = {
+export type UseIframeProps = {
   /**
    * A source document to use in the iframe
    */
   dependencies?: NPMDependency[];
-  /**
-   * A function to call when the iframe is ready to render, and whenever a render occurs
-   */
-  renderer: (iframe: HTMLIFrameElement, child: ChildRPC, Component: C) => void;
 
   onClick(id: string): void;
 
@@ -36,7 +30,7 @@ export type UseIframeProps<C> = {
   /**
    * The component to render
    */
-  initialComponent: C;
+  initialComponent: VNode;
 };
 
 export type ParentRPC = {
@@ -137,20 +131,28 @@ const iframeSrc = (head: string, registry: NPMRegistry) => `
  * @param props - controls for how to render the iframe
  * @returns
  */
-export function useSandboxedIframeRenderer<C>({
-  renderer,
+export function useSnabbdomSandboxedIframe({
   initialComponent,
   onClick,
   head,
   registry,
-}: UseIframeProps<C>) {
-  // TODO: - allow scripts to be added / removed / swapped. (should re-render entire frame on script update? otherwise version updates might not properly load?)
+}: UseIframeProps) {
 
-  const initialComponentRef = useRef<C>(initialComponent);
+  const initialComponentRef = useRef<VNode>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
   const [loaded, setLoaded] = useState(false);
   const childRef = useRef<ChildRPC>();
+
+  const renderer = (
+    iframe: HTMLIFrameElement,
+    child: ChildRPC,
+    Comp: VNode
+  ): void => {
+    if (!Comp) return; // no Component yet
+
+    child.render(Comp);
+  };
 
   useEffect(() => {
     if (container.current) {
@@ -190,7 +192,9 @@ export function useSandboxedIframeRenderer<C>({
           renderer(iframe, childRef.current!, initialComponentRef.current);
           setLoaded(true);
         })
-        .catch((e) => {});
+        .catch((e) => {
+          // TODO: Capture error in state
+        });
 
       return () => {
         iframeRef.current = undefined;
@@ -202,7 +206,7 @@ export function useSandboxedIframeRenderer<C>({
     return () => {};
   }, [head, registry]);
 
-  function renderInIframe(Component: C): void {
+  function renderInIframe(Component: VNode): void {
     initialComponentRef.current = Component;
     if (iframeRef.current && childRef.current && loaded) {
       renderer(iframeRef.current, childRef.current!, Component);

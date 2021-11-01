@@ -1,21 +1,18 @@
 import { RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import { h, VNode, VNodeStyle } from 'snabbdom';
-import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
+import { h, VNodeStyle } from 'snabbdom';
+import { RaisinScope } from '../atoms/RaisinScope';
 import {
   LocalURLAtom,
   ModuleDetailsAtom,
 } from '../component-metamodel/ComponentModel';
-import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
+import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
 import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
-import {
-  ChildRPC,
-  useSandboxedIframeRenderer,
-} from './useSandboxedIframeRenderer';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { RaisinScope } from '../atoms/RaisinScope';
+import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
+import { useSnabbdomSandboxedIframe } from './useSandboxedIframeRenderer';
 
 export type Size = {
   name: string;
@@ -41,26 +38,15 @@ const HeadAtom = atom((get) => {
 });
 
 function useInnerHtmlIframeRenderer() {
-  const renderer = (
-    iframe: HTMLIFrameElement,
-    child: ChildRPC,
-    Comp: VNode
-  ): void => {
-    if (!Comp) return; // no Component yet
-
-    child.render(Comp);
-  };
-
   const setSelectedId = useUpdateAtom(SetSelectedIdAtom, RaisinScope);
   const onClick = (id: string) => setSelectedId(id);
   const head = useAtomValue(HeadAtom, RaisinScope);
   const registry = useAtomValue(NPMRegistryAtom, RaisinScope);
-  const props = useSandboxedIframeRenderer<VNode>({
-    renderer,
+  const props = useSnabbdomSandboxedIframe({
     initialComponent: h('div', {}),
     onClick,
     head,
-    registry
+    registry,
   });
 
   return {
