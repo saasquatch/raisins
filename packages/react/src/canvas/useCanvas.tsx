@@ -1,6 +1,7 @@
 import { RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { useCallback } from 'react';
 import { h, VNodeStyle } from 'snabbdom';
 import { RaisinScope } from '../atoms/RaisinScope';
 import {
@@ -30,22 +31,15 @@ export const sizes: Size[] = [
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
 
-const HeadAtom = atom((get) => {
-  const localUrl = get(LocalURLAtom);
-  const moduleDetails = get(ModuleDetailsAtom);
-  const registry = get(NPMRegistryAtom);
-  return moduleDetailsToScriptSrc(moduleDetails, localUrl, registry);
-});
-
-function useInnerHtmlIframeRenderer() {
+function useIframeWithScriptsAndSelection() {
   const setSelectedId = useUpdateAtom(SetSelectedIdAtom, RaisinScope);
-  const onClick = (id: string) => setSelectedId(id);
-  const head = useAtomValue(HeadAtom, RaisinScope);
+  const onClick = useCallback((id: string) => setSelectedId(id), [setSelectedId]);
+  const canvasScripts = useAtomValue(CanvasScriptsAtom, RaisinScope);
   const registry = useAtomValue(NPMRegistryAtom, RaisinScope);
   const props = useSnabbdomSandboxedIframe({
     initialComponent: h('div', {}),
     onClick,
-    head,
+    head: canvasScripts,
     registry,
   });
 
@@ -54,6 +48,14 @@ function useInnerHtmlIframeRenderer() {
     containerRef: props.container,
   };
 }
+
+const CanvasScriptsAtom = atom((get) => {
+  const localUrl = get(LocalURLAtom);
+  const moduleDetails = get(ModuleDetailsAtom);
+  const registry = get(NPMRegistryAtom);
+  return moduleDetailsToScriptSrc(moduleDetails, localUrl, registry);
+});
+
 
 export const OutlineAtom = atom(true);
 export const ModeAtom = atom<Mode>('edit');
@@ -100,7 +102,7 @@ const VnodeAtom = atom((get) => {
 });
 
 export default function useCanvas() {
-  const frameProps = useInnerHtmlIframeRenderer();
+  const frameProps = useIframeWithScriptsAndSelection();
 
   const vnode = useAtomValue(VnodeAtom, RaisinScope);
   frameProps.renderInIframe(vnode);

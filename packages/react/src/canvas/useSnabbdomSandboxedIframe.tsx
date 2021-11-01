@@ -204,7 +204,7 @@ export function useSnabbdomSandboxedIframe({
       };
     }
     return () => {};
-  }, [head, registry]);
+  }, [onClick, head, registry]);
 
   function renderInIframe(Component: VNode): void {
     initialComponentRef.current = Component;
