@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { CanvasController } from '../canvas/CanvasController';
 import { StyleEditor } from '../stylesheets/StyleEditor';
 import { EditorPanel } from './EditorPanel';
@@ -7,40 +6,29 @@ import { Layers } from './Layers';
 import { PackageEditorController } from './PackageEditorView';
 import RichTextEditor from '../rich-text/RichTextEditor';
 import { ToolbarView } from './Toolbar';
+import styleToObject from 'style-to-object';
 
-export const Row = styled.div`
+export const Row = `
   display: flex;
   flex-direction: row;
   flex-wrap: no-wrap;
   width: 100%;
 `;
 
-const Header = styled.div`
+const Header = `
   grid-area: header;
 `;
-const Footer = styled.div`
-  grid-area: footer;
-`;
-const Edits = styled.div`
+const Edits = `
   grid-area: edits;
 `;
-const CanvasCss = styled.div`
+const CanvasCss = `
   grid-area: canvas;
 `;
-const LayersCss = styled.div`
+const LayersCss = `
   grid-area: layers;
 `;
 
-export const Main = styled.div`
-  font-family: var(--sl-font-sans);
-  font-size: var(--sl-font-size-medium);
-  font-weight: var(--sl-font-weight-normal);
-  letter-spacing: var(--sl-letter-spacing-normal);
-  color: var(--sl-color-gray-800);
-  line-height: var(--sl-line-height-normal);
-  background: var(--sl-color-gray-900);
-  color: var(--sl-color-gray-200);
-
+export const Main = `
   display: grid;
   grid-template-columns: 150px auto 150px;
   grid-template-rows: repeat(3, 100px);
@@ -59,52 +47,31 @@ export const Main = styled.div`
   margin: 0;
 
   overflow: hidden;
-
-  // Scrollbar colors: https://www.digitalocean.com/community/tutorials/css-scrollbars
-  & > *::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  & > *::-webkit-scrollbar-track {
-    background: var(--sl-color-gray-700);
-  }
-
-  & > *::-webkit-scrollbar-thumb {
-    background-color: white;
-    border-radius: 20px;
-    border: 3px solid var(--sl-color-gray-700);
-  }
-  & > * {
-    scrollbar-width: thin;
-    scrollbar-color: white var(--sl-color-gray-700);
-    overflow: auto;
-  }
 `;
 
 export function EditorView() {
   return (
     <>
-      <Main>
-        <Header>
+      <div style={styleToObject(Main)!}>
+        <div style={styleToObject(Header)!}>
           <ToolbarView />
-        </Header>
-        <Edits>
+        </div>
+        <div style={styleToObject(Edits)!}>
           <EditorPanel />
           <PackageEditorController />
           <StyleEditor />
-        </Edits>
-        <CanvasCss>
+        </div>
+        <div style={styleToObject(CanvasCss)!}>
           <CanvasController />
           <CanvasController />
           <RichTextEditor />
-        </CanvasCss>
+        </div>
 
-        <LayersCss>
+        <div style={styleToObject(LayersCss)!}>
           {' '}
           <Layers />
-        </LayersCss>
-        <Footer>Footer</Footer>
-      </Main>
+        </div>
+      </div>
     </>
   );
 }

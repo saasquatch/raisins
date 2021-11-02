@@ -1,7 +1,8 @@
-import { ElementType } from "domelementtype";
 import cloneDeep from "lodash.clonedeep";
 import { getNode, NodePath } from "../paths/Paths";
+import { CDATA, COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import {
+  RaisinCDATANode,
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -50,51 +51,47 @@ export function visit<T = unknown>(
   }
 
   switch (node.type) {
-    case ElementType.Text:
-      result = visitor.onText && visitor.onText(node as RaisinTextNode);
+    case TEXT:
+      result = visitor.onText && visitor.onText(node);
       break;
-    case ElementType.Directive: {
+    case DIRECTIVE: {
       result =
         visitor.onDirective &&
-        visitor.onDirective(node as RaisinProcessingInstructionNode);
+        visitor.onDirective(node);
       break;
     }
-    case ElementType.Comment:
+    case COMMENT:
       result =
-        visitor.onComment && visitor.onComment(node as RaisinCommentNode);
+        visitor.onComment && visitor.onComment(node);
       break;
-    case ElementType.Tag:
-    case ElementType.Script: {
+    case TAG: {
       if (!visitor.onElement) break;
-      const element = node as RaisinElementNode;
       const children =
-        recursive && element.children
-          ? (element.children
+        recursive && node.children
+          ? (node.children
               .map((c) => visit(c, visitor, recursive))
               .filter((c) => c !== undefined) as T[])
           : [];
-      result = visitor.onElement(element, children);
+      result = visitor.onElement(node, children);
       break;
     }
-    case ElementType.Style: {
+    case STYLE: {
       if (!visitor.onStyle) break;
-      const element = node as RaisinStyleNode;
-      result = visitor.onStyle(element);
+      result = visitor.onStyle(node);
       break;
     }
-    case ElementType.CDATA: {
+    case CDATA: {
       if (!visitor.onCData) break;
-      const cdata = node as RaisinNodeWithChildren;
       const children =
-        recursive && cdata.children
-          ? (cdata.children
+        recursive && node.children
+          ? (node.children
               .map((c) => visit(c, visitor, recursive))
               .filter((c) => c !== undefined) as T[])
           : [];
-      result = visitor.onCData(cdata, children);
+      result = visitor.onCData(node, children);
       break;
     }
-    case ElementType.Root: {
+    case ROOT: {
       if (!visitor.onRoot) break;
       const root = node as RaisinDocumentNode;
       const children =
@@ -105,10 +102,6 @@ export function visit<T = unknown>(
           : [];
       result = visitor.onRoot(root, children);
       break;
-    }
-    case ElementType.Doctype: {
-      // This type isn't used yet.
-      throw new Error("Not implemented yet: ElementType.Doctype case");
     }
   }
   return result;
@@ -126,7 +119,7 @@ export interface NodeVisitor<T> {
 
   onDirective(directive: RaisinProcessingInstructionNode): T | undefined;
   onComment(comment: RaisinCommentNode): T | undefined;
-  onCData(element: RaisinNodeWithChildren, children: T[]): T | undefined;
+  onCData(element: RaisinCDATANode, children: T[]): T | undefined;
 }
 
 /**
@@ -223,9 +216,9 @@ export function replace(
       return next;
     }
     if (el.children !== children) {
-      const replacement = {
+      const replacement:RaisinNode = {
         ...el,
-        children,
+        children: children ?? [],
       };
       callback && callback(el, replacement);
       return replacement;

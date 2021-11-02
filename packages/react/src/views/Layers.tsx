@@ -11,7 +11,6 @@ import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
 import React, { FC, useMemo, useState } from 'react';
-import styled from 'styled-components';
 import {
   duplicateForNode,
   isNodeAnElement,
@@ -32,53 +31,51 @@ import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode, isRoot } from '../util/isNode';
-
+import styleToObject from 'style-to-object';
 const { clone } = htmlUtil;
 
-const Label = styled.div`
+const Label = styleToObject(`
   cursor: pointer;
   line-height: 28px;
-`;
+`)!;
 
-const Layer = styled.div<{ selected: boolean }>`
+const Layer = styleToObject(`
   position: relative;
   user-select: none;
   cursor: pointer;
   padding: 10px 0;
-
-  background: ${(props) =>
-    props.selected ? 'var(--sl-color-gray-800)' : 'var(--sl-color-gray-900)'};
-  outline: ${(props) => (props.selected ? '2px solid red' : 'inherit')};
   outline-offset: -2px;
-`;
+`)!;
+const SelectedLayer = styleToObject(`
+  outline: '2px solid red';
+  outline-offset: -2px;
+`)!;
 
-const SlotContainer = styled.div`
+const SlotContainer = styleToObject(`
   margin-left: 3px;
   display: flex;
   padding: 0 0 3px 0;
-`;
+`)!;
 
-const SlotName = styled.div`
+const SlotName = styleToObject(`
   writing-mode: vertical-lr;
   text-orientation: sideways;
   font-size: 0.7em;
   padding: 5px 0 5px 2px;
   color: grey;
   background: rgba(0, 0, 0, 0.1);
-`;
-const SlotChildren = styled.div`
-  width: 100%;
-`;
+`)!;
 
-const TitleBar = styled.div`
+const SlotChildren = styleToObject(`
+  width: 100%;
+`)!;
+
+const TitleBar = styleToObject(`
   display: flex;
   justify-content: space-between;
-`;
-const Toolbar = styled.div`
-  // order: -1;
-`;
+`)!;
 
-const AddBlock = styled.div`
+const AddBlock = styleToObject(`
   flex: 1;
   width: 100%;
   justify-self: stretch;
@@ -88,7 +85,7 @@ const AddBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
+`)!;
 
 const RootHasChildren = atom(
   (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
@@ -123,9 +120,9 @@ function AddNew(props: { idx: number; slot?: string }) {
   return (
     <>
       {!open && (
-        <AddBlock onClick={() => setOpen(true)}>
+        <div style={AddBlock} onClick={() => setOpen(true)}>
           <div>Insert</div>
-        </AddBlock>
+        </div>
       )}
       {open && (
         <div style={{ display: 'flex', overflowX: 'auto' }}>
@@ -169,20 +166,24 @@ function ElementLayer() {
   if (!isAnElement) return <></>;
 
   const name = (
-    <TitleBar onClick={setSelected}>
-      <Label>{title}</Label>
-      <Toolbar>
+    <div style={TitleBar} onClick={setSelected}>
+      <div style={Label}>{title}</div>
+      <div>
         <button onClick={duplicate}>dupe</button>
         <button onClick={removeNode}>del</button>
-      </Toolbar>
-    </TitleBar>
+      </div>
+    </div>
   );
   // const hasChildren = children?.length > 0;
 
   const slots = nodeWithSlots ?? [];
   const hasSlots = slots?.length > 0;
+  const style = {
+    ...Layer,
+    ...(isSelected ? SelectedLayer : {}),
+  };
   return (
-    <Layer data-element selected={isSelected}>
+    <div data-element style={style}>
       {!hasSlots && name}
       {hasSlots && (
         <div>
@@ -196,7 +197,7 @@ function ElementLayer() {
           )}{' '}
         </div>
       )}
-    </Layer>
+    </div>
   );
 }
 
@@ -208,8 +209,10 @@ function SlotWidget({ s }: { s: Slot }) {
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   return (
-    <SlotContainer>
-      <SlotName>{s.title ?? s.name} ({childNodes.length})</SlotName>
+    <div style={SlotContainer}>
+      <div style={SlotName}>
+        {s.title ?? s.name} ({childNodes.length})
+      </div>
       {hasEditor && (
         // Rich Text Editor<>
         <RichTextEditorForAtom />
@@ -219,16 +222,16 @@ function SlotWidget({ s }: { s: Slot }) {
         <>
           {isEmpty && <AddNew idx={childNodes?.length ?? 0} slot={s.name} />}
           {!isEmpty && (
-            <SlotChildren>
+            <div style={SlotChildren}>
               <ChildrenEditorForAtoms
                 childAtoms={childNodes}
                 Component={ElementLayer}
               />
-            </SlotChildren>
+            </div>
           )}
         </>
       )}
-    </SlotContainer>
+    </div>
   );
 }
 

@@ -1,17 +1,17 @@
 import type * as DOMHandler from "domhandler";
 import { ElementType } from "htmlparser2";
 import cssParser from "../css-om/parser";
-
+import { CDATA, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import type {
+  RaisinCDATANode,
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
-  RaisinProcessingInstructionNode,
+  RaisinNode, RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode,
+  RaisinTextNode
 } from "./RaisinNode";
+
 
 /**
  * A depth-first visitor that will visit the deepest children first
@@ -32,10 +32,10 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
   const raisin = visit<RaisinNode>(node, {
     onText(text): RaisinTextNode {
       const { data } = text;
-      return { type: ElementType.Text, data };
+      return { type: TEXT, data };
     },
     onStyle(element, children): RaisinStyleNode {
-      const { type, attribs } = element;
+      const { attribs } = element;
       const textContent =
         children &&
         children
@@ -43,20 +43,18 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
           .map((c) => (c as RaisinTextNode)?.data)
           .join("\n");
       return {
+        type: STYLE,
         tagName: "style",
-        // @ts-ignore -- raisin has stronger types than DOMHandler
-        type,
         contents: textContent ? cssParser(textContent) : undefined,
         attribs: { ...attribs },
       };
     },
     onElement(element, children): RaisinElementNode {
-      const { tagName, type, attribs } = element;
+      const { tagName, attribs } = element;
       const { style, ...otherAttribs } = attribs;
       return {
+        type: TAG,
         tagName,
-        // @ts-ignore -- raisin has stronger types than
-        type,
         children: children ?? [],
         attribs: { ...otherAttribs },
         style: style ? cssParser(style, { context: "declarationList" }) : undefined,
@@ -64,7 +62,7 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
     },
     onRoot(_, children): RaisinDocumentNode {
       return {
-        type: ElementType.Root,
+        type: ROOT,
         children: children ?? [],
       };
     },
@@ -76,10 +74,9 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
       const { data } = comment;
       return { type: ElementType.Comment, data };
     },
-    onCData(element, children): RaisinNodeWithChildren {
-      const { type } = element;
+    onCData(_, children): RaisinCDATANode {
       return {
-        type,
+        type: CDATA,
         children: children ?? [],
       };
     },

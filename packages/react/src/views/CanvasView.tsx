@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
-import styled from 'styled-components';
+import styleToObject from 'style-to-object';
 import { Size } from '../canvas/useCanvas';
 
-const Wrapper = styled.div`
+const Wrapper = `
   background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%),
     linear-gradient(-45deg, #cccccc 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #cccccc 75%),
@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   padding: 50px;
 `;
 
-const Content = styled.div`
+const Content = `
   background: white;
   margin: 0 auto;
   padding: 20px;
@@ -26,12 +26,15 @@ export type WYSWIGCanvasProps = {
 
 export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
   return (
-    <Wrapper onClick={() => props.clearSelected()}>
-      <Content
+    <div style={styleToObject(Wrapper)!} onClick={() => props.clearSelected()}>
+      <div
+        style={{
+          ...styleToObject(Content)!,
+          width: props.size.width,
+        }}
         data-content
-        style={{ width: props.size.width }}
         ref={props.setHtmlRef}
       />
-    </Wrapper>
+    </div>
   );
 };

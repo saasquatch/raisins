@@ -1,41 +1,62 @@
-import { CssNodePlain } from 'css-tree';
-import { ElementType } from 'domelementtype';
+import { CssNodePlain } from "css-tree";
+import {
+  CDATA,
+  Comment,
+  Directive,
+  Root,
+  Style,
+  Tag,
+  Text
+} from "./domElementType";
 
 /**
  * The base used as the prototype for Nodes
  */
-export interface RaisinNode<T extends ElementType = ElementType> {
-  type: T;
-}
-type DataNodesTypes = ElementType.Comment | ElementType.Text | ElementType.Directive;
+export type RaisinNode =
+  | RaisinTextNode
+  | RaisinCommentNode
+  | RaisinProcessingInstructionNode
+  | RaisinCDATANode
+  | RaisinDocumentNode
+  | RaisinStyleNode
+  | RaisinElementNode;
 
-export interface RaisinDataNode<T extends DataNodesTypes = DataNodesTypes> extends RaisinNode<T> {
+export type RaisinNodeType = RaisinNode["type"];
+
+interface RaisinDataNode<T> {
   type: T;
   data: string;
 }
 
-export interface RaisinTextNode extends RaisinDataNode<ElementType.Text> {}
-export interface RaisinCommentNode extends RaisinDataNode<ElementType.Comment> {}
+export interface RaisinTextNode extends RaisinDataNode<Text> {}
+export interface RaisinCommentNode extends RaisinDataNode<Comment> {}
 
-export interface RaisinProcessingInstructionNode extends RaisinDataNode<ElementType.Directive> {
-  'name': string;
-  'x-name'?: string;
-  'x-publicId'?: string;
-  'x-systemId'?: string;
+export interface RaisinProcessingInstructionNode {
+  type: Directive;
+  name: string;
+  data: string;
 }
 
 /**
  * A `Node` that can have children.
  */
-export interface RaisinNodeWithChildren<T extends ElementType = ElementType> extends RaisinNode<T> {
+export type RaisinNodeWithChildren =
+  | RaisinElementNode
+  | RaisinDocumentNode
+  | RaisinCDATANode;
+
+export interface RaisinCDATANode {
+  type: CDATA;
   children: RaisinNode[];
 }
 
-export interface RaisinDocumentNode extends RaisinNodeWithChildren<ElementType.Root> {
-  'x-mode'?: 'no-quirks' | 'quirks' | 'limited-quirks';
+export interface RaisinDocumentNode {
+  type: Root;
+  children: RaisinNode[];
 }
 
-export interface RaisinStyleNode extends RaisinNode<ElementType.Style> {
+export interface RaisinStyleNode {
+  type: Style;
   attribs: {
     [name: string]: string;
   };
@@ -43,10 +64,15 @@ export interface RaisinStyleNode extends RaisinNode<ElementType.Style> {
   contents?: CssNodePlain;
 }
 
-export interface RaisinElementNode extends RaisinNodeWithChildren<ElementType.Tag | ElementType.Script> {
-  attribs: Omit<{
-    [name: string]: string;
-  }, "style">;
+export interface RaisinElementNode {
+  type: Tag;
+  attribs: Omit<
+    {
+      [name: string]: string;
+    },
+    "style"
+  >;
   style?: CssNodePlain;
   tagName: string;
+  children: RaisinNode[];
 }
