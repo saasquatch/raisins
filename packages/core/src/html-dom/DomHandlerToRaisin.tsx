@@ -1,9 +1,8 @@
 import type * as DOMHandler from "domhandler";
 import { ElementType } from "htmlparser2";
 import cssParser from "../css-om/parser";
-import { CDATA, ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import type {
-  RaisinCDATANode,
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -25,7 +24,6 @@ export interface DHNodeVisitor<T> {
 
   onDirective(directive: DOMHandler.ProcessingInstruction): T | undefined;
   onComment(comment: DOMHandler.Comment): T | undefined;
-  onCData(element: DOMHandler.NodeWithChildren, children?: T[]): T | undefined;
 }
 
 export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
@@ -73,13 +71,7 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
     onComment(comment): RaisinCommentNode {
       const { data } = comment;
       return { type: ElementType.Comment, data };
-    },
-    onCData(_, children): RaisinCDATANode {
-      return {
-        type: CDATA,
-        children: children ?? [],
-      };
-    },
+    }
   });
   // we know it's not undefined
   return raisin!;
@@ -135,18 +127,6 @@ export function visit<T>(
       result = visitor.onStyle(element, children);
       break;
     }
-    case ElementType.CDATA: {
-      if (!visitor.onCData) break;
-      const cdata = node as DOMHandler.NodeWithChildren;
-      const children =
-        recursive && cdata.children
-          ? cdata.children
-              .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined) as T[]
-          : [];
-      result = visitor.onCData(cdata, children);
-      break;
-    }
     case ElementType.Root: {
       if (!visitor.onRoot) break;
       const root = node as DOMHandler.Document;
@@ -160,8 +140,13 @@ export function visit<T>(
       break;
     }
     case ElementType.Doctype: {
-      // This type isn't used yet.
-      throw new Error("Not implemented yet: ElementType.Doctype case");
+      result =
+        visitor.onDirective &&
+        visitor.onDirective(node as DOMHandler.ProcessingInstruction);
+      break;
+    }
+    case ElementType.CDATA: {
+      throw new Error("Not implemented yet: CDATA case");
     }
   }
   return result;

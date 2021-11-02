@@ -1,5 +1,5 @@
-import { RaisinStyleNode } from "..";
-import { ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { RaisinCommentNode, RaisinProcessingInstructionNode, RaisinStyleNode } from "..";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import {
   RaisinDocumentNode,
   RaisinElementNode,
@@ -15,25 +15,31 @@ export function isNodeWithChilden(
 }
 
 export function isRoot(node?: RaisinNode): node is RaisinDocumentNode {
-  if (!node) return false;
-  if (node.type !== ROOT) return false;
-  return true;
+  return nodeIsType(ROOT, node);
 }
 
 export function isElementNode(node?: RaisinNode): node is RaisinElementNode {
-  if (!node) return false;
-  if (node.type !== TAG) return false;
-  return true;
+  return nodeIsType(TAG, node);
 }
 
 export function isStyleNode(node?: RaisinNode): node is RaisinStyleNode {
-  if (!node) return false;
-  if (node.type !== STYLE) return false;
-  return true;
+  return nodeIsType(STYLE, node);
 }
 
 export function isTextNode(node?: RaisinNode): node is RaisinTextNode {
+  return nodeIsType(TEXT, node);
+}
+
+export function isCommentNode(node?: RaisinNode): node is RaisinCommentNode {
+  return nodeIsType(COMMENT, node);
+}
+
+export function isDirectiveNode(node?: RaisinNode): node is RaisinProcessingInstructionNode {
+  return nodeIsType(DIRECTIVE, node);
+}
+
+function nodeIsType(type: string, node?: RaisinNode) {
   if (!node) return false;
-  if (node.type !== TEXT) return false;
+  if (node.type !== type) return false;
   return true;
 }

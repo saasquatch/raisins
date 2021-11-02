@@ -1,6 +1,5 @@
 import { CssNodePlain } from "css-tree";
 import {
-  CDATA,
   Comment,
   Directive,
   Root,
@@ -16,7 +15,6 @@ export type RaisinNode =
   | RaisinTextNode
   | RaisinCommentNode
   | RaisinProcessingInstructionNode
-  | RaisinCDATANode
   | RaisinDocumentNode
   | RaisinStyleNode
   | RaisinElementNode;
@@ -40,15 +38,7 @@ export interface RaisinProcessingInstructionNode {
 /**
  * A `Node` that can have children.
  */
-export type RaisinNodeWithChildren =
-  | RaisinElementNode
-  | RaisinDocumentNode
-  | RaisinCDATANode;
-
-export interface RaisinCDATANode {
-  type: CDATA;
-  children: RaisinNode[];
-}
+export type RaisinNodeWithChildren = RaisinElementNode | RaisinDocumentNode;
 
 export interface RaisinDocumentNode {
   type: Root;

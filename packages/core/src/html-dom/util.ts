@@ -1,8 +1,7 @@
 import cloneDeep from "lodash.clonedeep";
 import { getNode, NodePath } from "../paths/Paths";
-import { CDATA, COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import {
-  RaisinCDATANode,
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -23,18 +22,17 @@ export function getParents(
 ): WeakMap<RaisinNode, RaisinNodeWithChildren> {
   const map = new WeakMap<RaisinNode, RaisinNodeWithChildren>();
   function storeParent(elem: RaisinNodeWithChildren, children?: RaisinNode[]) {
-    children?.forEach((c) => map.set(c, elem));
+    children?.forEach(c => map.set(c, elem));
     return elem;
   }
 
   visit(root, {
-    onCData: storeParent,
     onElement: storeParent,
     onRoot: storeParent,
-    onStyle: (n) => n,
-    onComment: (n) => n,
-    onDirective: (n) => n,
-    onText: (n) => n,
+    onStyle: n => n,
+    onComment: n => n,
+    onDirective: n => n,
+    onText: n => n
   });
   return map;
 }
@@ -55,22 +53,19 @@ export function visit<T = unknown>(
       result = visitor.onText && visitor.onText(node);
       break;
     case DIRECTIVE: {
-      result =
-        visitor.onDirective &&
-        visitor.onDirective(node);
+      result = visitor.onDirective && visitor.onDirective(node);
       break;
     }
     case COMMENT:
-      result =
-        visitor.onComment && visitor.onComment(node);
+      result = visitor.onComment && visitor.onComment(node);
       break;
     case TAG: {
       if (!visitor.onElement) break;
       const children =
         recursive && node.children
           ? (node.children
-              .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined) as T[])
+              .map(c => visit(c, visitor, recursive))
+              .filter(c => c !== undefined) as T[])
           : [];
       result = visitor.onElement(node, children);
       break;
@@ -80,25 +75,14 @@ export function visit<T = unknown>(
       result = visitor.onStyle(node);
       break;
     }
-    case CDATA: {
-      if (!visitor.onCData) break;
-      const children =
-        recursive && node.children
-          ? (node.children
-              .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined) as T[])
-          : [];
-      result = visitor.onCData(node, children);
-      break;
-    }
     case ROOT: {
       if (!visitor.onRoot) break;
       const root = node as RaisinDocumentNode;
       const children =
         recursive && root.children
           ? (root.children
-              .map((c) => visit(c, visitor, recursive))
-              .filter((c) => c !== undefined) as T[])
+              .map(c => visit(c, visitor, recursive))
+              .filter(c => c !== undefined) as T[])
           : [];
       result = visitor.onRoot(root, children);
       break;
@@ -119,7 +103,6 @@ export interface NodeVisitor<T> {
 
   onDirective(directive: RaisinProcessingInstructionNode): T | undefined;
   onComment(comment: RaisinCommentNode): T | undefined;
-  onCData(element: RaisinCDATANode, children: T[]): T | undefined;
 }
 
 /**
@@ -136,7 +119,7 @@ export function remove(root: RaisinNode, node: RaisinNode): RaisinNode {
     skipNode(n) {
       return n === node;
     },
-    ...CloneVisitor,
+    ...CloneVisitor
   });
   return freeze(
     // Would only be null if node removed itself
@@ -167,20 +150,13 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
       const children = flatDeep<RaisinNode>(dupeChildren);
       return [{ ...n, children }];
     },
-    onCData: (n, dupeChildren) => {
-      if (node === n) {
-        return [clone(n), clone(n)];
-      }
-      const children = flatDeep<RaisinNode>(dupeChildren);
-      return [{ ...n, children }];
-    },
     onRoot: (n, dupeChildren) => {
       if (node === n) {
         return [clone(n), clone(n)];
       }
       const children = flatDeep<RaisinNode>(dupeChildren);
       return [{ ...n, children }];
-    },
+    }
   };
 
   const nodes = visit(root, DuplicateVisitor);
@@ -216,9 +192,9 @@ export function replace(
       return next;
     }
     if (el.children !== children) {
-      const replacement:RaisinNode = {
+      const replacement: RaisinNode = {
         ...el,
-        children: children ?? [],
+        children: children ?? []
       };
       callback && callback(el, replacement);
       return replacement;
@@ -231,9 +207,8 @@ export function replace(
     onComment: swap,
     onDirective: swap,
     onStyle: swap,
-    onCData: swapWithChildren,
     onElement: swapWithChildren,
-    onRoot: swapWithChildren,
+    onRoot: swapWithChildren
   })!;
 }
 
@@ -276,7 +251,7 @@ export function move(
       const newChildren =
         el === newParent ? add(children, cloned, newIdx) : children;
       return { ...el, children: newChildren };
-    },
+    }
   });
   return freeze(moved!);
 }
@@ -316,7 +291,7 @@ export function insertAt(
       const newChildren =
         el === newParent ? add(children, node, newIdx) : children;
       return { ...el, children: newChildren };
-    },
+    }
   });
   return freeze(moved!);
 }
@@ -341,7 +316,7 @@ export function removeWhitespace(root: RaisinNode): RaisinNode {
         return undefined;
       }
       return text;
-    },
+    }
   });
   if (!cleaned)
     throw new Error(
@@ -365,38 +340,35 @@ function visitAll(
   fn: (n: RaisinNode) => RaisinNode
 ): RaisinNode {
   return visit(node, {
-    onCData: fn,
     onText: fn,
     onStyle: fn,
     onDirective: fn,
     onComment: fn,
     onElement: fn,
-    onRoot: fn,
+    onRoot: fn
   })!;
 }
 
 export const IdentityVisitor: NodeVisitor<RaisinNode> = {
-  onText: (n) => n,
-  onDirective: (n) => n,
-  onComment: (n) => n,
-  onElement: (n) => n,
-  onStyle: (n) => n,
-  onCData: (n) => n,
-  onRoot: (n) => n,
+  onText: n => n,
+  onDirective: n => n,
+  onComment: n => n,
+  onElement: n => n,
+  onStyle: n => n,
+  onRoot: n => n
 };
 
 const CloneVisitor: NodeVisitor<RaisinNode> = {
-  onText: (n) => ({ ...n }),
-  onDirective: (n) => ({ ...n }),
-  onComment: (n) => ({ ...n }),
+  onText: n => ({ ...n }),
+  onDirective: n => ({ ...n }),
+  onComment: n => ({ ...n }),
   // TODO: deep clone CSS ast
-  onStyle: (n) => ({ ...n }),
+  onStyle: n => ({ ...n }),
   onElement: (n, children) => ({
     ...n,
-    children: children ? [...children] : [],
+    children: children ? [...children] : []
   }),
-  onCData: (n, children) => ({ ...n, children: children ? [...children] : [] }),
-  onRoot: (n, children) => ({ ...n, children: children ? [...children] : [] }),
+  onRoot: (n, children) => ({ ...n, children: children ? [...children] : [] })
 };
 
 /**
