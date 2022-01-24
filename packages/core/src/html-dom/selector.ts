@@ -58,7 +58,6 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
   getText(node: Node) {
     return (
       visit<string>(node, {
-        onCData: (_, c) => c.join(""),
         onComment: (_) => "",
         onDirective: (_) => "",
         onElement: (_, c) => c.join(""),

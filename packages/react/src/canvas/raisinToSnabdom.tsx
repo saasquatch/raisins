@@ -23,9 +23,6 @@ export function raisintoSnabdom(
   modifier: SnabdomRenderer = (d, n) => d
 ): VNode {
   const vnode = visit<VNode | string>(node, {
-    onCData(c) {
-      return undefined;
-    },
     onComment(c) {
       return undefined;
     },

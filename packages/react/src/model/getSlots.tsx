@@ -24,7 +24,6 @@ export function getSlots(
   });
   
   return visit<NodeWithSlots>(node, {
-    onCData: noSlotsWChildren,
     onComment: noSlots,
     onText: noSlots,
     onDirective: noSlots,

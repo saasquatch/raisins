@@ -160,7 +160,6 @@ function renderNode(
     },
     onDirective: renderDirective,
     onComment: renderComment,
-    onCData: renderCdata,
   }) ?? "";
 }
 
@@ -262,12 +261,6 @@ function renderText(
   }
 
   return data;
-}
-
-function renderCdata(elem: RaisinNodeWithChildren) {
-  return `<![CDATA[${
-    (elem.children[0] as RaisinProcessingInstructionNode).data
-  }]]>`;
 }
 
 function renderComment(elem: RaisinCommentNode) {
