@@ -23,6 +23,20 @@ export function Span() {
   );
 }
 
+export function TwoElements() {
+  const stateTuple = useState(
+    `<div><span>I am a thing with <b>bold content</b></span><span>bottom</span></div>`
+  );
+  return (
+    <>
+      <RaisinsProvider state={stateTuple}>
+        <Editor />
+      </RaisinsProvider>
+      <pre>{stateTuple[0]}</pre>
+    </>
+  );
+}
+
 export function Big() {
   const stateTuple = useState(big);
   return (

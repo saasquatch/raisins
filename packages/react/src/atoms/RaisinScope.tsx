@@ -10,7 +10,7 @@ import {
 import { useUpdateAtom } from 'jotai/utils';
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { LocalURLAtom } from '../component-metamodel/ComponentModel';
-import { useAtomFromRenderValue } from './useValueAtom';
+import { useAtomFromRenderValue } from './useAtomFromRenderValue';
 
 // Scopes the "Jotai" store
 //

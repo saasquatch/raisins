@@ -20,6 +20,7 @@ const {
   removePath,
   replace,
   replacePath,
+  move,
 } = htmlUtil;
 
 export const SetNodeInternalAtom = atom(
@@ -32,15 +33,26 @@ export const SetNodeInternalAtom = atom(
     });
   }
 );
+
+/**
+ * Deletes a raisin node from the document
+ */
 export const RemoveNodeAtom = atom(null, (_, set, toRemove: RaisinNode) =>
   set(SetNodeInternalAtom, (previous: RaisinNode) => remove(previous, toRemove))
 );
+
+/**
+ * Deletes a raisins node, adding a duplicate as a sibling in the document
+ */
 export const DuplicateNodeAtom = atom(null, (get, set, toClone: RaisinNode) => {
   const current = get(RootNodeAtom);
   const clone = duplicate(current, toClone);
   set(SetNodeInternalAtom, clone);
 });
 
+/**
+ * Inserts a node at a given position
+ */
 export const InsertNodeAtom = atom(
   null,
   (
@@ -62,6 +74,10 @@ export const InsertNodeAtom = atom(
   }
 );
 
+
+/**
+ * Deletes the selected node, if anything selected, otherwise no-op
+ */
 export const DeleteSelectedAtom = atom(null, (get, set) => {
   set(InternalStateAtom, (previous) => {
     if (previous.selected) {
@@ -72,6 +88,9 @@ export const DeleteSelectedAtom = atom(null, (get, set) => {
   });
 });
 
+/**
+ * Replaces a node with a new node
+ */
 export const ReplaceNodeAtom = atom(
   null,
   (_, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {

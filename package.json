@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "storybook": "turbo run storybook"
   },
   "workspaces":{
     "packages": [

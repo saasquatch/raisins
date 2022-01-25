@@ -1,8 +1,8 @@
-import React from 'react';
-import { useChildAtoms } from './childAtomRouter';
-import { useNodeAtom, NodeAtomProvider } from '../node/node-context';
-import { PrimitiveAtom } from 'jotai';
 import { RaisinNode } from '@raisins/core';
+import { PrimitiveAtom } from 'jotai';
+import React from 'react';
+import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import { useChildAtoms } from './childAtomRouter';
 
 /**
  * Provides a simple way of handling recursive controllers.
@@ -16,17 +16,24 @@ import { RaisinNode } from '@raisins/core';
 export function ChildrenEditor({ Component }: { Component: React.FC }) {
   const base = useNodeAtom();
   const { childAtoms } = useChildAtoms(base);
-  return <ChildrenEditorForAtoms Component={Component} childAtoms={childAtoms}/>
+  return (
+    <ChildrenEditorForAtoms Component={Component} childAtoms={childAtoms} />
+  );
 }
 
-
-export function ChildrenEditorForAtoms({ Component, childAtoms }: { Component: React.FC, childAtoms: PrimitiveAtom<RaisinNode>[]}) {
+export function ChildrenEditorForAtoms({
+  Component,
+  childAtoms,
+}: {
+  Component: React.FC<{ idx: number }>;
+  childAtoms: PrimitiveAtom<RaisinNode>[];
+}) {
   return (
     <>
-      {childAtoms.map((childAtom) => {
+      {childAtoms.map((childAtom, idx: number) => {
         return (
           <NodeAtomProvider nodeAtom={childAtom} key={`${childAtom}`}>
-            <Component />
+            <Component idx={idx} />
           </NodeAtomProvider>
         );
       })}

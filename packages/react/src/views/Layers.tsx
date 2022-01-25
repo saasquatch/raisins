@@ -10,17 +10,9 @@ import { atom } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
-import React, { FC, useMemo, useState } from 'react';
-import {
-  duplicateForNode,
-  isNodeAnElement,
-  isSelectedForNode,
-  nameForNode,
-  removeForNode,
-  setSelectedForNode,
-  slotsForNode,
-} from '../node/AtomsForNode';
-import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import React, { FC, useCallback, useMemo, useState } from 'react';
+import styleToObject from 'style-to-object';
+import { ploppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import {
@@ -29,9 +21,21 @@ import {
 } from '../controllers/ChildrenEditor';
 import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
+import {
+  duplicateForNode,
+  isNodeAnElement,
+  isNodePicked,
+  isSelectedForNode,
+  nameForNode,
+  plopNodeHere,
+  removeForNode,
+  setSelectedForNode,
+  slotsForNode,
+  togglePickNode,
+} from '../node/AtomsForNode';
+import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
-import { isElementNode, isRoot } from '../util/isNode';
-import styleToObject from 'style-to-object';
+import { isElementNode } from '../util/isNode';
 const { clone } = htmlUtil;
 
 const Label = styleToObject(`
@@ -157,20 +161,26 @@ function ElementLayer() {
   const setSelected = setSelectedForNode.useUpdate();
   const isAnElement = isNodeAnElement.useValue();
   const isSelected = isSelectedForNode.useValue();
+  const isPicked = isNodePicked.useValue();
   const nodeWithSlots = slotsForNode.useValue();
 
   const removeNode = removeForNode.useUpdate();
   const duplicate = duplicateForNode.useUpdate();
   const title = nameForNode.useValue();
+  const moveNode = togglePickNode.useUpdate();
+
   // Don't render non-element layers
   if (!isAnElement) return <></>;
 
   const name = (
     <div style={TitleBar} onClick={setSelected}>
-      <div style={Label}>{title}</div>
+      <div style={Label}>
+        {title} {isPicked && ' Moving...'}{' '}
+      </div>
       <div>
         <button onClick={duplicate}>dupe</button>
         <button onClick={removeNode}>del</button>
+        <button onClick={moveNode}>move</button>
       </div>
     </div>
   );
@@ -209,29 +219,37 @@ function SlotWidget({ s }: { s: Slot }) {
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   return (
-    <div style={SlotContainer}>
-      <div style={SlotName}>
-        {s.title ?? s.name} ({childNodes.length})
+    <>
+      <div style={SlotContainer}>
+        <div style={SlotName}>
+          {s.title ?? s.name} ({childNodes.length})
+        </div>
+        {hasEditor && (
+          // Rich Text Editor<>
+          <RichTextEditorForAtom />
+        )}
+        {!hasEditor && (
+          // Block Editor
+          <>
+            {isEmpty && <AddNew idx={childNodes?.length ?? 0} slot={s.name} />}
+            {!isEmpty && (
+              <div style={SlotChildren}>
+                <PlopTarget idx={0} slot={s.name} />
+                <ChildrenEditorForAtoms
+                  childAtoms={childNodes}
+                  Component={({ idx }: { idx: number }) => (
+                    <>
+                      <ElementLayer />
+                      <PlopTarget idx={idx} slot={s.name} />
+                    </>
+                  )}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
-      {hasEditor && (
-        // Rich Text Editor<>
-        <RichTextEditorForAtom />
-      )}
-      {!hasEditor && (
-        // Block Editor
-        <>
-          {isEmpty && <AddNew idx={childNodes?.length ?? 0} slot={s.name} />}
-          {!isEmpty && (
-            <div style={SlotChildren}>
-              <ChildrenEditorForAtoms
-                childAtoms={childNodes}
-                Component={ElementLayer}
-              />
-            </div>
-          )}
-        </>
-      )}
-    </div>
+    </>
   );
 }
 
@@ -259,4 +277,17 @@ function isInSlot(c: RaisinNode, slotName: string): boolean {
     return true;
   }
   return slotName === slotNameForNode;
+}
+
+function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
+  const isPlopActive = useAtomValue(ploppingIsActive);
+  const plopNode = plopNodeHere.useUpdate();
+  const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
+
+  return (
+    <div style={{ border: '1px dashed red' }}>
+      Position {idx} in {slot || 'content'}
+      <button onClick={plop}>Plop</button>
+    </div>
+  );
 }

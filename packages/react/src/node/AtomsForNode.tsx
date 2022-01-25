@@ -11,12 +11,43 @@ import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode, isRoot } from '../util/isNode';
 import { atomForAttributes } from '../atoms/atomForAttributes';
 import { atomForNode } from './node-context';
+import {
+  DropPloppedNodeInSlotAtom,
+  pickedAtom,
+} from '../atoms/pickAndPlopAtoms';
 
 /**
  * Is the node in context currently selected?
  */
 export const isSelectedForNode = atomForNode((n) =>
   atom((get) => get(SelectedNodeAtom) === get(n))
+);
+
+export const isNodePicked = atomForNode((n) =>
+  atom((get) => get(pickedAtom) === get(n))
+);
+
+export const togglePickNode = atomForNode((n) =>
+  atom(null, (get, set) => {
+    const node = get(n);
+    const isNodePicked = get(pickedAtom) === node;
+    if (isNodePicked) {
+      set(pickedAtom, undefined);
+    } else {
+      set(pickedAtom, node);
+    }
+  })
+);
+
+export const plopNodeHere = atomForNode((n) =>
+  atom(null, (get, set, { idx, slot }: { idx: number; slot: string }) => {
+    const node = get(n);
+    if (!isElementNode(node)) {
+      // Is not an element, do nothingl
+      return;
+    }
+    set(DropPloppedNodeInSlotAtom, { parent: node, idx, slot });
+  })
 );
 
 /**
@@ -27,6 +58,7 @@ export const setSelectedForNode = atomForNode((n) =>
     set(SelectedAtom, get(n));
   })
 );
+
 /**
  * Gets details on the type of node
  */

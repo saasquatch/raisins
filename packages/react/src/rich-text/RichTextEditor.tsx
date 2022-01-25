@@ -11,7 +11,7 @@ import { useAtomValue } from 'jotai/utils';
 import React, { useMemo, useRef } from 'react';
 import { useNodeAtom } from '../node/node-context';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { useAtomFromRenderValue } from '../atoms/useValueAtom';
+import { useAtomFromRenderValue } from '../atoms/useAtomFromRenderValue';
 import { IdentifierModelAtom, RootNodeAtom } from '../hooks/CoreAtoms';
 import {
   useProseEditorOnAtom,
