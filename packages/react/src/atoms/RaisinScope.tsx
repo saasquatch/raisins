@@ -1,16 +1,13 @@
 import {
   atom,
-  Provider,
-  Setter,
-  useAtom,
-  WritableAtom,
-  SetStateAction as JotaiSetStateAction,
   PrimitiveAtom,
+  Provider,
+  SetStateAction as JotaiSetStateAction,
+  useAtom,
 } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import { LocalURLAtom } from '../component-metamodel/ComponentModel';
-import { useAtomFromRenderValue } from './useAtomFromRenderValue';
 
 // Scopes the "Jotai" store
 //
@@ -20,28 +17,40 @@ export const RaisinScope = Symbol('Raisin Scope');
 
 type StateTuple<T> = [T, Dispatch<SetStateAction<T>>];
 export const RaisinsProvider = ({
-  state,
+  stateTuple,
   children,
 }: {
-  state: StateTuple<string>;
+  stateTuple: StateTuple<string>;
   children: React.ReactNode;
 }) => {
+  const initialValues = useMemo(
+    () => [
+      // TODO: Make this configurable
+      // Local atom
+      [LocalURLAtom, 'http://localhost:5000'],
+    ],
+    [LocalURLAtom]
+  );
+  /**
+   * FIXME: React profiling has revealed that this is removing the benefits of jotai re-rendering, and causing lots of downstream renders
+   */
   return (
     <Provider
       scope={RaisinScope}
-      initialValues={[
-        // TODO: Make this configurable
-        // Local atom
-        [LocalURLAtom, 'http://localhost:5000'],
-      ]}
+      initialValues={
+        // TODO: 2D array type is dumb
+        initialValues as any
+      }
     >
-      <ConnectState stateTuple={state} />
+      {/*
+      FIXME: The re-render bug is here
+      <ConnectState stateTuple={stateTuple} /> */}
       {children}
     </Provider>
   );
 };
 
-const defaultNeverUsedAtom: PrimitiveAtom<string> = atom('');
+const defaultNeverUsedAtom: PrimitiveAtom<string> = atom('<span>I am bold</span>');
 export const HTMLAtomAtom: PrimitiveAtom<PrimitiveAtom<string>> = atom(
   defaultNeverUsedAtom
 );

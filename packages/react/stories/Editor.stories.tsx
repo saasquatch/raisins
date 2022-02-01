@@ -17,7 +17,7 @@ export function Span() {
     `<span>I am a thing with <b>bold content</b></span>`
   );
   return (
-    <RaisinsProvider state={stateTuple}>
+    <RaisinsProvider stateTuple={stateTuple}>
       <Editor />
     </RaisinsProvider>
   );
@@ -29,7 +29,7 @@ export function TwoElements() {
   );
   return (
     <>
-      <RaisinsProvider state={stateTuple}>
+      <RaisinsProvider stateTuple={stateTuple}>
         <Editor />
       </RaisinsProvider>
       <pre>{stateTuple[0]}</pre>
@@ -41,7 +41,7 @@ export function Big() {
   const stateTuple = useState(big);
   return (
     <>
-      <RaisinsProvider state={stateTuple}>
+      <RaisinsProvider stateTuple={stateTuple}>
         <Editor />
       </RaisinsProvider>
       <pre>{stateTuple[0]}</pre>
@@ -53,7 +53,7 @@ export function CanvasOnly() {
   const stateTuple = useState(big);
   return (
     <>
-      <RaisinsProvider state={stateTuple}>
+      <RaisinsProvider stateTuple={stateTuple}>
         <div style={{ display: 'flex' }}>
           <div style={{ width: '50%' }}>
             <CanvasController />
@@ -69,7 +69,7 @@ export function LayersOnly() {
   const stateTuple = useState(big);
   return (
     <>
-      <RaisinsProvider state={stateTuple}>
+      <RaisinsProvider stateTuple={stateTuple}>
         <div style={{ display: 'flex' }}>
           <Layers />
           <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>

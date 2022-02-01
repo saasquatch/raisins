@@ -1,11 +1,16 @@
 import { RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import { VNodeStyle } from 'snabbdom';
+import { h, VNodeStyle } from 'snabbdom';
+import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
-import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
+import {
+  raisintoSnabdom,
+  SnabdomAppender,
+  SnabdomRenderer,
+} from './raisinToSnabdom';
 import { useIframeWithScriptsAndSelection } from './useIframeWithScriptsAndSelection';
 
 export type Size = {
@@ -33,6 +38,7 @@ const VnodeAtom = atom((get) => {
   const selected = get(SelectedNodeAtom);
   const outlined = get(OutlineAtom);
   const node = get(RootNodeAtom);
+  const isPloppingActive = get(PloppingIsActive);
 
   const renderer: SnabdomRenderer = (d, n) => {
     if (mode === 'preview') {
@@ -63,7 +69,18 @@ const VnodeAtom = atom((get) => {
       props: propsToRender,
     };
   };
-  const vnode = raisintoSnabdom(node as RaisinDocumentNode, renderer);
+
+  const appender: SnabdomAppender = (c, n) => {
+    if (isPloppingActive) {
+      // TODO:
+      // 1 - only render appropriate plop targets
+      // 2 - render pretty plop targets
+      // 3 - add appropriate attrs to make `onClick` work (and rewrite select-on-click stuff)
+      return [h('div', null, 'Plop here'), ...(Array.isArray(c) ? c : [])];
+    }
+    return c;
+  };
+  const vnode = raisintoSnabdom(node as RaisinDocumentNode, renderer, appender);
 
   return vnode;
 });

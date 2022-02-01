@@ -18,9 +18,12 @@ const GLOBAL_ENTRY = 'body';
  */
 export type SnabdomRenderer = (d: VNodeData, n: RaisinNode) => VNodeData;
 
+export type SnabdomAppender = (children:Array<VNode | string> | undefined, n: RaisinNode) => Array<VNode | string> | undefined;
+
 export function raisintoSnabdom(
   node: RaisinDocumentNode,
-  modifier: SnabdomRenderer = (d, n) => d
+  modifier: SnabdomRenderer = (d, n) => d,
+  appender: SnabdomAppender = (c, n) => c
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onComment(c) {
@@ -42,14 +45,14 @@ export function raisintoSnabdom(
       return h(
         el.tagName,
         modifier({ attrs: el.attribs, style: styleObj }, el),
-        children
+        appender(children, el)
       );
     },
     onText(text) {
       return text.data;
     },
-    onRoot(_, children) {
-      return h(GLOBAL_ENTRY, {}, children);
+    onRoot(root, children) {
+      return h(GLOBAL_ENTRY, {}, appender(children, root));
     },
   });
 
