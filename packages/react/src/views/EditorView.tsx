@@ -25,7 +25,8 @@ const CanvasCss = {
   gridArea: "canvas"
 }
 const LayersCss =  {
-  gridArea: "layers"
+  gridArea: "layers",
+  overflowY: "scroll"
 }
 
 export const Main = `
@@ -46,7 +47,7 @@ export const Main = `
   height: 100vh;
   margin: 0;
 
-  overflow: hidden;
+  overflow-y: hidden;
 `;
 
 export function EditorView() {

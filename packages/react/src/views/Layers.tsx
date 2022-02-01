@@ -52,8 +52,7 @@ const Layer = styleToObject(`
   outline-offset: -2px;
 `)!;
 const SelectedLayer = styleToObject(`
-  outline: '2px solid red';
-  outline-offset: -2px;
+  background: green;
 `)!;
 
 const SlotContainer = styleToObject(`

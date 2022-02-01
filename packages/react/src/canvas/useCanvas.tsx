@@ -1,19 +1,12 @@
 import { RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import { useCallback } from 'react';
-import { h, VNodeStyle } from 'snabbdom';
+import { useAtomValue } from 'jotai/utils';
+import { VNodeStyle } from 'snabbdom';
 import { RaisinScope } from '../atoms/RaisinScope';
-import {
-  LocalURLAtom,
-  ModuleDetailsAtom,
-} from '../component-metamodel/ComponentModel';
-import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
 import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
-import { SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
-import { NPMRegistryAtom } from '../util/NPMRegistry';
+import { SelectedNodeAtom } from '../selection/SelectedAtom';
 import { raisintoSnabdom, SnabdomRenderer } from './raisinToSnabdom';
-import { useSnabbdomSandboxedIframe } from './useSnabbdomSandboxedIframe';
+import { useIframeWithScriptsAndSelection } from './useIframeWithScriptsAndSelection';
 
 export type Size = {
   name: string;
@@ -30,32 +23,6 @@ export const sizes: Size[] = [
   { name: 'Small', width: '576px', height: 1080 },
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
-
-function useIframeWithScriptsAndSelection() {
-  const setSelectedId = useUpdateAtom(SetSelectedIdAtom, RaisinScope);
-  const onClick = useCallback((id: string) => setSelectedId(id), [setSelectedId]);
-  const canvasScripts = useAtomValue(CanvasScriptsAtom, RaisinScope);
-  const registry = useAtomValue(NPMRegistryAtom, RaisinScope);
-  const props = useSnabbdomSandboxedIframe({
-    initialComponent: h('div', {}),
-    onClick,
-    head: canvasScripts,
-    registry,
-  });
-
-  return {
-    renderInIframe: props.renderInIframe,
-    containerRef: props.container,
-  };
-}
-
-const CanvasScriptsAtom = atom((get) => {
-  const localUrl = get(LocalURLAtom);
-  const moduleDetails = get(ModuleDetailsAtom);
-  const registry = get(NPMRegistryAtom);
-  return moduleDetailsToScriptSrc(moduleDetails, localUrl, registry);
-});
-
 
 export const OutlineAtom = atom(true);
 export const ModeAtom = atom<Mode>('edit');
@@ -102,10 +69,23 @@ const VnodeAtom = atom((get) => {
 });
 
 export default function useCanvas() {
+  /*
+  Looks after wiring up an iframe with:
+   - snabbdom for vdom rendering
+   - penpal for cross-domain selection
+  */
   const frameProps = useIframeWithScriptsAndSelection();
 
+  /*
+   * Atom only updates on changes
+   */
   const vnode = useAtomValue(VnodeAtom, RaisinScope);
+
+  /*
+   * React render triggers snabbdom render
+   */
   frameProps.renderInIframe(vnode);
+
   return {
     ...frameProps,
   };
