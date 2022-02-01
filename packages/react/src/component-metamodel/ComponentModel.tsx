@@ -2,6 +2,7 @@ import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '@raisins/
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
+import { ParentsAtom } from '../hooks/CoreAtoms';
 import { NodeWithSlots } from '../model/EditorModel';
 import { getSlots } from '../model/getSlots';
 import { isElementNode, isRoot } from '../util/isNode';
@@ -148,16 +149,19 @@ export const ComponentModelAtom = atom<ComponentModel>((get) => {
   const getComponentMeta = get(ComponentMetaAtom);
   const blocks: Block[] = get(BlocksAtom);
   const getValidChildren = get(ValidChildrenAtom);
-
+    
   function isValidChild(
     child: RaisinElementNode,
     parent: RaisinElementNode,
     slot: string
   ): boolean {
+
     if (child === parent) {
       // Can't drop into yourself
+      // FIXME: Check for all ancestors
       return false;
     }
+    ParentsAtom
     const parentMeta = getComponentMeta(parent);
     const childMeta = getComponentMeta(child);
     return isNodeAllowed(child, childMeta, parent, parentMeta, slot);

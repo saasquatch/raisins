@@ -12,7 +12,7 @@ import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styleToObject from 'style-to-object';
-import { ploppingIsActive } from '../atoms/pickAndPlopAtoms';
+import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import {
@@ -22,6 +22,7 @@ import {
 import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
 import {
+  canPlopHereAtom,
   duplicateForNode,
   isNodeAnElement,
   isNodePicked,
@@ -169,6 +170,8 @@ function ElementLayer() {
   const title = nameForNode.useValue();
   const moveNode = togglePickNode.useUpdate();
 
+  const isPlopping = useAtomValue(PloppingIsActive, RaisinScope);
+  const canMove = isPicked || !isPlopping;
   // Don't render non-element layers
   if (!isAnElement) return <></>;
 
@@ -178,9 +181,15 @@ function ElementLayer() {
         {title} {isPicked && ' Moving...'}{' '}
       </div>
       <div>
-        <button onClick={duplicate}>dupe</button>
-        <button onClick={removeNode}>del</button>
-        <button onClick={moveNode}>move</button>
+        <button onClick={moveNode} disabled={!canMove}>
+          {isPicked ? 'Cancel move' : 'Move'}
+        </button>
+        <button onClick={duplicate} disabled={isPlopping}>
+          Dupe
+        </button>
+        <button onClick={removeNode} disabled={isPlopping}>
+          Delete
+        </button>
       </div>
     </div>
   );
@@ -280,10 +289,14 @@ function isInSlot(c: RaisinNode, slotName: string): boolean {
 }
 
 function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
-  const isPlopActive = useAtomValue(ploppingIsActive);
+  const canPlop = canPlopHereAtom.useValue();
   const plopNode = plopNodeHere.useUpdate();
   const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
 
+  const isPloppablable = canPlop({ slot, idx });
+  if (!isPloppablable) {
+    return <></>;
+  }
   return (
     <div style={{ border: '1px dashed red' }}>
       Position {idx} in {slot || 'content'}

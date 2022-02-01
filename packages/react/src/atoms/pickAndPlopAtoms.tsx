@@ -1,7 +1,9 @@
 import {
-    getPath,
+  getNode,
+  getPath,
   htmlUtil,
   isElementNode,
+  NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
@@ -14,12 +16,21 @@ const { remove, insertAtPath, clone } = htmlUtil;
 /**
  * For tracking which atom is picked. Can only have one atom picked at a time.
  */
-export const pickedAtom = atom<RaisinNode | undefined>(undefined);
+export const PickedAtom = atom<NodePath | undefined>(undefined);
+
+export const PickedNodeAtom = atom<RaisinNode | undefined>((get) => {
+  const currrentDoc = get(RootNodeAtom);
+  const pickedPath = get(PickedAtom);
+  if (!pickedPath) return undefined;
+  return getNode(currrentDoc, pickedPath);
+});
 
 /**
  * For tracking if a node can be plopped
  */
-export const ploppingIsActive = atom((get) => get(pickedAtom) !== undefined);
+export const PloppingIsActive = atom(
+  (get) => (get(PickedAtom) !== undefined) as boolean
+);
 
 export const DropPloppedNodeInSlotAtom = atom(
   null,
@@ -36,23 +47,35 @@ export const DropPloppedNodeInSlotAtom = atom(
       slot: string;
     }
   ) => {
-    const pickedNode = get(pickedAtom);
-    if (!pickedNode) {
+    const pickedNodePath = get(PickedAtom);
+    if (!pickedNodePath) {
       // Nothing is picked, so do nothing;
       return;
     }
 
     const currrentDoc = get(RootNodeAtom);
-    const parentPath = getPath(currrentDoc,parent)!;
+    const pickedNode = getNode(currrentDoc, pickedNodePath);
+    const parentPath = getPath(currrentDoc, parent)!;
     const docWithNodeRemoved = remove(currrentDoc, pickedNode);
 
     const cloneOfPickedNode = clone(pickedNode);
-    const newNode = !isElementNode(cloneOfPickedNode) ? {...cloneOfPickedNode} : {...cloneOfPickedNode, attribs:{...cloneOfPickedNode.attribs, slot}};
-    const newDocument = insertAtPath(docWithNodeRemoved, newNode, parentPath, idx);
+    
+    const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
+      ? { ...cloneOfPickedNode }
+      : {
+          ...cloneOfPickedNode,
+          attribs: { ...cloneOfPickedNode.attribs, slot },
+        };
+    const newDocument = insertAtPath(
+      docWithNodeRemoved,
+      nodeWithNewSlot,
+      parentPath,
+      idx
+    );
 
     set(SetNodeInternalAtom, newDocument);
 
     // Don't allow re-plop
-    set(pickedAtom, undefined);
+    set(PickedAtom, undefined);
   }
 );

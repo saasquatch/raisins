@@ -1,4 +1,4 @@
-import { RaisinElementNode } from '@raisins/core';
+import { getPath, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import {
@@ -13,8 +13,10 @@ import { atomForAttributes } from '../atoms/atomForAttributes';
 import { atomForNode } from './node-context';
 import {
   DropPloppedNodeInSlotAtom,
-  pickedAtom,
+  PickedAtom,
+  PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
 
 /**
  * Is the node in context currently selected?
@@ -24,18 +26,35 @@ export const isSelectedForNode = atomForNode((n) =>
 );
 
 export const isNodePicked = atomForNode((n) =>
-  atom((get) => get(pickedAtom) === get(n))
+  atom((get) => get(PickedNodeAtom) === get(n))
 );
 
 export const togglePickNode = atomForNode((n) =>
   atom(null, (get, set) => {
     const node = get(n);
-    const isNodePicked = get(pickedAtom) === node;
+    const isNodePicked = get(PickedNodeAtom) === node;
     if (isNodePicked) {
-      set(pickedAtom, undefined);
+      set(PickedAtom, undefined);
     } else {
-      set(pickedAtom, node);
+      const currrentDoc = get(RootNodeAtom);
+      set(PickedAtom, getPath(currrentDoc, node));
     }
+  })
+);
+
+export const canPlopHereAtom = atomForNode((n) =>
+  atom((get) => {
+    const node = get(n);
+    const pickedNode = get(PickedNodeAtom);
+    if(!pickedNode || !node) return ()=>false;
+    const { isValidChild } = get(ComponentModelAtom);
+    if (!isElementNode(pickedNode)) return () => false;
+    if (!isElementNode(node)) return () => false;
+
+    const fn = ({ slot, idx }: { slot: string; idx: number }) => {
+      return isValidChild(pickedNode, node, slot);
+    };
+    return fn;
   })
 );
 

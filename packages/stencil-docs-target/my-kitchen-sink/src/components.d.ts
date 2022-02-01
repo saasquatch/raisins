@@ -19,13 +19,14 @@ export namespace Components {
         "anonymousLabel": string;
         /**
           * The first name of the user to display to their friends
-          * @uiName First Noah
+          * @uiName First Name
           * @uiDefault Your
          */
         "first": string;
         /**
           * The last name
           * @uiName Last Name
+          * @uiDefault Friend
          */
         "last": string;
         /**
@@ -37,6 +38,7 @@ export namespace Components {
         /**
           * The middle name
           * @uiName Middle Name
+          * @uiDefault Best
          */
         "middle": string;
         /**
@@ -98,13 +100,14 @@ declare namespace LocalJSX {
         "anonymousLabel"?: string;
         /**
           * The first name of the user to display to their friends
-          * @uiName First Noah
+          * @uiName First Name
           * @uiDefault Your
          */
         "first"?: string;
         /**
           * The last name
           * @uiName Last Name
+          * @uiDefault Friend
          */
         "last"?: string;
         /**
@@ -116,6 +119,7 @@ declare namespace LocalJSX {
         /**
           * The middle name
           * @uiName Middle Name
+          * @uiDefault Best
          */
         "middle"?: string;
         /**

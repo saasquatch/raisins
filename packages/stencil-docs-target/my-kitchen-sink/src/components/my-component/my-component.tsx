@@ -1,7 +1,7 @@
 import { Component, Prop, h } from '@stencil/core';
 
 /**
- * @uiName My Component
+ * @uiName Kutay Component
  * @example Cool Kid - <my-component first=a middle=cool last=kid max-length=400></my-component>
  * @example Nerd Bird - <my-component first=The middle=Nerd last=Bird max-length=400></my-component>
  * @example Surely Sam - <my-component first=The middle=Surely last=Sam max-length=400></my-component>
@@ -15,24 +15,26 @@ export class MyComponent {
   /**
    * The first name of the user to display to their friends
    *
-   * @uiName First Noah
+   * @uiName First Name
    * @uiDefault Your
    */
-  @Prop() first: string = 'Your';
+  @Prop() first: string;
 
   /**
    * The middle name
    *
    * @uiName Middle Name
+   * @uiDefault Best
    */
-  @Prop() middle: string = "Company";
+  @Prop() middle: string;
 
   /**
    * The last name
    *
    * @uiName Last Name
+   * @uiDefault Friend
    */
-  @Prop() last: string = "Rep";
+  @Prop() last: string;
 
   /**
    * Truncates names longer than this
@@ -62,7 +64,7 @@ export class MyComponent {
   };
 
   private getText(): string {
-    let names = [this.first ?? 'friend', this.middle, this.last].filter(x => x);
+    let names = [this.first ?? 'Your', this.middle ?? "Best", this.last ?? "Friend"].filter(x => x);
     if (this.reverse) {
       names = [...names, 'reversed'].reverse();
     }

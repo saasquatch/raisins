@@ -15,18 +15,18 @@ export const Row = `
   width: 100%;
 `;
 
-const Header = `
-  grid-area: header;
-`;
-const Edits = `
-  grid-area: edits;
-`;
-const CanvasCss = `
-  grid-area: canvas;
-`;
-const LayersCss = `
-  grid-area: layers;
-`;
+const Header = {
+  gridArea: "header"
+}
+const Edits =  {
+  gridArea: "edits"
+}
+const CanvasCss = {
+  gridArea: "canvas"
+}
+const LayersCss =  {
+  gridArea: "layers"
+}
 
 export const Main = `
   display: grid;
@@ -53,21 +53,21 @@ export function EditorView() {
   return (
     <>
       <div style={styleToObject(Main)!}>
-        <div style={styleToObject(Header)!}>
+        <div style={Header}>
           <ToolbarView />
         </div>
-        <div style={styleToObject(Edits)!}>
+        <div style={Edits}>
           <EditorPanel />
           <PackageEditorController />
           <StyleEditor />
         </div>
-        <div style={styleToObject(CanvasCss)!}>
+        <div style={CanvasCss}>
           <CanvasController />
           <CanvasController />
           <RichTextEditor />
         </div>
 
-        <div style={styleToObject(LayersCss)!}>
+        <div style={LayersCss}>
           {' '}
           <Layers />
         </div>
