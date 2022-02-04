@@ -4,10 +4,11 @@ import { idToNode, ParentsAtom } from '../hooks/CoreAtoms';
 
 export const HoveredAtom = atom<RaisinNode | undefined>(undefined);
 
-export const SetHoveredIdAtom = atom(null, (_, set, id: string) =>
-  set(HoveredAtom, idToNode.get(id) || undefined)
+export const SetHoveredIdAtom = atom(null, (_, set, id: string | undefined) =>
+  set(HoveredAtom, id && idToNode.get(id) || undefined)
 );
 
+export const HoveredRectAtom = atom<{x:number, y:number} | undefined>(undefined)
 export const HoveredPath = atom((get) => {
   const node = get(HoveredAtom);
   if (!node) return '';

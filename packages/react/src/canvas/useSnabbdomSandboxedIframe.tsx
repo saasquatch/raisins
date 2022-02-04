@@ -15,7 +15,8 @@ export type UseIframeProps = {
    */
   dependencies?: NPMDependency[];
 
-  onEvent(event: { target: string; type: string }): void;
+  selector: string;
+  onEvent(event: CanvasEvent): void;
 
   /**
    * The head, used for scripts and styles. When changed will reload the iframe.
@@ -33,9 +34,17 @@ export type UseIframeProps = {
   initialComponent: VNode;
 };
 
+export type CanvasEvent = {
+  type: string;
+  target?: {
+    attributes: Record<string, string>;
+    rect: DOMRect;
+  };
+};
+
 export type ParentRPC = {
   resizeHeight(pixels: string): void;
-  event(target: string, event: string): void;
+  event(event: CanvasEvent): void;
 };
 
 export type ChildRPC = {
@@ -43,7 +52,7 @@ export type ChildRPC = {
 };
 
 // TODO: Extract raisins-id as a constant -- also make configurable?
-const childApiSrc = (registry: NPMRegistry) => `
+const childApiSrc = (registry: NPMRegistry, selector: string) => `
 <style>
 body{ margin: 0 }
 </style>
@@ -95,19 +104,34 @@ window.addEventListener('DOMContentLoaded',function () {
         parent.resizeHeight(entries[0].contentRect.height);
     });
     ro.observe(document.body);
-
+    function getAttributes(el){
+      return el.getAttributeNames().reduce((acc, attrName)=>{
+        return {
+          ...acc,
+          [attrName]: el.getAttribute(attrName)
+        }
+      }, {});
+    }
     function sendEventToParent(e){
       if(e.target.nodeType !== Node.ELEMENT_NODE) return;
-      if(e.target.getAttribute("raisins-id")){
-        parent.event(e.target.getAttribute("raisins-id"), e.type);
+      let elementTarget;
+      if(e.target.matches("${selector}")){
+        elementTarget = e.target;
       }else{
-        const closestParent = e.target.closest("[raisins-id]");
+        const closestParent = e.target.closest("${selector}");
         if(closestParent){
-          parent.event(closestParent.getAttribute("raisins-id"), e.type);
+          elementTarget = closestParent;
         }else{
-          parent.event(undefined, e.type);
+          elementTarget = undefined;
         }
       }
+      parent.event({
+        type: e.type,
+        target: elementTarget && {
+          attributes: getAttributes(elementTarget),
+          rect: elementTarget.getBoundingClientRect()
+        }
+      })
     }
     // Listen for all event types
     Object.keys(window).forEach(key => {
@@ -122,12 +146,12 @@ window.addEventListener('DOMContentLoaded',function () {
 </script>
 `;
 
-const iframeSrc = (head: string, registry: NPMRegistry) => `
+const iframeSrc = (head: string, registry: NPMRegistry, selector:string) => `
 <!DOCTYPE html>
 <html>
 <head>
   ${head}
-  ${childApiSrc(registry)}
+  ${childApiSrc(registry, selector)}
 </head>
 <body></body>
 </html>`;
@@ -145,6 +169,7 @@ export function useSnabbdomSandboxedIframe({
   onEvent,
   head,
   registry,
+  selector
 }: UseIframeProps) {
   const initialComponentRef = useRef<VNode>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
@@ -167,7 +192,7 @@ export function useSnabbdomSandboxedIframe({
       const el = container.current;
       const iframe: HTMLIFrameElement = document.createElement('iframe');
       iframeRef.current = iframe;
-      iframe.srcdoc = iframeSrc(head, registry);
+      iframe.srcdoc = iframeSrc(head, registry, selector);
       iframe.width = '100%';
       iframe.scrolling = 'no';
       iframe.setAttribute(
@@ -181,11 +206,8 @@ export function useSnabbdomSandboxedIframe({
         resizeHeight(pixels) {
           iframe.height = pixels;
         },
-        event(target, type) {
-          onEvent({
-            target,
-            type,
-          });
+        event(e) {
+          onEvent(e);
         },
       };
 
@@ -215,7 +237,7 @@ export function useSnabbdomSandboxedIframe({
       };
     }
     return () => {};
-  }, [onEvent, head, registry]);
+  }, [onEvent, head, registry, selector]);
 
   function renderInIframe(Component: VNode): void {
     initialComponentRef.current = Component;

@@ -24,6 +24,6 @@ export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
   return selected?.path ? getNode(current, selected.path) : undefined;
 });
 
-export const SetSelectedIdAtom = atom(null, (_, set, id: string) =>
-  set(SelectedAtom, idToNode.get(id) || undefined)
+export const SetSelectedIdAtom = atom(null, (_, set, id: string | undefined) =>
+  set(SelectedAtom, id && idToNode.get(id) || undefined)
 );
