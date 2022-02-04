@@ -15,7 +15,19 @@ export type UseIframeProps = {
    */
   dependencies?: NPMDependency[];
 
+  /**
+   * Selector for event handling.
+   *
+   * When a DOM event occurs, the `closest` parent with this selector
+   * will be the `target` for the `onEvent` callback.
+   */
   selector: string;
+
+  /**
+   * Will be called for every dom event. See {@link CanvasEvent}
+   *
+   * @param event
+   */
   onEvent(event: CanvasEvent): void;
 
   /**
@@ -34,8 +46,21 @@ export type UseIframeProps = {
   initialComponent: VNode;
 };
 
+/**
+ * DOM event from inside the canvas.
+ */
 export type CanvasEvent = {
+  /**
+   * A DOM event type.
+   * 
+   * See: https://developer.mozilla.org/en-US/docs/Web/Events
+   */
   type: string;
+  /**
+   * The serializable representation of the DOM Element
+   * closest parent that matches the `selector`, not necessarily the
+   * DOM element that triggered the event.
+   */
   target?: {
     attributes: Record<string, string>;
     rect: DOMRect;
@@ -146,7 +171,7 @@ window.addEventListener('DOMContentLoaded',function () {
 </script>
 `;
 
-const iframeSrc = (head: string, registry: NPMRegistry, selector:string) => `
+const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <!DOCTYPE html>
 <html>
 <head>
@@ -169,7 +194,7 @@ export function useSnabbdomSandboxedIframe({
   onEvent,
   head,
   registry,
-  selector
+  selector,
 }: UseIframeProps) {
   const initialComponentRef = useRef<VNode>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
