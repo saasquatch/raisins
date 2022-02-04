@@ -17,6 +17,7 @@ import {
   PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { HoveredAtom } from '../canvas/HoveredAtom';
 
 /**
  * Is the node in context currently selected?
@@ -24,6 +25,11 @@ import { RootNodeAtom } from '../hooks/CoreAtoms';
 export const isSelectedForNode = atomForNode(
   (n) => atom((get) => get(SelectedNodeAtom) === get(n)),
   'isSelectedForNode'
+);
+
+export const isNodeHovered = atomForNode(
+  (n) => atom((get) => get(HoveredAtom) === get(n)),
+  'isNodeHovered'
 );
 
 export const isNodePicked = atomForNode(

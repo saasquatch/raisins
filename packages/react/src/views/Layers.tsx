@@ -10,8 +10,13 @@ import { atom } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
-import React, { FC, useCallback, useMemo, useState } from 'react';
-import styleToObject from 'style-to-object';
+import React, {
+  CSSProperties,
+  FC,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
@@ -25,6 +30,7 @@ import {
   canPlopHereAtom,
   duplicateForNode,
   isNodeAnElement,
+  isNodeHovered,
   isNodePicked,
   isSelectedForNode,
   nameForNode,
@@ -39,57 +45,58 @@ import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode } from '../util/isNode';
 const { clone } = htmlUtil;
 
-const Label = styleToObject(`
-  cursor: pointer;
-  line-height: 28px;
-`)!;
+const Label: CSSProperties = {
+  cursor: 'pointer',
+  lineHeight: '28px',
+};
 
-const Layer = styleToObject(`
-  position: relative;
-  user-select: none;
-  cursor: pointer;
-  padding: 10px 0;
-  outline-offset: -2px;
-`)!;
-const SelectedLayer = styleToObject(`
-  background: green;
-`)!;
+const Layer: CSSProperties = {
+  position: 'relative',
+  userSelect: 'none',
+  cursor: 'pointer',
+  padding: '10px 0',
+  outlineOffset: '-2px',
+};
 
-const SlotContainer = styleToObject(`
-  margin-left: 3px;
-  display: flex;
-  padding: 0 0 3px 0;
-`)!;
+const SelectedLayer: CSSProperties = {
+  background: 'green',
+};
 
-const SlotName = styleToObject(`
-  writing-mode: vertical-lr;
-  text-orientation: sideways;
-  font-size: 0.7em;
-  padding: 5px 0 5px 2px;
-  color: grey;
-  background: rgba(0, 0, 0, 0.1);
-`)!;
+const SlotContainer: CSSProperties = {
+  marginLeft: '3px',
+  display: 'flex',
+  padding: '0 0 3px 0',
+};
 
-const SlotChildren = styleToObject(`
-  width: 100%;
-`)!;
+const SlotName: CSSProperties = {
+  writingMode: 'vertical-lr',
+  textOrientation: 'sideways',
+  fontSize: '0.7em',
+  padding: '5px 0 5px 2px',
+  color: 'grey',
+  background: 'rgba(0, 0, 0, 0.1)',
+};
 
-const TitleBar = styleToObject(`
-  display: flex;
-  justify-content: space-between;
-`)!;
+const SlotChildren: CSSProperties = {
+  width: '100%',
+};
 
-const AddBlock = styleToObject(`
-  flex: 1;
-  width: 100%;
-  justify-self: stretch;
-  align-self: stretch;
-  background: rgba(0, 0, 255, 0.1);
-  color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`)!;
+const TitleBar: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+};
+
+const AddBlock: CSSProperties = {
+  flex: '1',
+  width: '100%',
+  justifySelf: 'stretch',
+  alignSelf: 'stretch',
+  background: 'rgba(0, 0, 255, 0.1)',
+  color: 'rgba(0, 0, 0, 0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
 
 const RootHasChildren = atom(
   (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
@@ -162,6 +169,7 @@ function ElementLayer() {
   const isAnElement = isNodeAnElement.useValue();
   const isSelected = isSelectedForNode.useValue();
   const isPicked = isNodePicked.useValue();
+  const isHovered = isNodeHovered.useValue();
   const nodeWithSlots = slotsForNode.useValue();
 
   const removeNode = removeForNode.useUpdate();
@@ -199,6 +207,7 @@ function ElementLayer() {
   const style = {
     ...Layer,
     ...(isSelected ? SelectedLayer : {}),
+    ...(isHovered ? { outline: '1px dashed green' } : {}),
   };
   return (
     <div data-element style={style}>
