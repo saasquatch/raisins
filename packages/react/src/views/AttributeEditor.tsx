@@ -1,7 +1,7 @@
 import { Attribute } from '@raisins/schema/schema';
 import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
-import React from 'react';
+import React, { Fragment } from 'react';
 import { attributesForNode } from '../node/AtomsForNode';
 import { useNodeAtom } from '../node/node-context';
 import { RaisinScope } from '../atoms/RaisinScope';
@@ -38,7 +38,7 @@ export function AttributesEditor() {
         <tbody>
           {attributeSchema?.map((attr) => {
             return (
-              <>
+              <Fragment key={attr.name}>
                 <tr>
                   <td>
                     <b>{attr.title ?? attr.name}</b>
@@ -57,7 +57,7 @@ export function AttributesEditor() {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             );
           })}
         </tbody>
