@@ -43,7 +43,8 @@ export type WriteableScopedAtomCreator<R, W> = (
  * For writeable atoms
  */
 export function atomForNode<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W>
+  scopeFn: WriteableScopedAtomCreator<R, W>,
+  debugLabel?:string
 ): {
   useValue: () => R;
   useUpdate: () => SetAtom<W>;
@@ -53,7 +54,8 @@ export function atomForNode<R, W>(
  * For read-only atoms
  */
 export function atomForNode<R>(
-  scopeFn: ScopedAtomCreator<R>
+  scopeFn: ScopedAtomCreator<R>,
+  debugLabel?:string
 ): {
   useValue: () => R;
   useUpdate: () => never;
@@ -61,11 +63,17 @@ export function atomForNode<R>(
 };
 
 export function atomForNode<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W> | ScopedAtomCreator<R>
+  scopeFn: WriteableScopedAtomCreator<R, W> | ScopedAtomCreator<R>,
+  debugLabel?:string
 ) {
   const memoized = createMemoizeAtom();
   const getAtom = (base: PrimitiveAtom<RaisinNode>) =>
-    memoized(() => scopeFn(base), [scopeFn, base]);
+    memoized(() => {
+      const scopedAtom = scopeFn(base);
+      const baseDebugLabel = base.debugLabel ?? `${base}`
+      scopedAtom.debugLabel = `${baseDebugLabel}/${debugLabel}`;
+      return scopedAtom;
+    }, [scopeFn, base]);
 
   return {
     useValue: () => useAtomValue(getAtom(useNodeAtom()), RaisinScope),

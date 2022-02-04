@@ -5,6 +5,7 @@ import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
 import { useHotkeys } from '../src/hooks/useHotkeys';
 import { Layers } from '../src/views/Layers';
+import { RegisteredAtoms } from './DevTools';
 
 const meta: Meta = {
   title: 'Editor',
@@ -19,6 +20,7 @@ export function Span() {
   return (
     <RaisinsProvider stateTuple={stateTuple}>
       <Editor />
+      <RegisteredAtoms/>
     </RaisinsProvider>
   );
 }

@@ -44,7 +44,8 @@ export const RaisinsProvider = ({
     >
       {/*
       FIXME: The re-render bug is here
-      <ConnectState stateTuple={stateTuple} /> */}
+      */}
+      <ConnectState stateTuple={stateTuple} />
       {children}
     </Provider>
   );

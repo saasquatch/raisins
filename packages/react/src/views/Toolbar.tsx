@@ -1,9 +1,10 @@
 import { useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
-import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
-import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 import { RaisinScope } from '../atoms/RaisinScope';
+import { HoveredPath } from '../canvas/HoveredAtom';
+import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
+import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 
 export function ToolbarView() {
   const historySize = useAtom(HistorySizeAtom, RaisinScope)[0];
@@ -12,6 +13,8 @@ export function ToolbarView() {
   const [mode, setMode] = useAtom(ModeAtom, RaisinScope);
   const [size, setSize] = useAtom(SizeAtom, RaisinScope);
   const [outlined, setOutlined] = useAtom(OutlineAtom, RaisinScope);
+
+  const hovered = useAtomValue(HoveredPath, RaisinScope);
 
   return (
     <div>
@@ -49,6 +52,7 @@ export function ToolbarView() {
       >
         {outlined ? 'Outlined' : 'No Outline'}
       </button>
+      Hovered: {hovered}
     </div>
   );
 }

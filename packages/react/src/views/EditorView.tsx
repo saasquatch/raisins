@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { CanvasController } from '../canvas/CanvasController';
 import { StyleEditor } from '../stylesheets/StyleEditor';
 import { EditorPanel } from './EditorPanel';
@@ -24,7 +24,7 @@ const Edits =  {
 const CanvasCss = {
   gridArea: "canvas"
 }
-const LayersCss =  {
+const LayersCss:CSSProperties =  {
   gridArea: "layers",
   overflowY: "scroll"
 }

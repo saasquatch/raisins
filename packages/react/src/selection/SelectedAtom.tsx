@@ -1,12 +1,12 @@
 import { getNode, getPath, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { InternalStateAtom, InternalState, idToNode } from '../hooks/CoreAtoms';
+import { idToNode, InternalState, InternalStateAtom } from '../hooks/CoreAtoms';
 
 export const SelectedAtom = atom(
   (get) => get(InternalStateAtom).selected,
-  (_, set, next?: RaisinNode) => {
+  (_, set, next?: RaisinNode | undefined) => {
     set(InternalStateAtom, (prev: InternalState) => {
-      // TODO: Allows for selecting nodes that aren't part of the current tree. 
+      // TODO: Allows for selecting nodes that aren't part of the current tree.
       // That doesn't make sense and should be prevented
       return {
         ...prev,
@@ -25,5 +25,5 @@ export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
 });
 
 export const SetSelectedIdAtom = atom(null, (_, set, id: string) =>
-  set(SelectedAtom, idToNode.get(id)!)
+  set(SelectedAtom, idToNode.get(id) || undefined)
 );

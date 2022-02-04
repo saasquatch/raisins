@@ -6,6 +6,7 @@ import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
+import { HoveredAtom } from './HoveredAtom';
 import {
   raisintoSnabdom,
   SnabdomAppender,
@@ -36,6 +37,7 @@ export const SizeAtom = atom<Size>(sizes[0]);
 const VnodeAtom = atom((get) => {
   const mode = get(ModeAtom);
   const selected = get(SelectedNodeAtom);
+  const hovered = get(HoveredAtom);
   const outlined = get(OutlineAtom);
   const node = get(RootNodeAtom);
   const isPloppingActive = get(PloppingIsActive);
@@ -44,17 +46,21 @@ const VnodeAtom = atom((get) => {
     if (mode === 'preview') {
       return d;
     }
+    const isHovered = hovered === n;
+    const isSelected = selected === n;
+    const isOutlined = isHovered || isSelected;
     const { delayed, remove, ...rest } = d.style || {};
     const style: VNodeStyle = {
       ...rest,
       cursor: 'pointer',
-      outline:
-        n === selected
-          ? '2px dashed rgba(255,0,0,0.5)'
-          : outlined
-          ? '1px dashed rgba(0,0,0,0.2)'
-          : '',
-      outlineOffset: n === selected ? '-2px' : '',
+      outline: isHovered
+        ? '2px dashed rgba(0,255,0,0.5)'
+        : isSelected
+        ? '2px dashed rgba(255,0,0,0.5)'
+        : outlined
+        ? '1px dashed rgba(0,0,0,0.2)'
+        : '',
+      outlineOffset: isOutlined ? '-2px' : '',
     };
     let propsToRender: Record<string, any> = {};
 
@@ -84,6 +90,7 @@ const VnodeAtom = atom((get) => {
 
   return vnode;
 });
+VnodeAtom.debugLabel = 'VnodeAtom';
 
 export default function useCanvas() {
   /*

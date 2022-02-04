@@ -33,6 +33,7 @@ export const SetNodeInternalAtom = atom(
     });
   }
 );
+SetNodeInternalAtom.debugLabel = "SetNodeInternalAtom"
 
 /**
  * Deletes a raisin node from the document

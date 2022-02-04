@@ -37,7 +37,7 @@ export function getId(node: RaisinNode): string {
   return id;
 }
 
-const NodeFromHtml = atom(get=>htmlParser(get(HTMLAtom)));
+const NodeFromHtml = atom((get) => htmlParser(get(HTMLAtom)));
 const getDerivedInternal = (get: Getter) => {
   const current = get(NodeFromHtml);
   const historyState = get(HistoryAtom);
@@ -47,7 +47,6 @@ const getDerivedInternal = (get: Getter) => {
   };
 };
 
-
 // Should be made private
 export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
   getDerivedInternal,
@@ -55,19 +54,21 @@ export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
     const iState = getDerivedInternal(get);
     const { current, ...rest } = isFunction(next) ? next(iState) : next;
 
-    if(current !== iState.current){
+    if (current !== iState.current) {
       const htmlString = htmlSerializer(current);
-      set(HTMLAtom, htmlString);        
+      set(HTMLAtom, htmlString);
     }
     set(HistoryAtom, rest);
   }
 );
+InternalStateAtom.debugLabel = 'InternalStateAtom';
 
 export const HistoryAtom = atom<Omit<InternalState, 'current'>>({
   redoStack: [],
   undoStack: [],
-  selected: undefined
+  selected: undefined,
 });
+HistoryAtom.debugLabel = 'HistoryAtom';
 
 export const RootNodeAtom = atom(
   (get) => get(InternalStateAtom).current,
@@ -79,6 +80,7 @@ export const RootNodeAtom = atom(
     });
   }
 );
+RootNodeAtom.debugLabel = 'RootNodeAtom';
 
 export const IdentifierModelAtom = atom<IdentifierModel>((get) => {
   // TODO: Maybe this can be pushed into the internal state getters?
@@ -98,6 +100,7 @@ export const IdentifierModelAtom = atom<IdentifierModel>((get) => {
     getPath: getPathInternal,
   };
 });
+IdentifierModelAtom.debugLabel = 'IdentifierModelAtom';
 
 /**
  * Derived map of parents
@@ -106,3 +109,4 @@ export const ParentsAtom = atom((get) => {
   const doc = get(InternalStateAtom).current;
   return getParents(doc);
 });
+ParentsAtom.debugLabel = 'ParentsAtom';

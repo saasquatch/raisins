@@ -15,7 +15,7 @@ export type UseIframeProps = {
    */
   dependencies?: NPMDependency[];
 
-  onClick(id: string): void;
+  onEvent(event: { target: string; type: string }): void;
 
   /**
    * The head, used for scripts and styles. When changed will reload the iframe.
@@ -35,7 +35,7 @@ export type UseIframeProps = {
 
 export type ParentRPC = {
   resizeHeight(pixels: string): void;
-  clicked(id: string): void;
+  event(target: string, event: string): void;
 };
 
 export type ChildRPC = {
@@ -95,17 +95,26 @@ window.addEventListener('DOMContentLoaded',function () {
         parent.resizeHeight(entries[0].contentRect.height);
     });
     ro.observe(document.body);
-    document.body.addEventListener('click', function(e){
+
+    function sendEventToParent(e){
+      if(e.target.nodeType !== Node.ELEMENT_NODE) return;
       if(e.target.getAttribute("raisins-id")){
-        parent.clicked(e.target.getAttribute("raisins-id"));
+        parent.event(e.target.getAttribute("raisins-id"), e.type);
       }else{
         const closestParent = e.target.closest("[raisins-id]");
         if(closestParent){
-          parent.clicked(closestParent.getAttribute("raisins-id"));
+          parent.event(closestParent.getAttribute("raisins-id"), e.type);
+        }else{
+          parent.event(undefined, e.type);
         }
       }
+    }
+    // Listen for all event types
+    Object.keys(window).forEach(key => {
+      if (/^on/.test(key)) {
+        window.addEventListener(key.slice(2), sendEventToParent);
+      }
     });
-
   });
 
   // End event listener
@@ -133,11 +142,10 @@ const iframeSrc = (head: string, registry: NPMRegistry) => `
  */
 export function useSnabbdomSandboxedIframe({
   initialComponent,
-  onClick,
+  onEvent,
   head,
   registry,
 }: UseIframeProps) {
-
   const initialComponentRef = useRef<VNode>(initialComponent);
   const container = useRef<HTMLElement | undefined>();
   const iframeRef = useRef<HTMLIFrameElement | undefined>();
@@ -173,8 +181,11 @@ export function useSnabbdomSandboxedIframe({
         resizeHeight(pixels) {
           iframe.height = pixels;
         },
-        clicked(id) {
-          onClick(id);
+        event(target, type) {
+          onEvent({
+            target,
+            type,
+          });
         },
       };
 
@@ -204,7 +215,7 @@ export function useSnabbdomSandboxedIframe({
       };
     }
     return () => {};
-  }, [onClick, head, registry]);
+  }, [onEvent, head, registry]);
 
   function renderInIframe(Component: VNode): void {
     initialComponentRef.current = Component;

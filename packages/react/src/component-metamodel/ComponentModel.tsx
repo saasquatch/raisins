@@ -1,4 +1,8 @@
-import { RaisinElementNode, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import {
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
+} from '@raisins/core';
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
@@ -45,21 +49,29 @@ export const ComponentsAtom = atom((get) => {
  * When an NPM package is just `@local` then it is loaded from this URL
  */
 export const LocalURLAtom = atom<string | undefined>(undefined);
+LocalURLAtom.debugLabel = 'LocalURLAtom';
+
 export const BlocksAtom = atom((get) => {
   const globalBlocks = get(GlobalBlocksAtom);
   const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
   return [...blocksFromModules, ...globalBlocks];
 });
+BlocksAtom.debugLabel = 'BlocksAtom';
 
 export const AddModuleAtom = atom(null, (_, set, next: Module) =>
   set(SetModulesAtom, (modules) => [...modules, next])
 );
+AddModuleAtom.debugLabel = 'AddModuleAtom';
+
 export const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
   set(SetModulesAtom, (modules) => modules.filter((e) => e !== next))
 );
+RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
+
 export const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
   set(SetModulesAtom, (modules) => modules.filter((e) => e.name !== name))
 );
+RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
 
 /**
  * Allows modules to be edited, with their additional details provided asynchronously
@@ -84,6 +96,7 @@ export const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
     };
   });
 });
+SetModulesAtom.debugLabel = "SetModulesAtom";
 
 export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   const components = get(ComponentsAtom);
@@ -100,17 +113,15 @@ export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   }
   return getComponentMeta;
 });
+ComponentMetaAtom.debugLabel = "ComponentMetaAtom";
 
 export const ValidChildrenAtom = atom((get) => {
   const blocks = get(BlocksAtom);
   const getComponentMeta = get(ComponentMetaAtom);
 
-  function getValidChildren(
-    node: RaisinNode,
-    slot?: string
-  ): Block[] {
+  function getValidChildren(node: RaisinNode, slot?: string): Block[] {
     // Non-documents and elements aren't allowed children
-    if(!isElementNode(node) || !isRoot(node)) return [];
+    if (!isElementNode(node) || !isRoot(node)) return [];
 
     const allowedInParent = blocks.filter((block) => {
       const childMeta = getComponentMeta(block.content);
@@ -144,24 +155,24 @@ export const ValidChildrenAtom = atom((get) => {
 
   return getValidChildren;
 });
+ValidChildrenAtom.debugLabel = "ValidChildrenAtom"
 
 export const ComponentModelAtom = atom<ComponentModel>((get) => {
   const getComponentMeta = get(ComponentMetaAtom);
   const blocks: Block[] = get(BlocksAtom);
   const getValidChildren = get(ValidChildrenAtom);
-    
+
   function isValidChild(
     child: RaisinElementNode,
     parent: RaisinElementNode,
     slot: string
   ): boolean {
-
     if (child === parent) {
       // Can't drop into yourself
       // FIXME: Check for all ancestors
       return false;
     }
-    ParentsAtom
+    ParentsAtom;
     const parentMeta = getComponentMeta(parent);
     const childMeta = getComponentMeta(child);
     return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
@@ -180,6 +191,7 @@ export const ComponentModelAtom = atom<ComponentModel>((get) => {
     isValidChild,
   };
 });
+ComponentModelAtom.debugLabel = "ComponentModelAtom"
 
 /**
  * For managing the types of components that are edited and their properties

@@ -11,6 +11,7 @@ export function getId<T extends object>(obj: T) {
   }
   return idMap.get(obj);
 }
+
 const listener = (
   get: unknown,
   set: unknown,

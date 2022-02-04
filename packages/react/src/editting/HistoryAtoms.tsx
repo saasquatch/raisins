@@ -11,6 +11,7 @@ export const HistorySizeAtom = atom((get) => {
     redoSize: intState.redoStack.length,
   };
 });
+HistorySizeAtom.debugLabel = 'HistorySizeAtom';
 
 export const UndoAtom = atom(null, (_, set) => {
   set(InternalStateAtom, (previous) => {
@@ -31,6 +32,7 @@ export const UndoAtom = atom(null, (_, set) => {
     return newState;
   });
 });
+UndoAtom.debugLabel = 'UndoAtom';
 
 export const RedoAtom = atom(null, (_, set) => {
   set(InternalStateAtom, (previous) => {
@@ -52,3 +54,4 @@ export const RedoAtom = atom(null, (_, set) => {
     return newState;
   });
 });
+RedoAtom.debugLabel = 'RedoAtom';
