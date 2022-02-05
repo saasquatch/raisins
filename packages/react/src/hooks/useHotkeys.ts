@@ -2,7 +2,7 @@ import hotkeys from 'hotkeys-js';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { DeleteSelectedAtom } from '../editting/EditAtoms';
+import { DeleteSelectedAtom } from "../editting/EditSelectedAtom";
 import { RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 
 export function useHotkeys() {

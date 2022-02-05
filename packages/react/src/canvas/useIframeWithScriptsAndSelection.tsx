@@ -9,7 +9,7 @@ import {
 import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
 import { SetSelectedIdAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { HoveredRectAtom, SetHoveredIdAtom } from './HoveredAtom';
+import { HoveredRectAtom, SelectedRectAtom, SetHoveredIdAtom } from './HoveredAtom';
 import {
   CanvasEvent,
   useSnabbdomSandboxedIframe,
@@ -25,15 +25,28 @@ export const CanvasScriptsAtom = atom<string>((get) => {
 
 const onEventAtom = atom(null, (get, set, { target, type }: CanvasEvent) => {
   if (type === 'click') {
-    set(SetSelectedIdAtom, target?.attributes["raisins-id"]);
-    if(target){
-      set(HoveredRectAtom, { x: target.rect.x, y: target.rect.y });
+    set(SetSelectedIdAtom, target?.attributes['raisins-id']);
+    if (target) {
+      set(SelectedRectAtom, {
+        x: target.rect.x,
+        y: target.rect.y,
+        height: target.rect.height,
+        width: target.rect.width,
+      });
     }
+
   }
   if (type === 'mouseover') {
-    set(SetHoveredIdAtom, target?.attributes["raisins-id"]);
+    set(SetHoveredIdAtom, target?.attributes['raisins-id']);
+    if (target) {
+      set(HoveredRectAtom, {
+        x: target.rect.x,
+        y: target.rect.y,
+        height: target.rect.height,
+        width: target.rect.width,
+      });
+    }
   }
-  // console.log('Canvas event', type, target);
 });
 
 export function useIframeWithScriptsAndSelection() {
@@ -45,7 +58,7 @@ export function useIframeWithScriptsAndSelection() {
     onEvent,
     head: canvasScripts,
     registry,
-    selector: `[raisins-id]`
+    selector: `[raisins-id]`,
   });
 
   return {

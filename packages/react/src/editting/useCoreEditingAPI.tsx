@@ -1,13 +1,13 @@
 import { NodePath, RaisinNode } from '@raisins/core';
 import { useUpdateAtom } from 'jotai/utils';
 import {
-  DeleteSelectedAtom,
   DuplicateNodeAtom, InsertNodeAtom,
   RemoveNodeAtom,
   ReplaceNodeAtom,
   ReplacePathAtom,
   SetNodeInternalAtom
 } from './EditAtoms';
+import { DeleteSelectedAtom } from "./EditSelectedAtom";
 import { StateUpdater } from '../util/NewState';
 import { RaisinScope } from '../atoms/RaisinScope';
 

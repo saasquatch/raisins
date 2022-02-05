@@ -17,10 +17,8 @@ const {
   duplicate,
   insertAt,
   remove,
-  removePath,
   replace,
   replacePath,
-  move,
 } = htmlUtil;
 
 export const SetNodeInternalAtom = atom(
@@ -33,7 +31,7 @@ export const SetNodeInternalAtom = atom(
     });
   }
 );
-SetNodeInternalAtom.debugLabel = "SetNodeInternalAtom"
+SetNodeInternalAtom.debugLabel = 'SetNodeInternalAtom';
 
 /**
  * Deletes a raisin node from the document
@@ -74,20 +72,6 @@ export const InsertNodeAtom = atom(
     set(SetNodeInternalAtom, clone);
   }
 );
-
-
-/**
- * Deletes the selected node, if anything selected, otherwise no-op
- */
-export const DeleteSelectedAtom = atom(null, (get, set) => {
-  set(InternalStateAtom, (previous) => {
-    if (previous.selected) {
-      const clone = removePath(previous.current, previous.selected.path);
-      return generateNextState(previous, clone);
-    }
-    return previous;
-  });
-});
 
 /**
  * Replaces a node with a new node

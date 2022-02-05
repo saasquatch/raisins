@@ -76,7 +76,6 @@ export type ChildRPC = {
   render(html: VNode): void;
 };
 
-// TODO: Extract raisins-id as a constant -- also make configurable?
 const childApiSrc = (registry: NPMRegistry, selector: string) => `
 <style>
 body{ margin: 0 }
@@ -129,6 +128,7 @@ window.addEventListener('DOMContentLoaded',function () {
         parent.resizeHeight(entries[0].contentRect.height);
     });
     ro.observe(document.body);
+    
     function getAttributes(el){
       return el.getAttributeNames().reduce((acc, attrName)=>{
         return {

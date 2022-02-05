@@ -54,9 +54,9 @@ const VnodeAtom = atom((get) => {
       ...rest,
       cursor: 'pointer',
       outline: isHovered
-        ? '2px dashed rgba(0,255,0,0.5)'
+        ? '2px solid green'
         : isSelected
-        ? '2px dashed rgba(255,0,0,0.5)'
+        ? '2px solid rgba(255,0,0,0.5)'
         : outlined
         ? '1px dashed rgba(0,0,0,0.2)'
         : '',
@@ -79,6 +79,7 @@ const VnodeAtom = atom((get) => {
   const appender: SnabdomAppender = (c, n) => {
     if (isPloppingActive) {
       // TODO:
+      // 0 - infer plop targets from slot names and metamodel
       // 1 - only render appropriate plop targets
       // 2 - render pretty plop targets
       // 3 - add appropriate attrs to make `onClick` work (and rewrite select-on-click stuff)
