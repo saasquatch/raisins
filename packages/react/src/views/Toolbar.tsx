@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { HoveredPath } from '../canvas/HoveredAtom';
+import { HoveredPath } from '../canvas/CanvasHoveredAtom';
 import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 

@@ -1,5 +1,6 @@
-import { connectToChild } from 'penpal';
-import { useEffect, useRef, useState } from 'react';
+import { Atom, atom, WritableAtom } from 'jotai';
+import { Connection, connectToChild } from 'penpal';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
 
@@ -52,7 +53,7 @@ export type UseIframeProps = {
 export type CanvasEvent = {
   /**
    * A DOM event type.
-   * 
+   *
    * See: https://developer.mozilla.org/en-US/docs/Web/Events
    */
   type: string;
@@ -181,58 +182,112 @@ const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <body></body>
 </html>`;
 
-/**
- * Creates a renderer that will render a Component into an iframe.
- *
- * This was written to be independent of Raisins.
- *
- * @param props - controls for how to render the iframe
- * @returns
- */
-export function useSnabbdomSandboxedIframe({
-  initialComponent,
-  onEvent,
-  head,
-  registry,
-  selector,
-}: UseIframeProps) {
-  const initialComponentRef = useRef<VNode>(initialComponent);
-  const container = useRef<HTMLElement | undefined>();
-  const iframeRef = useRef<HTMLIFrameElement | undefined>();
-  const [loaded, setLoaded] = useState(false);
-  const childRef = useRef<ChildRPC>();
+function renderInChild(child: ChildRPC, Comp: VNode): void {
+  if (!Comp) return; // no Component yet
+  child.render(Comp);
+}
 
-  const renderer = (
-    iframe: HTMLIFrameElement,
-    child: ChildRPC,
-    Comp: VNode
-  ): void => {
-    if (!Comp) return; // no Component yet
+export type ConnectionState =
+  | { type: 'uninitialized' }
+  | { type: 'initializing'; connection: Connection<ChildRPC> }
+  | { type: 'loaded'; childRpc: ChildRPC; connection: Connection<ChildRPC> }
+  | { type: 'error'; error: unknown; connection: Connection<ChildRPC> };
 
-    child.render(Comp);
-  };
+export function createAtoms(props: {
+  vnodeAtom: Atom<VNode>;
+  head: Atom<string>;
+  selector: Atom<string>;
+  registry: Atom<NPMRegistry>;
+  onEvent: WritableAtom<null, CanvasEvent>;
+}) {
+  /**
+   * We put our iframe in here and manage it's state
+   */
+  const containerAtom = atom<HTMLElement | null>(null);
 
-  useEffect(() => {
-    if (container.current) {
-      const el = container.current;
-      const iframe: HTMLIFrameElement = document.createElement('iframe');
-      iframeRef.current = iframe;
-      iframe.srcdoc = iframeSrc(head, registry, selector);
-      iframe.width = '100%';
-      iframe.scrolling = 'no';
-      iframe.setAttribute(
-        'style',
-        'border: 0; background-color: none; width: 1px; min-width: 100%;'
-      );
-      iframe.setAttribute('sandbox', 'allow-scripts');
+  /**
+   * The HTML text content of the iframe
+   */
+  const iframeSource = atom<string>((get) => {
+    const head = get(props.head);
+    const selector = get(props.selector);
+    const registry = get(props.registry);
+    return iframeSrc(head, registry, selector);
+  });
 
-      el.appendChild(iframe);
+  const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
+    const el = get(containerAtom);
+    if (!el) return undefined;
+
+    const iframe: HTMLIFrameElement = document.createElement('iframe');
+    iframe.srcdoc = get(iframeSource);
+    iframe.width = '100%';
+    iframe.scrolling = 'no';
+    iframe.setAttribute(
+      'style',
+      'border: 0; background-color: none; width: 1px; min-width: 100%;'
+    );
+    iframe.setAttribute('sandbox', 'allow-scripts');
+    el.appendChild(iframe);
+
+    return iframe;
+  });
+
+  const connectionAtom = atom<Atom<ConnectionState>>((get) => {
+    const iframe = get(iframeAtom);
+    if (!iframe) return atom({ type: 'uninitialized' });
+
+    const internalState = atom<ConnectionState>({ type: 'uninitialized' });
+
+    type OnEventRef = MutableRefObject<null | ((e: CanvasEvent) => void)>;
+
+    /**
+     * Based on https://jotai.org/docs/guides/no-suspense
+     */
+    const penpalStateAtom = atom(
+      (get) => get(internalState),
+      (
+        _,
+        set,
+        {
+          connection,
+          onEventRef,
+        }: {
+          connection: Connection<ChildRPC>;
+          onEventRef: OnEventRef;
+        }
+      ) => {
+        onEventRef!.current = (e) => {
+          // Push Penpal state into atom state
+          set(props.onEvent, e);
+        };
+        //  { type: 'uninitialized' }
+        set(internalState, { type: 'initializing', connection });
+        // { type: 'initializing'; connection: Connection }
+        (async () => {
+          try {
+            const childRpc = await connection.promise;
+            // { type: 'loaded'; childRpc: ChildRPC; connection: Connection }
+            set(internalState, { type: 'loaded', childRpc, connection });
+          } catch (error) {
+            // { type: 'error'; error: Error; connection: Connection };
+            set(internalState, { type: 'error', error, connection });
+          }
+        })();
+      }
+    );
+
+    penpalStateAtom.onMount = (start) => {
+      const onEventRef: OnEventRef = {
+        current: null,
+      };
       const parentRPC: ParentRPC = {
         resizeHeight(pixels) {
           iframe.height = pixels;
         },
         event(e) {
-          onEvent(e);
+          // FIXME: Overridden later
+          onEventRef.current && onEventRef.current(e);
         },
       };
 
@@ -244,39 +299,45 @@ export function useSnabbdomSandboxedIframe({
         timeout: 1000,
         childOrigin: 'null',
       });
-      connection.promise
-        .then(async (child) => {
-          childRef.current = child;
-          renderer(iframe, childRef.current!, initialComponentRef.current);
-          setLoaded(true);
-        })
-        .catch((e) => {
-          // TODO: Capture error in state
-        });
 
+      start({ onEventRef, connection });
       return () => {
-        iframeRef.current = undefined;
-        iframe.parentElement?.removeChild(iframe);
+        // cleanup
         connection.destroy();
-        setLoaded(false);
       };
-    }
-    return () => {};
-  }, [onEvent, head, registry, selector]);
+    };
 
-  function renderInIframe(Component: VNode): void {
-    initialComponentRef.current = Component;
-    if (iframeRef.current && childRef.current && loaded) {
-      renderer(iframeRef.current, childRef.current!, Component);
-    } else {
-      // Render will be called when the iframe is loaded
-    }
-  }
+    return penpalStateAtom;
+  });
 
-  return {
-    renderInIframe,
-    loaded,
-    container,
-    iframeRef,
-  };
+  const lastRenderedComponent = atom<VNode | undefined>((get) => {
+    const connection = get(get(connectionAtom));
+    if (connection.type !== 'loaded') return undefined;
+
+    const component = get(props.vnodeAtom);
+    renderInChild(connection.childRpc, component);
+    return component;
+  });
+
+  const external = atom(
+    (get) => {
+      // Subscribes
+      const last = get(lastRenderedComponent);
+    },
+    (get, set, el: HTMLElement | null) => {
+      if (!el) {
+        /**
+         * When `el` is null, that is a signal that React has removed our element
+         *
+         * Thus, we need to clean up the previous iframe that we manually attached
+         */
+        const frameToDestroy = get(iframeAtom);
+        frameToDestroy &&
+          frameToDestroy.parentElement?.removeChild(frameToDestroy);
+      }
+      set(containerAtom, el);
+    }
+  );
+
+  return external;
 }

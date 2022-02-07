@@ -17,7 +17,7 @@ import {
   PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
-import { HoveredAtom } from '../canvas/HoveredAtom';
+import { HoveredAtom } from '../canvas/CanvasHoveredAtom';
 
 /**
  * Is the node in context currently selected?

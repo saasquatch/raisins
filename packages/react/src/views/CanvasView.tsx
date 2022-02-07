@@ -7,7 +7,7 @@ import {
   HoveredAtom,
   HoveredRectAtom,
   SelectedRectAtom,
-} from '../canvas/HoveredAtom';
+} from '../canvas/CanvasHoveredAtom';
 import { Rect } from '../canvas/Rect';
 import { Size } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';

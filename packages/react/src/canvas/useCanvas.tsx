@@ -1,18 +1,21 @@
 import { RaisinDocumentNode } from '@raisins/core';
-import { atom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
+import { atom, useAtom } from 'jotai';
+import { useMemo } from 'react';
 import { h, VNodeStyle } from 'snabbdom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { getId, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
-import { HoveredAtom } from './HoveredAtom';
+import { NPMRegistryAtom } from '../util/NPMRegistry';
+import { CanvasEventAtom } from './CanvasEventsAtom';
+import { HoveredAtom } from './CanvasHoveredAtom';
+import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
   SnabdomAppender,
   SnabdomRenderer,
 } from './raisinToSnabdom';
-import { useIframeWithScriptsAndSelection } from './useIframeWithScriptsAndSelection';
+import { createAtoms } from './SnabbdomSanboxedIframeAtom';
 
 export type Size = {
   name: string;
@@ -34,7 +37,7 @@ export const OutlineAtom = atom(true);
 export const ModeAtom = atom<Mode>('edit');
 export const SizeAtom = atom<Size>(sizes[0]);
 
-const VnodeAtom = atom((get) => {
+export const VnodeAtom = atom((get) => {
   const mode = get(ModeAtom);
   const selected = get(SelectedNodeAtom);
   const hovered = get(HoveredAtom);
@@ -99,19 +102,21 @@ export default function useCanvas() {
    - snabbdom for vdom rendering
    - penpal for cross-domain selection
   */
-  const frameProps = useIframeWithScriptsAndSelection();
+  const iframeAtom = useMemo(
+    () =>
+      createAtoms({
+        head: CanvasScriptsAtom,
+        registry: NPMRegistryAtom,
+        onEvent: CanvasEventAtom,
+        selector: atom('[raisins-id]'),
+        vnodeAtom: VnodeAtom,
+      }),
+    []
+  );
 
-  /*
-   * Atom only updates on changes
-   */
-  const vnode = useAtomValue(VnodeAtom, RaisinScope);
-
-  /*
-   * React render triggers snabbdom render
-   */
-  frameProps.renderInIframe(vnode);
+  const [state, setContainer] = useAtom(iframeAtom, RaisinScope);
 
   return {
-    ...frameProps,
+    containerRef: setContainer,
   };
 }

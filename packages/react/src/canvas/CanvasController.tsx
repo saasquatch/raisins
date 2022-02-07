@@ -1,9 +1,9 @@
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import useCanvas, { SizeAtom } from './useCanvas';
-import { SelectedAtom } from "../selection/SelectedAtom";
-import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
 import { RaisinScope } from '../atoms/RaisinScope';
+import { SelectedAtom } from '../selection/SelectedAtom';
+import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
+import useCanvas, { SizeAtom } from './useCanvas';
 
 export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   const frameProps = useCanvas();
@@ -11,9 +11,7 @@ export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   const setSelected = useUpdateAtom(SelectedAtom, RaisinScope);
 
   return {
-    setHtmlRef: (el) => {
-      frameProps.containerRef.current = el!;
-    },
+    setHtmlRef: frameProps.containerRef,
     clearSelected: () => setSelected(undefined as any),
     size,
   };
