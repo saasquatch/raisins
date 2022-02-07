@@ -83,7 +83,7 @@ export function PackageEditorView(props: ModuleManagement) {
       Details:
       <ul>
         {props.moduleDetails?.map((m) => (
-          <li key={m.name}>
+          <li key={`${m.name}@${m.version}`}>
             <b>{m['package.json'].description}</b>
             <br />
             <div style={{ fontSize: '0.8em', color: 'grey' }}>
