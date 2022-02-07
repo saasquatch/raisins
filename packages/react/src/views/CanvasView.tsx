@@ -11,7 +11,11 @@ import {
 import { Rect } from '../canvas/Rect';
 import { Size } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
-import { DeleteSelectedAtom, DuplicateSelectedAtom, PickSelectedAtom } from "../editting/EditSelectedAtom";
+import {
+  DeleteSelectedAtom,
+  DuplicateSelectedAtom,
+  PickSelectedAtom,
+} from '../editting/EditSelectedAtom';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 
 const Wrapper: CSSProperties = {
@@ -29,6 +33,7 @@ const Content: CSSProperties = {
   margin: '0 auto',
   padding: '20px',
   position: 'relative',
+  transition: 'width 300ms',
 };
 
 export type WYSWIGCanvasProps = {
@@ -72,11 +77,11 @@ export const CanvasHover = () => {
 };
 
 export const CanvasSelect = () => {
-  const seleted = useAtomValue(SelectedNodeAtom, RaisinScope)
+  const seleted = useAtomValue(SelectedNodeAtom, RaisinScope);
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
   const cloneSelected = useUpdateAtom(DuplicateSelectedAtom, RaisinScope);
   const moveSelected = useUpdateAtom(PickSelectedAtom, RaisinScope);
-  if(!seleted) return <div/>
+  if (!seleted) return <div />;
   return (
     <PositionedToolbar rectAtom={SelectedRectAtom}>
       <button onClick={deleteSelected}>Delete</button>
