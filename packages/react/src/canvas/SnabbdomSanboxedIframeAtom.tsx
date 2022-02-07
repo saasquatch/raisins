@@ -1,51 +1,8 @@
 import { Atom, atom, WritableAtom } from 'jotai';
 import { Connection, connectToChild } from 'penpal';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { MutableRefObject } from 'react';
 import { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
-
-type NPMDependency = {
-  package: string;
-  version?: string;
-  filePath?: string;
-};
-
-export type UseIframeProps = {
-  /**
-   * A source document to use in the iframe
-   */
-  dependencies?: NPMDependency[];
-
-  /**
-   * Selector for event handling.
-   *
-   * When a DOM event occurs, the `closest` parent with this selector
-   * will be the `target` for the `onEvent` callback.
-   */
-  selector: string;
-
-  /**
-   * Will be called for every dom event. See {@link CanvasEvent}
-   *
-   * @param event
-   */
-  onEvent(event: CanvasEvent): void;
-
-  /**
-   * The head, used for scripts and styles. When changed will reload the iframe.
-   */
-  head: string;
-
-  /**
-   * Registry (for loading the required inner iframe dependencies)
-   */
-  registry: NPMRegistry;
-
-  /**
-   * The component to render
-   */
-  initialComponent: VNode;
-};
 
 /**
  * DOM event from inside the canvas.
@@ -215,10 +172,19 @@ export function createAtoms(props: {
     return iframeSrc(head, registry, selector);
   });
 
+  const iframeRef = atom(() => ({} as { prev?: HTMLIFrameElement }));
+
   const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
     const el = get(containerAtom);
-    if (!el) return undefined;
-
+    const ref = get(iframeRef);
+    // Always cleans up the previous iframe.
+    //  When there is a new iframe
+    //  Then always remove the old one
+    ref.prev && ref.prev.parentElement?.removeChild(ref.prev);
+    if (!el) {
+      ref.prev = undefined;
+      return undefined;
+    }
     const iframe: HTMLIFrameElement = document.createElement('iframe');
     iframe.srcdoc = get(iframeSource);
     iframe.width = '100%';
@@ -230,6 +196,7 @@ export function createAtoms(props: {
     iframe.setAttribute('sandbox', 'allow-scripts');
     el.appendChild(iframe);
 
+    ref.prev = iframe;
     return iframe;
   });
 
@@ -325,16 +292,6 @@ export function createAtoms(props: {
       const last = get(lastRenderedComponent);
     },
     (get, set, el: HTMLElement | null) => {
-      if (!el) {
-        /**
-         * When `el` is null, that is a signal that React has removed our element
-         *
-         * Thus, we need to clean up the previous iframe that we manually attached
-         */
-        const frameToDestroy = get(iframeAtom);
-        frameToDestroy &&
-          frameToDestroy.parentElement?.removeChild(frameToDestroy);
-      }
       set(containerAtom, el);
     }
   );
