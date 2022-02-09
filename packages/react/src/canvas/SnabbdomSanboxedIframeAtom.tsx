@@ -1,8 +1,10 @@
-import { Atom, atom, WritableAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
+import { childApiSrc } from "./injected/childApiSrc";
+import { ChildRPC, ParentRPC } from './_CanvasRPCContract';
 
 /**
  * DOM event from inside the canvas.
@@ -24,110 +26,6 @@ export type CanvasEvent = {
     rect: DOMRect;
   };
 };
-
-export type ParentRPC = {
-  resizeHeight(pixels: string): void;
-  event(event: CanvasEvent): void;
-};
-
-export type ChildRPC = {
-  render(html: VNode): void;
-};
-
-const childApiSrc = (registry: NPMRegistry, selector: string) => `
-<style>
-body{ margin: 0 }
-</style>
-<script src="${registry.resolvePath(
-  {
-    name: 'penpal',
-    version: '6.2.1',
-  },
-  'dist/penpal.min.js'
-)}"></script>
-<script type="module">
-import { init, classModule, propsModule, attributesModule, styleModule, datasetModule, h } from "${registry.resolvePath(
-  {
-    name: 'snabbdom',
-    version: '3.1.0',
-  },
-  'build/index.js'
-)}"
-
-const patch = init([
-  // Init patch function with chosen modules
-  propsModule, // Handles props, for demo states
-  classModule, // makes it easy to toggle classes
-  attributesModule, // for setting attributes on DOM elements
-  styleModule, // handles styling on elements with support for animations
-  datasetModule,
-]);
-
-let prev = document.body;
-function patchAndCache(next){
-	patch(prev, next);
-	prev = next;
-}
-
-window.addEventListener('DOMContentLoaded',function () {
-
-  let myConnection = window.Penpal.connectToParent({
-    // Methods child is exposing to parent
-    methods: {
-      render(content) {
-        patchAndCache(content);
-      },
-    },
-  });
-
-  myConnection.promise.then(function(parent){
-    const ro = new ResizeObserver(function(entries){
-        // @ts-ignore -- number will be cast to string by browsers
-        parent.resizeHeight(entries[0].contentRect.height);
-    });
-    ro.observe(document.body);
-    
-    function getAttributes(el){
-      return el.getAttributeNames().reduce((acc, attrName)=>{
-        return {
-          ...acc,
-          [attrName]: el.getAttribute(attrName)
-        }
-      }, {});
-    }
-    function sendEventToParent(e){
-      if(e.target.nodeType !== Node.ELEMENT_NODE) return;
-      let elementTarget;
-      if(e.target.matches("${selector}")){
-        elementTarget = e.target;
-      }else{
-        const closestParent = e.target.closest("${selector}");
-        if(closestParent){
-          elementTarget = closestParent;
-        }else{
-          elementTarget = undefined;
-        }
-      }
-      parent.event({
-        type: e.type,
-        target: elementTarget && {
-          attributes: getAttributes(elementTarget),
-          rect: elementTarget.getBoundingClientRect()
-        }
-      })
-    }
-    // Listen for all event types
-    Object.keys(window).forEach(key => {
-      if (/^on/.test(key)) {
-        window.addEventListener(key.slice(2), sendEventToParent);
-      }
-    });
-  });
-
-  // End event listener
-});
-</script>
-`;
 
 const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <!DOCTYPE html>
@@ -172,33 +70,7 @@ export function createAtoms(props: {
     return iframeSrc(head, registry, selector);
   });
 
-  const iframeRef = atom(() => ({} as { prev?: HTMLIFrameElement }));
-
-  const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
-    const el = get(containerAtom);
-    const ref = get(iframeRef);
-    // Always cleans up the previous iframe.
-    //  When there is a new iframe
-    //  Then always remove the old one
-    ref.prev && ref.prev.parentElement?.removeChild(ref.prev);
-    if (!el) {
-      ref.prev = undefined;
-      return undefined;
-    }
-    const iframe: HTMLIFrameElement = document.createElement('iframe');
-    iframe.srcdoc = get(iframeSource);
-    iframe.width = '100%';
-    iframe.scrolling = 'no';
-    iframe.setAttribute(
-      'style',
-      'border: 0; background-color: none; width: 1px; min-width: 100%;'
-    );
-    iframe.setAttribute('sandbox', 'allow-scripts');
-    el.appendChild(iframe);
-
-    ref.prev = iframe;
-    return iframe;
-  });
+  const iframeAtom = createIframeAtom(containerAtom, iframeSource);
 
   const connectionAtom = atom<Atom<ConnectionState>>((get) => {
     const iframe = get(iframeAtom);
@@ -288,8 +160,8 @@ export function createAtoms(props: {
 
   const external = atom(
     (get) => {
-      // Subscribes
-      const last = get(lastRenderedComponent);
+      // Subscribes and does nothing
+      get(lastRenderedComponent);
     },
     (get, set, el: HTMLElement | null) => {
       set(containerAtom, el);
@@ -298,3 +170,35 @@ export function createAtoms(props: {
 
   return external;
 }
+
+function createIframeAtom(containerAtom: Atom<HTMLElement | null>, iframeSource: Atom<string>) {
+  const mutableIframeRefAtom = atom(() => ({} as { prev?: HTMLIFrameElement; }));
+
+  const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
+    const el = get(containerAtom);
+    const mutableIframeRef = get(mutableIframeRefAtom);
+    // Always cleans up the previous iframe.
+    //  When there is a new iframe
+    //  Then always remove the old one
+    mutableIframeRef.prev && mutableIframeRef.prev.parentElement?.removeChild(mutableIframeRef.prev);
+    if (!el) {
+      mutableIframeRef.prev = undefined;
+      return undefined;
+    }
+    const iframe: HTMLIFrameElement = document.createElement('iframe');
+    iframe.srcdoc = get(iframeSource);
+    iframe.width = '100%';
+    iframe.scrolling = 'no';
+    iframe.setAttribute(
+      'style',
+      'border: 0; background-color: none; width: 1px; min-width: 100%;'
+    );
+    iframe.setAttribute('sandbox', 'allow-scripts');
+    el.appendChild(iframe);
+
+    mutableIframeRef.prev = iframe;
+    return iframe;
+  });
+  return iframeAtom;
+}
+

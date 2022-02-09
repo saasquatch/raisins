@@ -10,7 +10,13 @@ export const SetHoveredIdAtom = atom(null, (_, set, id: string | undefined) =>
   set(HoveredAtom, (id && idToNode.get(id)) || undefined)
 );
 
+/**
+ * TODO: these should not be global, they need to be per-canvas (e.g. one canvas might have an element open, the other closed, different sizes)
+ */
 export const HoveredRectAtom = atom<Rect | undefined>(undefined);
+/**
+ * TODO: these should not be global, they need to be per-canvas (e.g. one canvas might have an element open, the other closed, different sizes)
+ */
 export const SelectedRectAtom = atom<Rect | undefined>(undefined);
 
 export const HoveredPath = atom((get) => {
