@@ -3,9 +3,7 @@ import { atom, PrimitiveAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import {
-  HoveredAtom,
-} from '../canvas/CanvasHoveredAtom';
+import { HoveredAtom } from '../canvas/CanvasHoveredAtom';
 import { Rect } from '../canvas/Rect';
 import { Size, useCanvasAtoms } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';

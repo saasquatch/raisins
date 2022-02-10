@@ -1,4 +1,3 @@
-import { isIfStatement } from '@babel/types';
 import { RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import React, { createContext, useContext, useMemo } from 'react';
@@ -180,18 +179,16 @@ export const CanvasContext = createContext<
   undefined | ReturnType<typeof createCanvasAtoms>
 >(undefined);
 
-
-export function useCanvasAtoms(){
+export function useCanvasAtoms() {
   const atoms = useContext(CanvasContext);
-  if(!atoms) throw new Error("No CanvasContext found. Make sure you wrap your component in a <CanvasProvider> component.")
+  if (!atoms)
+    throw new Error(
+      'No CanvasContext found. Make sure you wrap your component in a <CanvasProvider> component.'
+    );
   return atoms;
 }
 
-export function CanvasProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CanvasProvider({ children }: { children: React.ReactNode }) {
   const atoms = useMemo(createCanvasAtoms, []);
   return (
     <CanvasContext.Provider value={atoms}>{children}</CanvasContext.Provider>
