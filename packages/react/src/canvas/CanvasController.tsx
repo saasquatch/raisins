@@ -1,17 +1,19 @@
+import { useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { SelectedAtom } from '../selection/SelectedAtom';
 import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
-import useCanvas, { SizeAtom } from './useCanvas';
+import { CanvasProvider, SizeAtom, useCanvasAtoms } from './useCanvas';
 
 export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
-  const frameProps = useCanvas();
+  const atoms = useCanvasAtoms();
+  const [_, setContainer] = useAtom(atoms.IframeAtom, RaisinScope);
   const size = useAtomValue(SizeAtom, RaisinScope);
   const setSelected = useUpdateAtom(SelectedAtom, RaisinScope);
 
   return {
-    setHtmlRef: frameProps.containerRef,
+    setHtmlRef: setContainer,
     clearSelected: () => setSelected(undefined as any),
     size,
   };
@@ -19,5 +21,13 @@ export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
 
 // No props allowed -- should all come from context, or atoms
 export function CanvasController() {
+  return (
+    <CanvasProvider>
+      <ExampleController />
+    </CanvasProvider>
+  );
+}
+
+export function ExampleController() {
   return <WYSWIGCanvas {...useWYSIWYGCanvas()} />;
 }

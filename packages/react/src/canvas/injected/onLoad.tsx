@@ -37,6 +37,10 @@ export const onLoadScript: string = function () {
         };
       }, {});
     }
+    document.addEventListener('sq:geometry', function (e: Event) {
+      parent.geometry((e as CustomEvent).detail);
+    });
+
     function sendEventToParent(e: Event) {
       function isElement(value: any): value is HTMLElement {
         return value instanceof window.HTMLElement;

@@ -5,11 +5,9 @@ import React, { CSSProperties, FC } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import {
   HoveredAtom,
-  HoveredRectAtom,
-  SelectedRectAtom,
 } from '../canvas/CanvasHoveredAtom';
 import { Rect } from '../canvas/Rect';
-import { Size } from '../canvas/useCanvas';
+import { Size, useCanvasAtoms } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
 import {
   DeleteSelectedAtom,
@@ -64,26 +62,28 @@ const HoveredNodeContent = atom((get) => {
   const hoveredNode = get(HoveredAtom);
   const metamodel = get(ComponentMetaAtom);
   if (!isElementNode(hoveredNode)) return;
-
   return metamodel(hoveredNode).title ?? hoveredNode.tagName;
 });
+
 export const CanvasHover = () => {
+  const atoms = useCanvasAtoms();
   const nodeDetails = useAtomValue(HoveredNodeContent, RaisinScope);
   return (
-    <PositionedToolbar rectAtom={HoveredRectAtom}>
+    <PositionedToolbar rectAtom={atoms.HoveredRectAtom}>
       {nodeDetails}
     </PositionedToolbar>
   );
 };
 
 export const CanvasSelect = () => {
+  const atoms = useCanvasAtoms();
   const seleted = useAtomValue(SelectedNodeAtom, RaisinScope);
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
   const cloneSelected = useUpdateAtom(DuplicateSelectedAtom, RaisinScope);
   const moveSelected = useUpdateAtom(PickSelectedAtom, RaisinScope);
   if (!seleted) return <div />;
   return (
-    <PositionedToolbar rectAtom={SelectedRectAtom}>
+    <PositionedToolbar rectAtom={atoms.SelectedRectAtom}>
       <button onClick={deleteSelected}>Delete</button>
       <button onClick={cloneSelected}>Dupe</button>
       <button onClick={moveSelected}>Move</button>

@@ -1,31 +1,15 @@
-import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
+import { Atom, atom, WritableAtom } from 'jotai';
 import { Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
-import { childApiSrc } from "./injected/childApiSrc";
-import { ChildRPC, ParentRPC } from './_CanvasRPCContract';
-
-/**
- * DOM event from inside the canvas.
- */
-export type CanvasEvent = {
-  /**
-   * A DOM event type.
-   *
-   * See: https://developer.mozilla.org/en-US/docs/Web/Events
-   */
-  type: string;
-  /**
-   * The serializable representation of the DOM Element
-   * closest parent that matches the `selector`, not necessarily the
-   * DOM element that triggered the event.
-   */
-  target?: {
-    attributes: Record<string, string>;
-    rect: DOMRect;
-  };
-};
+import { childApiSrc } from './injected/childApiSrc';
+import {
+  CanvasEvent,
+  ChildRPC,
+  GeometryDetail,
+  ParentRPC,
+} from './_CanvasRPCContract';
 
 const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <!DOCTYPE html>
@@ -54,6 +38,7 @@ export function createAtoms(props: {
   selector: Atom<string>;
   registry: Atom<NPMRegistry>;
   onEvent: WritableAtom<null, CanvasEvent>;
+  onResize: WritableAtom<null, GeometryDetail>;
 }) {
   /**
    * We put our iframe in here and manage it's state
@@ -78,28 +63,36 @@ export function createAtoms(props: {
 
     const internalState = atom<ConnectionState>({ type: 'uninitialized' });
 
-    type OnEventRef = MutableRefObject<null | ((e: CanvasEvent) => void)>;
+    type ConnectionRef = MutableRefObject<Connection<any> | null>;
 
     /**
      * Based on https://jotai.org/docs/guides/no-suspense
      */
     const penpalStateAtom = atom(
       (get) => get(internalState),
-      (
-        _,
-        set,
-        {
-          connection,
-          onEventRef,
-        }: {
-          connection: Connection<ChildRPC>;
-          onEventRef: OnEventRef;
-        }
-      ) => {
-        onEventRef!.current = (e) => {
-          // Push Penpal state into atom state
-          set(props.onEvent, e);
+      (_, set, connectionRef: ConnectionRef) => {
+        const parentRPC: ParentRPC = {
+          resizeHeight(pixels) {
+            iframe.height = pixels;
+          },
+          event(e) {
+            set(props.onEvent, e);
+          },
+          geometry(detail) {
+            set(props.onResize, detail);
+          },
         };
+
+        const connection = connectToChild<ChildRPC>({
+          // The iframe to which a connection should be made
+          iframe,
+          // Methods the parent is exposing to the child
+          methods: parentRPC,
+          timeout: 1000,
+          childOrigin: 'null',
+        });
+        // for atom `onMount` cleanup
+        connectionRef.current = connection;
         //  { type: 'uninitialized' }
         set(internalState, { type: 'initializing', connection });
         // { type: 'initializing'; connection: Connection }
@@ -117,32 +110,13 @@ export function createAtoms(props: {
     );
 
     penpalStateAtom.onMount = (start) => {
-      const onEventRef: OnEventRef = {
+      const connectionRef: ConnectionRef = {
         current: null,
       };
-      const parentRPC: ParentRPC = {
-        resizeHeight(pixels) {
-          iframe.height = pixels;
-        },
-        event(e) {
-          // FIXME: Overridden later
-          onEventRef.current && onEventRef.current(e);
-        },
-      };
-
-      const connection = connectToChild<ChildRPC>({
-        // The iframe to which a connection should be made
-        iframe,
-        // Methods the parent is exposing to the child
-        methods: parentRPC,
-        timeout: 1000,
-        childOrigin: 'null',
-      });
-
-      start({ onEventRef, connection });
+      start(connectionRef);
       return () => {
         // cleanup
-        connection.destroy();
+        connectionRef.current?.destroy();
       };
     };
 
@@ -171,8 +145,11 @@ export function createAtoms(props: {
   return external;
 }
 
-function createIframeAtom(containerAtom: Atom<HTMLElement | null>, iframeSource: Atom<string>) {
-  const mutableIframeRefAtom = atom(() => ({} as { prev?: HTMLIFrameElement; }));
+function createIframeAtom(
+  containerAtom: Atom<HTMLElement | null>,
+  iframeSource: Atom<string>
+) {
+  const mutableIframeRefAtom = atom(() => ({} as { prev?: HTMLIFrameElement }));
 
   const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
     const el = get(containerAtom);
@@ -180,7 +157,8 @@ function createIframeAtom(containerAtom: Atom<HTMLElement | null>, iframeSource:
     // Always cleans up the previous iframe.
     //  When there is a new iframe
     //  Then always remove the old one
-    mutableIframeRef.prev && mutableIframeRef.prev.parentElement?.removeChild(mutableIframeRef.prev);
+    mutableIframeRef.prev &&
+      mutableIframeRef.prev.parentElement?.removeChild(mutableIframeRef.prev);
     if (!el) {
       mutableIframeRef.prev = undefined;
       return undefined;
@@ -201,4 +179,3 @@ function createIframeAtom(containerAtom: Atom<HTMLElement | null>, iframeSource:
   });
   return iframeAtom;
 }
-
