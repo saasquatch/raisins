@@ -1,5 +1,5 @@
 import { isElementNode } from '@raisins/core';
-import { Atom, atom, PrimitiveAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
@@ -57,10 +57,17 @@ export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
 };
 
 const HoveredNodeContent = atom((get) => {
-  const hoveredNode = get(HoveredAtom);
+  const node = get(HoveredAtom);
   const metamodel = get(ComponentMetaAtom);
-  if (!isElementNode(hoveredNode)) return;
-  return metamodel(hoveredNode).title ?? hoveredNode.tagName;
+  if (!isElementNode(node)) return;
+  return metamodel(node).title ?? node.tagName;
+});
+
+const SelectedNodeContent = atom((get) => {
+  const node = get(SelectedNodeAtom);
+  const metamodel = get(ComponentMetaAtom);
+  if (!isElementNode(node)) return;
+  return metamodel(node).title ?? node.tagName;
 });
 
 export const CanvasHover = () => {
@@ -81,10 +88,12 @@ export const CanvasSelect = () => {
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
   const cloneSelected = useUpdateAtom(DuplicateSelectedAtom, RaisinScope);
   const moveSelected = useUpdateAtom(PickSelectedAtom, RaisinScope);
+  const nodeContent = useAtomValue(SelectedNodeContent, RaisinScope);
   if (!seleted) return <div />;
   return (
     <Suspense fallback={null}>
       <PositionedToolbar rectAtom={atoms.SelectedRectAtom}>
+        {nodeContent}
         <button onClick={deleteSelected}>Delete</button>
         <button onClick={cloneSelected}>Dupe</button>
         <button onClick={moveSelected}>Move</button>
@@ -115,6 +124,7 @@ export const PositionedToolbar = ({
         position: 'absolute',
         top: y + 20 + height,
         left: x + 20,
+        width: width + "px"
       }}
     >
       {children}

@@ -30,7 +30,7 @@ import {
   canPlopHereAtom,
   duplicateForNode,
   isNodeAnElement,
-  isNodeHovered,
+  nodeHovered,
   isNodePicked,
   isSelectedForNode,
   nameForNode,
@@ -169,7 +169,7 @@ function ElementLayer() {
   const isAnElement = isNodeAnElement.useValue();
   const isSelected = isSelectedForNode.useValue();
   const isPicked = isNodePicked.useValue();
-  const isHovered = isNodeHovered.useValue();
+  const [isHovered, setHovered] = nodeHovered.useAtom();
   const nodeWithSlots = slotsForNode.useValue();
 
   const removeNode = removeForNode.useUpdate();
@@ -183,7 +183,7 @@ function ElementLayer() {
   if (!isAnElement) return <></>;
 
   const name = (
-    <div style={TitleBar} onClick={setSelected}>
+    <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
       <div style={Label}>
         {title} {isPicked && ' Moving...'}{' '}
       </div>

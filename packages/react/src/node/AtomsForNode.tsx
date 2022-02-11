@@ -1,4 +1,4 @@
-import { getPath, RaisinElementNode } from '@raisins/core';
+import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import {
@@ -27,9 +27,9 @@ export const isSelectedForNode = atomForNode(
   'isSelectedForNode'
 );
 
-export const isNodeHovered = atomForNode(
-  (n) => atom((get) => get(HoveredAtom) === get(n)),
-  'isNodeHovered'
+export const nodeHovered = atomForNode(
+  (n) => atom((get) => get(HoveredAtom) === get(n), (get, set) => set(HoveredAtom, get(n))),
+  'nodeHovered'
 );
 
 export const isNodePicked = atomForNode(
