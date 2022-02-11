@@ -2,11 +2,12 @@ import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
 import React, { createContext, useContext, useMemo } from 'react';
 import { h, VNodeStyle } from 'snabbdom';
+import { dependentAtom } from '../atoms/dependentAtom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { getId, idToNode, RootNodeAtom } from '../hooks/CoreAtoms';
-import { SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
+import { SelectedAtom, SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { HoveredAtom, SetHoveredIdAtom } from './CanvasHoveredAtom';
+import { HoveredAtom, HoveredPath, SetHoveredIdAtom } from './CanvasHoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
@@ -96,41 +97,39 @@ export const VnodeAtom = atom((get) => {
 });
 VnodeAtom.debugLabel = 'VnodeAtom';
 
-function defaultRect(connection:Atom<ConnectionState>, nodeAtom:Atom<RaisinNode | undefined>, listenedPosition:Atom<Rect | undefined>){
-
-  const rectAtom = atom(async (get)=>{
+function defaultRect(
+  connection: Atom<ConnectionState>,
+  nodeAtom: Atom<RaisinNode | undefined>,
+  listenedPosition: Atom<Rect | undefined>
+) {
+  const rectAtom = atom(async (get) => {
     const node = get(nodeAtom);
-    if(!node) return undefined;
+    if (!node) return undefined;
     // When node changes, then lookup initial value
     const latest = get(listenedPosition);
-    if(latest) return latest;
+    if (latest) return latest;
 
     const connState = get(connection);
 
-    if(connState.type !== "loaded"){
-      return undefined
+    if (connState.type !== 'loaded') {
+      return undefined;
     }
 
-    const geometry = await connState.childRpc.geometry()
+    const geometry = await connState.childRpc.geometry();
 
-    const rect = geometry.entries.find(e=>e.target?.attributes["raisins-id"] === getId(node));
+    const rect = geometry.entries.find(
+      (e) => e.target?.attributes['raisins-id'] === getId(node)
+    );
 
-    return rect?.contentRect
-  })
+    return rect?.contentRect;
+  });
   return rectAtom;
 }
 
-
 function createCanvasAtoms() {
-  /**
-   * TODO: Needs to be reset to `undefined` when hovered node changes
-   * otherwise it caches the hovered location of the other node
-   */
-  const HoveredRectAtom = atom<Rect | undefined>(undefined);
-  /**
-   */
-  const SelectedRectAtom = atom<Rect | undefined>(undefined);
-
+  // TODO: Path might not be the right thing to depend on. Might be worth switching ID
+  const HoveredRectAtom = dependentAtom<Rect | undefined>(HoveredPath,undefined);
+  const SelectedRectAtom = dependentAtom<Rect | undefined>(SelectedAtom,undefined);
 
   const CanvasEventAtom = atom(
     null,
@@ -194,11 +193,14 @@ function createCanvasAtoms() {
       });
     }),
   });
-  
 
   return {
     HoveredRectAtom: defaultRect(IframeAtom, HoveredAtom, HoveredRectAtom),
-    SelectedRectAtom: defaultRect(IframeAtom, SelectedNodeAtom, SelectedRectAtom),
+    SelectedRectAtom: defaultRect(
+      IframeAtom,
+      SelectedNodeAtom,
+      SelectedRectAtom
+    ),
     CanvasEventAtom,
     IframeAtom,
   };
