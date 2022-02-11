@@ -1,5 +1,5 @@
 import { Atom, atom, WritableAtom } from 'jotai';
-import { Connection, connectToChild } from 'penpal';
+import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
@@ -21,7 +21,7 @@ const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <body></body>
 </html>`;
 
-function renderInChild(child: ChildRPC, Comp: VNode): void {
+function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
   if (!Comp) return; // no Component yet
   child.render(Comp);
 }
@@ -29,7 +29,7 @@ function renderInChild(child: ChildRPC, Comp: VNode): void {
 export type ConnectionState =
   | { type: 'uninitialized' }
   | { type: 'initializing'; connection: Connection<ChildRPC> }
-  | { type: 'loaded'; childRpc: ChildRPC; connection: Connection<ChildRPC> }
+  | { type: 'loaded'; childRpc: AsyncMethodReturns<ChildRPC>; connection: Connection<ChildRPC> }
   | { type: 'error'; error: unknown; connection: Connection<ChildRPC> };
 
 export function createAtoms(props: {
@@ -136,6 +136,7 @@ export function createAtoms(props: {
     (get) => {
       // Subscribes and does nothing
       get(lastRenderedComponent);
+      return get(get(connectionAtom));
     },
     (get, set, el: HTMLElement | null) => {
       set(containerAtom, el);

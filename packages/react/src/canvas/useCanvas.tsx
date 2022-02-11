@@ -1,5 +1,5 @@
-import { RaisinDocumentNode } from '@raisins/core';
-import { atom } from 'jotai';
+import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
+import { Atom, atom } from 'jotai';
 import React, { createContext, useContext, useMemo } from 'react';
 import { h, VNodeStyle } from 'snabbdom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
@@ -14,7 +14,7 @@ import {
   SnabdomRenderer,
 } from './raisinToSnabdom';
 import { Rect } from './Rect';
-import { createAtoms } from './SnabbdomSanboxedIframeAtom';
+import { ConnectionState, createAtoms } from './SnabbdomSanboxedIframeAtom';
 import { CanvasEvent } from './_CanvasRPCContract';
 
 export type Size = {
@@ -96,13 +96,41 @@ export const VnodeAtom = atom((get) => {
 });
 VnodeAtom.debugLabel = 'VnodeAtom';
 
+function defaultRect(connection:Atom<ConnectionState>, nodeAtom:Atom<RaisinNode | undefined>, listenedPosition:Atom<Rect | undefined>){
+
+  const rectAtom = atom(async (get)=>{
+    const node = get(nodeAtom);
+    if(!node) return undefined;
+    // When node changes, then lookup initial value
+    const latest = get(listenedPosition);
+    if(latest) return latest;
+
+    const connState = get(connection);
+
+    if(connState.type !== "loaded"){
+      return undefined
+    }
+
+    const geometry = await connState.childRpc.geometry()
+
+    const rect = geometry.entries.find(e=>e.target?.attributes["raisins-id"] === getId(node));
+
+    return rect?.contentRect
+  })
+  return rectAtom;
+}
+
+
 function createCanvasAtoms() {
   /**
+   * TODO: Needs to be reset to `undefined` when hovered node changes
+   * otherwise it caches the hovered location of the other node
    */
   const HoveredRectAtom = atom<Rect | undefined>(undefined);
   /**
    */
   const SelectedRectAtom = atom<Rect | undefined>(undefined);
+
 
   const CanvasEventAtom = atom(
     null,
@@ -166,10 +194,11 @@ function createCanvasAtoms() {
       });
     }),
   });
+  
 
   return {
-    HoveredRectAtom,
-    SelectedRectAtom,
+    HoveredRectAtom: defaultRect(IframeAtom, HoveredAtom, HoveredRectAtom),
+    SelectedRectAtom: defaultRect(IframeAtom, SelectedNodeAtom, SelectedRectAtom),
     CanvasEventAtom,
     IframeAtom,
   };

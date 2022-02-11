@@ -39,4 +39,5 @@ export type ParentRPC = {
 
 export type ChildRPC = {
   render(html: VNode): void;
+  geometry(): GeometryDetail;
 };

@@ -1,7 +1,7 @@
 import { isElementNode } from '@raisins/core';
-import { atom, PrimitiveAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import React, { CSSProperties, FC } from 'react';
+import React, { CSSProperties, FC, Suspense } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { HoveredAtom } from '../canvas/CanvasHoveredAtom';
 import { Rect } from '../canvas/Rect';
@@ -67,9 +67,11 @@ export const CanvasHover = () => {
   const atoms = useCanvasAtoms();
   const nodeDetails = useAtomValue(HoveredNodeContent, RaisinScope);
   return (
-    <PositionedToolbar rectAtom={atoms.HoveredRectAtom}>
-      {nodeDetails}
-    </PositionedToolbar>
+    <Suspense fallback={null}>
+      <PositionedToolbar rectAtom={atoms.HoveredRectAtom}>
+        {nodeDetails}
+      </PositionedToolbar>
+    </Suspense>
   );
 };
 
@@ -81,11 +83,13 @@ export const CanvasSelect = () => {
   const moveSelected = useUpdateAtom(PickSelectedAtom, RaisinScope);
   if (!seleted) return <div />;
   return (
-    <PositionedToolbar rectAtom={atoms.SelectedRectAtom}>
-      <button onClick={deleteSelected}>Delete</button>
-      <button onClick={cloneSelected}>Dupe</button>
-      <button onClick={moveSelected}>Move</button>
-    </PositionedToolbar>
+    <Suspense fallback={null}>
+      <PositionedToolbar rectAtom={atoms.SelectedRectAtom}>
+        <button onClick={deleteSelected}>Delete</button>
+        <button onClick={cloneSelected}>Dupe</button>
+        <button onClick={moveSelected}>Move</button>
+      </PositionedToolbar>
+    </Suspense>
   );
 };
 
@@ -93,7 +97,7 @@ export const PositionedToolbar = ({
   rectAtom,
   children,
 }: {
-  rectAtom: PrimitiveAtom<Rect | undefined>;
+  rectAtom: Atom<Rect | undefined>;
   children: React.ReactNode;
 }) => {
   const rect = useAtomValue(rectAtom, RaisinScope);
