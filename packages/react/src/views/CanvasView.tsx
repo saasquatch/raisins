@@ -41,7 +41,7 @@ export type WYSWIGCanvasProps = {
 
 export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
   return (
-    <div style={Wrapper} onClick={() => props.clearSelected()}>
+    <div style={Wrapper}>
       <div
         style={{
           ...Content,
