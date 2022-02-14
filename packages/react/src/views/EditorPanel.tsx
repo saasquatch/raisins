@@ -1,17 +1,14 @@
-import { RaisinElementNode, RaisinNode, StyleNodeProps } from '@raisins/core';
-import { CssNodePlain } from 'css-tree';
+import { RaisinNode } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
-import { NodeAtomProvider } from '../node/node-context';
-import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
+import { RaisinScope } from '../atoms/RaisinScope';
 import { ReplaceNodeAtom } from '../editting/EditAtoms';
+import { NodeAtomProvider } from '../node/node-context';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
-import { StyleNodeEditor } from '../stylesheets/StyleEditor';
 import { isFunction } from '../util/isFunction';
 import { isElementNode } from '../util/isNode';
 import { AttributesEditor } from './AttributeEditor';
-import { RaisinScope } from '../atoms/RaisinScope';
 
 const EditSelectedNodeAtom = atom(
   (get) => get(SelectedNodeAtom)!,
@@ -26,38 +23,37 @@ const EditSelectedNodeAtom = atom(
   }
 );
 
+const SelectedIsElement = atom((get) => isElementNode(get(SelectedNodeAtom)));
+
 export function EditorPanel() {
-  const props = useCoreEditingApi();
-  const selected = useAtomValue(SelectedNodeAtom, RaisinScope);
-  if (isElementNode(selected)) {
-    const element = selected;
-
-    const styleProps: StyleNodeProps = {
-      node: element.style as CssNodePlain,
-      setNode: (nextStyle) => {
-        const nextStyleVal: CssNodePlain =
-          typeof nextStyle === 'function'
-            ? nextStyle(element.style!)
-            : nextStyle;
-        props.replaceNode({
-          prev: element,
-          next: {
-            ...element,
-            style: nextStyleVal,
-          } as RaisinElementNode,
-        });
-      },
-    };
-
+  const isElement = useAtomValue(SelectedIsElement, RaisinScope);
+  if (isElement) {
     return (
       <div>
         <NodeAtomProvider nodeAtom={EditSelectedNodeAtom}>
           <AttributesEditor />
         </NodeAtomProvider>
-        {element.style && <StyleNodeEditor {...styleProps} />}
       </div>
     );
   }
 
   return <div>No tag selected</div>;
 }
+
+// const props = useCoreEditingApi();
+// const styleProps: StyleNodeProps = {
+//   node: element.style as CssNodePlain,
+//   setNode: (nextStyle) => {
+//     const nextStyleVal: CssNodePlain =
+//       typeof nextStyle === 'function'
+//         ? nextStyle(element.style!)
+//         : nextStyle;
+//     props.replaceNode({
+//       prev: element,
+//       next: {
+//         ...element,
+//         style: nextStyleVal,
+//       } as RaisinElementNode,
+//     });
+//   },
+// };

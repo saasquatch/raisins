@@ -34,7 +34,6 @@ export function TwoElements() {
       <RaisinsProvider stateTuple={stateTuple}>
         <Editor />
       </RaisinsProvider>
-      <pre>{stateTuple[0]}</pre>
     </>
   );
 }

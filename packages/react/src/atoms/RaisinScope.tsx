@@ -43,7 +43,7 @@ export const RaisinsProvider = ({
       }
     >
       {/*
-      FIXME: The re-render bug is here
+      FIXME: The re-render bug is here?
       */}
       <ConnectState stateTuple={stateTuple} />
       {children}
@@ -51,7 +51,7 @@ export const RaisinsProvider = ({
   );
 };
 
-const defaultNeverUsedAtom: PrimitiveAtom<string> = atom('<span>I am bold</span>');
+const defaultNeverUsedAtom: PrimitiveAtom<string> = atom('<div><span>I am placeholder that should not exist</span></div>');
 export const HTMLAtomAtom: PrimitiveAtom<PrimitiveAtom<string>> = atom(
   defaultNeverUsedAtom
 );

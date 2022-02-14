@@ -1,22 +1,10 @@
 import { Attribute } from '@raisins/schema/schema';
-import { useAtom } from 'jotai';
-import { useAtomValue } from 'jotai/utils';
 import React, { Fragment } from 'react';
-import { attributesForNode } from '../node/AtomsForNode';
-import { useNodeAtom } from '../node/node-context';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { isElementNode } from '../util/isNode';
+import { attributesForNode, componentMetaForNode } from '../node/AtomsForNode';
 
 export function AttributesEditor() {
-  const nodeAtom = useNodeAtom();
-  const [node] = useAtom(nodeAtom, RaisinScope);
   const [attributes, setAttributes] = attributesForNode.useAtom();
-  const comp = useAtomValue(ComponentModelAtom, RaisinScope);
-
-  const attributeSchema = isElementNode(node)
-    ? comp.getComponentMeta(node)?.attributes ?? []
-    : [];
+  const attributeSchema = componentMetaForNode.useValue().attributes;
   const attribs = attributes ?? {};
 
   const onchange = (key: string) => {
