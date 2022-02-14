@@ -1,27 +1,12 @@
-import { RaisinNode } from '@raisins/core';
-import { atom, SetStateAction } from 'jotai';
+import { atom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { ReplaceNodeAtom } from '../editting/EditAtoms';
 import { NodeAtomProvider } from '../node/node-context';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
-import { isFunction } from '../util/isFunction';
 import { isElementNode } from '../util/isNode';
 import { AttributesEditor } from './AttributeEditor';
-
-const EditSelectedNodeAtom = atom(
-  (get) => get(SelectedNodeAtom)!,
-  (get, set, next: SetStateAction<RaisinNode>) => {
-    const selected = get(SelectedNodeAtom);
-    if (!selected) return; // Don't allow editing if nothing selected
-    const nextValue = isFunction(next) ? next(selected) : next;
-    set(ReplaceNodeAtom, {
-      prev: selected,
-      next: nextValue,
-    });
-  }
-);
+import { EditSelectedNodeAtom } from './EditSelectedNodeAtom';
 
 const SelectedIsElement = atom((get) => isElementNode(get(SelectedNodeAtom)));
 
