@@ -9,6 +9,7 @@ import { rootPrimitive } from '../atoms/_atoms';
 
 // TODO: allow this to be swapped out? There are likely more history listeners.
 const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(rootPrimitive);
+CONTEXT.displayName = "RaisinNodeAtomContext"
 
 /**
  * Uses atom for the "current node"
