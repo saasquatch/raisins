@@ -9,7 +9,7 @@ export const SetHoveredIdAtom = atom(null, (_, set, id: string | undefined) =>
   set(HoveredAtom, (id && idToNode.get(id)) || undefined)
 );
 
-export const HoveredPath = atom((get) => {
+export const HoveredBreadcrumbs = atom((get) => {
   const node = get(HoveredAtom);
   if (!node) return '';
   const parents = get(ParentsAtom);

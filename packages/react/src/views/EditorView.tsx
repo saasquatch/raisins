@@ -22,6 +22,7 @@ const Edits: CSSProperties = {
 };
 const CanvasCss: CSSProperties = {
   gridArea: 'canvas',
+  overflow: 'scroll',
 };
 const LayersCss: CSSProperties = {
   gridArea: 'layers',

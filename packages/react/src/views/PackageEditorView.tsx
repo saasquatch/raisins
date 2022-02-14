@@ -100,6 +100,30 @@ export function PackageEditorView(props: ModuleManagement) {
       >
         Shoelace + theme
       </button>
+      <button
+        onClick={() => {
+          [
+            {
+              name: '@saasquatch/mint-components',
+              filePath: '/dist/mint-components/mint-components.css',
+              version: '1.5.0-116',
+            },
+            {
+              name: '@saasquatch/bedrock-components',
+              filePath: '/dist/bedrock-components/bedrock-components.js',
+              version: '1.3.1-7',
+            },
+
+            {
+              name: '@saasquatch/mint-components',
+              filePath: '/dist/mint-components/mint-components.js',
+              version: '1.5.0-116',
+            },
+          ].forEach(props.addModule);
+        }}
+      >
+        Mint (alpha)
+      </button>
       <ul>
         {PACKAGES.map((m) => {
           return (

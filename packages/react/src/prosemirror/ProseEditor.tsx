@@ -1,12 +1,12 @@
 import { RaisinDocumentNode } from '@raisins/core';
-import { atom, PrimitiveAtom, useAtom } from 'jotai';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { Atom, atom, PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
+import connectedAtom from '../atoms/connectedAtom';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { useRaisinHistoryPlugin } from '../rich-text/useRaisinHistoryPlugin';
+import { HistoryKeyMapPluginAtom } from '../rich-text/HistoryKeyMapPluginAtom';
 import { NewLinePlugin } from './NewLineBreak';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
@@ -49,92 +49,102 @@ export function useProseEditorOnAtom(
   selection: PrimitiveAtom<ProseTextSelection | undefined>
 ) {
   // Memoize derived parsed doc
-  const proseDocAtom = useMemo(
-    () => atom((get) => raisinToProseDoc(get(node))),
-    [node]
-  );
+  const elementRef = useMemo(() => createAtoms(node, selection), [
+    node,
+    selection,
+  ]);
 
-  // Build editor state
+  const [, mountRef] = useAtom(elementRef, RaisinScope);
 
-  const historyPlugin = useRaisinHistoryPlugin();
-
-  const editorStateAtom = useMemo(
-    () =>
-      atom<EditorState>((get) => {
-        const sState: SerialState = {
-          doc: get(proseDocAtom),
-          selection: get(selection),
-        };
-        return hydratedState(sState, [
-          //
-          NewLinePlugin(),
-          //
-          historyPlugin,
-        ]);
-      }),
-    [proseDocAtom, selection, historyPlugin]
-  );
-  const handleTransactionAtion = useMemo(
-    () =>
-      atom<null, Transaction>(null, (get, set, trans) => {
-        const currentState = get(editorStateAtom);
-        const nextState = currentState.applyTransaction(trans);
-
-        // FIXME: Re-bundle this state. Since node and selection are independently updated,
-        // their derived state can become inconsistent.
-        // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
-        // NOTE: This currently works ONLY if selection is updated BEFORE document.
-        // Otherwise deleting from the end of the text will throw an error
-        if (nextState.state.selection !== currentState.selection) {
-          // Only lazily serializes changes
-          const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
-          set(selection, neextSelection);
-        }
-        if (nextState.state.doc !== currentState.doc) {
-          // Only lazily serializes changes
-          const nextRaisinNode = proseRichDocToRaisin(
-            nextState.state.doc.content
-          );
-          set(node, nextRaisinNode);
-        }
-      }),
-    [editorStateAtom, node, selection]
-  );
-
-  const elementRef = useRefAtom();
-
-  const mountRef = useUpdateAtom(elementRef, RaisinScope);
-  const dispatchTransaction = useUpdateAtom(handleTransactionAtion, RaisinScope);
-  const editorState = useAtomValue(editorStateAtom, RaisinScope);
-
-  const editorAtom = useRef(
-    atom((get) => {
-      const el = get(elementRef);
-      if (el) {
-        return new EditorView(el, {
-          state: editorState,
-          dispatchTransaction,
-          domParser: DOMParser.fromSchema(schema),
-          clipboardParser: DOMParser.fromSchema(schema),
-        });
-      }
-      return;
-    })
-  );
-
-  const [editor] = useAtom(editorAtom.current, RaisinScope);
-  editor?.updateState(editorState);
   return {
     mountRef,
   };
 }
 
-/**
- * Like a useRef, but allows for derived memoized state thanks to Jotai
- */
-function useRefAtom() {
-  const ref = useRef(atom<HTMLElement | null>(null));
-  return ref.current;
+function createAtoms(
+  node: PrimitiveAtom<RaisinDocumentNode>,
+  selection: PrimitiveAtom<ProseTextSelection | undefined>
+) {
+  const proseDocAtom = atom((get) => raisinToProseDoc(get(node)));
+
+  // Build editor state
+
+  const editorStateAtom = atom<EditorState | null>((get) => {
+    const historyPlugin = get(HistoryKeyMapPluginAtom);
+    if (!historyPlugin) return null;
+    const sState: SerialState = {
+      doc: get(proseDocAtom),
+      selection: get(selection),
+    };
+    return hydratedState(sState, [
+      //
+      NewLinePlugin(),
+      //
+      historyPlugin,
+    ]);
+  });
+
+  const handleTransactionAtion = atom<null, Transaction>(
+    null,
+    (get, set, trans) => {
+      const currentState = get(editorStateAtom);
+      if (!currentState) return;
+      const nextState = currentState.applyTransaction(trans);
+
+      // FIXME: Re-bundle this state. Since node and selection are independently updated,
+      // their derived state can become inconsistent.
+      // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
+      // NOTE: This currently works ONLY if selection is updated BEFORE document.
+      // Otherwise deleting from the end of the text will throw an error
+      if (nextState.state.selection !== currentState.selection) {
+        // Only lazily serializes changes
+        const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
+        set(selection, neextSelection);
+      }
+      if (nextState.state.doc !== currentState.doc) {
+        // Only lazily serializes changes
+        const nextRaisinNode = proseRichDocToRaisin(
+          nextState.state.doc.content
+        );
+        set(node, nextRaisinNode);
+      }
+    }
+  );
+
+  const elementRef = atom<HTMLElement | null>(null);
+
+  const editorViewAtom: Atom<Atom<EditorView | null>> = atom((get) => {
+    const el = get(elementRef);
+    if (!el) return atom(null);
+
+    return connectedAtom<EditorView | null>(
+      (get, set) => {
+        const state = get(editorStateAtom);
+        if (!state) return null;
+
+        return new EditorView(el, {
+          state,
+          dispatchTransaction: (tr) => set(handleTransactionAtion, tr),
+          domParser: DOMParser.fromSchema(schema),
+          clipboardParser: DOMParser.fromSchema(schema),
+        });
+      }
+      // TODO: Figure out why destroy doesn't work.
+      // (view) => view && view.destroy()
+    );
+  });
+
+  return atom(
+    (get) => {
+      // Subscribes but doesn't listen
+      const state = get(editorStateAtom);
+      const view = get(get(editorViewAtom));
+      if (state) view?.updateState(state);
+
+      return get(elementRef);
+    },
+    (_, set, next: SetStateAction<HTMLElement | null>) => set(elementRef, next)
+  );
 }
 
 function ProseEditorView2({
@@ -142,38 +152,6 @@ function ProseEditorView2({
 }: {
   mountRef: (el: HTMLElement | null) => void;
 }) {
-  return (
-    <>
-      <div ref={mountRef} />
-    </>
-  );
-}
-
-function ProseEditorView({
-  sState,
-  dispatchTransaction,
-}: {
-  sState: SerialState;
-  dispatchTransaction: (trans: Transaction) => void;
-}) {
-  const viewRef = useRef<EditorView>();
-  function mountRef(el: HTMLDivElement) {
-    const make = () =>
-      new EditorView(el, {
-        state: hydratedState(sState),
-        dispatchTransaction,
-        domParser: DOMParser.fromSchema(schema),
-        clipboardParser: DOMParser.fromSchema(schema),
-      });
-
-    if (!viewRef.current && el) {
-      viewRef.current = make();
-    }
-  }
-
-  const state = hydratedState(sState);
-  viewRef.current?.updateState(state);
-
   return (
     <>
       <div ref={mountRef} />

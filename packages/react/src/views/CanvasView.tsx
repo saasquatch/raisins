@@ -12,6 +12,7 @@ import {
   DuplicateSelectedAtom,
   PickSelectedAtom,
 } from '../editting/EditSelectedAtom';
+import RichTextEditor from '../rich-text/RichTextEditor';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 
 const Wrapper: CSSProperties = {
@@ -49,8 +50,8 @@ export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
         data-content
         ref={props.setHtmlRef}
       >
-        <CanvasHover />
-        <CanvasSelect />
+        <CanvasHoveredToolbar />
+        <CanvasSelectedToolbar />
       </div>
     </div>
   );
@@ -70,7 +71,7 @@ const SelectedNodeContent = atom((get) => {
   return metamodel(node).title ?? node.tagName;
 });
 
-export const CanvasHover = () => {
+export const CanvasHoveredToolbar = () => {
   const atoms = useCanvasAtoms();
   const nodeDetails = useAtomValue(HoveredNodeContent, RaisinScope);
   return (
@@ -82,7 +83,7 @@ export const CanvasHover = () => {
   );
 };
 
-export const CanvasSelect = () => {
+export const CanvasSelectedToolbar = () => {
   const atoms = useCanvasAtoms();
   const seleted = useAtomValue(SelectedNodeAtom, RaisinScope);
   const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
@@ -97,6 +98,9 @@ export const CanvasSelect = () => {
         <button onClick={deleteSelected}>Delete</button>
         <button onClick={cloneSelected}>Dupe</button>
         <button onClick={moveSelected}>Move</button>
+
+        <hr />
+        <RichTextEditor />
       </PositionedToolbar>
     </Suspense>
   );
@@ -124,7 +128,8 @@ export const PositionedToolbar = ({
         position: 'absolute',
         top: y + 20 + height,
         left: x + 20,
-        width: width + "px"
+        width: width + 'px',
+        minWidth: '200px',
       }}
     >
       {children}

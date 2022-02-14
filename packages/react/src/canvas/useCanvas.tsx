@@ -7,7 +7,7 @@ import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { getId, idToNode, RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedAtom, SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { HoveredAtom, HoveredPath, SetHoveredIdAtom } from './CanvasHoveredAtom';
+import { HoveredAtom, SetHoveredIdAtom } from './CanvasHoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
@@ -128,7 +128,7 @@ function defaultRect(
 
 function createCanvasAtoms() {
   // TODO: Path might not be the right thing to depend on. Might be worth switching ID
-  const HoveredRectAtom = dependentAtom<Rect | undefined>(HoveredPath,undefined);
+  const HoveredRectAtom = dependentAtom<Rect | undefined>(HoveredAtom,undefined);
   const SelectedRectAtom = dependentAtom<Rect | undefined>(SelectedAtom,undefined);
 
   const CanvasEventAtom = atom(

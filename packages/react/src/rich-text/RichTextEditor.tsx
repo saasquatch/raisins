@@ -3,31 +3,29 @@ import {
   htmlUtil,
   RaisinDocumentNode,
   RaisinElementNode,
-  RaisinNodeWithChildren,
 } from '@raisins/core';
 import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React, { useMemo, useRef } from 'react';
-import { useNodeAtom } from '../node/node-context';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { useAtomFromRenderValue } from '../atoms/useAtomFromRenderValue';
-import { IdentifierModelAtom, RootNodeAtom } from '../hooks/CoreAtoms';
-import {
-  useProseEditorOnAtom,
-} from '../prosemirror/ProseEditor';
-import { useSelectionAtom } from "../prosemirror/useSelectionAtom";
-import { SelectedNodeAtom } from '../selection/SelectedAtom';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { useNodeAtom } from '../node/node-context';
+import { useProseEditorOnAtom } from '../prosemirror/ProseEditor';
+import { useSelectionAtom } from '../prosemirror/useSelectionAtom';
+import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 
 const { replacePath } = htmlUtil;
 
 export default function RichTextEditor() {
-  const selected = useAtomValue(SelectedNodeAtom, RaisinScope);
-  if (!isElementNode(selected)) return <div>Not an element</div>;
+  const isElementAtom = useRef(
+    atom((get) => isElementNode(get(SelectedNodeAtom)))
+  ).current;
+  const isElement = useAtomValue(isElementAtom, RaisinScope);
+  if (!isElement) return <div>Not an element</div>;
 
-  const element = selected;
-  return <WithSelectionEditor node={element} />;
+  return <WithSelectionEditor />;
 }
 
 /**
@@ -35,27 +33,25 @@ export default function RichTextEditor() {
  *
  * This state should be pulled up to the top
  */
-export function WithSelectionEditor({
-  node,
-}: {
-  node: RaisinNodeWithChildren;
-}) {
-  const nodeAtom = useAtomFromRenderValue(node, RaisinScope);
+export function WithSelectionEditor({}: {}) {
   const selection = useSelectionAtom();
-  const { getPath } = useAtomValue(IdentifierModelAtom, RaisinScope);
-  const path = getPath(node);
 
   // Atom doesn't use get or set, so it's safe to be synthetic and different every render?
   const docNodeAtom = useRef(
     atom<RaisinDocumentNode, SetStateAction<RaisinDocumentNode>>(
       (get) => {
+        const node = get(SelectedNodeAtom) as RaisinElementNode;
         return {
           type: ElementType.Root,
-          children: get(nodeAtom).children,
+          children: node.children,
         };
       },
-      (_, set, next) => {
+      (get, set, next) => {
         set(RootNodeAtom, (prev) => {
+          const path = get(SelectedAtom)?.path;
+          const node = get(SelectedNodeAtom) as RaisinElementNode;
+          if (!path) return prev;
+
           const prevNode = getNode(prev, path);
           const prevDocNode = {
             type: ElementType.Root,
