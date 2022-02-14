@@ -14,6 +14,7 @@ import React, {
   CSSProperties,
   FC,
   useCallback,
+  useContext,
   useMemo,
   useState,
 } from 'react';
@@ -252,15 +253,12 @@ function SlotWidget({ s }: { s: Slot }) {
             {!isEmpty && (
               <div style={SlotChildren}>
                 <PlopTarget idx={0} slot={s.name} />
-                <ChildrenEditorForAtoms
-                  childAtoms={childNodes}
-                  Component={({ idx }: { idx: number }) => (
-                    <>
-                      <ElementLayer />
-                      <PlopTarget idx={idx} slot={s.name} />
-                    </>
-                  )}
-                />
+                <SlotContext.Provider value={s.name}>
+                  <ChildrenEditorForAtoms
+                    childAtoms={childNodes}
+                    Component={SlotChild}
+                  />
+                </SlotContext.Provider>
               </div>
             )}
           </>
@@ -269,6 +267,19 @@ function SlotWidget({ s }: { s: Slot }) {
     </>
   );
 }
+
+const SlotContext = React.createContext<string | undefined>(undefined);
+SlotContext.displayName="SlotContext";
+
+const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
+  const slotName = useContext(SlotContext)!;
+  return (
+    <>
+      <ElementLayer />
+      <PlopTarget idx={idx} slot={slotName} />
+    </>
+  );
+};
 
 function useSlotChildNodes(slotName: string) {
   const nodeAtom = useNodeAtom();
