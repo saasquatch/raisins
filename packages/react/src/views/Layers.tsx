@@ -139,7 +139,7 @@ function AddNew(props: { idx: number; slot?: string }) {
       {open && (
         <div style={{ display: 'flex', overflowX: 'auto' }}>
           {validChildren.map((b) => {
-            const meta = comp.getComponentMeta(b.content);
+            const meta = comp.getComponentMeta(b.content.tagName);
             return (
               <button
                 onClick={() => {

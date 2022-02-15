@@ -7,6 +7,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
+import { createSoul, SoulsAtom } from "../atoms/Soul";
 import {
   InternalState,
   InternalStateAtom,
@@ -78,7 +79,8 @@ export const InsertNodeAtom = atom(
  */
 export const ReplaceNodeAtom = atom(
   null,
-  (_, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
+  (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
+    const souls = get(SoulsAtom);
     set(InternalStateAtom, (previous) => {
       let newSelection: RaisinNode;
       const nextRoot = replace(
@@ -92,6 +94,8 @@ export const ReplaceNodeAtom = atom(
           ) {
             newSelection = replacement;
           }
+          souls.set(replacement, souls.get(old) || createSoul())
+          return replacement;
         }
       );
 

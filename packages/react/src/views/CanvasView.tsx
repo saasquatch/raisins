@@ -61,14 +61,14 @@ const HoveredNodeContent = atom((get) => {
   const node = get(HoveredAtom);
   const metamodel = get(ComponentMetaAtom);
   if (!isElementNode(node)) return;
-  return metamodel(node).title ?? node.tagName;
+  return metamodel(node.tagName).title ?? node.tagName;
 });
 
 const SelectedNodeContent = atom((get) => {
   const node = get(SelectedNodeAtom);
   const metamodel = get(ComponentMetaAtom);
   if (!isElementNode(node)) return;
-  return metamodel(node).title ?? node.tagName;
+  return metamodel(node.tagName).title ?? node.tagName;
 });
 
 export const CanvasHoveredToolbar = () => {
@@ -110,7 +110,7 @@ export const PositionedToolbar = ({
   rectAtom,
   children,
 }: {
-  rectAtom: Atom<Rect | undefined>;
+  rectAtom: Atom<Promise<Rect | undefined>>;
   children: React.ReactNode;
 }) => {
   const rect = useAtomValue(rectAtom, RaisinScope);

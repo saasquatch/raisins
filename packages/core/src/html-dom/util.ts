@@ -37,6 +37,9 @@ export function getParents(
   return map;
 }
 
+type OnReplace = (prev: RaisinNode, next: RaisinNode) => RaisinNode;
+const DefaultOnReplace: OnReplace = (_, next) => next;
+
 export function visit<T = unknown>(
   node: RaisinNode,
   visitor: Partial<NodeVisitor<T>>,
@@ -111,7 +114,11 @@ export interface NodeVisitor<T> {
  * @param root
  * @param node
  */
-export function remove(root: RaisinNode, node: RaisinNode): RaisinNode {
+export function remove(
+  root: RaisinNode,
+  node: RaisinNode,
+  onReplace = DefaultOnReplace
+): RaisinNode {
   if (root === node) {
     throw new Error("Can't remove node from itself");
   }
@@ -119,15 +126,19 @@ export function remove(root: RaisinNode, node: RaisinNode): RaisinNode {
     skipNode(n) {
       return n === node;
     },
-    ...CloneVisitor
+    ...CloneVisitor(onReplace)
   });
   return freeze(
     // Would only be null if node removed itself
     removed!
   );
 }
-export function removePath(root: RaisinNode, path: NodePath): RaisinNode {
-  return remove(root, getNode(root, path));
+export function removePath(
+  root: RaisinNode,
+  path: NodePath,
+  onReplace = DefaultOnReplace
+): RaisinNode {
+  return remove(root, getNode(root, path), onReplace);
 }
 
 /**
@@ -136,7 +147,11 @@ export function removePath(root: RaisinNode, path: NodePath): RaisinNode {
  * @param root
  * @param node
  */
-export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
+export function duplicate(
+  root: RaisinNode,
+  node: RaisinNode,
+  onReplace = DefaultOnReplace
+): RaisinNode {
   const cloneIfMatching = (n: RaisinNode) => (n === node ? [n, clone(n)] : [n]);
   const DuplicateVisitor: NodeVisitor<RaisinNode[]> = {
     onText: cloneIfMatching,
@@ -148,18 +163,19 @@ export function duplicate(root: RaisinNode, node: RaisinNode): RaisinNode {
         return [n, clone(n)];
       }
       const children = flatDeep<RaisinNode>(dupeChildren);
-      return [{ ...n, children }];
+      return [onReplace(n, { ...n, children })];
     },
     onRoot: (n, dupeChildren) => {
       if (node === n) {
-        return [clone(n), clone(n)];
+        throw new Error("Cannot duplicate root RaisinNode.");
       }
       const children = flatDeep<RaisinNode>(dupeChildren);
-      return [{ ...n, children }];
+      return [onReplace(n, { ...n, children })];
     }
   };
 
-  const nodes = visit(root, DuplicateVisitor);
+  const nodes = visit(root, DuplicateVisitor)!;
+  if (nodes.length > 1) throw new Error("Cannot duplicate root RaisinNode.");
   // Root node should not be duplicatable
   return freeze(nodes![0]);
 }
@@ -173,12 +189,11 @@ export function replace(
   root: RaisinNode,
   previous: RaisinNode,
   next: RaisinNode,
-  callback?: ReplacementCallback
+  onReplace = DefaultOnReplace
 ): RaisinNode {
   function swap(n: RaisinNode): RaisinNode {
     if (n === previous) {
-      callback && callback(n, next);
-      return next;
+      return onReplace(previous, next);
     }
     return n;
   }
@@ -188,16 +203,14 @@ export function replace(
     children?: RaisinNode[]
   ) {
     if (el === previous) {
-      callback && callback(el, next);
-      return next;
+      return onReplace(el, next);
     }
     if (el.children !== children) {
       const replacement: RaisinNode = {
         ...el,
         children: children ?? []
       };
-      callback && callback(el, replacement);
-      return replacement;
+      return onReplace(el, replacement);
     }
     return el;
   }
@@ -216,9 +229,9 @@ export function replacePath(
   root: RaisinNode,
   previous: NodePath,
   next: RaisinNode,
-  callback?: ReplacementCallback
+  onReplace = DefaultOnReplace
 ): RaisinNode {
-  return replace(root, getNode(root, previous), next, callback);
+  return replace(root, getNode(root, previous), next, onReplace);
 }
 
 /**
@@ -230,7 +243,8 @@ export function move(
   root: RaisinNode,
   node: RaisinNode,
   newParent: RaisinNode,
-  newIdx: number
+  newIdx: number,
+  onReplace = DefaultOnReplace
 ): RaisinNode {
   if (root === node) throw new Error("Can't root node");
   if (node === newParent) throw new Error("Can't move node inside itself");
@@ -245,12 +259,12 @@ export function move(
     onElement(el, children) {
       const newChildren =
         el === newParent ? add(children, cloned, newIdx) : children;
-      return { ...el, children: newChildren };
+      return onReplace(el, { ...el, children: newChildren });
     },
     onRoot(el, children) {
       const newChildren =
         el === newParent ? add(children, cloned, newIdx) : children;
-      return { ...el, children: newChildren };
+      return onReplace(el, { ...el, children: newChildren });
     }
   });
   return freeze(moved!);
@@ -260,9 +274,16 @@ export function moveToPath(
   root: RaisinNode,
   node: NodePath,
   newParent: NodePath,
-  newIdx: number
+  newIdx: number,
+  onReplace = DefaultOnReplace
 ): RaisinNode {
-  return move(root, getNode(root, node), getNode(root, newParent), newIdx);
+  return move(
+    root,
+    getNode(root, node),
+    getNode(root, newParent),
+    newIdx,
+    onReplace
+  );
 }
 
 /**
@@ -275,7 +296,8 @@ export function insertAt(
   root: RaisinNode,
   node: RaisinNode,
   newParent: RaisinNode,
-  newIdx: number
+  newIdx: number,
+  onReplace = DefaultOnReplace
 ): RaisinNode {
   if (root === node) throw new Error("Can't root node");
   if (node === newParent) throw new Error("Can't move node inside itself");
@@ -285,12 +307,12 @@ export function insertAt(
     onElement(el, children) {
       const newChildren =
         el === newParent ? add(children, node, newIdx) : children;
-      return { ...el, children: newChildren };
+      return onReplace(el, { ...el, children: newChildren });
     },
     onRoot(el, children) {
       const newChildren =
         el === newParent ? add(children, node, newIdx) : children;
-      return { ...el, children: newChildren };
+      return onReplace(el, { ...el, children: newChildren });
     }
   });
   return freeze(moved!);
@@ -299,18 +321,22 @@ export function insertAtPath(
   root: RaisinNode,
   node: RaisinNode,
   newParent: NodePath,
-  newIdx: number
+  newIdx: number,
+  onReplace = DefaultOnReplace
 ): RaisinNode {
-  return insertAt(root, node, getNode(root, newParent), newIdx);
+  return insertAt(root, node, getNode(root, newParent), newIdx, onReplace);
 }
 
 function isBlankOrEmpty(str: string) {
   return !str || /^\s*$/.test(str) || str.length === 0 || !str.trim();
 }
 
-export function removeWhitespace(root: RaisinNode): RaisinNode {
+export function removeWhitespace(
+  root: RaisinNode,
+  onReplace = DefaultOnReplace
+): RaisinNode {
   const cleaned = visit(root, {
-    ...CloneVisitor,
+    ...CloneVisitor(onReplace),
     onText(text) {
       if (isBlankOrEmpty(text.data.trim())) {
         return undefined;
@@ -335,7 +361,7 @@ function freeze(node: RaisinNode) {
   return visitAll(node, Object.freeze);
 }
 
-function visitAll(
+export function visitAll(
   node: RaisinNode,
   fn: (n: RaisinNode) => RaisinNode
 ): RaisinNode {
@@ -358,18 +384,22 @@ export const IdentityVisitor: NodeVisitor<RaisinNode> = {
   onRoot: n => n
 };
 
-const CloneVisitor: NodeVisitor<RaisinNode> = {
-  onText: n => ({ ...n }),
-  onDirective: n => ({ ...n }),
-  onComment: n => ({ ...n }),
-  // TODO: deep clone CSS ast
-  onStyle: n => ({ ...n }),
-  onElement: (n, children) => ({
-    ...n,
-    children: children ? [...children] : []
-  }),
-  onRoot: (n, children) => ({ ...n, children: children ? [...children] : [] })
-};
+function CloneVisitor(onReplace = DefaultOnReplace): NodeVisitor<RaisinNode> {
+  return {
+    onText: n => onReplace(n, { ...n }),
+    onDirective: n => onReplace(n, { ...n }),
+    onComment: n => onReplace(n, { ...n }),
+    // TODO: deep clone CSS ast
+    onStyle: n => onReplace(n, { ...n }),
+    onElement: (n, children) =>
+      onReplace(n, {
+        ...n,
+        children: children ? [...children] : []
+      }),
+    onRoot: (n, children) =>
+      onReplace(n, { ...n, children: children ? [...children] : [] })
+  };
+}
 
 /**
  * Returns a deep copy of a RaisinNode
@@ -383,7 +413,7 @@ export function clone(n: RaisinNode): RaisinNode {
  *
  * use recursion with reduce and concat
  */
-export function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
+function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
   // @ts-ignore
   return d > 0
     ? // @ts-ignore
@@ -417,5 +447,3 @@ export function getAncestry(
   }
   return [...ancestry];
 }
-
-type ReplacementCallback = (prev: RaisinNode, next: RaisinNode) => void;

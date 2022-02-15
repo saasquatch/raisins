@@ -4,10 +4,20 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { h, VNodeStyle } from 'snabbdom';
 import { dependentAtom } from '../atoms/dependentAtom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
-import { getId, idToNode, RootNodeAtom } from '../hooks/CoreAtoms';
-import { SelectedAtom, SelectedNodeAtom, SetSelectedIdAtom } from '../selection/SelectedAtom';
+import { GetSoulAtom, soulToString } from '../atoms/Soul';
+import {
+  getId,
+  IdToSoulAtom,
+  RootNodeAtom,
+  SoulIdToNodeAtom,
+} from '../hooks/CoreAtoms';
+import {
+  SelectedNodeAtom,
+  SelectedPathString,
+  SetSelectedIdAtom,
+} from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { HoveredAtom, SetHoveredIdAtom } from './CanvasHoveredAtom';
+import { HoveredAtom, HoveredSoulAtom } from './CanvasHoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
@@ -44,6 +54,7 @@ export const VnodeAtom = atom((get) => {
   const hovered = get(HoveredAtom);
   const outlined = get(OutlineAtom);
   const node = get(RootNodeAtom);
+  const souls = get(GetSoulAtom);
   const isPloppingActive = get(PloppingIsActive);
 
   const renderer: SnabdomRenderer = (d, n) => {
@@ -73,6 +84,7 @@ export const VnodeAtom = atom((get) => {
       attrs: {
         ...d.attrs,
         'raisins-id': getId(n),
+        'raisins-soul': soulToString(souls(n)),
         'raisins-thing': 'yes',
       },
       style,
@@ -116,9 +128,8 @@ function defaultRect(
     }
 
     const geometry = await connState.childRpc.geometry();
-
     const rect = geometry.entries.find(
-      (e) => e.target?.attributes['raisins-id'] === getId(node)
+      (e) => e.target?.attributes['raisins-soul'] === getId(node)
     );
 
     return rect?.contentRect;
@@ -128,14 +139,20 @@ function defaultRect(
 
 function createCanvasAtoms() {
   // TODO: Path might not be the right thing to depend on. Might be worth switching ID
-  const HoveredRectAtom = dependentAtom<Rect | undefined>(HoveredAtom,undefined);
-  const SelectedRectAtom = dependentAtom<Rect | undefined>(SelectedAtom,undefined);
+  const HoveredRectAtom = dependentAtom<Rect | undefined>(
+    HoveredSoulAtom,
+    undefined
+  );
+  const SelectedRectAtom = dependentAtom<Rect | undefined>(
+    SelectedPathString,
+    undefined
+  );
 
   const CanvasEventAtom = atom(
     null,
     (get, set, { target, type }: CanvasEvent) => {
       if (type === 'click') {
-        set(SetSelectedIdAtom, target?.attributes['raisins-id']);
+        set(SetSelectedIdAtom, target?.attributes['raisins-soul']);
         if (target) {
           // TODO: This doesn't handle when selection is changed in different canvas
           // We need to "pull" the size on THIS canvas when selection is set on the OTHER canvas
@@ -148,7 +165,10 @@ function createCanvasAtoms() {
         }
       }
       if (type === 'mouseover') {
-        set(SetHoveredIdAtom, target?.attributes['raisins-id']);
+        const idToSoul = get(IdToSoulAtom);
+        const soulId = target?.attributes['raisins-soul'];
+        const soul = soulId ? idToSoul(soulId) : undefined;
+        set(HoveredSoulAtom, soul);
         if (target) {
           // TODO: This doesn't handle when hover is changed in different canvas
           set(HoveredRectAtom, {
@@ -165,15 +185,16 @@ function createCanvasAtoms() {
   const IframeAtom = createAtoms({
     head: CanvasScriptsAtom,
     registry: NPMRegistryAtom,
-    selector: atom('[raisins-id]'),
+    selector: atom('[raisins-soul]'),
     vnodeAtom: VnodeAtom,
     onEvent: CanvasEventAtom,
     onResize: atom(null, (get, set, geometry) => {
+      const selected = get(SelectedNodeAtom);
+      const hovered = get(HoveredAtom);
+      const getNode = get(SoulIdToNodeAtom);
       geometry.entries.forEach((e) => {
-        const selected = get(SelectedNodeAtom);
-        const hovered = get(HoveredAtom);
-        const id = e.target?.attributes['raisins-id'];
-        const node = id && idToNode.get(id);
+        const id = e.target?.attributes['raisins-soul'];
+        const node = id && getNode(id);
         if (node && node === selected) {
           set(SelectedRectAtom, {
             x: e.contentRect.x,

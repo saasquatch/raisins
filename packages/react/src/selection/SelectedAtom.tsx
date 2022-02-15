@@ -18,6 +18,8 @@ export const SelectedAtom = atom(
   }
 );
 
+export const SelectedPathString = atom(get=>get(SelectedAtom)?.path.toString)
+
 export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
   const { current } = get(InternalStateAtom);
   const selected = get(SelectedAtom);

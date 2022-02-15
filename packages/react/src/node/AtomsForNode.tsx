@@ -1,23 +1,24 @@
 import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
-import {
-  ComponentMetaAtom,
-  ComponentModelAtom,
-} from '../component-metamodel/ComponentModel';
-import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
-import { DefaultSlotMeta } from '../model/EditorModel';
-import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
-import { isElementNode, isRoot } from '../util/isNode';
 import { atomForAttributes } from '../atoms/atomForAttributes';
-import { atomForNode } from './node-context';
 import {
   DropPloppedNodeInSlotAtom,
   PickedAtom,
   PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
-import { HoveredAtom } from '../canvas/CanvasHoveredAtom';
+import { GetSoulAtom, SoulsAtom } from "../atoms/Soul";
+import { HoveredAtom, HoveredSoulAtom } from '../canvas/CanvasHoveredAtom';
+import {
+  ComponentMetaAtom,
+  ComponentModelAtom,
+} from '../component-metamodel/ComponentModel';
+import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
+import { RootNodeAtom, SoulToNodeAtom } from '../hooks/CoreAtoms';
+import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
+import { isElementNode } from '../util/isNode';
+import { atomForNode } from './node-context';
+import { tagNameForNode } from './tagName';
 
 /**
  * Is the node in context currently selected?
@@ -28,7 +29,16 @@ export const isSelectedForNode = atomForNode(
 );
 
 export const nodeHovered = atomForNode(
-  (n) => atom((get) => get(HoveredAtom) === get(n), (get, set) => set(HoveredAtom, get(n))),
+  (n) =>
+    atom(
+      (get) => get(HoveredAtom) === get(n),
+      (get, set) => {
+        const node = get(n);
+        const getSoul = get(GetSoulAtom);
+        const soul = getSoul(node);
+        set(HoveredSoulAtom, soul);
+      }
+    ),
   'nodeHovered'
 );
 
@@ -109,7 +119,6 @@ export const attributesForNode = atomForNode(
   atomForAttributes,
   'attributesForNode'
 );
-
 /**
  * Gets component meta for the node in context
  */
@@ -118,7 +127,7 @@ export const componentMetaForNode = atomForNode(
     atom((get) => {
       const comp = get(ComponentModelAtom);
       const node = get(n);
-      return comp.getComponentMeta(node as RaisinElementNode);
+      return comp.getComponentMeta((node as RaisinElementNode).tagName);
     }),
   'componentMetaForNode'
 );
@@ -126,38 +135,42 @@ export const componentMetaForNode = atomForNode(
 /**
  * Gets slots for the node in context
  */
-export const slotsForNode = atomForNode(
-  (n) =>
-    atom((get) => {
-      const comp = get(ComponentModelAtom);
-      const node = get(n);
+export const slotsForNode = atomForNode((n) => {
+  const tagNameAtom = tagNameForNode(n);
+  const childSlotsAtom = atom((get) => {
+    // FIXME: This is updated too frequently, causing a new referentially unequal array and a rerender
+    const children = [] as RaisinNode[]; //get(atomForChildren(n));
+    const childSlots = children.map((child) => {
+      const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
+      return slotName;
+    });
+    return childSlots;
+  });
 
-      // Root has just one slot
-      if (isRoot(node)) return [DefaultSlotMeta] as Slot[];
-      if (!isElementNode(node)) return [] as Slot[];
+  return atom((get) => {
+    const comp = get(ComponentModelAtom);
+    const tagName = get(tagNameAtom);
+    // Root has just one slot
+    if (!tagName) return [] as Slot[];
+    const meta = comp.getComponentMeta(tagName);
 
-      const meta = comp.getComponentMeta(node);
+    const childSlots = get(childSlotsAtom);
 
-      const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
+    const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
 
-      const childSlots = node.children.map((child) => {
-        const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
-        return slotName;
-      });
-      const allSlots = [...definedSlots, ...childSlots];
-      const dedupedSet = new Set(allSlots);
-      const allSlotsWithMeta = [...dedupedSet.keys()].sort().map((k) => {
-        const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
-        return slot;
-      });
-      // TODO: Filter slots so they don't show text nodes?
-      // TODO: Figure out how to deal with elements that shouldn't have childen but they do?
-      //    -  maybe show the children, but don't allow drop targets or "Add New"
-      //    - show RED validation?
-      return allSlotsWithMeta;
-    }),
-  'slotsForNode'
-);
+    const allSlots = [...definedSlots, ...childSlots];
+    const dedupedSet = new Set(allSlots);
+    const allSlotsWithMeta = [...dedupedSet.keys()].sort().map((k) => {
+      const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
+      return slot;
+    });
+    // TODO: Filter slots so they don't show text nodes?
+    // TODO: Figure out how to deal with elements that shouldn't have childen but they do?
+    //    -  maybe show the children, but don't allow drop targets or "Add New"
+    //    - show RED validation?
+    return allSlotsWithMeta;
+  });
+}, 'slotsForNode');
 
 /**
  * Removes the node in context from the document
@@ -181,11 +194,11 @@ export const duplicateForNode = atomForNode(
 export const nameForNode = atomForNode(
   (n) =>
     atom((get) => {
-      const node = get(n);
+      const tagName = get(tagNameForNode(n));
       const getComponentMeta = get(ComponentMetaAtom);
-      if (!isElementNode(node)) return node.type;
-      const meta = getComponentMeta(node);
-      return meta?.title ?? node.tagName;
+      if (!tagName) return '';
+      const meta = getComponentMeta(tagName);
+      return meta?.title ?? tagName;
     }),
   'nameForNode'
 );

@@ -100,13 +100,13 @@ SetModulesAtom.debugLabel = "SetModulesAtom";
 
 export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   const components = get(ComponentsAtom);
-  function getComponentMeta(node: RaisinElementNode): CustomElement {
-    const found = components.find((c) => c.tagName === node.tagName);
+  function getComponentMeta(tagName: string): CustomElement {
+    const found = components.find((c) => c.tagName === tagName);
     if (found) return found;
 
     return {
-      tagName: node.tagName,
-      title: node.tagName,
+      tagName: tagName,
+      title: tagName,
       // Default slot meta assumes no children. We may want to assume a permissive default slot.
       slots: [],
     };
@@ -124,7 +124,7 @@ export const ValidChildrenAtom = atom((get) => {
     if (!isElementNode(node) || !isRoot(node)) return [];
 
     const allowedInParent = blocks.filter((block) => {
-      const childMeta = getComponentMeta(block.content);
+      const childMeta = getComponentMeta(block.content.tagName);
       const childAllowsParents = doesChildAllowParent(childMeta, node);
       return childAllowsParents;
     });
@@ -173,8 +173,8 @@ export const ComponentModelAtom = atom<ComponentModel>((get) => {
       return false;
     }
     ParentsAtom;
-    const parentMeta = getComponentMeta(parent);
-    const childMeta = getComponentMeta(child);
+    const parentMeta = getComponentMeta(parent.tagName);
+    const childMeta = getComponentMeta(child.tagName);
     return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
   }
 
@@ -214,6 +214,6 @@ export type ComponentDetails = {
   ) => boolean;
 };
 
-export type ComponentMetaProvider = (node: RaisinElementNode) => CustomElement;
+export type ComponentMetaProvider = (tagName: string) => CustomElement;
 
 export type ComponentModel = ComponentDetails;

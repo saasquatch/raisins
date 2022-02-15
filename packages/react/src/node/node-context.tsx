@@ -5,11 +5,11 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { useContext } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { createMemoizeAtom } from '../atoms/weakCache';
-import { rootPrimitive } from '../atoms/_atoms';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
 
 // TODO: allow this to be swapped out? There are likely more history listeners.
-const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(rootPrimitive);
-CONTEXT.displayName = "RaisinNodeAtomContext"
+const CONTEXT = React.createContext<PrimitiveAtom<RaisinNode>>(RootNodeAtom);
+CONTEXT.displayName = 'RaisinNodeAtomContext';
 
 /**
  * Uses atom for the "current node"
@@ -35,28 +35,28 @@ export const NodeAtomProvider = ({
   return <Pro value={nodeAtom}>{children}</Pro>;
 };
 
-export type ScopedAtomCreator<R> = (atom: PrimitiveAtom<RaisinNode>) => Atom<R>;
-export type WriteableScopedAtomCreator<R, W> = (
-  atom: PrimitiveAtom<RaisinNode>
+export type ScopedAtomCreator<R, T> = (atom: T) => Atom<R>;
+export type WriteableScopedAtomCreator<R, W, T> = (
+  atom: T
 ) => WritableAtom<R, W>;
 
 /**
  * For writeable atoms
  */
 export function atomForNode<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W>,
-  debugLabel?:string
+  scopeFn: WriteableScopedAtomCreator<R, W, PrimitiveAtom<RaisinNode>>,
+  debugLabel?: string
 ): {
   useValue: () => R;
-  useUpdate: () => SetAtom<W>;
-  useAtom: () => [R, SetAtom<W>];
+  useUpdate: () => SetAtom<W, void>;
+  useAtom: () => [R, SetAtom<W, void>];
 };
 /**
  * For read-only atoms
  */
 export function atomForNode<R>(
-  scopeFn: ScopedAtomCreator<R>,
-  debugLabel?:string
+  scopeFn: ScopedAtomCreator<R, PrimitiveAtom<RaisinNode>>,
+  debugLabel?: string
 ): {
   useValue: () => R;
   useUpdate: () => never;
@@ -64,14 +64,16 @@ export function atomForNode<R>(
 };
 
 export function atomForNode<R, W>(
-  scopeFn: WriteableScopedAtomCreator<R, W> | ScopedAtomCreator<R>,
-  debugLabel?:string
+  scopeFn:
+    | WriteableScopedAtomCreator<R, W, PrimitiveAtom<RaisinNode>>
+    | ScopedAtomCreator<R, PrimitiveAtom<RaisinNode>>,
+  debugLabel?: string
 ) {
   const memoized = createMemoizeAtom();
   const getAtom = (base: PrimitiveAtom<RaisinNode>) =>
     memoized(() => {
       const scopedAtom = scopeFn(base);
-      const baseDebugLabel = base.debugLabel ?? `${base}`
+      const baseDebugLabel = base.debugLabel ?? `${base}`;
       scopedAtom.debugLabel = `${baseDebugLabel}/${debugLabel}`;
       return scopedAtom;
     }, [scopeFn, base]);

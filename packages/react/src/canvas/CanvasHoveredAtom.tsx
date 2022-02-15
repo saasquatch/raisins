@@ -1,13 +1,19 @@
-import { isElementNode, RaisinNode } from '@raisins/core';
+import { getPath, isElementNode, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
+import { Soul } from "../atoms/Soul";
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
-import { idToNode, ParentsAtom } from '../hooks/CoreAtoms';
+import { ParentsAtom, RootNodeAtom, SoulToNodeAtom } from '../hooks/CoreAtoms';
 
-export const HoveredAtom = atom<RaisinNode | undefined>(undefined);
+export const HoveredSoulAtom = atom<Soul | undefined>(undefined);
+HoveredSoulAtom.debugLabel = 'HoveredSoulAtom';
 
-export const SetHoveredIdAtom = atom(null, (_, set, id: string | undefined) =>
-  set(HoveredAtom, (id && idToNode.get(id)) || undefined)
-);
+export const HoveredAtom = atom<RaisinNode | undefined>((get) => {
+  const hoveredSoul = get(HoveredSoulAtom);
+  if (!hoveredSoul) return undefined;
+  const getNode = get(SoulToNodeAtom);
+  return getNode(hoveredSoul);
+});
+HoveredAtom.debugLabel = 'HoveredAtom';
 
 export const HoveredBreadcrumbs = atom((get) => {
   const node = get(HoveredAtom);
@@ -15,13 +21,13 @@ export const HoveredBreadcrumbs = atom((get) => {
   const parents = get(ParentsAtom);
   const metamodel = get(ComponentMetaAtom);
   const tagNames = isElementNode(node)
-    ? [metamodel(node).title ?? node.tagName]
+    ? [metamodel(node.tagName).title ?? node.tagName]
     : [];
   let current = node;
   while (parents.has(current)) {
     const parent = parents.get(current)!;
     if (isElementNode(parent)) {
-      tagNames.push(metamodel(parent).title ?? parent.tagName);
+      tagNames.push(metamodel(parent.tagName).title ?? parent.tagName);
     }
     current = parent;
   }

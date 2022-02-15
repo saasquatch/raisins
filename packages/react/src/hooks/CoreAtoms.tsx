@@ -10,6 +10,7 @@ import {
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { HTMLAtom } from '../atoms/RaisinScope';
+import { GetSoulAtom, Soul, SoulsAtom, soulToString } from "../atoms/Soul";
 import { generateNextState } from '../editting/EditAtoms';
 import { IdentifierModel } from '../model/EditorModel';
 import { isFunction } from '../util/isFunction';
@@ -21,9 +22,51 @@ export type InternalState = {
   selected?: NodeSelection;
 };
 
-const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
+const { getParents, getAncestry: getAncestryUtil, visit, visitAll } = htmlUtil;
 
 const nodeToId = new WeakMap<RaisinNode, string>();
+
+export const IdToSoulAtom = atom((get) => {
+  const root = get(RootNodeAtom);
+  const getSoul = get(GetSoulAtom);
+  const soulIdToNode = new Map<string, Soul>();
+  visitAll(root, (n: RaisinNode) => {
+    const soulForNode = getSoul(n);
+
+    soulIdToNode.set(soulToString(soulForNode), soulForNode);
+    return n;
+  });
+  return (id: string) => soulIdToNode.get(id);
+});
+IdToSoulAtom.debugLabel = 'IdToSoulAtom';
+
+export const SoulToNodeAtom = atom((get) => {
+  const root = get(RootNodeAtom);
+  const getSoul = get(GetSoulAtom);
+
+  const soulToNode = new Map<Soul, RaisinNode>();
+  visitAll(root, (n: RaisinNode) => {
+    const soulForNode = getSoul(n);
+    soulToNode.set(soulForNode, n);
+    return n;
+  });
+  return (soul: Soul) => soulToNode.get(soul);
+});
+SoulToNodeAtom.debugLabel = 'SoulToNodeAtom';
+
+export const SoulIdToNodeAtom = atom((get) => {
+  const root = get(RootNodeAtom);
+  const getSoul = get(GetSoulAtom);
+  const soulIdToNode = new Map<string, RaisinNode>();
+  visitAll(root, (n: RaisinNode) => {
+    const soulForNode = getSoul(n);
+    soulIdToNode.set(soulToString(soulForNode), n);
+    return n;
+  });
+  return (id: string) => soulIdToNode.get(id);
+});
+SoulIdToNodeAtom.debugLabel = 'SoulIdToNodeAtom';
+
 export const idToNode = new Map<string, RaisinNode>();
 
 export function getId(node: RaisinNode): string {

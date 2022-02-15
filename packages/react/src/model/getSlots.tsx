@@ -29,7 +29,7 @@ export function getSlots(
     onDirective: noSlots,
     onRoot: noSlotsWChildren,
     onElement(el, children) {
-      const meta = getComponentMeta(el);
+      const meta = getComponentMeta(el.tagName);
 
       type Reduced = { [key: string]: NodeWithSlots[] };
 
