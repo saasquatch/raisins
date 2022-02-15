@@ -6,15 +6,14 @@ import { dependentAtom } from '../atoms/dependentAtom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { GetSoulAtom, soulToString } from '../atoms/Soul';
 import {
-  getId,
   IdToSoulAtom,
   RootNodeAtom,
-  SoulIdToNodeAtom,
+  SoulIdToNodeAtom
 } from '../hooks/CoreAtoms';
 import {
   SelectedNodeAtom,
   SelectedPathString,
-  SetSelectedIdAtom,
+  SelectedSoulAtom
 } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { HoveredAtom, HoveredSoulAtom } from './CanvasHoveredAtom';
@@ -22,7 +21,7 @@ import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
   SnabdomAppender,
-  SnabdomRenderer,
+  SnabdomRenderer
 } from './raisinToSnabdom';
 import { Rect } from './Rect';
 import { ConnectionState, createAtoms } from './SnabbdomSanboxedIframeAtom';
@@ -83,7 +82,6 @@ export const VnodeAtom = atom((get) => {
       ...d,
       attrs: {
         ...d.attrs,
-        'raisins-id': getId(n),
         'raisins-soul': soulToString(souls(n)),
         'raisins-thing': 'yes',
       },
@@ -128,8 +126,10 @@ function defaultRect(
     }
 
     const geometry = await connState.childRpc.geometry();
+    const getSoul = get(GetSoulAtom);
+    const soul = getSoul(node);
     const rect = geometry.entries.find(
-      (e) => e.target?.attributes['raisins-soul'] === getId(node)
+      (e) => e.target?.attributes['raisins-soul'] === soulToString(soul)
     );
 
     return rect?.contentRect;
@@ -152,7 +152,10 @@ function createCanvasAtoms() {
     null,
     (get, set, { target, type }: CanvasEvent) => {
       if (type === 'click') {
-        set(SetSelectedIdAtom, target?.attributes['raisins-soul']);
+        const idToSoul = get(IdToSoulAtom);
+        const soulId = target?.attributes['raisins-soul'];
+        const soul = soulId ? idToSoul(soulId) : undefined;
+        set(SelectedSoulAtom, soul);
         if (target) {
           // TODO: This doesn't handle when selection is changed in different canvas
           // We need to "pull" the size on THIS canvas when selection is set on the OTHER canvas

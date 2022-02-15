@@ -1,7 +1,6 @@
 import { cssUtil, StyleNodeProps } from '@raisins/core';
 import * as Css from 'css-tree';
 import React, { FormEvent } from 'react';
-import { getId } from '../hooks/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
 import { useStyleEditor } from './useStyleEditor';
 
@@ -21,7 +20,6 @@ export function StyleEditor() {
           <div
             onClick={() => model.setSelectedsheet(s)}
             style={{ fontWeight: isSelected ? 'bold' : 'normal' }}
-            key={getId(s)}
           >
             Sheet {i}
           </div>

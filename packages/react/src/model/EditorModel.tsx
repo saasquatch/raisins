@@ -3,7 +3,6 @@ import { Slot } from '@raisins/schema/schema';
 
 export type IdentifierModel = {
   getAncestry(node: RaisinNode): RaisinNodeWithChildren[];
-  getId(node: RaisinNode): string;
   getPath(node: RaisinNode): NodePath;
 };
 

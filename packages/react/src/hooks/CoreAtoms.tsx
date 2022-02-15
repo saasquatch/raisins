@@ -10,7 +10,7 @@ import {
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { HTMLAtom } from '../atoms/RaisinScope';
-import { GetSoulAtom, Soul, SoulsAtom, soulToString } from "../atoms/Soul";
+import { GetSoulAtom, Soul, SoulsAtom, soulToString } from '../atoms/Soul';
 import { generateNextState } from '../editting/EditAtoms';
 import { IdentifierModel } from '../model/EditorModel';
 import { isFunction } from '../util/isFunction';
@@ -23,8 +23,6 @@ export type InternalState = {
 };
 
 const { getParents, getAncestry: getAncestryUtil, visit, visitAll } = htmlUtil;
-
-const nodeToId = new WeakMap<RaisinNode, string>();
 
 export const IdToSoulAtom = atom((get) => {
   const root = get(RootNodeAtom);
@@ -66,19 +64,6 @@ export const SoulIdToNodeAtom = atom((get) => {
   return (id: string) => soulIdToNode.get(id);
 });
 SoulIdToNodeAtom.debugLabel = 'SoulIdToNodeAtom';
-
-export const idToNode = new Map<string, RaisinNode>();
-
-export function getId(node: RaisinNode): string {
-  const existing = nodeToId.get(node);
-  if (existing) {
-    return existing;
-  }
-  const id = 'node-' + Math.round(Math.random() * 10000);
-  nodeToId.set(node, id);
-  idToNode.set(id, node);
-  return id;
-}
 
 const NodeFromHtml = atom((get) => htmlParser(get(HTMLAtom)));
 const getDerivedInternal = (get: Getter) => {
@@ -139,7 +124,6 @@ export const IdentifierModelAtom = atom<IdentifierModel>((get) => {
   }
   return {
     getAncestry,
-    getId,
     getPath: getPathInternal,
   };
 });

@@ -1,6 +1,11 @@
 import { getNode, getPath, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { idToNode, InternalState, InternalStateAtom } from '../hooks/CoreAtoms';
+import { GetSoulAtom, Soul, SoulsAtom } from '../atoms/Soul';
+import {
+  InternalState,
+  InternalStateAtom,
+  SoulToNodeAtom,
+} from '../hooks/CoreAtoms';
 
 export const SelectedAtom = atom(
   (get) => get(InternalStateAtom).selected,
@@ -18,7 +23,9 @@ export const SelectedAtom = atom(
   }
 );
 
-export const SelectedPathString = atom(get=>get(SelectedAtom)?.path.toString)
+export const SelectedPathString = atom(
+  (get) => get(SelectedAtom)?.path.toString
+);
 
 export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
   const { current } = get(InternalStateAtom);
@@ -26,6 +33,20 @@ export const SelectedNodeAtom = atom<RaisinNode | undefined>((get) => {
   return selected?.path ? getNode(current, selected.path) : undefined;
 });
 
-export const SetSelectedIdAtom = atom(null, (_, set, id: string | undefined) =>
-  set(SelectedAtom, id && idToNode.get(id) || undefined)
+export const SelectedSoulAtom = atom(
+  (get) => {
+    const getSoul = get(GetSoulAtom);
+    const node = get(SelectedNodeAtom);
+    if (!node) return undefined;
+    return getSoul(node);
+  },
+  (get, set, next: Soul | undefined) => {
+    if (!next) {
+      set(SelectedAtom, undefined);
+      return;
+    }
+    const getNode = get(SoulToNodeAtom);
+    const node = getNode(next);
+    set(SelectedAtom, node);
+  }
 );
