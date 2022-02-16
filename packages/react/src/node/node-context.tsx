@@ -1,8 +1,8 @@
 import { RaisinNode } from '@raisins/core';
-import { Atom, PrimitiveAtom, useAtom, WritableAtom } from 'jotai';
-import type { SetAtom } from 'jotai/core/atom';
+import { Atom, PrimitiveAtom, useAtom, WritableAtom, atom } from 'jotai';
+import { SetAtom } from 'jotai/core/atom';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { createMemoizeAtom } from '../atoms/weakCache';
 import { RootNodeAtom } from '../hooks/CoreAtoms';
@@ -33,6 +33,35 @@ export const NodeAtomProvider = ({
 }) => {
   const Pro = CONTEXT.Provider;
   return <Pro value={nodeAtom}>{children}</Pro>;
+};
+
+export const OptionalNodeAtomProvider = ({
+  nodeAtom,
+  children,
+}: {
+  nodeAtom: PrimitiveAtom<RaisinNode | undefined>;
+  children: React.ReactNode;
+}) => {
+  const { ProviderAtom } = useMemo(() => {
+    const isDefinedAtom = atom((get) => {
+      const isDefined = get(nodeAtom) !== undefined;
+      console.log("Is defined?", isDefined)
+      return isDefined;
+    });
+    const ProviderAtom = atom((get) => {
+      const isDefined = get(isDefinedAtom);
+      if (isDefined){
+        console.log("Real provider")
+        return CONTEXT.Provider;
+      }
+      console.log("Fake provider")
+      return ({}: any) => <></>;
+    });
+    return { ProviderAtom };
+  }, []);
+
+  const Pro = useAtomValue(ProviderAtom);
+  return <Pro value={nodeAtom as PrimitiveAtom<RaisinNode>}>{children}</Pro>;
 };
 
 export type ScopedAtomCreator<R, T> = (atom: T) => Atom<R>;

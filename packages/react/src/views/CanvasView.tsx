@@ -12,7 +12,12 @@ import {
   DuplicateSelectedAtom,
   PickSelectedAtom,
 } from '../editting/EditSelectedAtom';
-import RichTextEditor from '../rich-text/RichTextEditor';
+import { nodeSoul } from '../node/AtomsForNode';
+import {
+  NodeAtomProvider,
+  OptionalNodeAtomProvider,
+} from '../node/node-context';
+import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 
 const Wrapper: CSSProperties = {
@@ -100,7 +105,7 @@ export const CanvasSelectedToolbar = () => {
         <button onClick={moveSelected}>Move</button>
 
         <hr />
-        <RichTextEditor />
+        <SelectedNodeRichTextEditor />
       </PositionedToolbar>
     </Suspense>
   );

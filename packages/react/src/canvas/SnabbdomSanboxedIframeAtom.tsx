@@ -124,11 +124,12 @@ export function createAtoms(props: {
   });
 
   const lastRenderedComponent = atom<VNode | undefined>((get) => {
-    const connection = get(get(connectionAtom));
-    if (connection.type !== 'loaded') return undefined;
+    const whichConnected = get(connectionAtom);
+    const connectionStatus = get(whichConnected);
+    if (connectionStatus.type !== 'loaded') return undefined;
 
     const component = get(props.vnodeAtom);
-    renderInChild(connection.childRpc, component);
+    renderInChild(connectionStatus.childRpc, component);
     return component;
   });
 
@@ -138,7 +139,7 @@ export function createAtoms(props: {
       get(lastRenderedComponent);
       return get(get(connectionAtom));
     },
-    (get, set, el: HTMLElement | null) => {
+    (_, set, el: HTMLElement | null) => {
       set(containerAtom, el);
     }
   );

@@ -1,4 +1,4 @@
-import hotkeys from 'hotkeys-js';
+import hotkeys, { KeyHandler } from 'hotkeys-js';
 import { useUpdateAtom } from 'jotai/utils';
 import { useEffect } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
@@ -13,7 +13,7 @@ export function useHotkeys() {
   useEffect(() => {
     // TODO: Scope so that backspace and delete only work depending on what is "focused"
     // TODO: Cleanup listeners on onmount so that the shortcuts don't live forever (e.g. and mess up program engine installation)
-    const fn = function (event: Event, handler: any) {
+    const fn:KeyHandler = function (event: Event, handler) {
       switch (handler.key) {
         case 'ctrl+z':
           event.preventDefault();

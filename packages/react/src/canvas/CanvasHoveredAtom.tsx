@@ -2,7 +2,8 @@ import { getPath, isElementNode, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { Soul } from "../atoms/Soul";
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
-import { ParentsAtom, RootNodeAtom, SoulToNodeAtom } from '../hooks/CoreAtoms';
+import { ParentsAtom, RootNodeAtom } from '../hooks/CoreAtoms';
+import { SoulToNodeAtom } from "../hooks/SoulsInDocumentAtoms";
 
 export const HoveredSoulAtom = atom<Soul | undefined>(undefined);
 HoveredSoulAtom.debugLabel = 'HoveredSoulAtom';

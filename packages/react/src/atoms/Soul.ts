@@ -1,12 +1,34 @@
-import { RaisinNode } from '@raisins/core';
+import { htmlUtil, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
+const { visit } = htmlUtil;
 
 export type Soul = { id: string };
-export const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => new WeakMap());
+export const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => {
+  console.log('Creating a new souls map');
+  return new WeakMap();
+});
+
+export function getSoulsMap(node: RaisinNode, map: WeakMap<RaisinNode, Soul>) {
+  const getSoul = (n: RaisinNode) => ({
+    soul: map.get(n)?.toString() ?? 'No soul',
+  });
+  const getSoulAndChildren = (n: RaisinNode, children: string[]) => ({
+    ...getSoul(n),
+    children,
+  });
+  return visit<any>(node, {
+    onComment: getSoul,
+    onDirective: getSoul,
+    onText: getSoul,
+    onStyle: getSoul,
+    onElement: getSoulAndChildren,
+    onRoot: getSoulAndChildren,
+  });
+}
+
 /**
  * Get (or create) a soul
  */
-
 export const GetSoulAtom = atom<(node: RaisinNode) => Soul>((get) => {
   const souls = get(SoulsAtom);
 

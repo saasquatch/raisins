@@ -4,6 +4,9 @@ import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React, { useMemo, useRef } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
+import { GetSoulAtom } from '../atoms/Soul';
+import { createMemoizeAtom } from '../atoms/weakCache';
+import { SoulSaverAtom } from '../editting/SoulSaverAtom';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
 import {
   ProseTextSelection,
@@ -13,7 +16,7 @@ import { SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 import { EditSelectedNodeAtom } from '../views/EditSelectedNodeAtom';
 
-export default function RichTextEditor() {
+export default function SelectedNodeRichTextEditor() {
   const isElementAtom = useRef(
     atom((get) => isElementNode(get(SelectedNodeAtom)))
   ).current;
@@ -37,6 +40,7 @@ export function useRichTextEditorForAtom() {
   return { mountRef };
 }
 
+const memoized = createMemoizeAtom();
 function createAtoms(nodeAtom: PrimitiveAtom<RaisinElementNode>) {
   const docNodeAtom = atom<
     RaisinDocumentNode,
@@ -59,10 +63,29 @@ function createAtoms(nodeAtom: PrimitiveAtom<RaisinElementNode>) {
         ...prevNode,
         children: nextVal.children,
       };
-      set(nodeAtom, nextNode);
+      const soulSaver = get(SoulSaverAtom);
+      set(nodeAtom, soulSaver(prevNode, nextNode) as RaisinElementNode);
     }
   );
-  const selection = atom<ProseTextSelection | undefined>(undefined);
+  const selectionAtomAtom = atom<PrimitiveAtom<ProseTextSelection | undefined>>(
+    (get) => {
+      const node = get(nodeAtom);
+      const getSoul = get(GetSoulAtom);
+      const soul = getSoul(node);
+
+      const selectionAtom = memoized(
+        () => atom<ProseTextSelection | undefined>(undefined),
+        [soul]
+      );
+      return selectionAtom;
+    }
+  );
+  const selection = atom(
+    (get) => get(get(selectionAtomAtom)),
+    (get, set, next: SetStateAction<ProseTextSelection | undefined>) => {
+      set(get(selectionAtomAtom), next);
+    }
+  );
   return {
     selection,
     docNodeAtom,

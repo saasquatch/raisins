@@ -40,6 +40,7 @@ import {
   setSelectedForNode,
   slotsForNode,
   togglePickNode,
+  nodeSoul,
 } from '../node/AtomsForNode';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
@@ -177,6 +178,7 @@ function ElementLayer() {
   const duplicate = duplicateForNode.useUpdate();
   const title = nameForNode.useValue();
   const moveNode = togglePickNode.useUpdate();
+  const soul = nodeSoul.useValue();
 
   const isPlopping = useAtomValue(PloppingIsActive, RaisinScope);
   const canMove = isPicked || !isPlopping;
@@ -187,6 +189,7 @@ function ElementLayer() {
     <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
       <div style={Label}>
         {title} {isPicked && ' Moving...'}{' '}
+        {soul.toString()}
       </div>
       <div>
         <button onClick={moveNode} disabled={!canMove}>
@@ -285,6 +288,8 @@ function useSlotChildNodes(slotName: string) {
   const nodeAtom = useNodeAtom();
   const slotChildrenAtom = useMemo(() => {
     return splitAtom(
+      // FIXME: This will replace the raisin tree, but without saving souls
+      // Need to replace this to not replace souls
       focusAtom(nodeAtom, (o) =>
         optic_<RaisinNodeWithChildren>()
           .prop('children')

@@ -7,14 +7,14 @@ import {
   PickedAtom,
   PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
-import { GetSoulAtom, SoulsAtom } from "../atoms/Soul";
+import { GetSoulAtom } from '../atoms/Soul';
 import { HoveredAtom, HoveredSoulAtom } from '../canvas/CanvasHoveredAtom';
 import {
   ComponentMetaAtom,
   ComponentModelAtom,
 } from '../component-metamodel/ComponentModel';
 import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
-import { RootNodeAtom, SoulToNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 import { atomForNode } from './node-context';
@@ -26,6 +26,15 @@ import { tagNameForNode } from './tagName';
 export const isSelectedForNode = atomForNode(
   (n) => atom((get) => get(SelectedNodeAtom) === get(n)),
   'isSelectedForNode'
+);
+
+export const nodeSoul = atomForNode((n) =>
+  atom((get) => {
+    const node = get(n);
+    const getSoul = get(GetSoulAtom);
+    const soul = getSoul(node);
+    return soul;
+  })
 );
 
 export const nodeHovered = atomForNode(

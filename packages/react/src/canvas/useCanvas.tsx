@@ -5,27 +5,20 @@ import { h, VNodeStyle } from 'snabbdom';
 import { dependentAtom } from '../atoms/dependentAtom';
 import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
 import { GetSoulAtom, soulToString } from '../atoms/Soul';
-import {
-  IdToSoulAtom,
-  RootNodeAtom,
-  SoulIdToNodeAtom
-} from '../hooks/CoreAtoms';
-import {
-  SelectedNodeAtom,
-  SelectedPathString,
-  SelectedSoulAtom
-} from '../selection/SelectedAtom';
+import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { IdToSoulAtom, SoulIdToNodeAtom } from '../hooks/SoulsInDocumentAtoms';
+import { SelectedNodeAtom, SelectedSoulAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { HoveredAtom, HoveredSoulAtom } from './CanvasHoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
   SnabdomAppender,
-  SnabdomRenderer
+  SnabdomRenderer,
 } from './raisinToSnabdom';
 import { Rect } from './Rect';
 import { ConnectionState, createAtoms } from './SnabbdomSanboxedIframeAtom';
-import { CanvasEvent } from './_CanvasRPCContract';
+import { CanvasEvent, GeometryDetail } from './_CanvasRPCContract';
 
 export type Size = {
   name: string;
@@ -144,7 +137,7 @@ function createCanvasAtoms() {
     undefined
   );
   const SelectedRectAtom = dependentAtom<Rect | undefined>(
-    SelectedPathString,
+    SelectedSoulAtom,
     undefined
   );
 
@@ -185,37 +178,39 @@ function createCanvasAtoms() {
     }
   );
 
+  const ResizeAtom = atom(null, (get, set, geometry:GeometryDetail) => {
+    const selected = get(SelectedNodeAtom);
+    const hovered = get(HoveredAtom);
+    const getNode = get(SoulIdToNodeAtom);
+    geometry.entries.forEach((e) => {
+      const id = e.target?.attributes['raisins-soul'];
+      const node = id && getNode(id);
+      if (node && node === selected) {
+        set(SelectedRectAtom, {
+          x: e.contentRect.x,
+          y: e.contentRect.y,
+          height: e.contentRect.height,
+          width: e.contentRect.width,
+        });
+      }
+      if (node && node === hovered) {
+        set(HoveredRectAtom, {
+          x: e.contentRect.x,
+          y: e.contentRect.y,
+          height: e.contentRect.height,
+          width: e.contentRect.width,
+        });
+      }
+    });
+  });
+  
   const IframeAtom = createAtoms({
     head: CanvasScriptsAtom,
     registry: NPMRegistryAtom,
     selector: atom('[raisins-soul]'),
     vnodeAtom: VnodeAtom,
     onEvent: CanvasEventAtom,
-    onResize: atom(null, (get, set, geometry) => {
-      const selected = get(SelectedNodeAtom);
-      const hovered = get(HoveredAtom);
-      const getNode = get(SoulIdToNodeAtom);
-      geometry.entries.forEach((e) => {
-        const id = e.target?.attributes['raisins-soul'];
-        const node = id && getNode(id);
-        if (node && node === selected) {
-          set(SelectedRectAtom, {
-            x: e.contentRect.x,
-            y: e.contentRect.y,
-            height: e.contentRect.height,
-            width: e.contentRect.width,
-          });
-        }
-        if (node && node === hovered) {
-          set(HoveredRectAtom, {
-            x: e.contentRect.x,
-            y: e.contentRect.y,
-            height: e.contentRect.height,
-            width: e.contentRect.width,
-          });
-        }
-      });
-    }),
+    onResize: ResizeAtom,
   });
 
   return {

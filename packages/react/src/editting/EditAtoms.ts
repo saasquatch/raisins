@@ -7,20 +7,15 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
-import { createSoul, SoulsAtom } from "../atoms/Soul";
+import { SoulsAtom } from '../atoms/Soul';
 import {
   InternalState,
   InternalStateAtom,
   RootNodeAtom,
 } from '../hooks/CoreAtoms';
+import { SoulSaverAtom } from './SoulSaverAtom';
 
-const {
-  duplicate,
-  insertAt,
-  remove,
-  replace,
-  replacePath,
-} = htmlUtil;
+const { duplicate, insertAt, remove, replace, replacePath } = htmlUtil;
 
 export const SetNodeInternalAtom = atom(
   null,
@@ -37,8 +32,10 @@ SetNodeInternalAtom.debugLabel = 'SetNodeInternalAtom';
 /**
  * Deletes a raisin node from the document
  */
-export const RemoveNodeAtom = atom(null, (_, set, toRemove: RaisinNode) =>
-  set(SetNodeInternalAtom, (previous: RaisinNode) => remove(previous, toRemove))
+export const RemoveNodeAtom = atom(null, (get, set, toRemove: RaisinNode) =>
+  set(SetNodeInternalAtom, (previous: RaisinNode) =>
+    remove(previous, toRemove, get(SoulSaverAtom))
+  )
 );
 
 /**
@@ -46,7 +43,8 @@ export const RemoveNodeAtom = atom(null, (_, set, toRemove: RaisinNode) =>
  */
 export const DuplicateNodeAtom = atom(null, (get, set, toClone: RaisinNode) => {
   const current = get(RootNodeAtom);
-  const clone = duplicate(current, toClone);
+  const souls = get(SoulsAtom);
+  const clone = duplicate(current, toClone, get(SoulSaverAtom));
   set(SetNodeInternalAtom, clone);
 });
 
@@ -69,7 +67,7 @@ export const InsertNodeAtom = atom(
     }
   ) => {
     const current = get(RootNodeAtom);
-    const clone = insertAt(current, n, parent, idx);
+    const clone = insertAt(current, n, parent, idx, get(SoulSaverAtom));
     set(SetNodeInternalAtom, clone);
   }
 );
@@ -80,7 +78,7 @@ export const InsertNodeAtom = atom(
 export const ReplaceNodeAtom = atom(
   null,
   (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
-    const souls = get(SoulsAtom);
+    const soulSaver = get(SoulSaverAtom);
     set(InternalStateAtom, (previous) => {
       let newSelection: RaisinNode;
       const nextRoot = replace(
@@ -94,8 +92,7 @@ export const ReplaceNodeAtom = atom(
           ) {
             newSelection = replacement;
           }
-          souls.set(replacement, souls.get(old) || createSoul())
-          return replacement;
+          return soulSaver(old, replacement);
         }
       );
 
@@ -119,7 +116,12 @@ export const ReplacePathAtom = atom(
   null,
   (get, set, { prev, next }: { prev: NodePath; next: RaisinNode }) => {
     set(InternalStateAtom, (previous) => {
-      const nextRoot = replacePath(previous.current, prev, next);
+      const nextRoot = replacePath(
+        previous.current,
+        prev,
+        next,
+        get(SoulSaverAtom)
+      );
 
       const undoStack = [previous.current, ...previous.undoStack];
       const newState: InternalState = {

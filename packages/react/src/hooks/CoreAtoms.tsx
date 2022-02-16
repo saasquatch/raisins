@@ -9,8 +9,8 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { MutableRefObject } from 'react';
 import { HTMLAtom } from '../atoms/RaisinScope';
-import { GetSoulAtom, Soul, SoulsAtom, soulToString } from '../atoms/Soul';
 import { generateNextState } from '../editting/EditAtoms';
 import { IdentifierModel } from '../model/EditorModel';
 import { isFunction } from '../util/isFunction';
@@ -22,50 +22,35 @@ export type InternalState = {
   selected?: NodeSelection;
 };
 
-const { getParents, getAncestry: getAncestryUtil, visit, visitAll } = htmlUtil;
+const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
-export const IdToSoulAtom = atom((get) => {
-  const root = get(RootNodeAtom);
-  const getSoul = get(GetSoulAtom);
-  const soulIdToNode = new Map<string, Soul>();
-  visitAll(root, (n: RaisinNode) => {
-    const soulForNode = getSoul(n);
-
-    soulIdToNode.set(soulToString(soulForNode), soulForNode);
-    return n;
-  });
-  return (id: string) => soulIdToNode.get(id);
+type NodeAndHTML = MutableRefObject<
+  { html: string; node: RaisinNode } | undefined
+>;
+const NodeWithHtmlRefAtom = atom<NodeAndHTML>({ current: undefined });
+const NodeFromHtml = atom((get) => {
+  const ref = get(NodeWithHtmlRefAtom);
+  const html = get(HTMLAtom);
+  if (ref.current?.html === html) {
+    return ref.current.node;
+  }
+  return htmlParser(html);
 });
-IdToSoulAtom.debugLabel = 'IdToSoulAtom';
 
-export const SoulToNodeAtom = atom((get) => {
-  const root = get(RootNodeAtom);
-  const getSoul = get(GetSoulAtom);
+/*
+Scenario: Souls are presered when downstream HTML matches upstream HTML
 
-  const soulToNode = new Map<Soul, RaisinNode>();
-  visitAll(root, (n: RaisinNode) => {
-    const soulForNode = getSoul(n);
-    soulToNode.set(soulForNode, n);
-    return n;
-  });
-  return (soul: Soul) => soulToNode.get(soul);
-});
-SoulToNodeAtom.debugLabel = 'SoulToNodeAtom';
+Given html has been loaded
+And a node is generated
+When a node is changed
+Then it's set upstream as serialized html
+When new serialized html is received downstream
+And the downstream html matches the upstream html
+Then a new node is not generated
+And a cached node is used
+And souls are preserved
+*/
 
-export const SoulIdToNodeAtom = atom((get) => {
-  const root = get(RootNodeAtom);
-  const getSoul = get(GetSoulAtom);
-  const soulIdToNode = new Map<string, RaisinNode>();
-  visitAll(root, (n: RaisinNode) => {
-    const soulForNode = getSoul(n);
-    soulIdToNode.set(soulToString(soulForNode), n);
-    return n;
-  });
-  return (id: string) => soulIdToNode.get(id);
-});
-SoulIdToNodeAtom.debugLabel = 'SoulIdToNodeAtom';
-
-const NodeFromHtml = atom((get) => htmlParser(get(HTMLAtom)));
 const getDerivedInternal = (get: Getter) => {
   const current = get(NodeFromHtml);
   const historyState = get(HistoryAtom);
@@ -75,6 +60,8 @@ const getDerivedInternal = (get: Getter) => {
   };
 };
 
+const HtmlCacheAtom = atom(() => new WeakMap<RaisinNode, string>());
+
 // Should be made private
 export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
   getDerivedInternal,
@@ -83,8 +70,15 @@ export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
     const { current, ...rest } = isFunction(next) ? next(iState) : next;
 
     if (current !== iState.current) {
-      const htmlString = htmlSerializer(current);
-      set(HTMLAtom, htmlString);
+      const cache = get(HtmlCacheAtom);
+      const cached = cache.get(current);
+      if (!cached) {
+        const htmlString = htmlSerializer(current);
+        cache.set(current, htmlString);
+        const ref = get(NodeWithHtmlRefAtom);
+        ref.current = { html: htmlString, node: current };
+        set(HTMLAtom, htmlString);
+      }
     }
     set(HistoryAtom, rest);
   }

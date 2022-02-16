@@ -1,9 +1,11 @@
 import { htmlParser, RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
-import React, { useRef } from 'react';
-import { AtomProseEditor } from '../src/prosemirror/ProseEditor';
-import { useSelectionAtom } from '../src/prosemirror/useSelectionAtom';
+import { atom, PrimitiveAtom, useAtom } from 'jotai';
+import React, { useMemo, useRef } from 'react';
+import {
+  AtomProseEditor,
+  ProseTextSelection,
+} from '../src/prosemirror/ProseEditor';
 
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
@@ -39,10 +41,12 @@ export const Paragraphs = () => (
 );
 
 function AtomEditor({ initial }: { initial: RaisinNode }) {
-  const nodeAtom = useRef(
-    atom<RaisinDocumentNode>(initial as RaisinDocumentNode)
-  ).current;
-  const selectionAtomRef = useSelectionAtom();
+  const { nodeAtom, selectionAtomRef } = useMemo(() => {
+    return {
+      nodeAtom: atom<RaisinDocumentNode>(initial as RaisinDocumentNode),
+      selectionAtomRef: atom(undefined) as PrimitiveAtom<ProseTextSelection>,
+    };
+  }, []);
 
   const [selection] = useAtom(selectionAtomRef);
   const [node] = useAtom(nodeAtom);
