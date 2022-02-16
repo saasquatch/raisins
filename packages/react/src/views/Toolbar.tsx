@@ -6,7 +6,7 @@ import { HoveredBreadcrumbs } from '../canvas/CanvasHoveredAtom';
 import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 import { HistorySizeAtom, RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 
-export function ToolbarView() {
+export function ToolbarController() {
   const historySize = useAtom(HistorySizeAtom, RaisinScope)[0];
   const undo = useUpdateAtom(UndoAtom, RaisinScope);
   const redo = useUpdateAtom(RedoAtom, RaisinScope);

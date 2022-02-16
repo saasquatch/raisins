@@ -1,11 +1,11 @@
 import React, { CSSProperties } from 'react';
 import { CanvasController } from '../canvas/CanvasController';
-import { StyleEditor } from '../stylesheets/StyleEditor';
-import { EditorPanel } from './EditorPanel';
-import { Layers } from './Layers';
+import { StyleEditorController } from '../stylesheets/StyleEditor';
+import { SelectedElementEditorController } from './SelectedElementEditorController';
+import { LayersController } from './Layers';
 import { PackageEditorController } from './PackageEditorView';
-import RichTextEditor from '../rich-text/RichTextEditor';
-import { ToolbarView } from './Toolbar';
+import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
+import { ToolbarController } from './Toolbar';
 
 export const Row: CSSProperties = {
   display: 'flex',
@@ -51,22 +51,22 @@ export function EditorView() {
     <>
       <div style={Main}>
         <div style={Header}>
-          <ToolbarView />
+          <ToolbarController />
         </div>
         <div style={Edits}>
-          <EditorPanel />
+          <SelectedElementEditorController />
           <PackageEditorController />
-          <StyleEditor />
+          <StyleEditorController />
         </div>
         <div style={CanvasCss}>
           <CanvasController />
           <CanvasController />
-          <RichTextEditor />
+          <SelectedNodeRichTextEditor />
         </div>
 
         <div style={LayersCss}>
           {' '}
-          <Layers />
+          <LayersController />
         </div>
       </div>
     </>

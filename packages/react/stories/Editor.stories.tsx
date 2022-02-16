@@ -4,7 +4,7 @@ import { RaisinsProvider } from '../src/atoms/RaisinScope';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
 import { useHotkeys } from '../src/hooks/useHotkeys';
-import { Layers } from '../src/views/Layers';
+import { LayersController } from '../src/views/Layers';
 import { RegisteredAtoms } from './DevTools';
 
 const meta: Meta = {
@@ -82,7 +82,7 @@ export function LayersOnly() {
     <>
       <RaisinsProvider stateTuple={stateTuple}>
         <div style={{ display: 'flex' }}>
-          <Layers />
+          <LayersController />
           <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>
         </div>
       </RaisinsProvider>

@@ -10,7 +10,7 @@ import { EditSelectedNodeAtom } from './EditSelectedNodeAtom';
 
 const SelectedIsElement = atom((get) => isElementNode(get(SelectedNodeAtom)));
 
-export function EditorPanel() {
+export function SelectedElementEditorController() {
   const isElement = useAtomValue(SelectedIsElement, RaisinScope);
   if (isElement) {
     return (

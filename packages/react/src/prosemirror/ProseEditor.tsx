@@ -128,9 +128,8 @@ function createAtoms(
           domParser: DOMParser.fromSchema(schema),
           clipboardParser: DOMParser.fromSchema(schema),
         });
-      }
-      // TODO: Figure out why destroy doesn't work.
-      // (view) => view && view.destroy()
+      },
+      (view) => view && view.destroy()
     );
   });
 

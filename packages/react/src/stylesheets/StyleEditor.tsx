@@ -5,7 +5,7 @@ import { StateUpdater } from '../util/NewState';
 import { useStyleEditor } from './useStyleEditor';
 
 const { createChildUpdater, createUpdater } = cssUtil;
-export function StyleEditor() {
+export function StyleEditorController() {
   const model = useStyleEditor();
 
   if (!model.sheets) {

@@ -103,7 +103,7 @@ const AddBlock: CSSProperties = {
 const RootHasChildren = atom(
   (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
 );
-export const Layers: FC<{}> = () => {
+export const LayersController: FC<{}> = () => {
   const hasChildren = useAtomValue(RootHasChildren, RaisinScope);
 
   return (

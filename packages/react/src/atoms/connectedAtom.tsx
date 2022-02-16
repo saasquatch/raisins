@@ -1,11 +1,11 @@
-import { Atom, atom, WritableAtom, Getter, Setter } from 'jotai';
+import { Atom, atom, Getter, Setter } from 'jotai';
 import { MutableRefObject } from 'react';
 
 /**
  * Creates a read-only atom for some external state connection that needs to be both initialized and optionally destroyed.
  *
  * Internally this wraps `atom.onMount` to provide access to both `set` and `get`.
- * 
+ *
  * @param initializer
  * @param destroy
  * @returns
@@ -28,7 +28,7 @@ export default function connectedAtom<T>(
       current: null,
     };
     setAtom(ref);
-    destroy && destroy(ref.current);
+    return () => destroy && destroy(ref.current);
   };
 
   const ReadOnlyAtom = atom((get) => get(ProxyAtom));
