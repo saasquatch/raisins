@@ -41,10 +41,11 @@ export const GetSoulAtom = atom<(node: RaisinNode) => Soul>((get) => {
   };
 });
 
+let soulNumber = 1;
 export function createSoul(): Soul {
   return {
     created: Date.now(),
-    id: 'soul-' + Math.round(Math.random() * 10000),
+    id: 'soul-' + (++soulNumber),
     toString() {
       return this.id;
     },

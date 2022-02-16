@@ -1,23 +1,33 @@
-import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
-import { Atom, atom } from 'jotai';
+import { isElementNode, RaisinDocumentNode } from '@raisins/core';
+import { atom } from 'jotai';
 import React, { createContext, useContext, useMemo } from 'react';
-import { h, VNodeStyle } from 'snabbdom';
+import { h, VNode, VNodeStyle } from 'snabbdom';
 import { dependentAtom } from '../atoms/dependentAtom';
-import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
+import {
+  DropPloppedNodeInSlotAtom,
+  PickedNodeAtom,
+  PloppingIsActive,
+} from '../atoms/pickAndPlopAtoms';
 import { GetSoulAtom, soulToString } from '../atoms/Soul';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
-import { IdToSoulAtom, SoulIdToNodeAtom } from '../hooks/SoulsInDocumentAtoms';
+import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
+import { ParentsAtom, RootNodeAtom } from '../hooks/CoreAtoms';
+import {
+  IdToSoulAtom,
+  SoulIdToNodeAtom,
+  SoulToNodeAtom,
+} from '../hooks/SoulsInDocumentAtoms';
 import { SelectedNodeAtom, SelectedSoulAtom } from '../selection/SelectedAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { HoveredAtom, HoveredSoulAtom } from './CanvasHoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
+import { defaultRectAtom } from './defaultRectAtom';
 import {
   raisintoSnabdom,
   SnabdomAppender,
   SnabdomRenderer,
 } from './raisinToSnabdom';
 import { Rect } from './Rect';
-import { ConnectionState, createAtoms } from './SnabbdomSanboxedIframeAtom';
+import { createAtoms } from './SnabbdomSanboxedIframeAtom';
 import { CanvasEvent, GeometryDetail } from './_CanvasRPCContract';
 
 export type Size = {
@@ -48,6 +58,9 @@ export const VnodeAtom = atom((get) => {
   const node = get(RootNodeAtom);
   const souls = get(GetSoulAtom);
   const isPloppingActive = get(PloppingIsActive);
+  const pickedNode = get(PickedNodeAtom);
+  const metamodel = get(ComponentModelAtom);
+  const parents = get(ParentsAtom);
 
   const renderer: SnabdomRenderer = (d, n) => {
     if (mode === 'preview') {
@@ -71,12 +84,13 @@ export const VnodeAtom = atom((get) => {
     };
     let propsToRender: Record<string, any> = {};
 
+    const soul = souls(n);
     return {
       ...d,
       attrs: {
         ...d.attrs,
-        'raisins-soul': soulToString(souls(n)),
-        'raisins-thing': 'yes',
+        'raisins-soul': soul.toString(),
+        'raisins-events': true,
       },
       style,
       props: propsToRender,
@@ -84,15 +98,29 @@ export const VnodeAtom = atom((get) => {
   };
 
   const appender: SnabdomAppender = (c, n) => {
-    if (isPloppingActive) {
-      // TODO:
-      // 0 - infer plop targets from slot names and metamodel
-      // 1 - only render appropriate plop targets
-      // 2 - render pretty plop targets
-      // 3 - add appropriate attrs to make `onClick` work (and rewrite select-on-click stuff)
-      return [h('div', null, 'Plop here'), ...(Array.isArray(c) ? c : [])];
-    }
-    return c;
+    // 0 - infer plop targets from slot names and metamodel
+    // 1 - only render appropriate plop targets
+    // 2 - render pretty plop targets (See Head atom)
+    // 3 - add appropriate attrs to make `onClick` work (and rewrite select-on-click stuff)
+    if (!pickedNode || !isElementNode(pickedNode)) return c;
+    if (!isPloppingActive || !isElementNode(n)) return c;
+    const parent = n;
+
+    // TODO: Root node should allow any children
+    if (!isElementNode(parent)) return c;
+
+    const slot = n.attribs.slot ?? '';
+    const isValid = metamodel.isValidChild(pickedNode, parent, slot);
+    if (!isValid) return c;
+    const idx = 1;
+    const soulId = souls(parent).toString();
+
+    const newChildren =
+      c?.reduce((acc, child, idx) => {
+        const plopTarget = createPlopTargetNode({ idx, slot, soulId });
+        return [...acc, plopTarget, child];
+      }, [] as Array<string | VNode>) ?? [];
+    return newChildren;
   };
   const vnode = raisintoSnabdom(node as RaisinDocumentNode, renderer, appender);
 
@@ -100,34 +128,29 @@ export const VnodeAtom = atom((get) => {
 });
 VnodeAtom.debugLabel = 'VnodeAtom';
 
-function defaultRect(
-  connection: Atom<ConnectionState>,
-  nodeAtom: Atom<RaisinNode | undefined>,
-  listenedPosition: Atom<Rect | undefined>
-) {
-  const rectAtom = atom(async (get) => {
-    const node = get(nodeAtom);
-    if (!node) return undefined;
-    // When node changes, then lookup initial value
-    const latest = get(listenedPosition);
-    if (latest) return latest;
-
-    const connState = get(connection);
-
-    if (connState.type !== 'loaded') {
-      return undefined;
-    }
-
-    const geometry = await connState.childRpc.geometry();
-    const getSoul = get(GetSoulAtom);
-    const soul = getSoul(node);
-    const rect = geometry.entries.find(
-      (e) => e.target?.attributes['raisins-soul'] === soulToString(soul)
-    );
-
-    return rect?.contentRect;
-  });
-  return rectAtom;
+function createPlopTargetNode({
+  soulId,
+  slot,
+  idx,
+}: {
+  idx: number;
+  soulId: string;
+  slot: string;
+}) {
+  return h(
+    'div',
+    {
+      attrs: {
+        slot,
+        'raisin-plop-target': true,
+        'raisin-plop-parent': soulId,
+        'raisin-plop-slot': slot,
+        'raisin-plop-idx': idx,
+        'raisins-events': true,
+      },
+    },
+    'Plop here'
+  );
 }
 
 function createCanvasAtoms() {
@@ -144,24 +167,41 @@ function createCanvasAtoms() {
   const CanvasEventAtom = atom(
     null,
     (get, set, { target, type }: CanvasEvent) => {
+      const idToSoul = get(IdToSoulAtom);
       if (type === 'click') {
-        const idToSoul = get(IdToSoulAtom);
+        const plopParentSoulId = target?.attributes['raisin-plop-parent'];
+        if (plopParentSoulId) {
+          const parentSoul = plopParentSoulId
+            ? idToSoul(plopParentSoulId)
+            : undefined;
+          if (!parentSoul) return;
+          const soulToNode = get(SoulToNodeAtom);
+          const parentNode = soulToNode(parentSoul);
+          if (!parentNode || !isElementNode(parentNode)) return;
+          const idx = Number(target?.attributes['raisin-plop-idx']);
+          const slot = target?.attributes['raisin-plop-slot'];
+          set(DropPloppedNodeInSlotAtom, { parent: parentNode, idx, slot });
+          // If plop, don't do select logic
+          return;
+        }
+
         const soulId = target?.attributes['raisins-soul'];
-        const soul = soulId ? idToSoul(soulId) : undefined;
-        set(SelectedSoulAtom, soul);
-        if (target) {
-          // TODO: This doesn't handle when selection is changed in different canvas
-          // We need to "pull" the size on THIS canvas when selection is set on the OTHER canvas
-          set(SelectedRectAtom, {
-            x: target.rect.x,
-            y: target.rect.y,
-            height: target.rect.height,
-            width: target.rect.width,
-          });
+        if (soulId) {
+          const soul = soulId ? idToSoul(soulId) : undefined;
+          set(SelectedSoulAtom, soul);
+          if (target) {
+            // TODO: This doesn't handle when selection is changed in different canvas
+            // We need to "pull" the size on THIS canvas when selection is set on the OTHER canvas
+            set(SelectedRectAtom, {
+              x: target.rect.x,
+              y: target.rect.y,
+              height: target.rect.height,
+              width: target.rect.width,
+            });
+          }
         }
       }
       if (type === 'mouseover') {
-        const idToSoul = get(IdToSoulAtom);
         const soulId = target?.attributes['raisins-soul'];
         const soul = soulId ? idToSoul(soulId) : undefined;
         set(HoveredSoulAtom, soul);
@@ -178,7 +218,7 @@ function createCanvasAtoms() {
     }
   );
 
-  const ResizeAtom = atom(null, (get, set, geometry:GeometryDetail) => {
+  const ResizeAtom = atom(null, (get, set, geometry: GeometryDetail) => {
     const selected = get(SelectedNodeAtom);
     const hovered = get(HoveredAtom);
     const getNode = get(SoulIdToNodeAtom);
@@ -203,19 +243,19 @@ function createCanvasAtoms() {
       }
     });
   });
-  
+
   const IframeAtom = createAtoms({
-    head: CanvasScriptsAtom,
+    head: IframeHeadAtom,
     registry: NPMRegistryAtom,
-    selector: atom('[raisins-soul]'),
+    selector: atom('[raisins-events]'),
     vnodeAtom: VnodeAtom,
     onEvent: CanvasEventAtom,
     onResize: ResizeAtom,
   });
 
   return {
-    HoveredRectAtom: defaultRect(IframeAtom, HoveredAtom, HoveredRectAtom),
-    SelectedRectAtom: defaultRect(
+    HoveredRectAtom: defaultRectAtom(IframeAtom, HoveredAtom, HoveredRectAtom),
+    SelectedRectAtom: defaultRectAtom(
       IframeAtom,
       SelectedNodeAtom,
       SelectedRectAtom
@@ -224,6 +264,21 @@ function createCanvasAtoms() {
     IframeAtom,
   };
 }
+
+const IframeHeadAtom = atom((get) => {
+  const script = get(CanvasScriptsAtom);
+  const styles = `<style>
+    [raisin-plop-target]{
+      background: yellow;
+
+    }
+    [raisin-plop-target]:hover{
+      outline: 1px solid red;
+    }
+  </style>
+  `;
+  return script + styles;
+});
 
 export const CanvasContext = createContext<
   undefined | ReturnType<typeof createCanvasAtoms>
