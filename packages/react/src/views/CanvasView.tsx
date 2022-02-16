@@ -1,5 +1,5 @@
 import { isElementNode } from '@raisins/core';
-import { Atom, atom, PrimitiveAtom, useAtom } from 'jotai';
+import { Atom, atom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
@@ -12,11 +12,6 @@ import {
   DuplicateSelectedAtom,
   PickSelectedAtom,
 } from '../editting/EditSelectedAtom';
-import { nodeSoul } from '../node/AtomsForNode';
-import {
-  NodeAtomProvider,
-  OptionalNodeAtomProvider,
-} from '../node/node-context';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
 import { SelectedNodeAtom } from '../selection/SelectedAtom';
 
