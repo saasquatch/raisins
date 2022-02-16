@@ -71,15 +71,15 @@ export const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
 
     if (current !== iState.current) {
       const cache = get(HtmlCacheAtom);
-      const cached = cache.get(current);
-      if (!cached) {
-        const htmlString = htmlSerializer(current);
+      let htmlString = cache.get(current);
+      if (!htmlString) {
+        htmlString = htmlSerializer(current);
         cache.set(current, htmlString);
-        const ref = get(NodeWithHtmlRefAtom);
-        ref.current = { html: htmlString, node: current };
-        set(HTMLAtom, htmlString);
       }
-    }
+      const ref = get(NodeWithHtmlRefAtom);
+      ref.current = { html: htmlString, node: current };
+      set(HTMLAtom, htmlString);
+  }
     set(HistoryAtom, rest);
   }
 );
