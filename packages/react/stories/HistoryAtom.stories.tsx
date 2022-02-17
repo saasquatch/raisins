@@ -1,11 +1,6 @@
-import { RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { ElementType } from 'domelementtype';
 import { atom, Getter, Setter, useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { atomForAttributes } from '../src/atoms/atomForAttributes';
-import { atomWithId, getId } from '../src/atoms/atomWithId';
 import { atomWithSetStateListener } from '../src/atoms/atomWithSetterListener';
 
 const meta: Meta = {
@@ -39,58 +34,6 @@ export function AtomWithHistory() {
       <button onClick={() => setHistory([])}>clear history</button>
       <hr />
       <pre>{JSON.stringify(history, null, 2)}</pre>
-    </div>
-  );
-}
-
-const objAtom = atom({});
-const objAtomWithId = atomWithId(objAtom);
-export function AtomWithHiddenId() {
-  const [obj, setObj] = useAtom(objAtomWithId);
-  const updateBase = useUpdateAtom(objAtom);
-
-  const nextVal = Math.random();
-  return (
-    <div>
-      Value: <code>{JSON.stringify(obj)}</code>
-      <br />
-      ID: {getId(obj)}
-      <br />
-      <button onClick={() => setObj({ val: nextVal })}>Set to {nextVal}</button>
-      <button onClick={() => updateBase({ val: nextVal })}>
-        Set base to {nextVal}
-      </button>
-    </div>
-  );
-}
-
-const nodeAtom = atom({
-  type: ElementType.Tag,
-  tagName: 'span',
-  attribs: {},
-  attrs: {
-    foo: 'Bar',
-  },
-  children: [],
-} as RaisinNode);
-const nodeAtomWithId = atomWithId(nodeAtom);
-const nodeAttrs = atomForAttributes(nodeAtomWithId);
-export function NodeWithHiddenId() {
-  const [obj, setObj] = useAtom(nodeAttrs);
-  const updateBase = useUpdateAtom(atomForAttributes(nodeAtom));
-  const [baseNode] = useAtom(nodeAtom);
-
-  const nextVal = Math.random() + '';
-  return (
-    <div>
-      Value: <code>{JSON.stringify(obj)}</code>
-      <br />
-      ID: {getId(baseNode)}
-      <br />
-      <button onClick={() => setObj({ val: nextVal })}>Set to {nextVal}</button>
-      <button onClick={() => updateBase({ val: nextVal })}>
-        Set base to {nextVal}
-      </button>
     </div>
   );
 }

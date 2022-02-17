@@ -1,11 +1,11 @@
 import { getPath, NodePath, RaisinNode } from '@raisins/core';
 import { Atom, atom, PrimitiveAtom } from 'jotai';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
 import { createMemoizeAtom } from './weakCache';
 
 const memoizeAtom = createMemoizeAtom();
 
-export function atomWithNodePath(
+export function atomForNodePath(
   baseAtom: PrimitiveAtom<RaisinNode>
 ): Atom<NodePath | undefined> {
   return memoizeAtom(

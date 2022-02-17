@@ -3,8 +3,8 @@ import { Meta } from '@storybook/react';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
 import React, { useMemo } from 'react';
 import { RaisinScope } from '../src/atoms/RaisinScope';
-import { ExampleProseEditor } from '../src/prosemirror/ExampleProseEditor';
-import { ProseTextSelection } from '../src/prosemirror/ProseEditor';
+import { ExampleProseEditor } from '../src/rich-text/prosemirror/ExampleProseEditor';
+import { ProseTextSelection } from '../src/rich-text/prosemirror/ProseEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };

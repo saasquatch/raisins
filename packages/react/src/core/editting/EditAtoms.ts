@@ -7,12 +7,12 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
-import { SoulsAtom } from '../atoms/Soul';
+import { SoulsAtom } from '../../atoms/Soul';
 import {
   InternalState,
   InternalStateAtom,
   RootNodeAtom,
-} from '../hooks/CoreAtoms';
+} from '../CoreAtoms';
 import { SoulSaverAtom } from './SoulSaverAtom';
 
 const { duplicate, insertAt, remove, replace, replacePath } = htmlUtil;

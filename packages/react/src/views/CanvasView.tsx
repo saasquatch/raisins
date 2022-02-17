@@ -3,17 +3,17 @@ import { Atom, atom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { HoveredAtom } from '../canvas/CanvasHoveredAtom';
-import { Rect } from '../canvas/Rect';
+import { HoveredNodeAtom } from '../core/selection/HoveredAtom';
+import { Rect } from '../canvas/api/Rect';
 import { Size, useCanvasAtoms } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
 import {
   DeleteSelectedAtom,
   DuplicateSelectedAtom,
   PickSelectedAtom,
-} from '../editting/EditSelectedAtom';
+} from '../core/editting/EditSelectedAtom';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
-import { SelectedNodeAtom } from '../selection/SelectedAtom';
+import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),
@@ -58,7 +58,7 @@ export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
 };
 
 const HoveredNodeContent = atom((get) => {
-  const node = get(HoveredAtom);
+  const node = get(HoveredNodeAtom);
   const metamodel = get(ComponentMetaAtom);
   if (!isElementNode(node)) return;
   return metamodel(node.tagName).title ?? node.tagName;

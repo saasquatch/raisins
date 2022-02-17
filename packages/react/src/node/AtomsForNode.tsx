@@ -8,17 +8,17 @@ import {
   PickedNodeAtom,
 } from '../atoms/pickAndPlopAtoms';
 import { GetSoulAtom } from '../atoms/Soul';
-import { HoveredAtom, HoveredSoulAtom } from '../canvas/CanvasHoveredAtom';
+import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredAtom';
 import {
   ComponentMetaAtom,
   ComponentModelAtom,
 } from '../component-metamodel/ComponentModel';
-import { DuplicateNodeAtom, RemoveNodeAtom } from '../editting/EditAtoms';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
-import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
+import { DuplicateNodeAtom, RemoveNodeAtom } from '../core/editting/EditAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
+import { SelectedAtom, SelectedNodeAtom } from '../core/selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 import { atomForNode } from './node-context';
-import { tagNameForNode } from './tagName';
+import { atomForTagName } from '../atoms/atomForTagName';
 
 /**
  * Is the node in context currently selected?
@@ -40,7 +40,7 @@ export const nodeSoul = atomForNode((n) =>
 export const nodeHovered = atomForNode(
   (n) =>
     atom(
-      (get) => get(HoveredAtom) === get(n),
+      (get) => get(HoveredNodeAtom) === get(n),
       (get, set) => {
         const node = get(n);
         const getSoul = get(GetSoulAtom);
@@ -148,7 +148,7 @@ export const componentMetaForNode = atomForNode(
  * Gets slots for the node in context
  */
 export const slotsForNode = atomForNode((n) => {
-  const tagNameAtom = tagNameForNode(n);
+  const tagNameAtom = atomForTagName(n);
   const childSlotsAtom = atom((get) => {
     // FIXME: This is updated too frequently, causing a new referentially unequal array and a rerender
     const children = [] as RaisinNode[]; //get(atomForChildren(n));
@@ -206,7 +206,7 @@ export const duplicateForNode = atomForNode(
 export const nameForNode = atomForNode(
   (n) =>
     atom((get) => {
-      const tagName = get(tagNameForNode(n));
+      const tagName = get(atomForTagName(n));
       const getComponentMeta = get(ComponentMetaAtom);
       if (!tagName) return '';
       const meta = getComponentMeta(tagName);

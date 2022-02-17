@@ -1,7 +1,7 @@
 import type PenpalType from 'penpal';
 import type * as SnabbdomType from 'snabbdom';
 import type { Module, VNode } from 'snabbdom';
-import type { ChildRPC, GeometryEntry, ParentRPC } from '../_CanvasRPCContract';
+import type { ChildRPC, GeometryEntry, ParentRPC } from '../api/_CanvasRPCContract';
 import type { Props } from './childApiSrc';
 
 type Snabbdom = typeof SnabbdomType;

@@ -8,7 +8,7 @@ import * as css from 'css-tree';
 import { useAtom } from 'jotai';
 import { useMemo, useState } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;

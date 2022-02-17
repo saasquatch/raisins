@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { InternalStateAtom } from '../hooks/CoreAtoms';
+import { InternalStateAtom } from '../CoreAtoms';
 
 /**
  * Returns the sizes of the undo/redo stacks for the UI

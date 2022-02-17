@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { RaisinsProvider } from '../src/atoms/RaisinScope';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
-import { useHotkeys } from '../src/hooks/useHotkeys';
+import { useHotkeys } from '../src/core/useHotkeys';
 import { LayersController } from '../src/views/Layers';
 import { RegisteredAtoms } from './DevTools';
 

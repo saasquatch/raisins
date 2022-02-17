@@ -1,23 +1,23 @@
-import { getPath, isElementNode, RaisinNode } from '@raisins/core';
+import { isElementNode, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { Soul } from "../atoms/Soul";
-import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
-import { ParentsAtom, RootNodeAtom } from '../hooks/CoreAtoms';
-import { SoulToNodeAtom } from "../hooks/SoulsInDocumentAtoms";
+import { Soul } from '../../atoms/Soul';
+import { ComponentMetaAtom } from '../../component-metamodel/ComponentModel';
+import { ParentsAtom } from '../CoreAtoms';
+import { SoulToNodeAtom } from '../SoulsInDocumentAtoms';
 
 export const HoveredSoulAtom = atom<Soul | undefined>(undefined);
 HoveredSoulAtom.debugLabel = 'HoveredSoulAtom';
 
-export const HoveredAtom = atom<RaisinNode | undefined>((get) => {
+export const HoveredNodeAtom = atom<RaisinNode | undefined>((get) => {
   const hoveredSoul = get(HoveredSoulAtom);
   if (!hoveredSoul) return undefined;
   const getNode = get(SoulToNodeAtom);
   return getNode(hoveredSoul);
 });
-HoveredAtom.debugLabel = 'HoveredAtom';
+HoveredNodeAtom.debugLabel = 'HoveredNodeAtom';
 
-export const HoveredBreadcrumbs = atom((get) => {
-  const node = get(HoveredAtom);
+export const HoveredBreadcrumbsAtom = atom((get) => {
+  const node = get(HoveredNodeAtom);
   if (!node) return '';
   const parents = get(ParentsAtom);
   const metamodel = get(ComponentMetaAtom);
@@ -34,3 +34,4 @@ export const HoveredBreadcrumbs = atom((get) => {
   }
   return tagNames.reverse().join(' > ');
 });
+HoveredBreadcrumbsAtom.debugLabel = 'HoveredBreadcrumbsAtom';

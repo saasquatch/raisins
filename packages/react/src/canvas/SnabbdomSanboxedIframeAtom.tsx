@@ -9,7 +9,7 @@ import {
   ChildRPC,
   GeometryDetail,
   ParentRPC,
-} from './_CanvasRPCContract';
+} from './api/_CanvasRPCContract';
 
 const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <!DOCTYPE html>

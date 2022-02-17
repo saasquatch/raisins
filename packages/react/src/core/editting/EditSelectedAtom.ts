@@ -1,7 +1,7 @@
 import { htmlUtil } from '@raisins/core';
 import { atom } from 'jotai';
-import { PickedAtom } from '../atoms/pickAndPlopAtoms';
-import { InternalStateAtom } from '../hooks/CoreAtoms';
+import { PickedAtom } from '../../atoms/pickAndPlopAtoms';
+import { InternalStateAtom } from '../CoreAtoms';
 import { SelectedAtom, SelectedNodeAtom } from '../selection/SelectedAtom';
 import { DuplicateNodeAtom, generateNextState } from './EditAtoms';
 

@@ -3,7 +3,7 @@ import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { NodeAtomProvider } from '../node/node-context';
-import { SelectedNodeAtom } from '../selection/SelectedAtom';
+import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 import { AttributesEditor } from './AttributeEditor';
 import { EditSelectedNodeAtom } from './EditSelectedNodeAtom';

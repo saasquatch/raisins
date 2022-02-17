@@ -1,9 +1,9 @@
 import { getNode, getPath, RaisinNode } from '@raisins/core';
 import { atom, Getter, SetStateAction } from 'jotai';
-import { GetSoulAtom, Soul } from '../atoms/Soul';
-import { InternalState, InternalStateAtom } from '../hooks/CoreAtoms';
-import { SoulToNodeAtom } from '../hooks/SoulsInDocumentAtoms';
-import { isFunction } from '../util/isFunction';
+import { GetSoulAtom, Soul } from '../../atoms/Soul';
+import { InternalState, InternalStateAtom } from '../CoreAtoms';
+import { SoulToNodeAtom } from '../SoulsInDocumentAtoms';
+import { isFunction } from '../../util/isFunction';
 
 export const SelectedAtom = atom(
   (get) => get(InternalStateAtom).selected,

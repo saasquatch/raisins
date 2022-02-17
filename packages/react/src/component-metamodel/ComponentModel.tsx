@@ -6,9 +6,9 @@ import {
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
-import { ParentsAtom } from '../hooks/CoreAtoms';
-import { NodeWithSlots } from '../model/EditorModel';
-import { getSlots } from '../model/getSlots';
+import { ParentsAtom } from '../core/CoreAtoms';
+import { NodeWithSlots } from './SlotModel';
+import { getSlots } from './getSlots';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';

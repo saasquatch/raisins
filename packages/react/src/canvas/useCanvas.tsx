@@ -8,17 +8,22 @@ import {
   PickedNodeAtom,
   PloppingIsActive,
 } from '../atoms/pickAndPlopAtoms';
-import { GetSoulAtom, soulToString } from '../atoms/Soul';
+import { GetSoulAtom } from '../atoms/Soul';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { ParentsAtom, RootNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
+import {
+  SelectedNodeAtom,
+  SelectedSoulAtom,
+} from '../core/selection/SelectedAtom';
 import {
   IdToSoulAtom,
   SoulIdToNodeAtom,
   SoulToNodeAtom,
-} from '../hooks/SoulsInDocumentAtoms';
-import { SelectedNodeAtom, SelectedSoulAtom } from '../selection/SelectedAtom';
+} from '../core/SoulsInDocumentAtoms';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { HoveredAtom, HoveredSoulAtom } from './CanvasHoveredAtom';
+import { Rect } from './api/Rect';
+import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
+import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredAtom';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import { defaultRectAtom } from './defaultRectAtom';
 import {
@@ -26,9 +31,7 @@ import {
   SnabdomAppender,
   SnabdomRenderer,
 } from './raisinToSnabdom';
-import { Rect } from './Rect';
 import { createAtoms } from './SnabbdomSanboxedIframeAtom';
-import { CanvasEvent, GeometryDetail } from './_CanvasRPCContract';
 
 export type Size = {
   name: string;
@@ -53,14 +56,13 @@ export const SizeAtom = atom<Size>(sizes[0]);
 export const VnodeAtom = atom((get) => {
   const mode = get(ModeAtom);
   const selected = get(SelectedNodeAtom);
-  const hovered = get(HoveredAtom);
+  const hovered = get(HoveredNodeAtom);
   const outlined = get(OutlineAtom);
   const node = get(RootNodeAtom);
   const souls = get(GetSoulAtom);
   const isPloppingActive = get(PloppingIsActive);
   const pickedNode = get(PickedNodeAtom);
   const metamodel = get(ComponentModelAtom);
-  const parents = get(ParentsAtom);
 
   const renderer: SnabdomRenderer = (d, n) => {
     if (mode === 'preview') {
@@ -219,7 +221,7 @@ function createCanvasAtoms() {
 
   const ResizeAtom = atom(null, (get, set, geometry: GeometryDetail) => {
     const selected = get(SelectedNodeAtom);
-    const hovered = get(HoveredAtom);
+    const hovered = get(HoveredNodeAtom);
     const getNode = get(SoulIdToNodeAtom);
     geometry.entries.forEach((e) => {
       const id = e.target?.attributes['raisins-soul'];
@@ -253,7 +255,7 @@ function createCanvasAtoms() {
   });
 
   return {
-    HoveredRectAtom: defaultRectAtom(IframeAtom, HoveredAtom, HoveredRectAtom),
+    HoveredRectAtom: defaultRectAtom(IframeAtom, HoveredNodeAtom, HoveredRectAtom),
     SelectedRectAtom: defaultRectAtom(
       IframeAtom,
       SelectedNodeAtom,

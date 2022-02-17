@@ -6,13 +6,13 @@ import React, { useMemo, useRef } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { GetSoulAtom } from '../atoms/Soul';
 import { createMemoizeAtom } from '../atoms/weakCache';
-import { SoulSaverAtom } from '../editting/SoulSaverAtom';
+import { SoulSaverAtom } from '../core/editting/SoulSaverAtom';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
 import {
   ProseTextSelection,
   useProseEditorOnAtom,
-} from '../prosemirror/ProseEditor';
-import { SelectedNodeAtom } from '../selection/SelectedAtom';
+} from './prosemirror/ProseEditor';
+import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
 import { isElementNode } from '../util/isNode';
 import { EditSelectedNodeAtom } from '../views/EditSelectedNodeAtom';
 

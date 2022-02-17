@@ -6,7 +6,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { atom } from 'jotai';
+import { atom, useSetAtom } from 'jotai';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
@@ -25,22 +25,22 @@ import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
 } from '../controllers/ChildrenEditor';
-import { useCoreEditingApi } from '../editting/useCoreEditingAPI';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
+import { InsertNodeAtom } from '../core/editting/EditAtoms';
 import {
   canPlopHereAtom,
   duplicateForNode,
   isNodeAnElement,
-  nodeHovered,
   isNodePicked,
   isSelectedForNode,
   nameForNode,
+  nodeHovered,
+  nodeSoul,
   plopNodeHere,
   removeForNode,
   setSelectedForNode,
   slotsForNode,
   togglePickNode,
-  nodeSoul,
 } from '../node/AtomsForNode';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
@@ -122,7 +122,7 @@ export const LayersController: FC<{}> = () => {
 
 function AddNew(props: { idx: number; slot?: string }) {
   const node = useAtomValue(useNodeAtom(), RaisinScope);
-  const model = useCoreEditingApi();
+  const insert = useSetAtom(InsertNodeAtom, RaisinScope);
   const comp = useAtomValue(ComponentModelAtom, RaisinScope);
 
   const [open, setOpen] = useState(false);
@@ -147,9 +147,9 @@ function AddNew(props: { idx: number; slot?: string }) {
                   const cloned = clone(b.content) as RaisinElementNode;
                   // TODO: add "insert into slot" into core model?
                   props.slot && (cloned.attribs.slot = props.slot);
-                  model.insert({
+                  insert({
                     node: cloned,
-                    parent: node,
+                    parent: node as RaisinElementNode,
                     idx: props.idx,
                   });
                 }}
@@ -188,8 +188,7 @@ function ElementLayer() {
   const name = (
     <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
       <div style={Label}>
-        {title} {isPicked && ' Moving...'}{' '}
-        {soul.toString()}
+        {title} {isPicked && ' Moving...'} {soul.toString()}
       </div>
       <div>
         <button onClick={moveNode} disabled={!canMove}>
@@ -272,7 +271,7 @@ function SlotWidget({ s }: { s: Slot }) {
 }
 
 const SlotContext = React.createContext<string | undefined>(undefined);
-SlotContext.displayName="SlotContext";
+SlotContext.displayName = 'SlotContext';
 
 const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
   const slotName = useContext(SlotContext)!;
@@ -284,11 +283,11 @@ const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
   );
 };
 
+// TODO: Move to AtomsForNode with slot context?
 function useSlotChildNodes(slotName: string) {
   const nodeAtom = useNodeAtom();
   const slotChildrenAtom = useMemo(() => {
     return splitAtom(
-      // FIXME: This will replace the raisin tree, but without saving souls
       // Need to replace this to not replace souls
       focusAtom(nodeAtom, (o) =>
         optic_<RaisinNodeWithChildren>()

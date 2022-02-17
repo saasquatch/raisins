@@ -1,10 +1,5 @@
-import { NodePath, RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import { RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-
-export type IdentifierModel = {
-  getAncestry(node: RaisinNode): RaisinNodeWithChildren[];
-  getPath(node: RaisinNode): NodePath;
-};
 
 export type NodeWithSlots = {
   node: RaisinNode;

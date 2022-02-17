@@ -5,7 +5,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { useContext } from 'react';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { createMemoizeAtom } from '../atoms/weakCache';
-import { RootNodeAtom } from '../hooks/CoreAtoms';
+import { RootNodeAtom } from '../core/CoreAtoms';
 import { nodeAtomWithSoulSaved } from './nodeAtomWithSoulSaved';
 import {
   ScopedAtomCreator,

@@ -2,8 +2,6 @@ import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { splitAtom } from 'jotai/utils';
 import { atomForChildren } from '../atoms/atomForChildren';
-import { atomWithId } from '../atoms/atomWithId';
-import { atomWithNodeProps } from '../atoms/atomWithNodeProps';
 import { polymorphicAtom } from '../atoms/polymorphicAtom';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { isElementNode, isRoot } from '../util/isNode';
@@ -31,13 +29,6 @@ export function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
   ] = useAtom(childrenOrUndefined, RaisinScope) ?? [undefined, undefined];
 
   return {
-    childAtoms: childAtoms?.map(atomWithId) ?? [],
-  };
-}
-
-export function getDerivedAtoms(base: PrimitiveAtom<RaisinNode>) {
-  return {
-    node: base,
-    nodeProps: atomWithNodeProps(base),
+    childAtoms: childAtoms ?? [],
   };
 }

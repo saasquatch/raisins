@@ -1,7 +1,7 @@
 import { keymap } from 'prosemirror-keymap';
 import connectedAtom from '../atoms/connectedAtom';
-import { RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
-import { SelectedAtom } from '../selection/SelectedAtom';
+import { RedoAtom, UndoAtom } from '../core/editting/HistoryAtoms';
+import { SelectedAtom } from '../core/selection/SelectedAtom';
 
 export const HistoryKeyMapPluginAtom = connectedAtom((_, set) => {
   // FIXME: on undo/redo, we also need to update the selection to move the cursor
