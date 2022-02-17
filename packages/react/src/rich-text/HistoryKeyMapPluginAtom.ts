@@ -4,6 +4,8 @@ import { RedoAtom, UndoAtom } from '../editting/HistoryAtoms';
 import { SelectedAtom } from '../selection/SelectedAtom';
 
 export const HistoryKeyMapPluginAtom = connectedAtom((_, set) => {
+  // FIXME: on undo/redo, we also need to update the selection to move the cursor
+
   const plugin = keymap({
     //  Uppercase Z implies "Shift" is used
     'Mod-Z': () => {

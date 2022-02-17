@@ -3,7 +3,7 @@ import { Atom, atom, PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
 import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import connectedAtom from '../atoms/connectedAtom';
 import { RaisinScope } from '../atoms/RaisinScope';
 import { HistoryKeyMapPluginAtom } from '../rich-text/HistoryKeyMapPluginAtom';
@@ -27,16 +27,6 @@ export type RaisinProseState = {
   selection?: ProseTextSelection;
 };
 
-export function AtomProseEditor(props: {
-  nodeAtom: PrimitiveAtom<RaisinDocumentNode>;
-  selectionAtom: PrimitiveAtom<ProseTextSelection | undefined>;
-}) {
-  return (
-    <ProseEditorView2
-      {...useProseEditorOnAtom(props.nodeAtom, props.selectionAtom)}
-    />
-  );
-}
 /**
  * A prose editor that stores it's state in the `node` and `selection` atoms that are provided to this hook.
  *
@@ -61,6 +51,7 @@ export function useProseEditorOnAtom(
   };
 }
 
+// TODO: pluginAtom as a prop, allow plugins to be hot-swapped
 function createAtoms(
   node: PrimitiveAtom<RaisinDocumentNode>,
   selection: PrimitiveAtom<ProseTextSelection | undefined>
@@ -94,6 +85,7 @@ function createAtoms(
       // FIXME: Re-bundle this state. Since node and selection are independently updated,
       // their derived state can become inconsistent.
       // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
+      
       // NOTE: This currently works ONLY if selection is updated BEFORE document.
       // Otherwise deleting from the end of the text will throw an error
       if (nextState.state.selection !== currentState.selection) {
@@ -146,17 +138,7 @@ function createAtoms(
   );
 }
 
-function ProseEditorView2({
-  mountRef,
-}: {
-  mountRef: (el: HTMLElement | null) => void;
-}) {
-  return (
-    <>
-      <div ref={mountRef} />
-    </>
-  );
-}
+
 
 function hydratedState(
   sState: SerialState,
@@ -169,7 +151,7 @@ function hydratedState(
     richSelect = selection ? Selection.fromJSON(richDoc, selection) : undefined;
   } catch (e) {
     // Selection out of range caught here
-    // TODO: There's probably a smarter way to validate and replace selections.
+    // TODO: There's probably a smarter way to validate and replace selections
   }
 
   let state = EditorState.create({

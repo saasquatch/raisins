@@ -13,7 +13,7 @@ export const SoulSaverAtom = atom((get) => {
   return (prev: RaisinNode, next: RaisinNode) => {
     const prevSoul = getSoul(prev);
     souls.set(next, prevSoul);
-    const nextSoul = souls.get(next);
+    // const nextSoul = souls.get(next);
     return next;
   };
 });

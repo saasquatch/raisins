@@ -89,6 +89,9 @@ export const canPlopHereAtom = atomForNode(
   'canPlopHereAtom'
 );
 
+/**
+ * For plopping the active picked node into his node at a given idx and slot
+ */
 export const plopNodeHere = atomForNode(
   (n) =>
     atom(null, (get, set, { idx, slot }: { idx: number; slot: string }) => {

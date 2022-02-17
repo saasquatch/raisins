@@ -112,7 +112,6 @@ export const VnodeAtom = atom((get) => {
     const slot = n.attribs.slot ?? '';
     const isValid = metamodel.isValidChild(pickedNode, parent, slot);
     if (!isValid) return c;
-    const idx = 1;
     const soulId = souls(parent).toString();
 
     const newChildren =

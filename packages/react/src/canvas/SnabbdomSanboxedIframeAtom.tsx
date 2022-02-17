@@ -1,7 +1,7 @@
 import { Atom, atom, WritableAtom } from 'jotai';
 import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
-import { VNode } from 'snabbdom';
+import type { VNode } from 'snabbdom';
 import { NPMRegistry } from '../util/NPMRegistry';
 import { childApiSrc } from './injected/childApiSrc';
 import {
