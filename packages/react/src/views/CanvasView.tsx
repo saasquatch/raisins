@@ -2,8 +2,8 @@ import { isElementNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { HoveredNodeAtom } from '../core/selection/HoveredAtom';
+import { RaisinScope } from '../core/RaisinScope';
+import { HoveredNodeAtom } from '../core/selection/HoveredNode';
 import { Rect } from '../canvas/api/Rect';
 import { Size, useCanvasAtoms } from '../canvas/useCanvas';
 import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
@@ -13,7 +13,7 @@ import {
   PickSelectedAtom,
 } from '../core/editting/EditSelectedAtom';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
-import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
+import { SelectedNodeAtom } from '../core/selection/SelectedNode';
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),

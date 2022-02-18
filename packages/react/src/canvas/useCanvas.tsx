@@ -2,28 +2,28 @@ import { isElementNode, RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import React, { createContext, useContext, useMemo } from 'react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
-import { dependentAtom } from '../atoms/dependentAtom';
+import { dependentAtom } from '../util/atoms/dependentAtom';
 import {
   DropPloppedNodeInSlotAtom,
   PickedNodeAtom,
   PloppingIsActive,
-} from '../atoms/pickAndPlopAtoms';
-import { GetSoulAtom } from '../atoms/Soul';
+} from '../core/selection/PickedNode';
+import { GetSoulAtom } from '../core/souls/Soul';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import { RootNodeAtom } from '../core/CoreAtoms';
 import {
   SelectedNodeAtom,
   SelectedSoulAtom,
-} from '../core/selection/SelectedAtom';
+} from '../core/selection/SelectedNode';
 import {
   IdToSoulAtom,
   SoulIdToNodeAtom,
   SoulToNodeAtom,
-} from '../core/SoulsInDocumentAtoms';
+} from '../core/souls/SoulsInDocumentAtoms';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { Rect } from './api/Rect';
 import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
-import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredAtom';
+import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredNode';
 import { CanvasScriptsAtom } from './CanvasScriptsAtom';
 import { defaultRectAtom } from './defaultRectAtom';
 import {

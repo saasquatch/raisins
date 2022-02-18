@@ -1,23 +1,19 @@
-import {
-  RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
-} from '@raisins/core';
+import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { ParentsAtom } from '../core/CoreAtoms';
-import { NodeWithSlots } from './SlotModel';
-import { getSlots } from './getSlots';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
+import { getSlots } from './getSlots';
 import * as HTMLComponents from './HTMLComponents';
 import { Module, ModuleDetails } from './ModuleManagement';
 import { doesChildAllowParent } from './rules/doesChildAllowParent';
 import { doesParentAllowChild } from './rules/doesParentAllowChild';
 import { isNodeAllowed } from './rules/isNodeAllowed';
+import { NodeWithSlots } from './SlotModel';
 
 export const GlobalBlocksAtom = atom([] as Block[]);
 
@@ -96,7 +92,7 @@ export const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
     };
   });
 });
-SetModulesAtom.debugLabel = "SetModulesAtom";
+SetModulesAtom.debugLabel = 'SetModulesAtom';
 
 export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   const components = get(ComponentsAtom);
@@ -113,7 +109,7 @@ export const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
   }
   return getComponentMeta;
 });
-ComponentMetaAtom.debugLabel = "ComponentMetaAtom";
+ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
 
 export const ValidChildrenAtom = atom((get) => {
   const blocks = get(BlocksAtom);
@@ -155,7 +151,7 @@ export const ValidChildrenAtom = atom((get) => {
 
   return getValidChildren;
 });
-ValidChildrenAtom.debugLabel = "ValidChildrenAtom"
+ValidChildrenAtom.debugLabel = 'ValidChildrenAtom';
 
 export const ComponentModelAtom = atom<ComponentModel>((get) => {
   const getComponentMeta = get(ComponentMetaAtom);
@@ -191,7 +187,7 @@ export const ComponentModelAtom = atom<ComponentModel>((get) => {
     isValidChild,
   };
 });
-ComponentModelAtom.debugLabel = "ComponentModelAtom"
+ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
 /**
  * For managing the types of components that are edited and their properties

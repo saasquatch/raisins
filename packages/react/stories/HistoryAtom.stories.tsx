@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react';
 import { atom, Getter, Setter, useAtom } from 'jotai';
 import React from 'react';
-import { atomWithSetStateListener } from '../src/atoms/atomWithSetterListener';
+import { atomWithSetStateListener } from '../src/util/atoms/atomWithSetterListener';
 
 const meta: Meta = {
   title: 'Listener Atom',

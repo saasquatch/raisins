@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import React, { useState } from 'react';
-import { RaisinsProvider } from '../src/atoms/RaisinScope';
+import { RaisinsProvider } from '../src/core/RaisinScope';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { EditorView } from '../src/views/EditorView';
 import { useHotkeys } from '../src/core/useHotkeys';

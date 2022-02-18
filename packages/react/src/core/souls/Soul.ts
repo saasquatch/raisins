@@ -3,12 +3,14 @@ import { atom } from 'jotai';
 const { visit } = htmlUtil;
 
 export type Soul = { id: string };
-export const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => {
-  console.log('Creating a new souls map');
-  return new WeakMap();
-});
 
-export function getSoulsMap(node: RaisinNode, map: WeakMap<RaisinNode, Soul>) {
+/**
+ * Generate the tree of souls, for debugging
+ */
+export function generateSoulTree(
+  node: RaisinNode,
+  map: WeakMap<RaisinNode, Soul>
+) {
   const getSoul = (n: RaisinNode) => ({
     soul: map.get(n)?.toString() ?? 'No soul',
   });
@@ -25,6 +27,10 @@ export function getSoulsMap(node: RaisinNode, map: WeakMap<RaisinNode, Soul>) {
     onRoot: getSoulAndChildren,
   });
 }
+
+export const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => {
+  return new WeakMap();
+});
 
 /**
  * Get (or create) a soul
@@ -45,7 +51,7 @@ let soulNumber = 1;
 export function createSoul(): Soul {
   return {
     created: Date.now(),
-    id: 'soul-' + (++soulNumber),
+    id: 'soul-' + ++soulNumber,
     toString() {
       return this.id;
     },

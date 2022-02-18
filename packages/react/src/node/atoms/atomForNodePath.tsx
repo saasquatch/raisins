@@ -1,7 +1,7 @@
 import { getPath, NodePath, RaisinNode } from '@raisins/core';
 import { Atom, atom, PrimitiveAtom } from 'jotai';
-import { RootNodeAtom } from '../core/CoreAtoms';
-import { createMemoizeAtom } from './weakCache';
+import { RootNodeAtom } from '../../core/CoreAtoms';
+import { createMemoizeAtom } from '../../util/weakCache';
 
 const memoizeAtom = createMemoizeAtom();
 

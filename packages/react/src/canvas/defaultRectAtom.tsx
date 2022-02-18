@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
-import { GetSoulAtom, soulToString } from '../atoms/Soul';
+import { GetSoulAtom, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
 import type { ConnectionState } from './SnabbdomSanboxedIframeAtom';
 

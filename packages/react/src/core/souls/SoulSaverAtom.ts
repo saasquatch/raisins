@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { GetSoulAtom, SoulsAtom } from '../../atoms/Soul';
+import { GetSoulAtom, SoulsAtom } from './Soul';
 
 /**
  * A `onReplace` function atom that will

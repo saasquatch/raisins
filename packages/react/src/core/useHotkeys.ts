@@ -1,10 +1,10 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
 import { atom, useAtomValue, WritableAtom } from 'jotai';
-import connectedAtom from '../atoms/connectedAtom';
-import { RaisinScope } from '../atoms/RaisinScope';
+import connectedAtom from '../util/atoms/connectedAtom';
+import { RaisinScope } from './RaisinScope';
 import { DeleteSelectedAtom } from './editting/EditSelectedAtom';
 import { RedoAtom, UndoAtom } from './editting/HistoryAtoms';
-import { SelectedAtom } from './selection/SelectedAtom';
+import { SelectedAtom } from './selection/SelectedNode';
 
 const HotKeysAtom = connectedAtom(
   (_, set) => {

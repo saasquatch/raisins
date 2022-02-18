@@ -10,7 +10,7 @@ import {
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { MutableRefObject } from 'react';
-import { HTMLAtom } from '../atoms/RaisinScope';
+import { HTMLAtom } from './RaisinScope';
 import { isFunction } from '../util/isFunction';
 import { generateNextState } from './editting/EditAtoms';
 

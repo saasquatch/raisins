@@ -1,24 +1,24 @@
 import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
-import { atomForAttributes } from '../atoms/atomForAttributes';
+import { atomForAttributes } from './atoms/atomForAttributes';
 import {
   DropPloppedNodeInSlotAtom,
   PickedAtom,
   PickedNodeAtom,
-} from '../atoms/pickAndPlopAtoms';
-import { GetSoulAtom } from '../atoms/Soul';
-import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredAtom';
+} from '../core/selection/PickedNode';
+import { GetSoulAtom } from '../core/souls/Soul';
+import { HoveredNodeAtom, HoveredSoulAtom } from '../core/selection/HoveredNode';
 import {
   ComponentMetaAtom,
   ComponentModelAtom,
 } from '../component-metamodel/ComponentModel';
 import { DuplicateNodeAtom, RemoveNodeAtom } from '../core/editting/EditAtoms';
 import { RootNodeAtom } from '../core/CoreAtoms';
-import { SelectedAtom, SelectedNodeAtom } from '../core/selection/SelectedAtom';
+import { SelectedAtom, SelectedNodeAtom } from '../core/selection/SelectedNode';
 import { isElementNode } from '../util/isNode';
 import { atomForNode } from './node-context';
-import { atomForTagName } from '../atoms/atomForTagName';
+import { atomForTagName } from './atoms/atomForTagName';
 
 /**
  * Is the node in context currently selected?

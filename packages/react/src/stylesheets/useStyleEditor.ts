@@ -7,7 +7,7 @@ import {
 import * as css from 'css-tree';
 import { useAtom } from 'jotai';
 import { useMemo, useState } from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
+import { RaisinScope } from '../core/RaisinScope';
 import { RootNodeAtom } from '../core/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
 

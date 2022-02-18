@@ -2,9 +2,9 @@ import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { splitAtom } from 'jotai/utils';
 import { atomForChildren } from '../atoms/atomForChildren';
-import { polymorphicAtom } from '../atoms/polymorphicAtom';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { isElementNode, isRoot } from '../util/isNode';
+import { polymorphicAtom } from '../../util/atoms/polymorphicAtom';
+import { RaisinScope } from '../../core/RaisinScope';
+import { isElementNode, isRoot } from '../../util/isNode';
 
 /**
  * Returns a child atom when children exist. Prevents exceptions by returning undefined when not.

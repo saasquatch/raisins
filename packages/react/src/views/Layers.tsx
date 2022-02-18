@@ -18,13 +18,13 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { PloppingIsActive } from '../atoms/pickAndPlopAtoms';
-import { RaisinScope } from '../atoms/RaisinScope';
+import { PloppingIsActive } from '../core/selection/PickedNode';
+import { RaisinScope } from '../core/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
 import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
-} from '../controllers/ChildrenEditor';
+} from '../node/children/ChildrenEditor';
 import { RootNodeAtom } from '../core/CoreAtoms';
 import { InsertNodeAtom } from '../core/editting/EditAtoms';
 import {

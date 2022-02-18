@@ -8,8 +8,8 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom } from 'jotai';
-import { SetNodeInternalAtom } from '../core/editting/EditAtoms';
-import { RootNodeAtom } from '../core/CoreAtoms';
+import { SetNodeInternalAtom } from '../editting/EditAtoms';
+import { RootNodeAtom } from '../CoreAtoms';
 
 const { remove, insertAtPath, clone } = htmlUtil;
 

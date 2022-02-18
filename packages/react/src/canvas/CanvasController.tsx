@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { SelectedAtom } from '../core/selection/SelectedAtom';
+import { RaisinScope } from '../core/RaisinScope';
+import { SelectedAtom } from '../core/selection/SelectedNode';
 import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
 import { CanvasProvider, SizeAtom, useCanvasAtoms } from './useCanvas';
 

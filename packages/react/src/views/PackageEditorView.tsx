@@ -1,6 +1,6 @@
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
+import { RaisinScope } from '../core/RaisinScope';
 import {
   AddModuleAtom,
   ModuleDetailsAtom,

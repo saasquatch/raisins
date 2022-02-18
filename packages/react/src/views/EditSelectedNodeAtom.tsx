@@ -1,7 +1,7 @@
 import { RaisinNode } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
 import { ReplaceNodeAtom } from '../core/editting/EditAtoms';
-import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
+import { SelectedNodeAtom } from '../core/selection/SelectedNode';
 import { isFunction } from '../util/isFunction';
 
 

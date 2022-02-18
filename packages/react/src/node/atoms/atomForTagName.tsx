@@ -1,6 +1,6 @@
 import { isElementNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, PrimitiveAtom } from 'jotai';
-import { createMemoizeAtom } from './weakCache';
+import { createMemoizeAtom } from '../../util/weakCache';
 
 const memoized = createMemoizeAtom();
 

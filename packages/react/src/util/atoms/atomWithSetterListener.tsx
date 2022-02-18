@@ -1,6 +1,6 @@
 import { atom, Getter, PrimitiveAtom, Setter } from 'jotai';
-import { isFunction } from '../util/isFunction';
-import { createMemoizeAtom } from './weakCache';
+import { isFunction } from '../isFunction';
+import { createMemoizeAtom } from '../weakCache';
 
 const memoizeAtom = createMemoizeAtom();
 export type SetStateListener<T> = (

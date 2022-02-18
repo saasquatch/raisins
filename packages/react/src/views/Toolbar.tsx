@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { HoveredBreadcrumbsAtom } from '../core/selection/HoveredAtom';
+import { RaisinScope } from '../core/RaisinScope';
+import { HoveredBreadcrumbsAtom } from '../core/selection/HoveredNode';
 import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
 import { HistorySizeAtom, RedoAtom, UndoAtom } from '../core/editting/HistoryAtoms';
 

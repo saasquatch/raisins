@@ -1,7 +1,7 @@
 import { htmlUtil, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { GetSoulAtom, Soul, soulToString } from '../atoms/Soul';
-import { RootNodeAtom } from './CoreAtoms';
+import { GetSoulAtom, Soul, soulToString } from './Soul';
+import { RootNodeAtom } from '../CoreAtoms';
 
 const { visitAll } = htmlUtil;
 

@@ -3,18 +3,18 @@ import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import React, { useMemo, useRef } from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { GetSoulAtom } from '../atoms/Soul';
-import { createMemoizeAtom } from '../atoms/weakCache';
-import { SoulSaverAtom } from '../core/editting/SoulSaverAtom';
+import { SoulSaverAtom } from '../core/souls/SoulSaverAtom';
+import { RaisinScope } from '../core/RaisinScope';
+import { SelectedNodeAtom } from '../core/selection/SelectedNode';
+import { GetSoulAtom } from '../core/souls/Soul';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import { isElementNode } from '../util/isNode';
+import { createMemoizeAtom } from '../util/weakCache';
+import { EditSelectedNodeAtom } from '../views/EditSelectedNodeAtom';
 import {
   ProseTextSelection,
   useProseEditorOnAtom,
 } from './prosemirror/ProseEditor';
-import { SelectedNodeAtom } from '../core/selection/SelectedAtom';
-import { isElementNode } from '../util/isNode';
-import { EditSelectedNodeAtom } from '../views/EditSelectedNodeAtom';
 
 export default function SelectedNodeRichTextEditor() {
   const isElementAtom = useRef(

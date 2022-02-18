@@ -3,8 +3,8 @@ import { PrimitiveAtom, useAtom } from 'jotai';
 import { SetAtom } from 'jotai/core/atom';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { useContext } from 'react';
-import { RaisinScope } from '../atoms/RaisinScope';
-import { createMemoizeAtom } from '../atoms/weakCache';
+import { RaisinScope } from '../core/RaisinScope';
+import { createMemoizeAtom } from '../util/weakCache';
 import { RootNodeAtom } from '../core/CoreAtoms';
 import { nodeAtomWithSoulSaved } from './nodeAtomWithSoulSaved';
 import {

@@ -1,5 +1,5 @@
 import { useAtomsSnapshot } from 'jotai/devtools';
-import { RaisinScope } from '../src/atoms/RaisinScope';
+import { RaisinScope } from '../src/core/RaisinScope';
 
 export const RegisteredAtoms = () => {
   const atoms = useAtomsSnapshot(RaisinScope);

@@ -1,4 +1,4 @@
-import { RaisinElementNode, RaisinNode } from '@raisins/core';
+import { RaisinNode } from '@raisins/core';
 import { CustomElement } from '../Component';
 import { doesChildAllowParent } from './doesChildAllowParent';
 import { doesParentAllowChild } from './doesParentAllowChild';
@@ -8,7 +8,7 @@ import { doesParentAllowChild } from './doesParentAllowChild';
  * Checks both sides of relationship:
  *  - parent allows child
  *  - child allows parent
- * 
+ *
  */
 export function isNodeAllowed(
   child: RaisinNode,

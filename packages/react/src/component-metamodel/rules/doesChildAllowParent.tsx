@@ -1,6 +1,6 @@
-import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import { CustomElement } from '../Component';
+import { RaisinNode } from '@raisins/core';
 import { isElementNode, isRoot } from '../../util/isNode';
+import { CustomElement } from '../Component';
 
 /**
  * Given a tag's metadata, checks if it allows children.

@@ -1,7 +1,7 @@
 import { RaisinNode } from '@raisins/core';
 import { atom, PrimitiveAtom } from 'jotai';
-import { SoulsAtom } from '../atoms/Soul';
-import { createMemoizeAtom } from '../atoms/weakCache';
+import { SoulsAtom } from '../core/souls/Soul';
+import { createMemoizeAtom } from '../util/weakCache';
 import { isFunction } from '../util/isFunction';
 
 /**

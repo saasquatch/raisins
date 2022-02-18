@@ -1,5 +1,5 @@
 import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { createMemoizeAtom } from './weakCache';
+import { createMemoizeAtom } from '../weakCache';
 
 const memoizeAtom = createMemoizeAtom();
 
