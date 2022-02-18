@@ -1,7 +1,18 @@
+/*
+
+Important!
+
+Since this file is used to generate serialized code from this function, it can only import types, not values.
+
+*/
 import type PenpalType from 'penpal';
 import type * as SnabbdomType from 'snabbdom';
 import type { Module, VNode } from 'snabbdom';
-import type { ChildRPC, GeometryEntry, ParentRPC } from '../api/_CanvasRPCContract';
+import type {
+  ChildRPC,
+  GeometryEntry,
+  ParentRPC,
+} from '../api/_CanvasRPCContract';
 import type { Props } from './childApiSrc';
 
 type Snabbdom = typeof SnabbdomType;
