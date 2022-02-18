@@ -301,19 +301,18 @@ export function insertAt(
 ): RaisinNode {
   if (root === node) throw new Error("Can't root node");
   if (node === newParent) throw new Error("Can't move node inside itself");
-
+  const replaceChildren = (
+    el: RaisinNodeWithChildren,
+    children: RaisinNode[]
+  ): RaisinNode => {
+    const newChildren =
+      el === newParent ? add(children, node, newIdx) : children;
+    return onReplace(el, { ...el, children: newChildren });
+  };
   const moved = visit(root, {
     ...IdentityVisitor,
-    onElement(el, children) {
-      const newChildren =
-        el === newParent ? add(children, node, newIdx) : children;
-      return onReplace(el, { ...el, children: newChildren });
-    },
-    onRoot(el, children) {
-      const newChildren =
-        el === newParent ? add(children, node, newIdx) : children;
-      return onReplace(el, { ...el, children: newChildren });
-    }
+    onElement: replaceChildren,
+    onRoot: replaceChildren
   });
   return freeze(moved!);
 }
