@@ -337,7 +337,8 @@ export function removeWhitespace(
   const cleaned = visit(root, {
     ...CloneVisitor(onReplace),
     onText(text) {
-      if (isBlankOrEmpty(text.data.trim())) {
+      text.data = text.data.trim();
+      if (isBlankOrEmpty(text.data)) {
         return undefined;
       }
       return text;
