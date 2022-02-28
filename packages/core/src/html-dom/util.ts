@@ -346,7 +346,7 @@ export function removeWhitespace(
   });
   if (!cleaned)
     throw new Error(
-      "Whitespace removal produced no content at all. Try this on a root node instead of a embedded text node"
+      "Whitespace removal produced no content at all. Try this on a root node instead of an embedded text node"
     );
   return cleaned;
 }

@@ -5,8 +5,7 @@ export function domNativeToRaisin(node: NodeList): RaisinNode {
     type: "comment",
     data: ""
   };
-
-  console.log(node, temp);
-
+  node;
+  // TODO: add html dom conversion to raisinnode using browser parser
   return temp;
 }
