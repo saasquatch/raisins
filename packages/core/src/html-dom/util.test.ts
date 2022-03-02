@@ -1,3 +1,4 @@
+import { ElementType } from "domelementtype";
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { RaisinNode } from "./RaisinNode";
 import { removeWhitespace, visit } from "./util";
@@ -109,12 +110,12 @@ const visitSteps: StepDefinitions = ({ given, and, when, then }) => {
     style: RaisinNode;
     root: RaisinNode;
   } = {
-    text: { type: "text", data: "Hello World" },
-    directive: { type: "directive", data: "hello", name: "world" },
-    comment: { type: "comment", data: "Hello World" },
-    tag: { type: "tag", tagName: "div", children: [], attribs: {} },
-    style: { type: "style", tagName: "style", attribs: {} },
-    root: { type: "root", children: [] }
+    text: { type: ElementType.Text, data: "Hello World" },
+    directive: { type: ElementType.Directive, data: "hello", name: "world" },
+    comment: { type: ElementType.Comment, data: "Hello World" },
+    tag: { type: ElementType.Tag, tagName: "div", children: [], attribs: {} },
+    style: { type: ElementType.Style, tagName: "style", attribs: {} },
+    root: { type: ElementType.Root, children: [] }
   };
 
   const visitor = {
