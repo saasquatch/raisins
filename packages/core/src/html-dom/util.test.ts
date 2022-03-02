@@ -1,6 +1,6 @@
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { RaisinNode } from "./RaisinNode";
-import { removeWhitespace } from "./util";
+import { removeWhitespace, visit } from "./util";
 
 const feature = loadFeature("./util.feature", { loadRelativePath: true });
 
@@ -100,4 +100,139 @@ export const removeWhitespaceSteps: StepDefinitions = ({
   });
 };
 
-autoBindSteps([feature], [removeWhitespaceSteps]);
+const visitSteps: StepDefinitions = ({ given, and, when, then }) => {
+  const node: {
+    text: RaisinNode;
+    directive: RaisinNode;
+    comment: RaisinNode;
+    tag: RaisinNode;
+    style: RaisinNode;
+    root: RaisinNode;
+  } = {
+    text: { type: "text", data: "Hello World" },
+    directive: { type: "directive", data: "hello", name: "world" },
+    comment: { type: "comment", data: "Hello World" },
+    tag: { type: "tag", tagName: "div", children: [], attribs: {} },
+    style: { type: "style", tagName: "style", attribs: {} },
+    root: { type: "root", children: [] }
+  };
+
+  const visitor = {
+    onText: (_textNode: any) => "r_text",
+    onDirective: (_directiveNode: any) => "r_directive",
+    onComment: (_textNode: any) => "r_comment",
+    onElement: (_textNode: any) => "r_tag",
+    onStyle: (_textNode: any) => "r_style",
+    onRoot: (_textNode: any) => "r_root"
+  };
+
+  let types: "text" | "directive" | "comment" | "tag" | "style" | "root";
+
+  let callbacks:
+    | "onText"
+    | "onDirective"
+    | "onComment"
+    | "onElement"
+    | "onStyle"
+    | "onRoot";
+
+  let results:
+    | "r_text"
+    | "r_directive"
+    | "r_comment"
+    | "r_tag"
+    | "r_style"
+    | "r_root";
+
+  let callbackSpy: jest.SpyInstance;
+  let callbackResult: string | undefined;
+
+  given(/^the node is (.*)$/, type => {
+    types = type;
+  });
+
+  and(/^the visitor has a (.*) function defined$/, callback => {
+    callbacks = callback;
+    callbackSpy = jest.spyOn(visitor, callbacks);
+  });
+
+  when("visit is called", () => {
+    callbackResult = visit(node[types], visitor, false);
+  });
+
+  then("the callback is called with the node", () => {
+    expect(callbackSpy).toBeCalledTimes(1);
+  });
+
+  and(/^the (.*) of the callback is returned$/, result => {
+    results = result;
+    expect(callbackResult).toBe(results);
+  });
+};
+
+autoBindSteps([feature], [removeWhitespaceSteps, visitSteps]);
+
+test("Visitor recursive", () => {
+  const node: {
+    tag: RaisinNode;
+    root: RaisinNode;
+  } = {
+    tag: {
+      type: "tag",
+      tagName: "div",
+      children: [
+        {
+          type: "tag",
+          tagName: "div",
+          children: [
+            {
+              type: "tag",
+              tagName: "div",
+              children: [
+                {
+                  type: "text",
+                  data: "hello world"
+                }
+              ],
+              attribs: {}
+            }
+          ],
+          attribs: {}
+        }
+      ],
+      attribs: {}
+    },
+    root: {
+      type: "root",
+      children: [
+        {
+          type: "root",
+          children: [
+            {
+              type: "root",
+              children: [
+                {
+                  type: "text",
+                  data: "hello world"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  };
+  const visitor = {
+    onElement: (_textNode: any) => "r_tag",
+    onRoot: (_textNode: any) => "r_root"
+  };
+
+  const spyTag = jest.spyOn(visitor, "onRoot");
+  const spyRoot = jest.spyOn(visitor, "onElement");
+
+  visit(node.tag, visitor, true);
+  visit(node.root, visitor, true);
+
+  expect(spyTag).toBeCalledTimes(3);
+  expect(spyRoot).toBeCalledTimes(3);
+});
