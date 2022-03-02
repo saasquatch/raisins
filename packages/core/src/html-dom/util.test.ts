@@ -178,8 +178,7 @@ test("Visitor recursive", () => {
     root: RaisinNode;
   } = {
     tag: {
-      type: "tag",
-      tagName: "div",
+      type: "root",
       children: [
         {
           type: "tag",
@@ -199,40 +198,54 @@ test("Visitor recursive", () => {
           ],
           attribs: {}
         }
-      ],
-      attribs: {}
+      ]
     },
     root: {
       type: "root",
       children: [
         {
-          type: "root",
+          type: "tag",
+          tagName: "div",
           children: [
             {
-              type: "root",
+              type: "tag",
+              tagName: "div",
               children: [
                 {
-                  type: "text",
-                  data: "hello world"
+                  type: "tag",
+                  tagName: "div",
+                  children: [
+                    {
+                      type: "text",
+                      data: "hello world"
+                    }
+                  ],
+                  attribs: {}
                 }
-              ]
+              ],
+              attribs: {}
             }
-          ]
+          ],
+          attribs: {}
         }
       ]
     }
   };
   const visitor = {
-    onElement: (_textNode: any) => "r_tag",
-    onRoot: (_textNode: any) => "r_root"
+    onElement: (_textNode: any) => "tag",
+    onRoot: (_textNode: any) => "root"
   };
 
-  const spyTag = jest.spyOn(visitor, "onRoot");
-  const spyRoot = jest.spyOn(visitor, "onElement");
+  const spyTag = jest.spyOn(visitor, "onElement");
+  const spyRoot = jest.spyOn(visitor, "onRoot");
 
+  // 1 root with 2 tag children
   visit(node.tag, visitor, true);
+
+  // 1 root with 3 tag children
   visit(node.root, visitor, true);
 
-  expect(spyTag).toBeCalledTimes(3);
-  expect(spyRoot).toBeCalledTimes(3);
+  // total: 2 root calls and 5 tag calls
+  expect(spyRoot).toBeCalledTimes(2);
+  expect(spyTag).toBeCalledTimes(5);
 });
