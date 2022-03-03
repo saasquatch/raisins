@@ -26,6 +26,10 @@ describe("isNode utility", () => {
     expect(isRoot(doc)).toBe(true);
   });
 
+  test("False if no node is provided", () => {
+    expect(isRoot()).toBe(false);
+  });
+
   isNode(`<div></div>`, isElementNode, isNodeWithChilden);
   isNode(`<!--This is a comment -->`, isCommentNode);
   isNode(`<style></stlye>`, isStyleNode);
