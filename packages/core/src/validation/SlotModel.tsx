@@ -1,5 +1,5 @@
-import { RaisinNode } from '@raisins/core';
-import { Slot } from '@raisins/schema/schema';
+import { Slot } from "@raisins/schema/schema";
+import { RaisinNode } from "../html-dom/RaisinNode";
 
 export type NodeWithSlots = {
   node: RaisinNode;
@@ -12,15 +12,15 @@ export type NamedSlot = {
 };
 
 export const DefaultSlotMeta: Slot = {
-  name: '',
-  title: 'Content',
+  name: "",
+  title: "Content"
 };
 
 export const DefaultSlot: NamedSlot = {
   slot: {
-    name: '',
-    title: 'Content',
-  },
+    name: "",
+    title: "Content"
+  }
 };
 
 export type Block = {

@@ -1,4 +1,13 @@
-import { RaisinElementNode, RaisinNode } from '@raisins/core';
+import {
+  doesChildAllowParent,
+  doesParentAllowChild,
+  getSlots,
+  HTMLComponents,
+  isNodeAllowed,
+  NodeWithSlots,
+  RaisinElementNode,
+  RaisinNode,
+} from '@raisins/core';
 import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
@@ -7,13 +16,7 @@ import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { getSlots } from './getSlots';
-import * as HTMLComponents from './HTMLComponents';
 import { Module, ModuleDetails } from './ModuleManagement';
-import { doesChildAllowParent } from './rules/doesChildAllowParent';
-import { doesParentAllowChild } from './rules/doesParentAllowChild';
-import { isNodeAllowed } from './rules/isNodeAllowed';
-import { NodeWithSlots } from './SlotModel';
 
 export const GlobalBlocksAtom = atom([] as Block[]);
 
