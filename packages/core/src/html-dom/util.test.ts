@@ -1,7 +1,7 @@
 import { ElementType } from "domelementtype";
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { RaisinNode } from "./RaisinNode";
-import { removeWhitespace, visit } from "./util";
+import { removeWhitespace, visit, visitAll } from "./util";
 
 const feature = loadFeature("./util.feature", { loadRelativePath: true });
 
@@ -278,4 +278,36 @@ test("Visitor skip node", () => {
   visit(node, visitor, false);
 
   expect(spySkip).toBeCalledTimes(2);
+});
+
+test("Visit all", () => {
+  const node: RaisinNode = {
+    type: "root",
+    children: [
+      {
+        type: "tag",
+        tagName: "div",
+        children: [
+          {
+            type: "text",
+            data: "hello world"
+          }
+        ],
+        attribs: {}
+      }
+    ]
+  };
+
+  const callback = {
+    callbackCounter: (_callback: any) => false
+  };
+
+  const callbackSpy = jest.spyOn(callback, "callbackCounter");
+
+  visitAll(node, (n: RaisinNode) => {
+    callback.callbackCounter(0);
+    return n;
+  });
+
+  expect(callbackSpy).toBeCalledTimes(3);
 });

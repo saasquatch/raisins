@@ -1,33 +1,47 @@
 import { ElementType } from "domelementtype";
 import { RaisinNode } from "..";
-import parser from "./parser";
+import parse from "./parser";
 
-test("Parse nodes", () => {
-  function raisinNode(tagName: string, attribs: any = {}): RaisinNode {
-    const node: RaisinNode = {
-      type: ElementType.Root,
-      children: [
-        {
-          type: ElementType.Tag,
-          tagName: tagName,
-          attribs: attribs,
-          children: [],
-          style: undefined
-        }
-      ]
-    };
-    return node;
+describe("Parse", () => {
+  const values: boolean[] = [true, false];
+
+  for (let value of values) {
+    test("using browser native: " + value, () => {
+      function raisinNode(tagName: string, attribs: any = {}): RaisinNode {
+        const node: RaisinNode = {
+          type: ElementType.Root,
+          children: [
+            {
+              type: ElementType.Tag,
+              tagName: tagName,
+              attribs: attribs,
+              children: [],
+              style: undefined
+            }
+          ]
+        };
+        return node;
+      }
+
+      expect(parse("<div></div>", { domParser: value })).toStrictEqual(
+        raisinNode("div")
+      );
+      expect(parse("<span></span>", { domParser: value })).toStrictEqual(
+        raisinNode("span")
+      );
+      expect(parse("<h1></h1>", { domParser: value })).toStrictEqual(
+        raisinNode("h1")
+      );
+      expect(parse("<p></p>", { domParser: value })).toStrictEqual(
+        raisinNode("p")
+      );
+
+      expect(
+        parse('<img src="www.example.com"></img>', { domParser: value })
+      ).toStrictEqual(raisinNode("img", { src: "www.example.com" }));
+      expect(
+        parse('<div center class="myClass"></div>', { domParser: value })
+      ).toStrictEqual(raisinNode("div", { center: "", class: "myClass" }));
+    });
   }
-
-  expect(parser("<div></div>")).toStrictEqual(raisinNode("div"));
-  expect(parser("<span></span>")).toStrictEqual(raisinNode("span"));
-  expect(parser("<h1></h1>")).toStrictEqual(raisinNode("h1"));
-  expect(parser("<p></p>")).toStrictEqual(raisinNode("p"));
-
-  expect(parser('<img src="www.example.com"></img>')).toStrictEqual(
-    raisinNode("img", { src: "www.example.com" })
-  );
-  expect(parser('<div class="myClass"></div>')).toStrictEqual(
-    raisinNode("div", { class: "myClass" })
-  );
 });

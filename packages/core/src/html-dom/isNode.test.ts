@@ -22,7 +22,7 @@ describe("isNode utility", () => {
   }
 
   test("Root should be root", () => {
-    const doc = parse(`Text <tag>And elements</tag> <!--comments too-->`);
+    const doc = parse("");
     expect(isRoot(doc)).toBe(true);
   });
 
@@ -32,7 +32,7 @@ describe("isNode utility", () => {
 
   isNode(`<div></div>`, isElementNode, isNodeWithChilden);
   isNode(`<!--This is a comment -->`, isCommentNode);
-  isNode(`<style></stlye>`, isStyleNode);
+  isNode(`<style></style>`, isStyleNode);
   isNode(`hello world`, isTextNode);
   isNode(`<!DOCTYPE html>`, isDirectiveNode);
 });
