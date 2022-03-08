@@ -5,6 +5,41 @@ import parse from "./parser";
 describe("Parse", () => {
   const values: boolean[] = [true, false];
 
+  // PASSES
+  var string = "<style></style>";
+  expect(parse(string, { domParser: true })).toStrictEqual(
+    parse(string, { domParser: false })
+  );
+  // UNSUPPORTED
+  //   var string = "<!DOCTYPE html>";
+  //   expect(parse(string, { domParser: true })).toStrictEqual(
+  //     parse(string, { domParser: false })
+  //   );
+
+  // PASSES
+  var string = "<!--comment test-->";
+  expect(parse(string, { domParser: true })).toStrictEqual(
+    parse(string, { domParser: false })
+  );
+
+  // PASSES
+  var string = "<!-- comment test --><div>484</div>";
+  expect(parse(string, { domParser: true })).toStrictEqual(
+    parse(string, { domParser: false })
+  );
+
+  // UNSUPPORTED
+  //   var string = "<?xml-stylesheet … ?>";
+  //   expect(parse(string, { domParser: true })).toStrictEqual(
+  //     parse(string, { domParser: false })
+  //   );
+
+  // UNSUPPORTED
+  //   var string = "<div>123</div><?xml-stylesheet … ?>";
+  //   expect(parse(string, { domParser: true })).toStrictEqual(
+  //     parse(string, { domParser: false })
+  //   );
+
   for (let value of values) {
     test("using browser native: " + value, () => {
       function raisinNode(tagName: string, attribs: any = {}): RaisinNode {

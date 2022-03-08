@@ -4,8 +4,7 @@ import {
   isTextNode,
   isStyleNode,
   isElementNode,
-  isCommentNode,
-  isDirectiveNode
+  isCommentNode
 } from "./isNode";
 import parse from "./parser";
 
@@ -34,5 +33,6 @@ describe("isNode utility", () => {
   isNode(`<!--This is a comment -->`, isCommentNode);
   isNode(`<style></style>`, isStyleNode);
   isNode(`hello world`, isTextNode);
-  isNode(`<!DOCTYPE html>`, isDirectiveNode);
+  // UNSUPPORTED
+  // isNode(`<!DOCTYPE html>`, isDirectiveNode);
 });
