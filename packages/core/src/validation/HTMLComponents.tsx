@@ -1,4 +1,4 @@
-import { CustomElement, Slot } from './Component';
+import { CustomElement, Slot } from "@raisins/schema/schema";
 
 /**
  * Standard HTML library of components
@@ -11,25 +11,25 @@ import { CustomElement, Slot } from './Component';
 undefined;
 
 const DefaultSlot: Slot = {
-  name: '',
-  title: 'Content',
+  name: "",
+  title: "Content"
 };
 
 const COMMON_HTML_ATTRS_SCHEMA = [
   {
-    name: 'id',
-    type: 'string',
+    name: "id",
+    type: "string"
   },
   {
-    name: 'title',
-    type: 'string',
-  },
+    name: "title",
+    type: "string"
+  }
 ];
 
 // 'a',
 export const A: CustomElement = {
-  title: 'Anchor',
-  tagName: 'a',
+  title: "Anchor",
+  tagName: "a"
 };
 
 // 'abbr',
@@ -47,37 +47,37 @@ export const A: CustomElement = {
 // 'body',
 // 'br',
 export const BR: CustomElement = {
-  title: 'Line Break',
-  tagName: 'br',
-  slots: [{ ...DefaultSlot }],
+  title: "Line Break",
+  tagName: "br",
+  slots: [{ ...DefaultSlot }]
 };
 // 'button',
 // 'canvas',
 // 'caption',
 export const CAPTION: CustomElement = {
-  title: 'Table Caption',
-  tagName: 'caption',
+  title: "Table Caption",
+  tagName: "caption",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  validParents: ['table'],
-  slots: [{ ...DefaultSlot }],
+  validParents: ["table"],
+  slots: [{ ...DefaultSlot }]
 };
 // 'cite',
 // 'code',
 // 'col',
 export const COL: CustomElement = {
-  title: 'Table Column',
-  tagName: 'col',
+  title: "Table Column",
+  tagName: "col",
   // Could use `span` property
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  validParents: ['colgroup'],
+  validParents: ["colgroup"]
 };
 // 'colgroup',
 export const COLGROUP: CustomElement = {
-  title: 'Table Column Group',
-  tagName: 'colgroup',
+  title: "Table Column Group",
+  tagName: "colgroup",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  validParents: ['table'],
-  slots: [{ ...DefaultSlot, validChildren: ['col'] }],
+  validParents: ["table"],
+  slots: [{ ...DefaultSlot, validChildren: ["col"] }]
 };
 // 'data',
 // 'datalist',
@@ -88,10 +88,10 @@ export const COLGROUP: CustomElement = {
 // 'dialog',
 // 'div',
 export const DIV: CustomElement = {
-  title: 'Block',
-  tagName: 'div',
+  title: "Block",
+  tagName: "div",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot, validChildren: ['*'] }],
+  slots: [{ ...DefaultSlot, validChildren: ["*"] }]
 };
 
 // 'dl',
@@ -105,40 +105,40 @@ export const DIV: CustomElement = {
 // 'form',
 // 'h1',
 export const H1: CustomElement = {
-  title: 'Heading 1',
-  tagName: 'h1',
+  title: "Heading 1",
+  tagName: "h1",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [DefaultSlot],
+  slots: [DefaultSlot]
 };
 // 'h2',
 export const H2: CustomElement = {
-  title: 'Heading 2',
-  tagName: 'h2',
-  slots: [DefaultSlot],
+  title: "Heading 2",
+  tagName: "h2",
+  slots: [DefaultSlot]
 };
 // 'h3',
 export const H3: CustomElement = {
-  title: 'Heading 3',
-  tagName: 'h3',
-  slots: [DefaultSlot],
+  title: "Heading 3",
+  tagName: "h3",
+  slots: [DefaultSlot]
 };
 // 'h4',
 export const H4: CustomElement = {
-  title: 'Heading 4',
-  tagName: 'h4',
-  slots: [DefaultSlot],
+  title: "Heading 4",
+  tagName: "h4",
+  slots: [DefaultSlot]
 };
 // 'h5',
 export const H5: CustomElement = {
-  title: 'Heading 5',
-  tagName: 'h5',
-  slots: [DefaultSlot],
+  title: "Heading 5",
+  tagName: "h5",
+  slots: [DefaultSlot]
 };
 // 'h6',
 export const H6: CustomElement = {
-  title: 'Heading 6',
-  tagName: 'h6',
-  slots: [DefaultSlot],
+  title: "Heading 6",
+  tagName: "h6",
+  slots: [DefaultSlot]
 };
 // 'head',
 // 'header',
@@ -149,8 +149,8 @@ export const H6: CustomElement = {
 // 'iframe',
 // 'img',
 export const IMG: CustomElement = {
-  title: 'Image',
-  tagName: 'img',
+  title: "Image",
+  tagName: "img"
 };
 // 'input',
 // 'ins',
@@ -177,9 +177,9 @@ export const IMG: CustomElement = {
 // 'output',
 // 'p',
 export const P: CustomElement = {
-  title: 'Paragraph',
-  tagName: 'p',
-  slots: [DefaultSlot],
+  title: "Paragraph",
+  tagName: "p",
+  slots: [DefaultSlot]
 };
 // 'param',
 // 'picture',
@@ -196,34 +196,34 @@ export const P: CustomElement = {
 // 'select',
 // 'small',
 export const SMALL: CustomElement = {
-  title: 'Small Text',
-  tagName: 'small',
+  title: "Small Text",
+  tagName: "small",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot }],
+  slots: [{ ...DefaultSlot }]
 };
 // 'source',
 // 'span',
 export const SPAN: CustomElement = {
-  title: 'Text (span)',
-  tagName: 'span',
+  title: "Text (span)",
+  tagName: "span",
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['span'],
-      editor: 'inline',
-    },
-  ],
+      validChildren: ["span"],
+      editor: "inline"
+    }
+  ]
 };
 // 'strong',
 export const STRONG: CustomElement = {
-  title: 'Text (strong)',
-  tagName: 'strong',
+  title: "Text (strong)",
+  tagName: "strong",
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['span'],
-    },
-  ],
+      validChildren: ["span"]
+    }
+  ]
 };
 // 'style',
 // 'sub',
@@ -231,89 +231,89 @@ export const STRONG: CustomElement = {
 // 'sup',
 // 'table',
 export const TABLE: CustomElement = {
-  title: 'Table',
-  tagName: 'table',
+  title: "Table",
+  tagName: "table",
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['caption', 'colgroup', 'thead', 'tbody', 'tr', 'tfoot'],
-    },
-  ],
+      validChildren: ["caption", "colgroup", "thead", "tbody", "tr", "tfoot"]
+    }
+  ]
 };
 // 'tbody',
 export const TBODY: CustomElement = {
-  title: 'Table Body',
-  tagName: 'tbody',
-  validParents: ['table'],
+  title: "Table Body",
+  tagName: "tbody",
+  validParents: ["table"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['tr'],
-    },
-  ],
+      validChildren: ["tr"]
+    }
+  ]
 };
 // 'td',
 export const TD: CustomElement = {
-  title: 'Table Cell',
-  tagName: 'td',
-  validParents: ['tr'],
+  title: "Table Cell",
+  tagName: "td",
+  validParents: ["tr"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['*'],
-    },
-  ],
+      validChildren: ["*"]
+    }
+  ]
 };
 // 'textarea',
 // 'tfoot',
 export const TFOOT: CustomElement = {
-  title: 'Table Footer',
-  tagName: 'tfoot',
-  validParents: ['table'],
+  title: "Table Footer",
+  tagName: "tfoot",
+  validParents: ["table"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['tr'],
-    },
-  ],
+      validChildren: ["tr"]
+    }
+  ]
 };
 // 'th',
 export const TH: CustomElement = {
-  title: 'Table Header Cell',
-  tagName: 'th',
-  validParents: ['tr'],
+  title: "Table Header Cell",
+  tagName: "th",
+  validParents: ["tr"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['*'],
-    },
-  ],
+      validChildren: ["*"]
+    }
+  ]
 };
 // 'thead',
 export const THEAD: CustomElement = {
-  title: 'Table Header',
-  tagName: 'thead',
-  validParents: ['table'],
+  title: "Table Header",
+  tagName: "thead",
+  validParents: ["table"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['tr'],
-    },
-  ],
+      validChildren: ["tr"]
+    }
+  ]
 };
 // 'time',
 // 'title',
 // 'tr',
 export const TR: CustomElement = {
-  title: 'Table Row',
-  tagName: 'tr',
-  validParents: ['thead', 'tfoot', 'tbody'],
+  title: "Table Row",
+  tagName: "tr",
+  validParents: ["thead", "tfoot", "tbody"],
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ['td', 'th'],
-    },
-  ],
+      validChildren: ["td", "th"]
+    }
+  ]
 };
 // 'track',
 // 'u',
