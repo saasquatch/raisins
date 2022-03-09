@@ -12,7 +12,7 @@ export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
   let node: RaisinDocumentNode;
   given("an html document", (itemName: string) => {
     source = itemName;
-    node = parse(source);
+    node = parse(source.trim());
   });
 
   when(/^we select "(.*)"$/, (select: string) => {
@@ -20,14 +20,13 @@ export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
   });
 
   then(/^it should return "(.*)"$/, (jsSelector: string) => {
-    
-    let expected = jsonata(jsSelector).evaluate({ node, undefined: undefined })
-    if(!Array.isArray(expected)){
-        expected = [expected];
+    let expected = jsonata(jsSelector).evaluate({ node, undefined: undefined });
+    if (!Array.isArray(expected)) {
+      expected = [expected];
     }
-    found.forEach((f,idx)=>{
-        expect(f).toBe(expected[idx])
-    })
+    found.forEach((f, idx) => {
+      expect(f).toBe(expected[idx]);
+    });
   });
 };
 

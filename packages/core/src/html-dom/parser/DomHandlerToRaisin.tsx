@@ -1,6 +1,6 @@
 import type * as DOMHandler from "domhandler";
 import { ElementType } from "htmlparser2";
-import cssParser from "../css-om/parser";
+import cssParser from "../../css-om/parser";
 import { ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import type {
   RaisinCommentNode,
@@ -9,7 +9,7 @@ import type {
   RaisinNode, RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./RaisinNode";
+} from "../RaisinNode";
 
 
 /**

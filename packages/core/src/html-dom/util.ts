@@ -1,6 +1,6 @@
 import cloneDeep from "lodash.clonedeep";
 import { getNode, NodePath } from "../paths/Paths";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./parser/domElementType";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,

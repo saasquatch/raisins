@@ -1,27 +1,19 @@
 import cssParser from "../../css-om/parser";
-import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "../domElementType";
+import { COMMENT, STYLE, TAG, TEXT } from "./domElementType";
 import { RaisinDocumentNode, RaisinNode } from "../RaisinNode";
 
-export function domNativeToRaisin(
-  document: Document,
-  body?: boolean
+export function documentFragmentToRaisin(
+  Dom: DocumentFragment
 ): RaisinDocumentNode {
   const raisin: RaisinDocumentNode = {
     type: "root",
-    children: body
-      ? nodeListToRaisin(document.body.childNodes)
-      : nodeListToRaisin(document.childNodes)
+    children: nodeListToRaisin(Dom.childNodes)
   };
   return raisin;
 }
 
 function nodeListToRaisin(nodes: NodeList): RaisinNode[] {
-  var nodesArray = Array.from(nodes);
-  nodesArray.forEach((x, i) => {
-    if (x.nodeName === "d3l3t3") nodesArray.splice(i, 1);
-    if (x.nodeName === "t3xt") nodesArray[i] = nodesArray[i].childNodes[0];
-  });
-  return nodesArray.map(nodeToRaisin);
+  return Array.from(nodes).map(nodeToRaisin);
 }
 
 function nodeToRaisin(node: Node): RaisinNode {
@@ -31,7 +23,7 @@ function nodeToRaisin(node: Node): RaisinNode {
       const attribs = getAttribues(element);
       const { style, ...otherAttribs } = attribs;
 
-      if (element.nodeName === "template") {
+      if (element.nodeName === "TEMPLATE") {
         const template = element as HTMLTemplateElement;
         return {
           type: TAG,
@@ -40,7 +32,7 @@ function nodeToRaisin(node: Node): RaisinNode {
           children: nodeListToRaisin(template.content.childNodes)
         };
       }
-      if (element.nodeName === "style") {
+      if (element.nodeName === "STYLE") {
         const textContent = node.textContent;
         return {
           type: STYLE,
@@ -58,20 +50,6 @@ function nodeToRaisin(node: Node): RaisinNode {
           ? cssParser(style, { context: "declarationList" })
           : undefined
       };
-    case Node.DOCUMENT_TYPE_NODE:
-      const docType = node as DocumentType;
-      return {
-        type: DIRECTIVE,
-        name: "!doctype",
-        data: "!DOCTYPE " + docType.nodeName
-      };
-    case Node.PROCESSING_INSTRUCTION_NODE:
-      const proNode = node as ProcessingInstruction;
-      return {
-        type: DIRECTIVE,
-        name: "?" + proNode.nodeName,
-        data: `?${proNode.nodeName} ${proNode.nodeValue}?`
-      };
     case Node.TEXT_NODE:
       const textNode = node as Text;
       return {
@@ -86,9 +64,6 @@ function nodeToRaisin(node: Node): RaisinNode {
         // TODO: Should we convert null to empty string? Or not return a comment node? Or change the raisin node interface?
         data: comment.textContent ?? ""
       };
-    case Node.DOCUMENT_NODE:
-      const doc = node as Document;
-      return domNativeToRaisin(doc);
     default:
       throw new Error("Unhandled node type " + node.nodeType);
   }

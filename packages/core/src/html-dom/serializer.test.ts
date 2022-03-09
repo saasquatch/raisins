@@ -1,6 +1,7 @@
 import { ElementType } from "domelementtype";
 import glob from "glob-promise";
 import fs from "mz/fs";
+import * as parse5 from "parse5";
 import { parse } from "./parser";
 import { RaisinElementNode } from "./RaisinNode";
 import serializer from "./serializer";
@@ -36,10 +37,10 @@ describe("Parse + serialize", () => {
         type: ElementType.Tag,
         tagName: "details",
         attribs: {
-          open: value,
+          open: value
         },
         children: [],
-        style: undefined,
+        style: undefined
       };
       expect(serializer(node)).toEqual(`<details open></details>`);
     }
@@ -57,12 +58,12 @@ describe("Parse + serialize", () => {
             type: "tag",
             tagName: "details",
             attribs: {
-              open: attrValue,
+              open: attrValue
             },
             children: [],
-            style: undefined,
-          },
-        ],
+            style: undefined
+          }
+        ]
       });
       expect(serializer(node)).toEqual(out);
     }
@@ -87,7 +88,7 @@ describe("Parse + serialize", () => {
 
   describe("Can parse HTML Benchmark cases", () => {
     const files = glob.sync(process.cwd() + "/benchmark-files/**/*.html", {
-      absolute: true,
+      absolute: true
     });
 
     expect(files?.length).toBeGreaterThan(0);
@@ -97,6 +98,9 @@ describe("Parse + serialize", () => {
 
         const node = parse(source, { cleanWhitespace: false });
         const out = serializer(node);
+
+        const comparisonNode = parse5.parse(source);
+        // const comparisonHTML = parse5serialize(comparisonNode);
 
         /*
           Matching on exact HTML is hard.
@@ -121,6 +125,16 @@ describe("Parse + serialize", () => {
         */
         serializer(parse(out, { cleanWhitespace: false }));
 
+        const comparisonOutputNode = parse5.parse(out);
+        // const comparisonOutputHtml = parse5serialize(comparisonOutputNode);
+
+        /**
+         * A round-trip through Raisins + parse5
+         * should match a round trip through just parse5
+         */
+        // expect(comparisonOutputHtml).toEqual(comparisonHTML);
+        expect(comparisonOutputNode).toStrictEqual(comparisonNode);
+
         // TODO: An element with style=";" will produce style="" in first run, and no style attribute in second pass
         // expect(out2).toEqual(out);
 
@@ -129,3 +143,18 @@ describe("Parse + serialize", () => {
     }
   });
 });
+
+
+function compare(expected:parse5.Document, actual:parse5.Document){
+  const pass = expected.childNodes.every((value,index)=>{
+    return compareNode(value, actual.childNodes[index])
+  });
+  if(!pass){
+    throw new Error("");
+  }
+}
+
+function compareNode(expected:parse5.ChildNode, actual:parse5.ChildNode){
+
+  expected.
+}

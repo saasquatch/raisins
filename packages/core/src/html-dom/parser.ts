@@ -1,16 +1,8 @@
 import { parseDocument } from "htmlparser2";
-import { domHandlerToRaisin } from "./DomHandlerToRaisin";
-import { domNativeToRaisin } from "./parser/DomNativeToRaisin";
-import { domTemplateToRaisin } from "./parser/DomTemplateToRaisin";
+import { domHandlerToRaisin } from "./parser/DomHandlerToRaisin";
+import { documentFragmentToRaisin } from "./parser/DomNativeToRaisin";
 import { RaisinDocumentNode } from "./RaisinNode";
 import { removeWhitespace } from "./util";
-
-type DOMParserSupportedType =
-  | "application/xhtml+xml"
-  | "application/xml"
-  | "image/svg+xml"
-  | "text/html"
-  | "text/xml";
 
 type Options = {
   cleanWhitespace?: boolean;
@@ -30,53 +22,18 @@ type Options = {
  */
 export function parse(
   html: string,
-  { cleanWhitespace = true, domParser = false }: Options = {}
+  { cleanWhitespace = false, domParser = false }: Options = {}
 ): RaisinDocumentNode {
-  const raisinNode = domParser ? parseDomNative(html, false) : parseDomHandler(html);
+  const raisinNode = domParser
+    ? parseWithTemplateTag(html)
+    : parseWithHtmlParser2(html);
   const clean = cleanWhitespace ? removeWhitespace(raisinNode) : raisinNode;
   return clean as RaisinDocumentNode;
 }
 
-function parseDomHandler(html: string) {
+function parseWithHtmlParser2(html: string) {
   const DomNode = parseDocument(html);
   return domHandlerToRaisin(DomNode) as RaisinDocumentNode;
-}
-
-function parseDomNative(html: string, template?: boolean) {
-	
-  if (template) {
-    const Dom = parseFromTemplate(html);
-    return domTemplateToRaisin(Dom) as RaisinDocumentNode;
-  }
-
-  const parser = new DOMParser();
-  var mimeType: DOMParserSupportedType = "text/html";
-  if (
-    html.startsWith("<!DOCTYPE") ||
-    (html.startsWith("<!--") && html.endsWith("-->")) ||
-    (html.startsWith("<?") && html.endsWith("?>"))
-  ) {
-    html = html + "<d3l3t3></d3l3t3>";
-    mimeType = "text/xml";
-  }
-  if (!(html.startsWith("<") && html.endsWith(">"))) {
-    html = "<t3xt>html</t3xt>";
-    mimeType = "text/xml";
-  }
-  if (
-    html.includes("</style>") ||
-    html.includes("</template>") ||
-    html.includes("?>") ||
-    html.includes("-->")
-  ) {
-    mimeType = "text/xml";
-  }
-  const document = parser.parseFromString(html, mimeType);
-  // TODO: parsing using template tags?
-  return domNativeToRaisin(
-    document,
-    mimeType === "text/html"
-  ) as RaisinDocumentNode;
 }
 
 /**
@@ -86,20 +43,11 @@ function parseDomNative(html: string, template?: boolean) {
  *
  * @see https://developer.mozilla.org/docs/Web/HTML/Element/template
  */
-var template = document.createElement("template");
-var parseFromTemplate: (html: string) => DocumentFragment;
-
-if (template.content) {
-  /**
-   * Uses a template element (content fragment) to parse HTML.
-   *
-   * @param  {string} html - The HTML string.
-   * @return {NodeList}
-   */
-  parseFromTemplate = function(html: string) {
-    template.innerHTML = html;
-    return template.content;
-  };
+const template = document.createElement("template");
+function parseWithTemplateTag(html: string) {
+  template.innerHTML = html;
+  const Dom = template.content;
+  return documentFragmentToRaisin(Dom) as RaisinDocumentNode;
 }
 
 export default parse;

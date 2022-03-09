@@ -6,7 +6,7 @@ import {
   Style,
   Tag,
   Text
-} from "./domElementType";
+} from "./parser/domElementType";
 
 /**
  * The base used as the prototype for Nodes

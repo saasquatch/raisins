@@ -136,8 +136,7 @@ Feature: Selecting by CSS selectors
     Scenario Outline: Match multiple tags selectors
         Given an html document
             """
-            <HTML>
-            <HTML>
+            <HTML><HTML>
             """
         When we select "<Selector>"
         Then it should return "node.children"
