@@ -53,22 +53,22 @@ Feature: HTML Equivalency Checker
             | First                         | Second                       |
             | <div>Hello <b>World</b></div> | <div>Hello<b>World</b></div> |
 
-    @skip
     Scenario Outline: Unequivalent CSS will cause failures
         Given one HTML string "<First>"
         And another HTML string "<Second>"
         Then they will not be equivalent
 
         Examples:
-            | First                               | Second                         |
-            | <div style="display: none; "></div> | <div style="bold:true;"></div> |
+            | First                                          | Second                               |
+            | <div style="display: none; "></div>            | <div style="bold:true;"></div>       |
+            | <style> body {border: 1px solid red;} </style> | <style> body {color: blue;} </style> |
 
-    @skip
     Scenario Outline: Unequivalent CSS will ignore text differences
         Given one HTML string "<First>"
         And another HTML string "<Second>"
         Then they will be equivalent
 
         Examples:
-            | First                                  | Second                             |
-            | <div style="   display: none; "></div> | <div style="display: none;"></div> |
+            | First                                             | Second                              |
+            | <div style="   display: none; "></div>            | <div style="display: none;"></div>  |
+            | <style>     body {   color:   red;     } </style> | <style> body {color: red;} </style> |

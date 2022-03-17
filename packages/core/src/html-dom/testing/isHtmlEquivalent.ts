@@ -1,15 +1,31 @@
 import * as parse5 from "parse5";
+import * as css5 from "css";
 
 /**
- * Strips all styles from html
+ * Validates CSS
+ */
+interface css5Options {
+  inline?: boolean;
+}
+
+function parseCSS(input: string, options: css5Options): string {
+  if (options.inline) {
+    input = "*{" + input + "}";
+  }
+  input = css5.stringify(css5.parse(input));
+  input = input.slice(4, -1).replace(/\s/g, "");
+  return input;
+}
+
+/**
+ * Cleans css style values from html
  */
 function cleanUpCSS(html: string) {
   html = html
-    .replace(/<\s*style.*?<\W+style\s*>/gs, "<style>CSSPARSE</style>") // replaces the content between <style> tags
-    .replace(/style=([\"'])(?:(?=(\\?))\2.)*?\1/gs, 'style="CSSPARSE"'); // replaces the content inside style attribs
-
-  // TODO: Could use a third party CSS parser instead of regex
-
+    .replace(/(?<=<style>).*?(?=<\/style>)/gs, parseCSS)
+    .replace(/(?<=style=([\"']))(?:(?=(\\?))\2.)*?(?=\1)/gs, input =>
+      parseCSS(input, { inline: true })
+    );
   return html;
 }
 
