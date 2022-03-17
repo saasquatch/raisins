@@ -24,12 +24,10 @@ export function isHtmlEquivalent(
   const parsedOriginal = parse5.parse(cleanUpCSS(expected));
   const parsedRaisin = parse5.parse(cleanUpCSS(actual));
 
-  purify(parsedOriginal);
-  purify(parsedRaisin);
-
-  // fs.writeFileSync("parsedSource.html", html);
-  // fs.writeFileSync("parsedOriginal.html", parse5.serialize(parsedOriginal));
-  // fs.writeFileSync("parsedRaisin.html", parse5.serialize(parsedRaisin));
+  /*
+   * Data massage on parse5 nodes
+   */
+  purify(parsedOriginal, parsedRaisin);
 
   expect(parsedRaisin).toStrictEqual(parsedOriginal);
 
@@ -66,17 +64,15 @@ function purify(...nodes: any[]) {
   nodes.map(node => {
     for (var i = 0; i < node.childNodes.length; i++) {
       var child = node.childNodes[i];
-      if (child.hasOwnProperty("attrs") && child.attrs.length > 0) {
-        child.attrs.sort(attributeCompare);
-      }
       if (child.hasOwnProperty("parentNode")) {
         delete child["parentNode"];
       }
-      if (child.nodeName === "#text") {
-        if (!/\S/.test(child.value) || /\<|&..|\>/.test(child.value)) {
-          node.childNodes.splice(i, 1);
-          i--;
-        }
+      if (child.hasOwnProperty("attrs")) {
+        child.attrs.sort(attributeCompare);
+      }
+      if (child.nodeName === "#text" && !/\S/.test(child.value)) {
+        node.childNodes.splice(i, 1);
+        i--;
       }
       if (child.hasOwnProperty("childNodes")) {
         purify(child);

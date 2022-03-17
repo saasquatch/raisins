@@ -2,7 +2,8 @@ import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { isHtmlEquivalent } from "./isHtmlEquivalent";
 
 const feature = loadFeature("./IsHtmlEquivalent.feature", {
-  loadRelativePath: true, tagFilter: "not @skip"
+  loadRelativePath: true,
+  tagFilter: "not @skip"
 });
 
 export const htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
@@ -16,11 +17,9 @@ export const htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
   and(/^another HTML string (.*)$/, (html: string) => {
     html_b = html;
   });
-  
+
   then(/^they will be equivalent$/, () => {
-    expect(() => {
-      isHtmlEquivalent(html_a, html_b);
-    }).toBeTruthy();
+    expect(isHtmlEquivalent(html_a, html_b)).toBe(true);
   });
 
   then(/^they will not be equivalent$/, () => {
