@@ -61,6 +61,7 @@ Feature: HTML Equivalency Checker
         Examples:
             | First                                          | Second                               |
             | <div style="display: none; "></div>            | <div style="bold:true;"></div>       |
+            | <div style='opacity: 0.5"></div>               | <div style="opacity: 0.5"></div>     |
             | <style> body {border: 1px solid red;} </style> | <style> body {color: blue;} </style> |
 
     Scenario Outline: Unequivalent CSS will ignore text differences
@@ -69,6 +70,9 @@ Feature: HTML Equivalency Checker
         Then they will be equivalent
 
         Examples:
-            | First                                             | Second                              |
-            | <div style="   display: none; "></div>            | <div style="display: none;"></div>  |
-            | <style>     body {   color:   red;     } </style> | <style> body {color: red;} </style> |
+            | First                                       | Second                              |
+            | <div style="display: none;"></div>          | <div style="display:none"></div>    |
+            | <div style="display: none;"></div>          | <div style="DISPLAY: NONE;"></div>  |
+            | <div style="   display: none; "></div>      | <div style="display: none;"></div>  |
+            | <div style="opacity: 0.5"></div>            | <div style='opacity: 0.5'></div>    |
+            | <style>     body {   color:   red} </style> | <style> body {color: red;} </style> |

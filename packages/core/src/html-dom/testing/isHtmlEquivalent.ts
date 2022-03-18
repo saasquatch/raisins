@@ -12,7 +12,7 @@ function parseCSS(input: string, options: css5Options): string {
   if (options.inline) {
     input = "*{" + input + "}";
   }
-  input = css5.stringify(css5.parse(input));
+  input = css5.stringify(css5.parse(input.toLowerCase()));
   input = input.slice(4, -1).replace(/\s/g, "");
   return input;
 }
