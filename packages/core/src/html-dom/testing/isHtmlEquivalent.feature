@@ -126,6 +126,42 @@ Feature: HTML Equivalency Checker
 			| <div>Hello <b>World</b></div>         | <div>Hello<b>World</b></div>         |
 			| <span>Hello <span>World</span></span> | <span>Hello<span>World</span></span> |
 
+
+	Scenario Outline: Encoded characters do not matter
+
+		Given one HTML string "<First>"
+		And another HTML string "<Second>"
+		Then they will be equivalent
+
+		Examples:
+			| First                                                                                                                                   | Second                                                                                                                                                               |
+			| <a name="&lpos=Class&lid=<span style='color: green'>Custom Publishing</span>"  ><span style='color: green'>Custom Publishing</span></a> | <a  name="&amp;lpos=Class&amp;lid=&lt;span style=&apos;color: green&apos;&gt;Custom Publishing&lt;/span&gt;"><span style="color: green">Custom Publishing</span></a> |
+			| <img src="" alt="(Photo: NASA&amp;JAXA/Inode)></img>                                                                                    | <img src="" alt="(Photo: NASA&JAXA/Inode)></img>                                                                                                                     |
+			| <div>And &#x2014; poof &#x2014; time is gone.</div>                                                                                     | <div>And &mdash; poof &mdash; time is gone.</div>                                                                                                                    |
+
+	Scenario Outline: Encoded characters do not matter (negative)
+
+		Given one HTML string "<First>"
+		And another HTML string "<Second>"
+		Then they will not be equivalent
+
+		Examples:
+			| First                                                                                                                                    | Second                                                                                                                                                               |
+			| 1<a name="&lpos=Class&lid=<span style='color: green'>Custom Publishing</span>"  ><span style='color: green'>Custom Publishing</span></a> | <a  name="&amp;lpos=Class&amp;lid=&lt;span style=&apos;color: green&apos;&gt;Custom Publishing&lt;/span&gt;"><span style="color: green">Custom Publishing</span></a> |
+			| 1<img src="" alt="(Photo: NASA&amp;JAXA/Inode)></img>                                                                                    | <img src="" alt="(Photo: NASA&JAXA/Inode)></img>                                                                                                                     |
+			| 1<div>And &#x2014; poof &#x2014; time is gone.</div>                                                                                     | <div>And &mdash; poof &mdash; time is gone.</div>                                                                                                                    |
+
+
+	Scenario Outline: CDATA node support
+
+		Given one HTML string "<First>"
+		And another HTML string "<Second>"
+		Then they will be equivalent
+
+		Examples:
+			| First                                                   | Second                                                      |
+			| <div><![CDATA[ <div><p>a paragraph.</p></div> ]]></div> | <div><!--[CDATA[ <div><p>a paragraph.</p></div> ]]--></div> |
+
 	Scenario Outline: Unequivalent CSS styles will cause failures
 		Given one HTML string "<First>"
 		And another HTML string "<Second>"

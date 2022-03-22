@@ -86,6 +86,19 @@ describe("Parse + serialize", () => {
     });
   });
 
+  describe("Can parse Email Benchmark cases", () => {
+    const files = glob.sync(process.cwd() + "/benchmark-emails/**/*.html", {
+      absolute: true
+    });
+    expect(files?.length).toBeGreaterThan(0);
+    for (const file of files) {
+      test(`File ${files.indexOf(file)}: ${file}`, async () => {
+        var source = await fs.readFile(file, "utf-8");
+        testRaisinOutputWithParse5(source);
+      });
+    }
+  });
+
   describe("Can parse HTML Benchmark cases", () => {
     const files = glob.sync(process.cwd() + "/benchmark-files/**/*.html", {
       absolute: true
@@ -102,8 +115,7 @@ describe("Parse + serialize", () => {
 
 function testRaisinOutputWithParse5(html: string) {
   /**
-   * A round-trip through Raisins + parse5
-   * should match a round trip through just parse5
+   * A round-trip through Raisins should match original html
    */
   const raisinNode = parse(html, { cleanWhitespace: false });
   const raisinString = serializer(raisinNode);

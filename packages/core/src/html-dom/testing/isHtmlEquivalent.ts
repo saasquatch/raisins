@@ -1,4 +1,5 @@
 import * as css5 from "css";
+import { fs } from "mz";
 import * as parse5 from "parse5";
 
 /**
@@ -45,21 +46,33 @@ function cleanUpCSS(html: string) {
  * Cleans html that is not supported
  */
 function cleanUpHTML(html: string) {
-  html = html.replace(/noscript|textarea/g, "$&div"); // parsed as text nodes
-  html = html.replace(/<!-*?\[CDATA\[.*?]]-*?>/gs, ""); // not supported yet
+  html = html.replace(/noscript|textarea|iframe/g, "$&div"); // parsed as text nodes
+  html = html.replace(/(<!--\[CDATA\[)(.+?)(]]-->)/gs, "<![CDATA[$2]]>");
   html = html.replace(/\s+(\w+)=\1/g, ' $1=""'); // parse5 boolean suppport
+  html = html.replace(/&apos;/g, "'");
+  html = html.replace(/&lt;/g, "<");
+  html = html.replace(/&gt;/g, ">");
+
   return html;
 }
 
 export function isHtmlEquivalent(
   expected: string,
-  received: string
+  received: string,
+  debug?: boolean
 ): true | never {
+  // Print files for debugging
+  if (debug) {
+    fs.writeFileSync("input.html", expected);
+    fs.writeFileSync("parse5.html", parse5.serialize(parse5.parse(expected)));
+    fs.writeFileSync("raisin.html", received);
+  }
+
   /*
    * Data massage on html
    */
-  expected = cleanUpHTML(cleanUpCSS(expected));
-  received = cleanUpHTML(cleanUpCSS(received));
+  expected = cleanUpCSS(cleanUpHTML(expected));
+  received = cleanUpCSS(cleanUpHTML(received));
 
   /*
    * Initial pass through parse5
@@ -70,8 +83,8 @@ export function isHtmlEquivalent(
   /*
    * Second round trip to compare
    */
-  const parsedExpected = parse5.parse(cleanUpCSS(expected));
-  const parsedReceived = parse5.parse(cleanUpCSS(received));
+  const parsedExpected = parse5.parse(expected);
+  const parsedReceived = parse5.parse(received);
 
   /*
    * Data massage on parse5 nodes
@@ -88,8 +101,9 @@ export function isHtmlEquivalent(
 
     Instead we confirm that we have the same number of imporant characters.
   */
-  const importantCharsExpected = (expected.match(/<|>/g) || []).length;
-  const importantCharsReceived = (received.match(/<|>/g) || []).length;
+
+  const importantCharsExpected = (parse5.serialize(parsedExpected).match(/<|>/g) || []).length;
+  const importantCharsReceived = (parse5.serialize(parsedReceived).match(/<|>/g) || []).length;
 
   expect(importantCharsReceived).toBe(importantCharsExpected);
 
@@ -119,6 +133,9 @@ function purify(...nodes: any[]) {
       }
       if (child.hasOwnProperty("attrs")) {
         child.attrs.sort(attributeCompare);
+        for (var j = 0; j < child.attrs.length; j++) {
+          child.attrs[j].value = child.attrs[j].value.replace(/\"/g, "");
+        }
       }
       if (child.nodeName === "#text") {
         if (!/\S/.test(child.value)) {
