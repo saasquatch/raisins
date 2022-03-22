@@ -102,17 +102,10 @@ describe("Parse + serialize", () => {
 
 function testRaisinOutputWithParse5(html: string) {
   /**
-   * An initial round-trip through parse5 to ensure html
-   * edge cases are not handled differently through two
-   * different parsers
-   */
-
-  const raisinNode = parse(html, { cleanWhitespace: false });
-  const raisinString = serializer(raisinNode);
-
-  /**
    * A round-trip through Raisins + parse5
    * should match a round trip through just parse5
    */
+  const raisinNode = parse(html, { cleanWhitespace: false });
+  const raisinString = serializer(raisinNode);
   isHtmlEquivalent(html, raisinString);
 }

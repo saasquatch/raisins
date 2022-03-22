@@ -49,12 +49,12 @@ export function domHandlerToRaisin(node: DOMHandler.Node): RaisinNode {
     },
     onElement(element, children): RaisinElementNode {
       const { tagName, attribs } = element;
-      const { style, ...otherAttribs } = attribs;
+      const { style } = attribs;
       return {
         type: TAG,
         tagName,
         children: children ?? [],
-        attribs: { ...otherAttribs },
+        attribs: attribs,
         style: style ? cssParser(style, { context: "declarationList" }) : undefined,
       };
     },

@@ -10,7 +10,6 @@ import type {
 } from "./RaisinNode";
 import { getParents, visit } from "./util";
 import cssSerializer from "../css-om/serializer";
-import { CssNodePlain } from "css-tree";
 
 /**
  *
@@ -208,11 +207,6 @@ function renderTag(
     tag += ` ${attribs}`;
   }
 
-  let style = elem.style && formatStyle(elem.style);
-  if (style) {
-    tag += ` ${style}`;
-  }
-
   if (
     elem.children.length === 0 &&
     (opts.xmlMode
@@ -265,10 +259,4 @@ function renderText(
 
 function renderComment(elem: RaisinCommentNode) {
   return `<!--${elem.data}-->`;
-}
-
-function formatStyle(style: CssNodePlain): string | undefined {
-  if (!style) return;
-  const content = cssSerializer(style);
-  return `style="${content}"`;
 }

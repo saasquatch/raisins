@@ -1,5 +1,5 @@
-import * as parse5 from "parse5";
 import * as css5 from "css";
+import * as parse5 from "parse5";
 
 /**
  * Validates CSS
@@ -8,12 +8,21 @@ interface css5Options {
   inline?: boolean;
 }
 
-function parseCSS(input: string, options: css5Options): string {
-  if (options.inline) {
-    input = "*{" + input + "}";
+function parseCSS(input: string, options?: css5Options): string {
+  input = input.toLowerCase();
+  if (options?.inline) input = "*{" + input + "}";
+  try {
+    input = css5.stringify(css5.parse(input), {
+      compress: true
+    });
+    input = css5.stringify(css5.parse(input), {
+      compress: true
+    });
+  } catch {
+    input = "invalid-css";
   }
-  input = css5.stringify(css5.parse(input.toLowerCase()));
-  input = input.slice(4, -1).replace(/\s/g, "");
+  input = input.replace(/\s+/g, "");
+  if (options?.inline) input = input.slice(2, -1);
   return input;
 }
 
@@ -22,32 +31,52 @@ function parseCSS(input: string, options: css5Options): string {
  */
 function cleanUpCSS(html: string) {
   html = html
-    .replace(/(?<=<style>).*?(?=<\/style>)/gs, parseCSS)
     .replace(/(?<=style=([\"']))(?:(?=(\\?))\2.)*?(?=\1)/gs, input =>
       parseCSS(input, { inline: true })
+    )
+    .replace(
+      /(<style.*?>)(.*?)(<\/style>)/gs,
+      (_, start, input, end) => start + parseCSS(input) + end
     );
+  return html;
+}
+
+/**
+ * Cleans html that is not supported
+ */
+function cleanUpHTML(html: string) {
+  html = html.replace(/noscript|textarea/g, "$&div"); // parsed as text nodes
+  html = html.replace(/<!-*?\[CDATA\[.*?]]-*?>/gs, ""); // not supported yet
+  html = html.replace(/\s+(\w+)=\1/g, ' $1=""'); // parse5 boolean suppport
   return html;
 }
 
 export function isHtmlEquivalent(
   expected: string,
-  actual: string
+  received: string
 ): true | never {
-  /**
-   * A round-trip through Raisins + parse5
-   * should match a round trip through just parse5
+  /*
+   * Data massage on html
    */
-  const parsedOriginal = parse5.parse(cleanUpCSS(expected));
-  const parsedRaisin = parse5.parse(cleanUpCSS(actual));
+  expected = cleanUpHTML(cleanUpCSS(expected));
+  received = cleanUpHTML(cleanUpCSS(received));
+
+  /*
+   * Initial pass through parse5
+   */
+  expected = parse5.serialize(parse5.parse(expected));
+  received = parse5.serialize(parse5.parse(received));
+
+  /*
+   * Second round trip to compare
+   */
+  const parsedExpected = parse5.parse(cleanUpCSS(expected));
+  const parsedReceived = parse5.parse(cleanUpCSS(received));
 
   /*
    * Data massage on parse5 nodes
    */
-  purify(parsedOriginal, parsedRaisin);
-
-  expect(parsedRaisin).toStrictEqual(parsedOriginal);
-
-  // TODO: Could use Playwright visual comparisons to confirm HTML looks the same: https://playwright.dev/docs/test-snapshots
+  purify(parsedExpected, parsedReceived);
 
   /*
     Matching on exact HTML is hard.
@@ -59,13 +88,18 @@ export function isHtmlEquivalent(
 
     Instead we confirm that we have the same number of imporant characters.
   */
-  const importantCharsIn = (
-    parse5.serialize(parsedOriginal).match(/<|>/g) || []
-  ).length;
-  const importantCharsOut = (parse5.serialize(parsedRaisin).match(/<|>/g) || [])
-    .length;
+  const importantCharsExpected = (expected.match(/<|>/g) || []).length;
+  const importantCharsReceived = (received.match(/<|>/g) || []).length;
 
-  expect(importantCharsOut).toBe(importantCharsIn);
+  expect(importantCharsReceived).toBe(importantCharsExpected);
+
+  /*
+   * Test node equivalence with deep comparison
+   */
+  expect(parsedReceived).toStrictEqual(parsedExpected);
+
+  // TODO: Could use Playwright visual comparisons to confirm HTML looks the same: https://playwright.dev/docs/test-snapshots
+
   return true;
 }
 
@@ -86,9 +120,11 @@ function purify(...nodes: any[]) {
       if (child.hasOwnProperty("attrs")) {
         child.attrs.sort(attributeCompare);
       }
-      if (child.nodeName === "#text" && !/\S/.test(child.value)) {
-        node.childNodes.splice(i, 1);
-        i--;
+      if (child.nodeName === "#text") {
+        if (!/\S/.test(child.value)) {
+          node.childNodes.splice(i, 1);
+          i--;
+        }
       }
       if (child.hasOwnProperty("childNodes")) {
         purify(child);

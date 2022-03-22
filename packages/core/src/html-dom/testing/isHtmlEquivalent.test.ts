@@ -1,7 +1,7 @@
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { isHtmlEquivalent } from "./isHtmlEquivalent";
 
-const feature = loadFeature("./IsHtmlEquivalent.feature", {
+const feature = loadFeature("./isHtmlEquivalent.feature", {
   loadRelativePath: true,
   tagFilter: "not @skip"
 });
