@@ -21,7 +21,8 @@
     "test:coverage": "tsdx test --coverage",
     "lint": "tsdx lint",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "cypress:open": "cypress open"
   },
   "husky": {
     "hooks": {
@@ -51,6 +52,7 @@
     "@types/parse5": "^6.0.3",
     "@types/styled-components": "^5.1.14",
     "classnames": "^2.3.1",
+    "cypress": "^9.5.2",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
     "husky": "^7.0.2",
@@ -77,5 +79,10 @@
     "penpal": "^6.1.0",
     "snabbdom": "^3.1.0",
     "styled-components": "^5.3.1"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/cypress/"
+    ]
   }
 }

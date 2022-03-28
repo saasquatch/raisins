@@ -1,12 +1,9 @@
-import { parseDocument } from "htmlparser2";
-import { domHandlerToRaisin } from "./parser/DomHandlerToRaisin";
-import { documentFragmentToRaisin } from "./parser/DomNativeToRaisin";
+import { domNativeToRaisin } from "./parser/DomNativeToRaisin";
 import { RaisinDocumentNode } from "./RaisinNode";
 import { removeWhitespace } from "./util";
 
 type Options = {
   cleanWhitespace?: boolean;
-  domParser?: boolean;
 };
 
 /**
@@ -22,32 +19,54 @@ type Options = {
  */
 export function parse(
   html: string,
-  { cleanWhitespace = false, domParser = false }: Options = {}
+  { cleanWhitespace = false }: Options = {}
 ): RaisinDocumentNode {
-  const raisinNode = domParser
-    ? parseWithTemplateTag(html)
-    : parseWithHtmlParser2(html);
+  const raisinNode = parseDomParser(html);
   const clean = cleanWhitespace ? removeWhitespace(raisinNode) : raisinNode;
   return clean as RaisinDocumentNode;
 }
 
-function parseWithHtmlParser2(html: string) {
-  const DomNode = parseDocument(html);
-  return domHandlerToRaisin(DomNode) as RaisinDocumentNode;
-}
-
 /**
- * remarkablemark, (2022) html-dom-parser [Source code]: https://github.com/remarkablemark/html-dom-parser/blob/master/lib/client/domparser.js
- *
- * Template (performance: fast).
+ * DOM Parser using template tags
  *
  * @see https://developer.mozilla.org/docs/Web/HTML/Element/template
+ *
+ * @param html string to be parsed
+ * @returns
  */
-const template = document.createElement("template");
-function parseWithTemplateTag(html: string) {
+function parseDomParser(html: string) {
+  const isDoctype = /<!doctype.*?>/is.test(html);
+  const isHtml = /<\/?html.*?>/is.test(html);
+  const isHead = /<\/?head.*?>/is.test(html);
+  const isBody = /<\/?body.*?>/is.test(html);
+
+  if (isDoctype || isHtml || isHead || isBody) {
+    const parser = new DOMParser();
+    const dom = parser.parseFromString(html, "text/html");
+
+    if (!isBody) {
+      const body = dom.getElementsByTagName("body")[0];
+      body.replaceWith(...Array.from(body.childNodes));
+    }
+    if (!isHead) {
+      const head = dom.getElementsByTagName("head")[0];
+      head.replaceWith(...Array.from(head.childNodes));
+    }
+    if (isDoctype) {
+      return domNativeToRaisin(dom, !isHtml) as RaisinDocumentNode;
+    }
+    if (!isHtml) {
+      const html = dom.getElementsByTagName("html")[0];
+      html.replaceWith(...Array.from(html.childNodes));
+    }
+
+    return domNativeToRaisin(dom) as RaisinDocumentNode;
+  }
+
+  const template = document.createElement("template");
   template.innerHTML = html;
-  const Dom = template.content;
-  return documentFragmentToRaisin(Dom) as RaisinDocumentNode;
+  const documentFragment = template.content;
+  return domNativeToRaisin(documentFragment) as RaisinDocumentNode;
 }
 
 export default parse;

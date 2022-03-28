@@ -4,7 +4,7 @@ import fs from "mz/fs";
 import { parse } from "./parser";
 import { RaisinElementNode } from "./RaisinNode";
 import serializer from "./serializer";
-import { isHtmlEquivalent } from "./testing/isHtmlEquivalent";
+import isHtmlEquivalent from "./testing/isHtmlEquivalent";
 
 describe("Parse + serialize", () => {
   test("Can parse simple HTML", () => {
@@ -94,7 +94,11 @@ describe("Parse + serialize", () => {
     for (const file of files) {
       test(`File ${files.indexOf(file)}: ${file}`, async () => {
         var source = await fs.readFile(file, "utf-8");
-        testRaisinOutputWithParse5(source);
+        const raisinNode = parse(source, {
+          cleanWhitespace: false
+        });
+        const raisinString = serializer(raisinNode);
+        isHtmlEquivalent(source, raisinString);
       });
     }
   });
@@ -107,17 +111,12 @@ describe("Parse + serialize", () => {
     for (const file of files) {
       test(`File ${files.indexOf(file)}: ${file}`, async () => {
         var source = await fs.readFile(file, "utf-8");
-        testRaisinOutputWithParse5(source);
+        const raisinNode = parse(source, {
+          cleanWhitespace: false
+        });
+        const raisinString = serializer(raisinNode);
+        isHtmlEquivalent(source, raisinString);
       });
     }
   });
 });
-
-function testRaisinOutputWithParse5(html: string) {
-  /**
-   * A round-trip through Raisins should match original html
-   */
-  const raisinNode = parse(html, { cleanWhitespace: false });
-  const raisinString = serializer(raisinNode);
-  isHtmlEquivalent(html, raisinString);
-}
