@@ -1,24 +1,30 @@
-import { Getter, Molecule, MoleculeContext, ContextGetter, MoleculeGetter } from '../Molecule.stories';
+import {
+  Getter,
+  Molecule,
+  MoleculeScope,
+  ScopeGetter,
+  MoleculeGetter,
+} from '../Molecule.stories';
 
-export function discoverDependencies(m: { getter: Getter<unknown>; }) {
-    const dependentMolecules = new Set<Molecule<unknown>>();
-    const dependentContexts = new Set<MoleculeContext<unknown>>();
+export function discoverDependencies(m: { getter: Getter<unknown> }) {
+  const dependentMolecules = new Set<Molecule<unknown>>();
+  const dependentScopes = new Set<MoleculeScope<unknown>>();
 
-    const fakeGetContext: ContextGetter = (ctx) => {
-        dependentContexts.add(ctx);
-        return ctx.defaultValue;
-    };
-    const fakeGetMolecule: MoleculeGetter = (mol) => {
-        dependentMolecules.add(mol);
-        return mol.getter(fakeGetMolecule, fakeGetContext);
-    };
-    // Determines dependencies
-    m.getter(fakeGetMolecule, fakeGetContext);
+  const fakeGetContext: ScopeGetter = (ctx) => {
+    dependentScopes.add(ctx);
+    return ctx.defaultValue;
+  };
+  const fakeGetMolecule: MoleculeGetter = (mol) => {
+    dependentMolecules.add(mol);
+    return mol.getter(fakeGetMolecule, fakeGetContext);
+  };
+  // Determines dependencies
+  m.getter(fakeGetMolecule, fakeGetContext);
 
-    const contexts = Array.from(dependentContexts.entries()).map((ctx) => ctx[0]);
-    const molecules = Array.from(dependentMolecules.entries()).map(
-        (entry) => entry[0]
-    );
+  const scopes = Array.from(dependentScopes.entries()).map((ctx) => ctx[0]);
+  const molecules = Array.from(dependentMolecules.entries()).map(
+    (entry) => entry[0]
+  );
 
-    return { contexts, molecules };
+  return { scopes, molecules };
 }

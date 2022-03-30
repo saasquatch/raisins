@@ -8,10 +8,10 @@ const meta: Meta = {
 };
 export default meta;
 
-const TenantContext = createContext<string>('tenant-a');
-const UserContext = createContext<string>('user-a');
+const TenantScope = createScope<string>('tenant-a');
+const UserScope = createScope<string>('user-a');
 
-function createContext<T>(defaultValue: T): MoleculeContext<T> {
+function createScope<T>(defaultValue: T): MoleculeScope<T> {
   const wrapped = React.createContext<T>(defaultValue);
   const Provider = ({
     children,
@@ -27,7 +27,7 @@ function createContext<T>(defaultValue: T): MoleculeContext<T> {
   return { defaultValue, wrapped, Provider };
 }
 
-export type MoleculeContext<T> = {
+export type MoleculeScope<T> = {
   defaultValue: T;
   wrapped: React.Context<T>;
   Provider: React.FC<{
@@ -38,11 +38,11 @@ export type MoleculeContext<T> = {
 };
 
 export type MoleculeGetter<T = unknown> = (mol: Molecule<T>) => T;
-export type ContextGetter<T = unknown> = (ctx: MoleculeContext<T>) => T;
+export type ScopeGetter<T = unknown> = (ctx: MoleculeScope<T>) => T;
 
 export type Getter<T> = (
   getMolecule: MoleculeGetter,
-  getContext: ContextGetter
+  getScope: ScopeGetter
 ) => T;
 export type Molecule<T> = ReturnType<typeof molecule>;
 function molecule<T>(getter: Getter<T>) {
@@ -52,10 +52,10 @@ function molecule<T>(getter: Getter<T>) {
 const memoize = createMemoizeAtom();
 
 function useMolecule<T>(m: Molecule<T>): T {
-  const { contexts, molecules } = useMemo(() => discoverDependencies(m), [m]);
+  const { scopes, molecules } = useMemo(() => discoverDependencies(m), [m]);
 
-  const realGetContext: ContextGetter = (ctx) => {
-    return useContext(contexts.find((a) => a.wrapped === ctx.wrapped).wrapped);
+  const realGetContext: ScopeGetter = (ctx) => {
+    return useContext(scopes.find((a) => a.wrapped === ctx.wrapped).wrapped);
   };
 
   // Get real value, memoized based on context
@@ -69,13 +69,13 @@ function useMolecule<T>(m: Molecule<T>): T {
   return realGetMolecule(m) as T;
 }
 
-const coreAtoms = molecule((getMolecule, getContext) => {
-  return { basicAtom: atom(getContext(TenantContext as any) + ' name') };
+const coreAtoms = molecule((getMolecule, getScope) => {
+  return { basicAtom: atom(getScope(TenantScope as any) + ' name') };
 });
 
-const editAtoms = molecule((getMolecule, getContext) => {
+const editAtoms = molecule((getMolecule, getScope) => {
   const core = getMolecule(coreAtoms) as any;
-  const userId = getContext(UserContext as any) as string;
+  const userId = getScope(UserScope as any) as string;
   return {
     user: atom((get) => userId),
     basicAtom: atom((get) => (get(core.basicAtom) as string).toUpperCase()),
@@ -112,21 +112,21 @@ export function Example() {
         value={state}
         onChange={(e) => setState(e.target.value)}
       />
-      <TenantContext.Provider value={state}>
+      <TenantScope.Provider value={state}>
         <Component />
-      </TenantContext.Provider>
-      <TenantContext.Provider>
+      </TenantScope.Provider>
+      <TenantScope.Provider>
         <Component />
-      </TenantContext.Provider>
-      <TenantContext.Provider value="user_a">
+      </TenantScope.Provider>
+      <TenantScope.Provider value="user_a">
         <Component />
-        <TenantContext.Provider value="user_a">
+        <TenantScope.Provider value="user_a">
           <Component />
-        </TenantContext.Provider>
-      </TenantContext.Provider>
-      <TenantContext.Provider value="user_a">
+        </TenantScope.Provider>
+      </TenantScope.Provider>
+      <TenantScope.Provider value="user_a">
         <Component />
-      </TenantContext.Provider>
+      </TenantScope.Provider>
     </div>
   );
 }
