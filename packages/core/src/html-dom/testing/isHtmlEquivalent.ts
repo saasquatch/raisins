@@ -20,8 +20,7 @@ function parseCSS(input: string, options?: css5Options): string {
       compress: true
     });
   } catch {
-    input = "invalid-css";
-    return input;
+    return "";
   }
   input = input.replace(/\s+/g, "");
   if (options?.inline) input = input.slice(2, -1);
