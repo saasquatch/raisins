@@ -8,7 +8,8 @@ const meta: Meta = {
 };
 export default meta;
 
-const StartContext = createContext<string>('Foo');
+const TenantContext = createContext<string>('tenant-a');
+const UserContext = createContext<string>('user-a');
 
 function createContext<T>(defaultValue: T): MoleculeContext<T> {
   const wrapped = React.createContext<T>(defaultValue);
@@ -49,6 +50,7 @@ function molecule<T>(getter: Getter<T>) {
 }
 
 const memoize = createMemoizeAtom();
+
 function useMolecule<T>(m: Molecule<T>): T {
   const { contexts, molecules } = useMemo(() => discoverDependencies(m), [m]);
 
@@ -58,22 +60,24 @@ function useMolecule<T>(m: Molecule<T>): T {
 
   // Get real value, memoized based on context
   const realGetMolecule = (mol: Molecule<unknown>) => {
-    return memoize(() => {
-      const real = mol.getter(realGetMolecule, realGetContext);
-      return real;
-    }, [...contexts, ...molecules]);
+    // return memoize(() => {
+    const real = mol.getter(realGetMolecule, realGetContext);
+    return real;
+    // }, [...contexts, ...molecules]);
   };
 
   return realGetMolecule(m) as T;
 }
 
 const coreAtoms = molecule((getMolecule, getContext) => {
-  return { basicAtom: atom(getContext(StartContext as any)) };
+  return { basicAtom: atom(getContext(TenantContext as any) + ' name') };
 });
 
 const editAtoms = molecule((getMolecule, getContext) => {
   const core = getMolecule(coreAtoms) as any;
+  const userId = getContext(UserContext as any) as string;
   return {
+    user: atom((get) => userId),
     basicAtom: atom((get) => (get(core.basicAtom) as string).toUpperCase()),
   };
 });
@@ -100,7 +104,7 @@ function Component() {
 }
 
 export function Example() {
-  const [state, setState] = useState('external');
+  const [state, setState] = useState('user_a');
   return (
     <div>
       <input
@@ -108,21 +112,21 @@ export function Example() {
         value={state}
         onChange={(e) => setState(e.target.value)}
       />
-      <StartContext.Provider value={state}>
+      <TenantContext.Provider value={state}>
         <Component />
-      </StartContext.Provider>
-      <StartContext.Provider>
+      </TenantContext.Provider>
+      <TenantContext.Provider>
         <Component />
-      </StartContext.Provider>
-      <StartContext.Provider value="one">
+      </TenantContext.Provider>
+      <TenantContext.Provider value="user_a">
         <Component />
-        <StartContext.Provider value="two">
+        <TenantContext.Provider value="user_a">
           <Component />
-        </StartContext.Provider>
-      </StartContext.Provider>
-      <StartContext.Provider value="one">
+        </TenantContext.Provider>
+      </TenantContext.Provider>
+      <TenantContext.Provider value="user_a">
         <Component />
-      </StartContext.Provider>
+      </TenantContext.Provider>
     </div>
   );
 }
