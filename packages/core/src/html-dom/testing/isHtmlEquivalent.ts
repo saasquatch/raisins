@@ -44,14 +44,6 @@ function cleanUpCSS(html: string) {
 }
 
 /**
- * Cleans html that is not supported
- */
-function cleanUpHTML(html: string) {
-  html = html.replace(/noscript|textarea|iframe/g, "$&div");
-  return html;
-}
-
-/**
  * Compares two HTML strings to see if they are equivalent
  *
  * @param expected original html string
@@ -60,46 +52,33 @@ function cleanUpHTML(html: string) {
  */
 export function isHtmlEquivalent(
   expected: string,
-  received: string
+  received: string,
+  parseOptions?: parse5.ParserOptions,
+  purifyOptions?: PurifyOptions
 ): true | never {
   /*
    * Initial pass through parse5
    */
-  expected = parse5.serialize(parse5.parse(expected));
-  received = parse5.serialize(parse5.parse(received));
+  expected = parse5.serialize(parse5.parse(expected, parseOptions));
+  received = parse5.serialize(parse5.parse(received, parseOptions));
 
   /*
    * Data massage on html
    */
-  expected = cleanUpCSS(cleanUpHTML(expected));
-  received = cleanUpCSS(cleanUpHTML(received));
+  expected = cleanUpCSS(expected);
+  received = cleanUpCSS(received);
 
   /*
    * Second trip to compare
    */
-  const parsedExpected = parse5.parse(expected);
-  const parsedReceived = parse5.parse(received);
+  const parsedExpected = parse5.parse(expected, parseOptions);
+  const parsedReceived = parse5.parse(received, parseOptions);
 
   /*
    * Data massage on parse5 nodes
    */
-  purify(parsedExpected, parsedReceived);
-
-  /*
-    Matching on exact HTML is hard.
-    - attributes can use different quotes 'attr' vs "attr"
-    - trailing slashes are optiona <img> vs <img />
-    - whitepace in tags <li> vs <li >
-    - order of attributes <li class="a" id="a"> vs <li id="a" class="a">
-    - equivalent attributes <li attr=""> vs <li attr>
-
-    Instead we confirm that we have the same number of imporant characters.
-  */
-
-  const importantCharsExpected = (expected.match(/<|>/g) || []).length;
-  const importantCharsReceived = (received.match(/<|>/g) || []).length;
-
-  expect(importantCharsReceived).toBe(importantCharsExpected);
+  purify(parsedExpected, purifyOptions);
+  purify(parsedReceived, purifyOptions);
 
   /*
    * Test node equivalence with deep comparison
@@ -107,6 +86,9 @@ export function isHtmlEquivalent(
   expect(parsedReceived).toStrictEqual(parsedExpected);
 
   return true;
+}
+interface PurifyOptions {
+  ignoreComments?: boolean;
 }
 
 /*
@@ -116,27 +98,27 @@ export function isHtmlEquivalent(
     - removing text nodes caused by whitespaces between elements
       or containing html elements
 */
-function purify(...nodes: any[]) {
-  nodes.map(node => {
-    for (var i = 0; i < node.childNodes.length; i++) {
-      var child = node.childNodes[i];
-      if (child.hasOwnProperty("parentNode")) {
-        delete child["parentNode"];
-      }
-      if (child.hasOwnProperty("attrs")) {
-        child.attrs.sort(attributeCompare);
-      }
-      if (child.nodeName === "#text") {
-        if (!/\S/.test(child.value)) {
-          node.childNodes.splice(i, 1);
-          i--;
-        }
-      }
-      if (child.hasOwnProperty("childNodes")) {
-        purify(child);
-      }
+function purify(node: any, options?: PurifyOptions | undefined) {
+  for (var i = 0; i < node.childNodes.length; i++) {
+    var child = node.childNodes[i];
+    if (child.hasOwnProperty("parentNode")) {
+      delete child["parentNode"];
     }
-  });
+    if (child.hasOwnProperty("attrs")) {
+      child.attrs.sort(attributeCompare);
+    }
+    if (child.nodeName === "#text" && !/\S/.test(child.value)) {
+      node.childNodes.splice(i, 1);
+      i--;
+    }
+    if (options?.ignoreComments && child.nodeName === "#comment") {
+      node.childNodes.splice(i, 1);
+      i--;
+    }
+    if (child.hasOwnProperty("childNodes")) {
+      purify(child, options);
+    }
+  }
 }
 
 /*
