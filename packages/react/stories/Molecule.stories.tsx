@@ -8,8 +8,8 @@ const meta: Meta = {
 };
 export default meta;
 
-const TenantScope = createScope<string>('tenant-a');
-const UserScope = createScope<string>('user-a');
+const TenantScope = createScope<string>('Red Bull');
+const UserScope = createScope<string>('Bob');
 
 function createScope<T>(defaultValue: T): MoleculeScope<T> {
   const wrapped = React.createContext<T>(defaultValue);
@@ -44,8 +44,11 @@ export type Getter<T> = (
   getMolecule: MoleculeGetter,
   getScope: ScopeGetter
 ) => T;
-export type Molecule<T> = ReturnType<typeof molecule>;
-function molecule<T>(getter: Getter<T>) {
+export type Molecule<T> = {
+  getter: Getter<T>;
+  displayName?: string;
+};
+function molecule<T>(getter: Getter<T>): Molecule<T> {
   return { getter };
 }
 
@@ -54,57 +57,77 @@ const memoize = createMemoizeAtom();
 function useMolecule<T>(m: Molecule<T>): T {
   const { scopes, molecules } = useMemo(() => discoverDependencies(m), [m]);
 
-  const realGetContext: ScopeGetter = (ctx) => {
-    return useContext(scopes.find((a) => a.wrapped === ctx.wrapped).wrapped);
+  const scopeValues = scopes.map((s) => ({
+    value: useContext(s.wrapped),
+    scope: s,
+  }));
+
+  const realGetScope: ScopeGetter = (ctx) => {
+    return scopeValues.find((a) => a.scope.wrapped === ctx.wrapped).value;
   };
 
   // Get real value, memoized based on context
   const realGetMolecule = (mol: Molecule<unknown>) => {
-    // return memoize(() => {
-    const real = mol.getter(realGetMolecule, realGetContext);
-    return real;
-    // }, [...contexts, ...molecules]);
+    const { scopes, molecules } = discoverDependencies(mol);
+    const scopeValues = scopes.map((s) => ({
+      value: useContext(s.wrapped),
+      scope: s,
+    }));
+
+    return memoize(() => {
+      console.log('Mounting a new molecule', mol, scopeValues, molecules);
+      const real = mol.getter(realGetMolecule, realGetScope);
+      return real;
+    }, [...scopeValues, ...molecules]);
   };
 
   return realGetMolecule(m) as T;
 }
 
-const coreAtoms = molecule((getMolecule, getScope) => {
-  return { basicAtom: atom(getScope(TenantScope as any) + ' name') };
+const coreAtoms = molecule(function createCore(getMolecule, getScope) {
+  return { basicAtom: atom(getScope(TenantScope as any) + '  Inc.') };
 });
 
-const editAtoms = molecule((getMolecule, getScope) => {
+const editAtoms = molecule(function createEdit(getMolecule, getScope) {
   const core = getMolecule(coreAtoms) as any;
   const userId = getScope(UserScope as any) as string;
   return {
     user: atom((get) => userId),
-    basicAtom: atom((get) => (get(core.basicAtom) as string).toUpperCase()),
+    preference: atom(
+      (get) => (userId + ' likes ' + get(core.basicAtom)) as string
+    ),
   };
 });
 
 function Component() {
+  const tenant = useContext(TenantScope.wrapped);
+  const user = useContext(UserScope.wrapped);
   const core = useMolecule(coreAtoms) as any;
   const [cname, setCName] = useAtom(core.basicAtom);
 
-  const atoms = useMolecule(editAtoms) as any;
-  const [name] = useAtom(atoms.basicAtom);
+  const edits = useMolecule(editAtoms) as any;
+  const [name] = useAtom(edits.preference);
 
   return (
     <div style={{ border: '1px solid grey', padding: '30px' }}>
-      {cname}
+      Tenant: {tenant}
+      <br />
+      User: {user}
+      <br />
+      Company Name: {cname} <br />
       <input
         type="text"
         value={cname as string}
         onChange={(e) => setCName(e.target.value)}
       />
       <br />
-      Upper: {name}
+      Preference: {name}
     </div>
   );
 }
 
 export function Example() {
-  const [state, setState] = useState('user_a');
+  const [state, setState] = useState('Android');
   return (
     <div>
       <input
@@ -118,13 +141,13 @@ export function Example() {
       <TenantScope.Provider>
         <Component />
       </TenantScope.Provider>
-      <TenantScope.Provider value="user_a">
+      <TenantScope.Provider value="pepsi">
         <Component />
-        <TenantScope.Provider value="user_a">
+        <TenantScope.Provider value="coke">
           <Component />
         </TenantScope.Provider>
       </TenantScope.Provider>
-      <TenantScope.Provider value="user_a">
+      <TenantScope.Provider value="pepsi">
         <Component />
       </TenantScope.Provider>
     </div>
