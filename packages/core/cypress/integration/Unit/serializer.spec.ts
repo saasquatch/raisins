@@ -1,9 +1,90 @@
-import parse from "../../src/html-dom/parser";
-import serializer from "../../src/html-dom/serializer";
-import isHtmlEquivalent from "../../src/html-dom/testing/isHtmlEquivalent";
+import parse from "../../../src/html-dom/parser";
+import serializer from "../../../src/html-dom/serializer";
+import isHtmlEquivalent from "../../../src/html-dom/testing/isHtmlEquivalent";
+import { RaisinElementNode } from "../../../src/html-dom/RaisinNode";
+import { ElementType } from "domelementtype";
 import expect from "expect";
 
+describe("Boolean attributes", () => {
+  /*
+
+    Boolean attributes, e.g. `<details open>`
+
+    Read these links. They're short, just read them
+    
+    MDN - https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#boolean_attributes
+    Spec - https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
+
+    htmlparser2 implements this behaviour: https://github.com/fb55/htmlparser2/issues/215
+    It matches the dom value you'd get for a boolean attribute (DOM returns empty string too)
+
+    */
+
+  function testBooleanAttributeSerializer(value: any) {
+    const node: RaisinElementNode = {
+      type: ElementType.Tag,
+      tagName: "details",
+      attribs: {
+        open: value
+      },
+      children: [],
+      style: undefined
+    };
+    expect(serializer(node)).toEqual(`<details open></details>`);
+    cy.log("Pass");
+  }
+
+  function testBooleanAttribute(
+    input: string,
+    attrValue: any,
+    out: string = input
+  ) {
+    const node = parse(input);
+    expect(node).toEqual({
+      type: "root",
+      children: [
+        {
+          type: "tag",
+          tagName: "details",
+          attribs: {
+            open: attrValue
+          },
+          children: [],
+          style: undefined
+        }
+      ]
+    });
+    expect(serializer(node)).toEqual(out);
+    cy.log("Pass");
+  }
+
+  it("Boolean attributes are internally empty strings", () => {
+    const input = "<details open></details>";
+    testBooleanAttribute(input, "");
+  });
+  it("Attributes represented as empty strings are converted to boolean attributes", () => {
+    const input = `<details open=""></details>`;
+    testBooleanAttribute(input, "", `<details open></details>`);
+  });
+  it("Non quoted strings are parsed as strings", () => {
+    const input = `<details open=open></details>`;
+    testBooleanAttribute(input, "open", `<details open="open"></details>`);
+  });
+
+  it("JS booleans are serialized", () => {
+    testBooleanAttributeSerializer("");
+  });
+});
+
 describe("Parse + serialize", () => {
+  it("Can parse simple HTML", () => {
+    const source = `<div>Example</div>`;
+    const node = parse(source);
+    const out = serializer(node);
+    expect(out).toBe(source);
+    cy.log("Pass");
+  });
+
   it("Can parse Email Benchmark cases", () => {
     cy.task("getFiles", "benchmark-emails").each(file => {
       cy.readFile("./benchmark-emails/" + file).then(source => {
@@ -48,7 +129,7 @@ describe("Parse + serialize", () => {
         const raisinNode = parse(source, { cleanWhitespace: false });
         const raisinString = serializer(raisinNode);
 
-        let ignoreComments = false;		
+        let ignoreComments = false;
         /* Some files have comments that are parsed differently in browser, simply ignore them */
         if (badFileComments.includes(String(file))) ignoreComments = true;
         expect(
