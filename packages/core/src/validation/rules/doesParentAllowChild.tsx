@@ -13,7 +13,7 @@ export function doesParentAllowChild(
   parentMeta: CustomElement,
   slot: string | undefined
 ): boolean {
-  const slots = parentMeta?.slots;
+  const slots = parentMeta.slots;
   const slotMeta = slots?.find(s => s.name === slot);
   if (!slotMeta) return false;
 
@@ -26,6 +26,7 @@ export function doesParentAllowChild(
   const parentAllowsChild =
     slotMeta.validChildren?.includes("*") ||
     (tagName && slotMeta.validChildren?.includes(tagName)) ||
+    slotMeta.validChildren === undefined || // if no constraints, child should be allowed (similar to doesChildAllowParent)
     false;
   return parentAllowsChild;
 }

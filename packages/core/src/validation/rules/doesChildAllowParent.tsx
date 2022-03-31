@@ -25,24 +25,21 @@ export function doesChildAllowParent(
     return true;
   }
 
-  if (isElementNode(parent)) {
-    tagName = parent.tagName;
-  }
+  tagName = parent.tagName;
 
-  const hasConstraints = childMeta?.validParents !== undefined;
-  if (!hasConstraints) {
+  if (childMeta.validParents === undefined) {
     // No constraints, so all parents are allowed.
     return true;
   }
 
-  if (hasConstraints && !tagName) {
-    // If a child specifies a set of valid parents,
+  if (childMeta.validParents !== undefined && !tagName) {
+    // Constraints, if a child specifies a set of valid parents,
     // then it will not allow it parent elements without tag names (e.g. comments)
     return false;
   }
 
   // TODO: Use CSS selectors engine or ProseMirror content engine
-  if (tagName && childMeta?.validParents?.includes(tagName)) {
+  if (childMeta.validParents.includes(tagName) || childMeta.validParents.includes("*")) {
     // Child allows parent
     return true;
   }
