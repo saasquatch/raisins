@@ -47,6 +47,7 @@ const userMolecule = molecule((getMol, getScope) => {
     return userId + ' in ' + get(company.companyNameAtom);
   });
   return {
+    userId,
     userCountryAtom,
     userNameAtom,
     groupAtom,
@@ -155,12 +156,33 @@ describe('Store', () => {
 
       const firstValue = store.get(userMolecule, company1Scope, user1Scope);
       const secondValue = store.get(userMolecule, company2Scope, user1Scope);
+      const thirdValue = store.get(userMolecule, user1Scope);
 
       expect(firstValue.company).toBe(company1Scope[1]);
       expect(secondValue.company).toBe(company2Scope[1]);
+      expect(thirdValue.company).toBe(CompanyScope.defaultValue);
 
       expect(firstValue).not.toBe(secondValue);
+      expect(firstValue).not.toBe(thirdValue);
+      expect(secondValue).not.toBe(thirdValue);
     });
+
+    it('Creates one molecule per dependent molecule that is scope dependent', () => {
+      //
+      const store = createStore();
+
+      const firstValue = store.get(userMolecule, company1Scope, user1Scope);
+      const secondValue = store.get(userMolecule, company1Scope, user2Scope);
+
+      expect(firstValue.company).toBe(company1Scope[1]);
+      expect(secondValue.company).toBe(company1Scope[1]);
+
+      expect(firstValue).not.toBe(secondValue);
+
+      expect(firstValue.userId).toBe(user1Scope[1]);
+      expect(secondValue.userId).toBe(user2Scope[1]);
+    });
+
     it('Creates ONLY one molecule per dependent molecule that is scope dependent', () => {
       //
       const store = createStore();

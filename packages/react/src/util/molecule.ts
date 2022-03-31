@@ -2,7 +2,7 @@ import { createMemoizeAtom } from './weakCache';
 
 type Deps = {
   scopes: AnyScope[];
-  transientScopes: AnyScope[];
+  transitiveScopes: AnyScope[];
   molecules: AnyMolecule[];
 };
 
@@ -45,7 +45,7 @@ export function createStore() {
       deps: {
         molecules: Array.from(dependentMolecules.values()),
         scopes: Array.from(dependentScopes.values()),
-        transientScopes: Array.from(transientScopes.values()),
+        transitiveScopes: Array.from(transientScopes.values()),
       },
       value,
     };
@@ -68,18 +68,19 @@ export function createStore() {
       const scope = s[0];
       return mounted.deps.scopes.includes(scope);
     });
-    const transientRelatedScopes = scopes.filter((s) => {
+    const transitiveRelatedScopes = scopes.filter((s) => {
       const scope = s[0];
-      return mounted.deps.transientScopes.includes(scope);
+      return mounted.deps.transitiveScopes.includes(scope);
     });
 
-    if (relatedScopes.length > 0) {
+    if (relatedScopes.length > 0 || transitiveRelatedScopes.length > 0) {
       // TODO: Need to properly cache based on transient scope dependencies
       return deepCache(() => mounted, [
         ...relatedScopes,
-        ...transientRelatedScopes,
+        ...transitiveRelatedScopes,
       ]);
     }
+
     const cached = shallowCache.get(m);
     if (cached) {
       return cached;
@@ -89,7 +90,7 @@ export function createStore() {
   }
 
   function get<T>(m: Molecule<T>, ...scopes: AnyScopeTuple[]): T {
-    return getInternal(m).value as T;
+    return getInternal(m, ...scopes).value as T;
   }
   return {
     get,

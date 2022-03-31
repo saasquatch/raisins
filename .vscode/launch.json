@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node.js: React Jest Tests Wtach",
+      "cwd": "${workspaceFolder}/packages/react/",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceFolder}/packages/react/node_modules/tsdx/dist/index.js",
+        "test",
+        "--runInBand",
+        "--watch"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "port": 9229
+    }
+  ],
+  "compounds": []
+}
