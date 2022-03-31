@@ -3,29 +3,20 @@ import { atom, useAtom } from 'jotai';
 import React, { useContext, useMemo, useState } from 'react';
 import { createMemoizeAtom } from '../src/util/weakCache';
 import { discoverDependencies } from './molecules/discoverDependencies';
+
 const meta: Meta = {
   title: 'Molecule',
 };
 export default meta;
 
-const TenantScope = createScope<string>('Red Bull');
-const UserScope = createScope<string>('Bob');
 
-function createScope<T>(defaultValue: T): MoleculeScope<T> {
-  const wrapped = React.createContext<T>(defaultValue);
-  const Provider = ({
-    children,
-    value,
-  }: {
-    children?: React.ReactNode;
-    value?: T;
-  }) => (
-    <wrapped.Provider value={value ?? defaultValue}>
-      {children}
-    </wrapped.Provider>
-  );
-  return { defaultValue, wrapped, Provider };
+type AnyMolecule = Molecule<unknown>;
+type AnyValue = unknown;
+class Store{
+  mounted = new WeakMap<AnyMolecule, AnyValue>();
+
 }
+
 
 export type MoleculeScope<T> = {
   defaultValue: T;
@@ -54,6 +45,25 @@ function molecule<T>(getter: Getter<T>): Molecule<T> {
 
 const memoize = createMemoizeAtom();
 
+
+const TenantScope = createScope<string>('Red Bull');
+const UserScope = createScope<string>('Bob');
+
+function createScope<T>(defaultValue: T): MoleculeScope<T> {
+  const wrapped = React.createContext<T>(defaultValue);
+  const Provider = ({
+    children,
+    value,
+  }: {
+    children?: React.ReactNode;
+    value?: T;
+  }) => (
+    <wrapped.Provider value={value ?? defaultValue}>
+      {children}
+    </wrapped.Provider>
+  );
+  return { defaultValue, wrapped, Provider };
+}
 function useMolecule<T>(m: Molecule<T>): T {
   const { scopes, molecules } = useMemo(() => discoverDependencies(m), [m]);
 
