@@ -30,6 +30,9 @@ const doubleDerived = molecule((getMol, getScope) => {
   };
 });
 
+const UnrelatedScope = createScope<number>(1);
+const unrelatedScope1: ScopeTuple<number> = [UnrelatedScope, 1];
+
 const UserScope = createScope<string>('bob@example.com');
 const user1Scope: ScopeTuple<string> = [UserScope, 'one@example.com'];
 const user2Scope: ScopeTuple<string> = [UserScope, 'two@example.com'];
@@ -115,8 +118,12 @@ describe('Store', () => {
       const store = createStore();
       const firstValue = store.get(exampleMol);
       const secondValue = store.get(exampleMol, user1Scope);
+      const thirdValue = store.get(exampleMol, company1Scope);
+      const fourthValue = store.get(exampleMol, company1Scope, user1Scope);
       // Molecule doesn't depend on scope, should be the same
       expect(firstValue).toBe(secondValue);
+      expect(firstValue).toBe(thirdValue);
+      expect(firstValue).toBe(fourthValue);
     });
 
     it('Creates one molecule, if no scope provided', () => {
@@ -135,29 +142,31 @@ describe('Store', () => {
       const secondValue = store.get(companyMolecule, company2Scope);
       const thirdValue = store.get(companyMolecule);
 
+      // Molecule depends on scope, should be different for each scope
       expect(firstValue).not.toBe(secondValue);
       expect(firstValue).not.toBe(thirdValue);
       expect(thirdValue).not.toBe(secondValue);
     });
 
     it('Creates only one molecule per dependent scope', () => {
-      //
       const store = createStore();
 
       const firstValue = store.get(companyMolecule, company1Scope);
       const secondValue = store.get(companyMolecule, company1Scope);
 
+      // Molecole depends on scope, should produce the same element for the same scope
       expect(firstValue).toBe(secondValue);
     });
 
     it('Creates one molecule per dependent molecule that is scope dependent', () => {
-      //
       const store = createStore();
 
       const firstValue = store.get(userMolecule, company1Scope, user1Scope);
       const secondValue = store.get(userMolecule, company2Scope, user1Scope);
       const thirdValue = store.get(userMolecule, user1Scope);
 
+      // Molecule has a TRANSITIVE dependency on scope via another molecule
+      // So should be a different molecule every time
       expect(firstValue.company).toBe(company1Scope[1]);
       expect(secondValue.company).toBe(company2Scope[1]);
       expect(thirdValue.company).toBe(CompanyScope.defaultValue);
@@ -168,12 +177,13 @@ describe('Store', () => {
     });
 
     it('Creates one molecule per dependent molecule that is scope dependent', () => {
-      //
       const store = createStore();
 
       const firstValue = store.get(userMolecule, company1Scope, user1Scope);
       const secondValue = store.get(userMolecule, company1Scope, user2Scope);
 
+      // Molecule has a direct dependency AND a transitive dependency
+      // Should be different for each direct dependency when the transitive dependency is unchanged
       expect(firstValue.company).toBe(company1Scope[1]);
       expect(secondValue.company).toBe(company1Scope[1]);
 
@@ -184,13 +194,37 @@ describe('Store', () => {
     });
 
     it('Creates ONLY one molecule per dependent molecule that is scope dependent', () => {
-      //
       const store = createStore();
 
       const firstValue = store.get(userMolecule, company1Scope, user1Scope);
       const secondValue = store.get(userMolecule, company1Scope, user1Scope);
-
+      const thirdValue = store.get(
+        userMolecule,
+        company1Scope,
+        unrelatedScope1,
+        user1Scope
+      );
+      // Molecule has a direct dependency AND a transitive dependency
+      // Should be the same for the same scope
       expect(firstValue).toBe(secondValue);
+      expect(firstValue).toBe(thirdValue);
+    });
+
+    it('Creates ONLY one molecule per dependent molecule, regardless of scope order', () => {
+      const store = createStore();
+
+      const firstValue = store.get(userMolecule, company1Scope, user1Scope);
+      const secondValue = store.get(userMolecule, user1Scope, company1Scope);
+      const thirdValue = store.get(
+        userMolecule,
+        unrelatedScope1,
+        user1Scope,
+        company1Scope
+      );
+      // Molecule has a direct dependency AND a transitive dependency
+      // Should be the same for the same scope
+      expect(firstValue).toBe(secondValue);
+      expect(firstValue).toBe(thirdValue);
     });
   });
 });
