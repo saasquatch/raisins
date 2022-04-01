@@ -6,7 +6,6 @@ import {
 } from "../../../src/html-dom/RaisinNode";
 import selector from "../../../src/html-dom/selector";
 import expect from "expect";
-// import jsonata from "jsonata"
 
 let source: string;
 let found: RaisinElementNode[];
@@ -17,18 +16,13 @@ Given("an html document", (itemName: string) => {
 });
 
 When(/^we select "(.*)"$/, (select: string) => {
-  console.log(node);
-  console.log(select);
   found = selector(node, select);
 });
 
 Then(/^it should return "(.*)"$/, (jsSelector: string) => {
-  //   let expected = jsonata(jsSelector).evaluate({ node, undefined: undefined });
-  //   if (!Array.isArray(expected)) {
-  //     expected = [expected];
-  //   }
-  //   found.forEach((f, idx) => {
-  //     expect(f).toBe(expected[idx]);
-  //   });
-  expect(true).toBe(true);
+  cy.task("getJsonata", { jsSelector, node, found }).then((result: any) => {
+    for (let i = 0; i < result.f_array.length; i++) {
+      expect(result.f_array[i]).toStrictEqual(result.expected_array[i]);
+    }
+  });
 });

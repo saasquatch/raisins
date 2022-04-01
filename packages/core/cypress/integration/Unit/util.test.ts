@@ -1,4 +1,3 @@
-import expect from "expect";
 import { RaisinNode } from "../../../src/html-dom/RaisinNode";
 import { visit, visitAll } from "../../../src/html-dom/util";
 
@@ -23,12 +22,12 @@ it("Visitor skip node", () => {
     skipNode: (_skipNode: any) => false
   };
 
-  //   const spySkip = jest.spyOn(visitor, "skipNode");
+  const spySkip = cy.spy(visitor, "skipNode");
 
   visit(node, visitor, true);
   visit(node, visitor, false);
 
-  //   expect(spySkip).toBeCalledTimes(2);
+  expect(spySkip).to.be.called;
 });
 
 it("Visit all", () => {
@@ -53,12 +52,12 @@ it("Visit all", () => {
     callbackCounter: (_callback: any) => false
   };
 
-  //   const callbackSpy = jest.spyOn(callback, "callbackCounter");
+  const callbackSpy = cy.spy(callback, "callbackCounter");
 
   visitAll(node, (n: RaisinNode) => {
     callback.callbackCounter(0);
     return n;
   });
 
-  //   expect(callbackSpy).toBeCalledTimes(3);
+  expect(callbackSpy).to.be.called;
 });
