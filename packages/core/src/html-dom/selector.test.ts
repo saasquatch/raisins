@@ -4,7 +4,7 @@ import { parse } from "./parser";
 import { RaisinDocumentNode, RaisinElementNode } from "./RaisinNode";
 import selector from "./selector";
 
-const feature = loadFeature("./selector.feature", { loadRelativePath: true });
+const feature = loadFeature("cypress/integration/Specs/selector.feature");
 
 export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
   let source: string;
