@@ -55,12 +55,8 @@ function parseDomParser(html: string) {
       const head = dom.getElementsByTagName("head")[0];
       head.replaceWith(...Array.from(head.childNodes));
     }
-    if (isDoctype) {
+    if (!isHtml || isDoctype) {
       return domNativeToRaisin(dom, !isHtml) as RaisinDocumentNode;
-    }
-    if (!isHtml) {
-      const html = dom.getElementsByTagName("html")[0];
-      html.replaceWith(...Array.from(html.childNodes));
     }
 
     return domNativeToRaisin(dom) as RaisinDocumentNode;

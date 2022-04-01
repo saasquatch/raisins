@@ -2,9 +2,9 @@ import { ElementType } from "domelementtype";
 import { RaisinNode } from "../../../src/html-dom/RaisinNode";
 import parse from "../../../src/html-dom/parser";
 import expect from "expect";
+import serializer from "../../../src/html-dom/serializer";
 
 describe("Parse simple nodes", () => {
-
   function parseElement(src: string, tagName: string, attribs: any = {}) {
     it("Can parse " + src, () => {
       const node: RaisinNode = {
@@ -40,4 +40,42 @@ describe("Parse simple nodes", () => {
     center: "",
     class: "my-class"
   });
+});
+
+describe("Parse + serialize edge cases", () => {
+  function parseSimpleNodes(html: string) {
+    it(html, () => {
+      const raisin = parse(html);
+      const raisingString = serializer(raisin);
+      expect(raisingString).toBe(html);
+    });
+  }
+
+  parseSimpleNodes("<div>hello world</div>");
+
+  parseSimpleNodes("<html><div>hello world</div></html>");
+
+  parseSimpleNodes("<body><div>hello world</div></body>");
+
+  parseSimpleNodes("<head></head><div>hello world</div>");
+
+  parseSimpleNodes("<head></head><body><div>hello world</div></body>");
+
+  parseSimpleNodes(
+    "<html><head></head><body><div>hello world</div></body></html>"
+  );
+
+  parseSimpleNodes("<!DOCTYPE html><html><div>hello world</div></html>");
+
+  parseSimpleNodes("<!DOCTYPE html><body><div>hello world</div></body>");
+
+  parseSimpleNodes("<!DOCTYPE html><head></head><div>hello world</div>");
+
+  parseSimpleNodes(
+    "<!DOCTYPE html><head></head><body><div>hello world</div></body>"
+  );
+
+  parseSimpleNodes(
+    "<!DOCTYPE html><html><head></head><body><div>hello world</div></body></html>"
+  );
 });
