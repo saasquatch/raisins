@@ -4,10 +4,10 @@ import { RaisinDocumentNode, RaisinNode } from "../RaisinNode";
 
 /**
  * Parses a DOM (Document or Document Fragment) into a Raisin object
- * 
+ *
  * @param Dom document or document fragment to be parsed
- * @param isHtml flag for removing html tag from the dom 
- * @returns 
+ * @param isHtml flag for removing html tag from the dom
+ * @returns
  */
 export function domNativeToRaisin(
   Dom: DocumentFragment | Document,
@@ -43,7 +43,7 @@ function nodeToRaisin(node: Node): RaisinNode {
     case Node.ELEMENT_NODE:
       const element = node as HTMLElement;
       const attribs = getAttribues(element);
-      const { style } = attribs;
+      const { style, ...otherAttribs } = attribs;
 
       if (element.nodeName === "TEMPLATE") {
         const template = element as HTMLTemplateElement;
@@ -65,12 +65,13 @@ function nodeToRaisin(node: Node): RaisinNode {
       }
       return {
         type: TAG,
-        attribs: { ...attribs },
+        attribs: { ...otherAttribs },
         tagName: element.nodeName.toLowerCase(),
         children: nodeListToRaisin(element.childNodes),
-        style: style
-          ? cssParser(style, { context: "declarationList" })
-          : undefined
+        style:
+          style !== undefined
+            ? cssParser(style, { context: "declarationList" })
+            : undefined
       };
     case Node.TEXT_NODE:
       const textNode = node as Text;

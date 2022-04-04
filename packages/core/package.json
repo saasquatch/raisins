@@ -45,6 +45,7 @@
     "@testing-library/react-hooks": "^7.0.2",
     "@types/css": "0.0.33",
     "@types/css-tree": "^1.0.5",
+    "@types/cypress-cucumber-preprocessor": "^4.0.1",
     "@types/domelementtype": "^2.0.1",
     "@types/jest": "^27.0.2",
     "@types/lodash.clonedeep": "^4.5.6",
@@ -53,6 +54,7 @@
     "@types/styled-components": "^5.1.14",
     "classnames": "^2.3.1",
     "cypress": "^9.5.2",
+    "cypress-cucumber-preprocessor": "^4.3.1",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
     "husky": "^7.0.2",
@@ -84,5 +86,9 @@
     "testPathIgnorePatterns": [
       "<rootDir>/cypress/"
     ]
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "stepDefinitions": "cypress/stepsDefinition"
   }
 }

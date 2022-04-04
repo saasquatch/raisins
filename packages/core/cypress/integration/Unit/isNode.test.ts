@@ -1,17 +1,18 @@
 import {
   isRoot,
-  isNodeWithChilden,
-  isTextNode,
-  isStyleNode,
   isElementNode,
+  isNodeWithChilden,
   isCommentNode,
+  isStyleNode,
+  isTextNode,
   isDirectiveNode
-} from "./isNode";
-import parse from "./parser";
+} from "../../../src";
+import parse from "../../../src/html-dom/parser";
+import expect from "expect";
 
 describe("isNode utility", () => {
   function isNode(src: string, ...fns: any[]) {
-    test(src + "should be node", () => {
+    it(src + " should be node", () => {
       const doc = parse(src);
       expect(doc.children.length).toBe(1);
       const child = doc.children[0];
@@ -21,12 +22,12 @@ describe("isNode utility", () => {
     });
   }
 
-  test("Root should be root", () => {
+  it("Root should be root", () => {
     const doc = parse("");
     expect(isRoot(doc)).toBe(true);
   });
 
-  test("False if no node is provided", () => {
+  it("False if no node is provided", () => {
     expect(isRoot()).toBe(false);
   });
 

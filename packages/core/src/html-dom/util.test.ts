@@ -3,7 +3,7 @@ import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { RaisinNode } from "./RaisinNode";
 import { removeWhitespace, visit, visitAll } from "./util";
 
-const feature = loadFeature("./util.feature", { loadRelativePath: true });
+const feature = loadFeature("cypress/integration/Specs/util.feature");
 
 export const removeWhitespaceSteps: StepDefinitions = ({
   given,

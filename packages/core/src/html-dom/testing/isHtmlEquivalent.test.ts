@@ -1,10 +1,7 @@
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { isHtmlEquivalent } from "./isHtmlEquivalent";
 
-const feature = loadFeature("./isHtmlEquivalent.feature", {
-  loadRelativePath: true,
-  tagFilter: "not @skip"
-});
+const feature = loadFeature("cypress/integration/Specs/isHtmlEquivalent.feature");
 
 export const htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
   var html_a: string;

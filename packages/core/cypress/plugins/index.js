@@ -11,7 +11,6 @@
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
-
 /**
  * @type {Cypress.PluginConfig}
  */
@@ -19,21 +18,56 @@
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-}
+};
 
-const fs = require('fs')
+/* Cucumber support for feature files @see https://www.npmjs.com/package/cypress-cucumber-preprocessor */
+const browserify = require("@cypress/browserify-preprocessor");
+const cucumber = require("cypress-cucumber-preprocessor").default;
+const resolve = require("resolve");
+
+/* File import support for testing benchmarks  */
+const fs = require("fs");
+
+/* Jsonata support for selector tests  */
+const jsonata = require("jsonata");
 
 module.exports = (on, config) => {
-  on('task', {
+  const options = {
+    ...browserify.defaultOptions,
+    typescript: resolve.sync("typescript", { baseDir: config.projectRoot })
+  };
+
+  on("file:preprocessor", cucumber(options));
+
+  on("task", {
     getFiles(folderName) {
       return new Promise((resolve, reject) => {
         fs.readdir(folderName, (err, files) => {
           if (err) {
-            return reject(err)
+            return reject(err);
           }
-          resolve(files)
-        })
-      })
-    },
-  })
-}
+          resolve(files);
+        });
+      });
+    }
+  });
+
+  on("task", {
+    getJsonata({ jsSelector, node, found }) {
+      let expected = jsonata(jsSelector).evaluate({
+        node,
+        undefined: undefined
+      });
+      if (!Array.isArray(expected)) {
+        expected = [expected];
+      }
+      var f_array = [];
+      var expected_array = [];
+      found.forEach((f, idx) => {
+        f_array.push(f);
+        expected_array.push(expected[idx]);
+      });
+      return { f_array, expected_array };
+    }
+  });
+};

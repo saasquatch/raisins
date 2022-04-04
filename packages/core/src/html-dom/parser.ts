@@ -40,6 +40,9 @@ function parseDomParser(html: string) {
   const isHead = /<\/?head.*?>/is.test(html);
   const isBody = /<\/?body.*?>/is.test(html);
 
+  // removes any excess new line characters after a closing <html> tag
+  html = html.replace(/(?<=<\/html>)\n*/g, "");
+
   if (isDoctype || isHtml || isHead || isBody) {
     const parser = new DOMParser();
     const dom = parser.parseFromString(html, "text/html");
@@ -48,19 +51,13 @@ function parseDomParser(html: string) {
       const body = dom.getElementsByTagName("body")[0];
       body.replaceWith(...Array.from(body.childNodes));
     }
+
     if (!isHead) {
       const head = dom.getElementsByTagName("head")[0];
       head.replaceWith(...Array.from(head.childNodes));
     }
-    if (isDoctype) {
-      return domNativeToRaisin(dom, !isHtml) as RaisinDocumentNode;
-    }
-    if (!isHtml) {
-      const html = dom.getElementsByTagName("html")[0];
-      html.replaceWith(...Array.from(html.childNodes));
-    }
 
-    return domNativeToRaisin(dom) as RaisinDocumentNode;
+    return domNativeToRaisin(dom, !isHtml) as RaisinDocumentNode;
   }
 
   const template = document.createElement("template");
