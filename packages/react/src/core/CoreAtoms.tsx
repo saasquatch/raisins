@@ -9,11 +9,10 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { createScope, molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
-import { HTMLAtom } from './RaisinScope';
 import { isFunction } from '../util/isFunction';
 import { generateNextState } from './editting/EditAtoms';
-import { createScope, molecule } from 'jotai-molecules';
 
 export type InternalState = {
   current: RaisinNode;
@@ -24,7 +23,7 @@ export type InternalState = {
 
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
-export const CoreEditorScope = createScope();
+export const CoreEditorScope = createScope<PrimitiveAtom<string>>(atom(''));
 
 export const CoreMolecule = molecule((getMol, getScope) => {
   /**
@@ -32,7 +31,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
    *
    * This will create a new set of atoms for every CoreEditorScope scope provider
    */
-  getScope(CoreEditorScope);
+  const HTMLAtom = getScope(CoreEditorScope);
 
   /*
     Scenario: Souls are presered when downstream HTML matches upstream HTML

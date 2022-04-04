@@ -1,9 +1,10 @@
 import { Meta } from '@storybook/react';
-import React, { useState } from 'react';
-import { RaisinsProvider } from '../src/core/RaisinScope';
+import { atom, useAtom } from 'jotai';
+import React, { useMemo } from 'react';
 import { CanvasController } from '../src/canvas/CanvasController';
-import { EditorView } from '../src/views/EditorView';
+import { RaisinScope, RaisinsProvider } from '../src/core/RaisinScope';
 import { useHotkeys } from '../src/core/useHotkeys';
+import { EditorView } from '../src/views/EditorView';
 import { LayersController } from '../src/views/Layers';
 import { RegisteredAtoms } from './DevTools';
 
@@ -14,62 +15,86 @@ const meta: Meta = {
 export default meta;
 
 export function Span() {
-  const stateTuple = useState(
-    `<span>I am a thing with <b>bold content</b></span>`
+  const htmlAtom = useMemo(
+    () => atom(`<span>I am a thing with <b>bold content</b></span>`),
+    []
   );
   return (
-    <RaisinsProvider stateTuple={stateTuple}>
-      <Editor />
-      <RegisteredAtoms/>
-    </RaisinsProvider>
+    <>
+      <RaisinsProvider htmlAtom={htmlAtom}>
+        <Editor />
+        <RegisteredAtoms />
+      </RaisinsProvider>
+    </>
+  );
+}
+export function ExternalHTMLControl() {
+  const htmlAtom = useMemo(
+    () => atom(`<span>I am a thing with <b>bold content</b></span>`),
+    []
+  );
+
+  const [html, setHtml] = useAtom(htmlAtom, RaisinScope);
+  return (
+    <>
+      <textarea
+        value={html}
+        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+      />
+      <RaisinsProvider htmlAtom={htmlAtom}>
+        <Editor />
+        <RegisteredAtoms />
+      </RaisinsProvider>
+    </>
   );
 }
 
 export function TwoElements() {
-  const stateTuple = useState(
-    `<div><span>I am a thing with <b>bold content</b></span><span>bottom</span></div>`
+  const htmlAtom = useMemo(
+    () =>
+      atom(
+        `<div><span>I am a thing with <b>bold content</b></span><span>bottom</span></div>`
+      ),
+    []
   );
   return (
-    <>
-      <RaisinsProvider stateTuple={stateTuple}>
-        <Editor />
-      </RaisinsProvider>
-    </>
+    <RaisinsProvider htmlAtom={htmlAtom}>
+      <Editor />
+      <RegisteredAtoms />
+    </RaisinsProvider>
   );
 }
 
 export function Mint() {
-  const stateTuple = useState(mintMono);
+  const htmlAtom = useMemo(() => atom(mintMono), []);
   return (
-    <>
-      <RaisinsProvider stateTuple={stateTuple}>
-        <Editor />
-      </RaisinsProvider>
-    </>
+    <RaisinsProvider htmlAtom={htmlAtom}>
+      <Editor />
+      <RegisteredAtoms />
+    </RaisinsProvider>
   );
 }
+
 export function Big() {
-  const stateTuple = useState(big);
+  const htmlAtom = useMemo(() => atom(big), []);
   return (
-    <>
-      <RaisinsProvider stateTuple={stateTuple}>
-        <Editor />
-      </RaisinsProvider>
-      <pre>{stateTuple[0]}</pre>
-    </>
+    <RaisinsProvider htmlAtom={htmlAtom}>
+      <Editor />
+      <RegisteredAtoms />
+    </RaisinsProvider>
   );
 }
 
 export function CanvasOnly() {
-  const stateTuple = useState(big);
+  const htmlAtom = useMemo(() => atom(big), []);
   return (
     <>
-      <RaisinsProvider stateTuple={stateTuple}>
+      <RaisinsProvider htmlAtom={htmlAtom}>
         <div style={{ display: 'flex' }}>
           <div style={{ width: '50%' }}>
             <CanvasController />
           </div>
-          <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>
+          {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
         </div>
       </RaisinsProvider>
     </>
@@ -77,13 +102,13 @@ export function CanvasOnly() {
 }
 
 export function LayersOnly() {
-  const stateTuple = useState(big);
+  const htmlAtom = useMemo(() => atom(big), []);
   return (
     <>
-      <RaisinsProvider stateTuple={stateTuple}>
+      <RaisinsProvider htmlAtom={htmlAtom}>
         <div style={{ display: 'flex' }}>
           <LayersController />
-          <pre style={{ width: '50%' }}>{stateTuple[0]}</pre>
+          {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
         </div>
       </RaisinsProvider>
     </>
