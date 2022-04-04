@@ -6,7 +6,8 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { atom, useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from 'jotai';
+import { useMolecule } from 'jotai-molecules';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
@@ -18,31 +19,17 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { PloppingIsActive } from '../core/selection/PickedNode';
-import { RaisinScope } from '../core/RaisinScope';
 import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
+import { RootNodeAtom } from '../core/CoreAtoms';
+import { InsertNodeAtom } from '../core/editting/EditAtoms';
+import { RaisinScope } from '../core/RaisinScope';
+import { PloppingIsActive } from '../core/selection/PickedNode';
 import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
 } from '../node/children/ChildrenEditor';
-import { RootNodeAtom } from '../core/CoreAtoms';
-import { InsertNodeAtom } from '../core/editting/EditAtoms';
-import {
-  canPlopHereAtom,
-  duplicateForNode,
-  isNodeAnElement,
-  isNodePicked,
-  isSelectedForNode,
-  nameForNode,
-  nodeHovered,
-  nodeSoul,
-  plopNodeHere,
-  removeForNode,
-  setSelectedForNode,
-  slotsForNode,
-  togglePickNode,
-} from '../node/AtomsForNode';
 import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import { NodeMolecule } from '../node/NodeMolecule';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode } from '../util/isNode';
 const { clone } = htmlUtil;
@@ -167,18 +154,31 @@ function AddNew(props: { idx: number; slot?: string }) {
 }
 
 function ElementLayer() {
-  const setSelected = setSelectedForNode.useUpdate();
-  const isAnElement = isNodeAnElement.useValue();
-  const isSelected = isSelectedForNode.useValue();
-  const isPicked = isNodePicked.useValue();
-  const [isHovered, setHovered] = nodeHovered.useAtom();
-  const nodeWithSlots = slotsForNode.useValue();
+  const {
+    duplicateForNode,
+    isNodeAnElement,
+    isNodePicked,
+    isSelectedForNode,
+    nameForNode,
+    nodeHovered,
+    nodeSoul,
+    removeForNode,
+    setSelectedForNode,
+    slotsForNode,
+    togglePickNode,
+  } = useMolecule(NodeMolecule);
+  const setSelected = useSetAtom(setSelectedForNode, RaisinScope);
+  const isAnElement = useAtomValue(isNodeAnElement, RaisinScope);
+  const isSelected = useAtomValue(isSelectedForNode, RaisinScope);
+  const isPicked = useAtomValue(isNodePicked, RaisinScope);
+  const [isHovered, setHovered] = useAtom(nodeHovered, RaisinScope);
+  const nodeWithSlots = useAtomValue(slotsForNode, RaisinScope);
 
-  const removeNode = removeForNode.useUpdate();
-  const duplicate = duplicateForNode.useUpdate();
-  const title = nameForNode.useValue();
-  const moveNode = togglePickNode.useUpdate();
-  const soul = nodeSoul.useValue();
+  const removeNode = useSetAtom(removeForNode, RaisinScope);
+  const duplicate = useSetAtom(duplicateForNode, RaisinScope);
+  const title = useAtomValue(nameForNode, RaisinScope);
+  const moveNode = useSetAtom(togglePickNode, RaisinScope);
+  const soul = useAtomValue(nodeSoul, RaisinScope);
 
   const isPlopping = useAtomValue(PloppingIsActive, RaisinScope);
   const canMove = isPicked || !isPlopping;
@@ -283,7 +283,7 @@ const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
   );
 };
 
-// TODO: Move to AtomsForNode with slot context?
+// TODO: Move to a molecule?
 function useSlotChildNodes(slotName: string) {
   const nodeAtom = useNodeAtom();
   const slotChildrenAtom = useMemo(() => {
@@ -312,8 +312,9 @@ function isInSlot(c: RaisinNode, slotName: string): boolean {
 }
 
 function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
-  const canPlop = canPlopHereAtom.useValue();
-  const plopNode = plopNodeHere.useUpdate();
+  const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
+  const canPlop = useAtomValue(canPlopHereAtom, RaisinScope);
+  const plopNode = useSetAtom(plopNodeHere, RaisinScope);
   const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
 
   const isPloppablable = canPlop({ slot, idx });
