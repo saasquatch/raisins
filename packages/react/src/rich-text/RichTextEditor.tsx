@@ -7,7 +7,7 @@ import { SoulSaverAtom } from '../core/souls/SoulSaverAtom';
 import { RaisinScope } from '../core/RaisinScope';
 import { SelectedNodeAtom } from '../core/selection/SelectedNode';
 import { GetSoulAtom } from '../core/souls/Soul';
-import { NodeAtomProvider, useNodeAtom } from '../node/node-context';
+import { NodeAtomProvider, useNodeAtom } from '../node/NodeContext';
 import { isElementNode } from '../util/isNode';
 import { createMemoizeAtom } from '../util/weakCache';
 import { EditSelectedNodeAtom } from '../views/EditSelectedNodeAtom';
