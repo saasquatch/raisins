@@ -22,7 +22,7 @@ import { GetSoulAtom } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForTagName } from './atoms/atomForTagName';
-import { NodeScope } from './NodeContext';
+import { NodeScope } from './NodeScope';
 
 export const NodeMolecule = molecule((getMol, getScope) => {
   const n = getScope(NodeScope);

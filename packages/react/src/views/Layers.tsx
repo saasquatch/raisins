@@ -28,7 +28,7 @@ import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
 } from '../node/children/ChildrenEditor';
-import { NodeAtomProvider, useNodeAtom } from '../node/NodeContext';
+import { NodeAtomProvider, useNodeAtom } from '../node/NodeScope';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode } from '../util/isNode';
