@@ -1,15 +1,9 @@
+import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { RaisinScope } from '../core/RaisinScope';
-import {
-  AddModuleAtom,
-  ModuleDetailsAtom,
-  ModulesAtom,
-  ModulesLoadingAtom,
-  RemoveModuleAtom,
-  RemoveModuleByNameAtom,
-} from '../component-metamodel/ComponentModel';
+import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
 import { Module, ModuleDetails } from '../component-metamodel/ModuleManagement';
+import { RaisinScope } from '../core/RaisinScope';
 
 export const PACKAGES = [
   '@local',
@@ -45,6 +39,14 @@ const setOfThings: Module[] = [
 ];
 
 function usePackageEditor(): ModuleManagement {
+  const {
+    AddModuleAtom,
+    ModuleDetailsAtom,
+    ModulesAtom,
+    ModulesLoadingAtom,
+    RemoveModuleAtom,
+    RemoveModuleByNameAtom,
+  } = useMolecule(ComponenetModelMolecule);
   return {
     loadingModules: useAtomValue(ModulesLoadingAtom, RaisinScope),
     modules: useAtomValue(ModulesAtom, RaisinScope),

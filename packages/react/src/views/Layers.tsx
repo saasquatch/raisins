@@ -7,7 +7,7 @@ import {
 } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'jotai-molecules';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom, useAtomValue } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
@@ -19,17 +19,17 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { ComponentModelAtom } from '../component-metamodel/ComponentModel';
-import { RootNodeAtom } from '../core/CoreAtoms';
-import { InsertNodeAtom } from '../core/editting/EditAtoms';
+import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { CoreMolecule } from '../core/CoreAtoms';
+import { EditMolecule } from '../core/editting/EditAtoms';
 import { RaisinScope } from '../core/RaisinScope';
-import { PloppingIsActive } from '../core/selection/PickedNode';
+import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import {
   ChildrenEditor,
   ChildrenEditorForAtoms,
 } from '../node/children/ChildrenEditor';
-import { NodeAtomProvider, useNodeAtom } from '../node/NodeScope';
 import { NodeMolecule } from '../node/NodeMolecule';
+import { NodeAtomProvider, useNodeAtom } from '../node/NodeScope';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
 import { isElementNode } from '../util/isNode';
 const { clone } = htmlUtil;
@@ -87,18 +87,16 @@ const AddBlock: CSSProperties = {
   justifyContent: 'center',
 };
 
-const RootHasChildren = atom(
-  (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
-);
 export const LayersController: FC<{}> = () => {
-  const hasChildren = useAtomValue(RootHasChildren, RaisinScope);
+  const atoms = useMolecule(LayersMolecule);
+  const hasChildren = useAtomValue(atoms.RootHasChildren, RaisinScope);
 
   return (
     <div data-layers>
       {' '}
       Don't re-render unless number of children changes!
       <div data-layers-root>
-        <NodeAtomProvider nodeAtom={RootNodeAtom}>
+        <NodeAtomProvider nodeAtom={atoms.RootNodeAtom}>
           {hasChildren && <ChildrenEditor Component={ElementLayer} />}
           {!hasChildren && <AddNew idx={0} />}
         </NodeAtomProvider>
@@ -108,9 +106,10 @@ export const LayersController: FC<{}> = () => {
 };
 
 function AddNew(props: { idx: number; slot?: string }) {
+  const atoms = useMolecule(LayersMolecule);
   const node = useAtomValue(useNodeAtom(), RaisinScope);
-  const insert = useSetAtom(InsertNodeAtom, RaisinScope);
-  const comp = useAtomValue(ComponentModelAtom, RaisinScope);
+  const insert = useSetAtom(atoms.InsertNodeAtom, RaisinScope);
+  const comp = useAtomValue(atoms.ComponentModelAtom, RaisinScope);
 
   const [open, setOpen] = useState(false);
   const validChildren = comp.getValidChildren(node, props.slot);
@@ -153,6 +152,23 @@ function AddNew(props: { idx: number; slot?: string }) {
   );
 }
 
+const LayersMolecule = molecule((getMol) => {
+  const { InsertNodeAtom } = getMol(EditMolecule);
+  const { ComponentModelAtom } = getMol(ComponenetModelMolecule);
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const RootHasChildren = atom(
+    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+  );
+
+  return {
+    ...getMol(PickedNodeMolecule),
+    InsertNodeAtom,
+    ComponentModelAtom,
+    RootHasChildren,
+    RootNodeAtom,
+  };
+});
+
 function ElementLayer() {
   const {
     duplicateForNode,
@@ -167,6 +183,7 @@ function ElementLayer() {
     slotsForNode,
     togglePickNode,
   } = useMolecule(NodeMolecule);
+  const atoms = useMolecule(LayersMolecule);
   const setSelected = useSetAtom(setSelectedForNode, RaisinScope);
   const isAnElement = useAtomValue(isNodeAnElement, RaisinScope);
   const isSelected = useAtomValue(isSelectedForNode, RaisinScope);
@@ -180,7 +197,7 @@ function ElementLayer() {
   const moveNode = useSetAtom(togglePickNode, RaisinScope);
   const soul = useAtomValue(nodeSoul, RaisinScope);
 
-  const isPlopping = useAtomValue(PloppingIsActive, RaisinScope);
+  const isPlopping = useAtomValue(atoms.PloppingIsActive, RaisinScope);
   const canMove = isPicked || !isPlopping;
   // Don't render non-element layers
   if (!isAnElement) return <></>;

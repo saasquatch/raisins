@@ -1,23 +1,24 @@
 import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
-import { GetSoulAtom, soulToString } from '../core/souls/Soul';
+import { Soul, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
 import type { ConnectionState } from './SnabbdomSanboxedIframeAtom';
 
 /**
  * Creates an asynchronous `Rect` atom that will poll for
  * the position of a node when it's undefined.
- * 
- * @param connection 
- * @param nodeAtom 
- * @param listenedPosition 
- * @returns 
+ *
+ * @param connection
+ * @param nodeAtom
+ * @param listenedPosition
+ * @returns
  */
 export function defaultRectAtom(
   connection: Atom<ConnectionState>,
   nodeAtom: Atom<RaisinNode | undefined>,
+  soulAtom: Atom<(node: RaisinNode) => Soul>,
   listenedPosition: Atom<Rect | undefined>
-):Atom<Promise<Rect | undefined>> {
+): Atom<Promise<Rect | undefined>> {
   const rectAtom = atom(async (get) => {
     const node = get(nodeAtom);
     if (!node) return undefined;
@@ -32,7 +33,7 @@ export function defaultRectAtom(
     }
 
     const geometry = await connState.childRpc.geometry();
-    const getSoul = get(GetSoulAtom);
+    const getSoul = get(soulAtom);
     const soul = getSoul(node);
     const rect = geometry.entries.find(
       (e) => e.target?.attributes['raisins-soul'] === soulToString(soul)

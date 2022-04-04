@@ -1,20 +1,30 @@
 import { useAtom } from 'jotai';
+import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
+import { CanvasStyleMolecule, sizes } from '../canvas/useCanvas';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms';
 import { RaisinScope } from '../core/RaisinScope';
-import { HoveredBreadcrumbsAtom } from '../core/selection/HoveredNode';
-import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
-import { HistorySizeAtom, RedoAtom, UndoAtom } from '../core/editting/HistoryAtoms';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
+
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasStyleMolecule),
+  };
+});
 
 export function ToolbarController() {
-  const historySize = useAtom(HistorySizeAtom, RaisinScope)[0];
-  const undo = useUpdateAtom(UndoAtom, RaisinScope);
-  const redo = useUpdateAtom(RedoAtom, RaisinScope);
-  const [mode, setMode] = useAtom(ModeAtom, RaisinScope);
-  const [size, setSize] = useAtom(SizeAtom, RaisinScope);
-  const [outlined, setOutlined] = useAtom(OutlineAtom, RaisinScope);
+  const atoms = useMolecule(ToolbarMolecule);
+  const historySize = useAtom(atoms.HistorySizeAtom, RaisinScope)[0];
+  const undo = useUpdateAtom(atoms.UndoAtom, RaisinScope);
+  const redo = useUpdateAtom(atoms.RedoAtom, RaisinScope);
+  const [mode, setMode] = useAtom(atoms.ModeAtom, RaisinScope);
+  const [size, setSize] = useAtom(atoms.SizeAtom, RaisinScope);
+  const [outlined, setOutlined] = useAtom(atoms.OutlineAtom, RaisinScope);
 
-  const hovered = useAtomValue(HoveredBreadcrumbsAtom, RaisinScope);
+  const hovered = useAtomValue(atoms.HoveredBreadcrumbsAtom, RaisinScope);
 
   return (
     <div>

@@ -1,5 +1,5 @@
 import { RaisinNode } from '@raisins/core';
-import { PrimitiveAtom } from 'jotai';
+import { atom, PrimitiveAtom } from 'jotai';
 import {
   createScope,
   molecule,
@@ -7,10 +7,15 @@ import {
   useMolecule,
 } from 'jotai-molecules';
 import React from 'react';
-import { RootNodeAtom } from '../core/CoreAtoms';
-import { nodeAtomWithSoulSaved } from './nodeAtomWithSoulSaved';
+import { CoreMolecule } from '../core/CoreAtoms';
+import { SoulsMolecule } from '../core/souls/Soul';
+import { isFunction } from '../util/isFunction';
+import { createMemoizeAtom } from '../util/weakCache';
 
-export const NodeScope = createScope<PrimitiveAtom<RaisinNode>>(RootNodeAtom);
+export const NodeScope = createScope<PrimitiveAtom<RaisinNode> | undefined>(
+  undefined
+);
+
 /**
  * Uses atom for the "current node"
  *
@@ -20,7 +25,42 @@ export const NodeScope = createScope<PrimitiveAtom<RaisinNode>>(RootNodeAtom);
  * @returns
  */
 export const useNodeAtom = () => useMolecule(NodeAtomMolecule);
-export const NodeAtomMolecule = molecule((_, getScope) => getScope(NodeScope));
+
+export const NodeAtomMolecule = molecule((getMol, getScope) => {
+  const nodeAtom = getScope(NodeScope);
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { SoulsAtom } = getMol(SoulsMolecule);
+
+  /**
+   * Creates a proxy atom of `nodeAtom` that preserves the
+   * soul of the node when it is updated.
+   *
+   * Memoized internally based on `nodeAtom` to prevent creating
+   * atoms all the time.
+   *
+   * @param nodeAtom - the atom to wrap/proxy
+   * @returns a proxy atom with soul saved
+   */
+  function nodeAtomWithSoulSaved(
+    nodeAtom: PrimitiveAtom<RaisinNode>
+  ): PrimitiveAtom<RaisinNode> {
+    return memoized(() => {
+      return atom(
+        (get) => get(nodeAtom),
+        (get, set, next) => {
+          set(nodeAtom, (prev) => {
+            const souls = get(SoulsAtom);
+            const soul = souls.get(prev);
+            const nextNode = isFunction(next) ? next(prev) : next;
+            soul && souls.set(nextNode, soul);
+            return nextNode;
+          });
+        }
+      );
+    }, [nodeAtom]);
+  }
+  return nodeAtomWithSoulSaved(nodeAtom ?? RootNodeAtom);
+});
 
 /**
  * Provides the "current node" context.
@@ -33,10 +73,12 @@ export const NodeAtomProvider = ({
   children: React.ReactNode;
 }) => {
   // Provides an important step -- saves souls to prevent spurious rerenders
-  const value = nodeAtomWithSoulSaved(nodeAtom);
+  // const value = nodeAtomWithSoulSaved(nodeAtom);
   return (
-    <ScopeProvider scope={NodeScope} value={value}>
+    <ScopeProvider scope={NodeScope} value={nodeAtom}>
       {children}
     </ScopeProvider>
   );
 };
+
+const memoized = createMemoizeAtom();

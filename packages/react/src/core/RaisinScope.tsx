@@ -1,13 +1,13 @@
 import {
   atom,
   PrimitiveAtom,
-  Provider,
   SetStateAction as JotaiSetStateAction,
   useAtom,
 } from 'jotai';
+import { ScopeProvider } from 'jotai-molecules';
 import { useUpdateAtom } from 'jotai/utils';
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
-import { LocalURLAtom } from '../component-metamodel/ComponentModel';
+import { CoreEditorScope } from './CoreAtoms';
 
 // Scopes the "Jotai" store
 //
@@ -23,35 +23,19 @@ export const RaisinsProvider = ({
   stateTuple: StateTuple<string>;
   children: React.ReactNode;
 }) => {
-  const initialValues = useMemo(
-    () => [
-      // TODO: Make this configurable
-      // Local atom
-      [LocalURLAtom, 'http://localhost:5000'],
-    ],
-    [LocalURLAtom]
-  );
   /**
    * FIXME: React profiling has revealed that this is removing the benefits of jotai re-rendering, and causing lots of downstream renders
    */
   return (
-    <Provider
-      scope={RaisinScope}
-      initialValues={
-        // TODO: 2D array type is dumb
-        initialValues as any
-      }
-    >
-      {/*
-      FIXME: The re-render bug is here?
-      */}
-      <ConnectState stateTuple={stateTuple} />
+    <ScopeProvider scope={CoreEditorScope} uniqueValue>
       {children}
-    </Provider>
+    </ScopeProvider>
   );
 };
 
-const defaultNeverUsedAtom: PrimitiveAtom<string> = atom('<div><span>I am placeholder that should not exist</span></div>');
+const defaultNeverUsedAtom: PrimitiveAtom<string> = atom(
+  '<div><span>I am placeholder that should not exist</span></div>'
+);
 export const HTMLAtomAtom: PrimitiveAtom<PrimitiveAtom<string>> = atom(
   defaultNeverUsedAtom
 );

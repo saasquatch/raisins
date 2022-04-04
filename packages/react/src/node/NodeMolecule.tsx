@@ -2,30 +2,31 @@ import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import {
-  ComponentMetaAtom,
-  ComponentModelAtom,
-} from '../component-metamodel/ComponentModel';
-import { RootNodeAtom } from '../core/CoreAtoms';
-import { DuplicateNodeAtom, RemoveNodeAtom } from '../core/editting/EditAtoms';
-import {
-  HoveredNodeAtom,
-  HoveredSoulAtom,
-} from '../core/selection/HoveredNode';
-import {
-  DropPloppedNodeInSlotAtom,
-  PickedAtom,
-  PickedNodeAtom,
-} from '../core/selection/PickedNode';
-import { SelectedAtom, SelectedNodeAtom } from '../core/selection/SelectedNode';
-import { GetSoulAtom } from '../core/souls/Soul';
+import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { CoreMolecule } from '../core/CoreAtoms';
+import { EditMolecule } from '../core/editting/EditAtoms';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
+import { PickedNodeMolecule } from '../core/selection/PickedNode';
+import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForTagName } from './atoms/atomForTagName';
-import { NodeScope } from './NodeScope';
+import { NodeAtomMolecule } from './NodeScope';
 
 export const NodeMolecule = molecule((getMol, getScope) => {
-  const n = getScope(NodeScope);
+  const { PickedAtom, PickedNodeAtom, DropPloppedNodeInSlotAtom } = getMol(
+    PickedNodeMolecule
+  );
+  const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
+  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
+  const { ComponentMetaAtom, ComponentModelAtom } = getMol(
+    ComponenetModelMolecule
+  );
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { GetSoulAtom } = getMol(SoulsMolecule);
+  const n = getMol(NodeAtomMolecule);
 
   /**
    * Is the node in context currently selected?
