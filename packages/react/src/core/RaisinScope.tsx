@@ -1,7 +1,6 @@
-import { PrimitiveAtom } from 'jotai';
 import { ScopeProvider } from 'jotai-molecules';
 import React from 'react';
-import { CoreEditorScope } from './CoreAtoms';
+import { PropsScope, RaisinPropsMolecule } from './CoreAtoms';
 
 // Scopes the "Jotai" store
 //
@@ -10,17 +9,17 @@ import { CoreEditorScope } from './CoreAtoms';
 export const RaisinScope = Symbol('Raisin Scope');
 
 export const RaisinsProvider = ({
-  htmlAtom,
+  molecule,
   children,
 }: {
-  htmlAtom: PrimitiveAtom<string>;
+  molecule: RaisinPropsMolecule;
   children: React.ReactNode;
 }) => {
   /**
    * FIXME: React profiling has revealed that this is removing the benefits of jotai re-rendering, and causing lots of downstream renders
    */
   return (
-    <ScopeProvider scope={CoreEditorScope} value={htmlAtom}>
+    <ScopeProvider scope={PropsScope} value={molecule}>
       {children}
     </ScopeProvider>
   );

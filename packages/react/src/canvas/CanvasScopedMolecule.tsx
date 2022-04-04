@@ -62,7 +62,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
           const parentNode = soulToNode(parentSoul);
           if (!parentNode || !isElementNode(parentNode)) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
-          const slot = target?.attributes['raisin-plop-slot'];
+          const slot = target?.attributes['raisin-plop-slot'] ?? "";
           set(DropPloppedNodeInSlotAtom, { parent: parentNode, idx, slot });
           // If plop, don't do select logic
           return;

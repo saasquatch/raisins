@@ -12,7 +12,7 @@ import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { CoreMolecule } from '../core/CoreAtoms';
+import { CoreMolecule, PropsMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
@@ -21,27 +21,26 @@ import { Module, ModuleDetails } from './ModuleManagement';
 
 export const GlobalBlocksAtom = atom([] as Block[]);
 
-type InternalState = {
-  modules: Module[];
+type ModuleDerivedState = {
   loading: boolean;
   moduleDetails: ModuleDetails[];
 };
 
-const Ste = atom<InternalState>({
-  loading: false,
-  modules: [],
-  moduleDetails: [],
-});
-
 export const ComponenetModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
 
-  const ModulesAtom = atom((get) => get(Ste).modules ?? []);
+  const { PackagesAtom } = getMol(PropsMolecule);
+
+  const Ste = atom<ModuleDerivedState>({
+    loading: false,
+    moduleDetails: [],
+  });
+  const ModulesAtom = PackagesAtom;
   const ModuleDetailsAtom = atom((get) => get(Ste).moduleDetails ?? []);
   const ModulesLoadingAtom = atom((get) => get(Ste).loading);
 
   const ComponentsAtom = atom((get) => {
-    const { moduleDetails } = get(Ste);
+    const moduleDetails = get(ModuleDetailsAtom);
     return [
       ...Object.values(HTMLComponents),
       ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
@@ -81,13 +80,13 @@ export const ComponenetModelMolecule = molecule((getMol) => {
    */
   const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
     set(Ste, (i) => {
-      const next = typeof m === 'function' ? m(i.modules) : m;
+      const next = typeof m === 'function' ? m(get(PackagesAtom)) : m;
 
       const localUrl = get(LocalURLAtom);
       (async () => {
+        set(PackagesAtom, next);
         set(Ste, {
           loading: false,
-          modules: next,
           moduleDetails: await modulesToDetails(next, localUrl),
         });
       })();

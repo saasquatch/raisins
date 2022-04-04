@@ -8,9 +8,11 @@ import {
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { Atom, atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { createScope, molecule } from 'jotai-molecules';
+import { Molecule } from 'jotai-molecules/dist/molecule';
 import { MutableRefObject } from 'react';
+import { Module } from '../component-metamodel/ModuleManagement';
 import { isFunction } from '../util/isFunction';
 import { generateNextState } from './editting/EditAtoms';
 
@@ -23,15 +25,34 @@ export type InternalState = {
 
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
-export const CoreEditorScope = createScope<PrimitiveAtom<string>>(atom(''));
+export type RaisinProps = {
+  HTMLAtom: PrimitiveAtom<string>;
+  PackagesAtom: PrimitiveAtom<Module[]>;
+  uiWidgetsAtom: Atom<Record<string, React.FC>>;
+};
+export type RaisinPropsMolecule = Molecule<RaisinProps>;
+
+export const PropsScope = createScope<RaisinPropsMolecule | undefined>(
+  undefined
+);
+
+export const PropsMolecule: RaisinPropsMolecule = molecule<RaisinProps>(
+  (getMol, getScope) => {
+    /**
+     * This will create a new set of atoms for every CoreEditorScope scope provider
+     */
+    const props = getScope(PropsScope);
+    if (!props)
+      throw new Error(
+        'Must use this molecule in a wrapping <RaisinsProvider> element'
+      );
+
+    return getMol(props);
+  }
+);
 
 export const CoreMolecule = molecule((getMol, getScope) => {
-  /**
-   * Subscribes to Core Editor Scope (a void scope)
-   *
-   * This will create a new set of atoms for every CoreEditorScope scope provider
-   */
-  const HTMLAtom = getScope(CoreEditorScope);
+  const { HTMLAtom } = getMol(PropsMolecule);
 
   /*
     Scenario: Souls are presered when downstream HTML matches upstream HTML

@@ -1,11 +1,17 @@
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
+import {
+  createScope,
+  molecule,
+  ScopeProvider,
+  useMolecule,
+} from 'jotai-molecules';
 import React, { useMemo } from 'react';
 import { CanvasController } from '../src/canvas/CanvasController';
+import { RaisinProps } from '../src/core/CoreAtoms';
 import { RaisinScope, RaisinsProvider } from '../src/core/RaisinScope';
 import { useHotkeys } from '../src/core/useHotkeys';
 import { EditorView } from '../src/views/EditorView';
-import { LayersController } from '../src/views/Layers';
 import { RegisteredAtoms } from './DevTools';
 
 const meta: Meta = {
@@ -14,34 +20,57 @@ const meta: Meta = {
 };
 export default meta;
 
-export function Span() {
-  const htmlAtom = useMemo(
-    () => atom(`<span>I am a thing with <b>bold content</b></span>`),
-    []
-  );
+const StoryScope = createScope<{ startingHtml: string }>({
+  startingHtml: '<span>I am a span</span>',
+});
+const StoryMolecule = molecule<RaisinProps>((_, getScope) => {
+  const storyScope = getScope(StoryScope);
+  return {
+    HTMLAtom: atom(storyScope.startingHtml),
+    PackagesAtom: atom([]),
+    uiWidgetsAtom: atom({}),
+  };
+});
+
+export function Span({
+  startingHtml = '<span>I am a span</span>',
+  children = (
+    <>
+      <Editor />
+      <RegisteredAtoms />
+    </>
+  ),
+}) {
   return (
     <>
-      <RaisinsProvider htmlAtom={htmlAtom}>
-        <Editor />
-        <RegisteredAtoms />
-      </RaisinsProvider>
+      <ScopeProvider scope={StoryScope} value={{ startingHtml }}>
+        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
+      </ScopeProvider>{' '}
     </>
   );
 }
+
 export function ExternalHTMLControl() {
-  const htmlAtom = useMemo(
-    () => atom(`<span>I am a thing with <b>bold content</b></span>`),
+  const state = useMemo(
+    () =>
+      molecule<RaisinProps>(() => {
+        return {
+          HTMLAtom: atom('<span>I am a span</span>'),
+          PackagesAtom: atom([]),
+          uiWidgetsAtom: atom({}),
+        };
+      }),
     []
   );
 
-  const [html, setHtml] = useAtom(htmlAtom, RaisinScope);
+  const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom, RaisinScope);
   return (
     <>
       <textarea
         value={html}
         onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
       />
-      <RaisinsProvider htmlAtom={htmlAtom}>
+      <RaisinsProvider molecule={state}>
         <Editor />
         <RegisteredAtoms />
       </RaisinsProvider>
@@ -49,71 +78,33 @@ export function ExternalHTMLControl() {
   );
 }
 
-export function TwoElements() {
-  const htmlAtom = useMemo(
-    () =>
-      atom(
-        `<div><span>I am a thing with <b>bold content</b></span><span>bottom</span></div>`
-      ),
-    []
-  );
-  return (
-    <RaisinsProvider htmlAtom={htmlAtom}>
-      <Editor />
-      <RegisteredAtoms />
-    </RaisinsProvider>
-  );
-}
+export const Mint = () => <Span startingHtml={mintMono} />;
+export const Big = () => <Span startingHtml={big} />;
 
-export function Mint() {
-  const htmlAtom = useMemo(() => atom(mintMono), []);
-  return (
-    <RaisinsProvider htmlAtom={htmlAtom}>
-      <Editor />
-      <RegisteredAtoms />
-    </RaisinsProvider>
-  );
-}
+export const CanvasOnly = () => (
+  <Span startingHtml={big}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <CanvasController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </Span>
+);
 
-export function Big() {
-  const htmlAtom = useMemo(() => atom(big), []);
-  return (
-    <RaisinsProvider htmlAtom={htmlAtom}>
-      <Editor />
-      <RegisteredAtoms />
-    </RaisinsProvider>
-  );
-}
-
-export function CanvasOnly() {
-  const htmlAtom = useMemo(() => atom(big), []);
-  return (
-    <>
-      <RaisinsProvider htmlAtom={htmlAtom}>
-        <div style={{ display: 'flex' }}>
-          <div style={{ width: '50%' }}>
-            <CanvasController />
-          </div>
-          {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-        </div>
-      </RaisinsProvider>
-    </>
-  );
-}
-
-export function LayersOnly() {
-  const htmlAtom = useMemo(() => atom(big), []);
-  return (
-    <>
-      <RaisinsProvider htmlAtom={htmlAtom}>
-        <div style={{ display: 'flex' }}>
-          <LayersController />
-          {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-        </div>
-      </RaisinsProvider>
-    </>
-  );
-}
+// export function LayersOnly() {
+//   const htmlAtom = useMemo(() => atom(big), []);
+//   return (
+//     <>
+//       <RaisinsProvider htmlAtom={htmlAtom}>
+//         <div style={{ display: 'flex' }}>
+//           <LayersController />
+//           {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+//         </div>
+//       </RaisinsProvider>
+//     </>
+//   );
+// }
 function Editor() {
   useHotkeys();
 
