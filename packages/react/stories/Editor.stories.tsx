@@ -25,7 +25,7 @@ const StoryScope = createScope({
   startingPackages: [],
 });
 
-const StoryMolecule = molecule<RaisinProps>((_, getScope) => {
+const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
   const storyScope = getScope(StoryScope);
   return {
     HTMLAtom: atom(storyScope.startingHtml),
@@ -59,7 +59,7 @@ export function Span({
 export function ExternalHTMLControl() {
   const state = useMemo(
     () =>
-      molecule<RaisinProps>(() => {
+      molecule<Partial<RaisinProps>>(() => {
         return {
           HTMLAtom: atom('<span>I am a span</span>'),
           PackagesAtom: atom([]),
@@ -113,6 +113,7 @@ export const CanvasOnly = () => (
 //     </>
 //   );
 // }
+
 function Editor() {
   useHotkeys();
 
@@ -210,7 +211,7 @@ const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
         </sqm-text>
         <sqm-text slot="content">
           <p>
-            They’ll get a $50 credit towards a new account and you’ll get up
+            They'll get a $50 credit towards a new account and you'll get up
             to $1200
           </p>
         </sqm-text>
