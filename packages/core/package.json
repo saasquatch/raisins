@@ -6,6 +6,11 @@
   "main": "dist/index.js",
   "module": "dist/raisins.esm.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/raisins",
+    "directory": "packages/core"
+  },
   "files": [
     "dist",
     "src"
