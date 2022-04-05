@@ -19,7 +19,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
 import { RaisinScope } from '../core/RaisinScope';
@@ -154,7 +154,7 @@ function AddNew(props: { idx: number; slot?: string }) {
 
 const LayersMolecule = molecule((getMol) => {
   const { InsertNodeAtom } = getMol(EditMolecule);
-  const { ComponentModelAtom } = getMol(ComponenetModelMolecule);
+  const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const RootHasChildren = atom(
     (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0

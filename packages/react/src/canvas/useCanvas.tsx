@@ -2,12 +2,13 @@ import { isElementNode, RaisinDocumentNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { h, VNode, VNodeStyle } from 'snabbdom';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
+import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
 import { CanvasScriptsMolecule } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
@@ -21,7 +22,7 @@ export type Size = {
   height: number;
 };
 
-export type Mode = 'preview' | 'edit' | 'html';
+export type Mode = 'preview' | 'edit';
 
 export const sizes: Size[] = [
   { name: 'Auto', width: 'auto', height: 1080 },
@@ -32,7 +33,8 @@ export const sizes: Size[] = [
 ];
 
 export const CanvasStyleMolecule = molecule((getMol) => {
-  const { ComponentModelAtom } = getMol(ComponenetModelMolecule);
+  const CanvasOptions = getMol(CanvasOptionsMolecule);
+  const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);
   const { PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
@@ -53,6 +55,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
     const isPloppingActive = get(PloppingIsActive);
     const pickedNode = get(PickedNodeAtom);
     const metamodel = get(ComponentModelAtom);
+    const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
 
     const renderer: SnabdomRenderer = (d, n) => {
       if (mode === 'preview') {
@@ -81,7 +84,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
         ...d,
         attrs: {
           ...d.attrs,
-          'raisins-soul': soul.toString(),
+          [raisinsSoulAttribute]: soul.toString(),
           'raisins-events': true,
         },
         style,

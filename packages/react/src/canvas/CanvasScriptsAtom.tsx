@@ -1,11 +1,11 @@
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 
 export const CanvasScriptsMolecule = molecule((getMol) => {
-  const { LocalURLAtom, ModuleDetailsAtom } = getMol(ComponenetModelMolecule);
+  const { LocalURLAtom, ModuleDetailsAtom } = getMol(ComponentModelMolecule);
   // HTML script tags for canvas
   const CanvasScriptsAtom = atom<string>((get) => {
     const localUrl = get(LocalURLAtom);

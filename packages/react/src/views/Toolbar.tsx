@@ -42,9 +42,6 @@ export function ToolbarController() {
       <button disabled={mode === 'preview'} onClick={() => setMode('preview')}>
         Preview
       </button>
-      <button disabled={mode === 'html'} onClick={() => setMode('html')}>
-        HTML
-      </button>
       <button
         disabled
         style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}

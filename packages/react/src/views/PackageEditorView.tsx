@@ -1,7 +1,7 @@
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { Module, ModuleDetails } from '../component-metamodel/ModuleManagement';
 import { RaisinScope } from '../core/RaisinScope';
 
@@ -46,7 +46,7 @@ function usePackageEditor(): ModuleManagement {
     ModulesLoadingAtom,
     RemoveModuleAtom,
     RemoveModuleByNameAtom,
-  } = useMolecule(ComponenetModelMolecule);
+  } = useMolecule(ComponentModelMolecule);
   return {
     loadingModules: useAtomValue(ModulesLoadingAtom, RaisinScope),
     modules: useAtomValue(ModulesAtom, RaisinScope),

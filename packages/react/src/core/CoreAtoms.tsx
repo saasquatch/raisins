@@ -12,6 +12,7 @@ import { Atom, atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { createScope, molecule } from 'jotai-molecules';
 import { Molecule } from 'jotai-molecules/dist/molecule';
 import { MutableRefObject } from 'react';
+import { CanvasOptions } from '../canvas/CanvasOptionsMolecule';
 import { Module } from '../component-metamodel/ModuleManagement';
 import { isFunction } from '../util/isFunction';
 import { generateNextState } from './editting/EditAtoms';
@@ -25,7 +26,7 @@ export type InternalState = {
 
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
-export type RaisinProps = {
+export type RaisinProps = Partial<CanvasOptions> & {
   /**
    * Atom for the primitive string value that will be read
    */

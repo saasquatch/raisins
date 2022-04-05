@@ -6,12 +6,13 @@ import React, { CSSProperties, FC, Suspense } from 'react';
 import { Rect } from '../canvas/api/Rect';
 import { CanvasScopedMolecule } from '../canvas/CanvasScopedMolecule';
 import { CanvasStyleMolecule, Size } from '../canvas/useCanvas';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { RaisinScope } from '../core/RaisinScope';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
+
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),
@@ -57,7 +58,7 @@ export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
 
 const CanvasViewMolecule = molecule((getMol) => {
   const CanvasScope = getMol(CanvasScopedMolecule);
-  const { ComponentMetaAtom } = getMol(ComponenetModelMolecule);
+  const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
   const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);
   const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const CanvasStyle = getMol(CanvasStyleMolecule);

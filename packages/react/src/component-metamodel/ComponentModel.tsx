@@ -19,10 +19,9 @@ import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
 import { Module } from './ModuleManagement';
 
-export const ComponenetModelMolecule = molecule((getMol) => {
+export const ComponentModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
   const { PackagesAtom, LocalURLAtom } = getMol(PropsMolecule);
-
 
   /**
    * Module details from NPM (loaded async)

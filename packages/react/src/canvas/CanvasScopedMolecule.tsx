@@ -11,6 +11,7 @@ import { dependentAtom } from '../util/atoms/dependentAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { Rect } from './api/Rect';
 import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
+import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
 import { createAtoms } from './SnabbdomSanboxedIframeAtom';
 import { CanvasStyleMolecule } from './useCanvas';
@@ -28,6 +29,7 @@ export function CanvasProvider({ children }: { children: React.ReactNode }) {
 export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   getScope(CanvasScope);
 
+  const CanvasOptions = getMol(CanvasOptionsMolecule);
   const { VnodeAtom, IframeHeadAtom } = getMol(CanvasStyleMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
@@ -51,6 +53,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     null,
     (get, set, { target, type }: CanvasEvent) => {
       const idToSoul = get(IdToSoulAtom);
+      const raisinsAttribute = get(CanvasOptions.SoulAttributeAtom);
       if (type === 'click') {
         const plopParentSoulId = target?.attributes['raisin-plop-parent'];
         if (plopParentSoulId) {
@@ -62,13 +65,13 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
           const parentNode = soulToNode(parentSoul);
           if (!parentNode || !isElementNode(parentNode)) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
-          const slot = target?.attributes['raisin-plop-slot'] ?? "";
+          const slot = target?.attributes['raisin-plop-slot'] ?? '';
           set(DropPloppedNodeInSlotAtom, { parent: parentNode, idx, slot });
           // If plop, don't do select logic
           return;
         }
 
-        const soulId = target?.attributes['raisins-soul'];
+        const soulId = target?.attributes[raisinsAttribute];
         if (soulId) {
           const soul = soulId ? idToSoul(soulId) : undefined;
           set(SelectedSoulAtom, soul);
@@ -85,7 +88,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
         }
       }
       if (type === 'mouseover') {
-        const soulId = target?.attributes['raisins-soul'];
+        const soulId = target?.attributes[raisinsAttribute];
         const soul = soulId ? idToSoul(soulId) : undefined;
         set(HoveredSoulAtom, soul);
         if (target) {
@@ -102,11 +105,12 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   );
 
   const ResizeAtom = atom(null, (get, set, geometry: GeometryDetail) => {
+    const raisinsAttribute = get(CanvasOptions.SoulAttributeAtom);
     const selected = get(SelectedNodeAtom);
     const hovered = get(HoveredNodeAtom);
     const getNode = get(SoulIdToNodeAtom);
     geometry.entries.forEach((e) => {
-      const id = e.target?.attributes['raisins-soul'];
+      const id = e.target?.attributes[raisinsAttribute];
       const node = id && getNode(id);
       if (node && node === selected) {
         set(SelectedRectAtom, {
@@ -141,13 +145,15 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
       IframeAtom,
       HoveredNodeAtom,
       GetSoulAtom,
-      HoveredRectAtom
+      HoveredRectAtom,
+      CanvasOptions
     ),
     SelectedRectAtom: defaultRectAtom(
       IframeAtom,
       SelectedNodeAtom,
       GetSoulAtom,
-      SelectedRectAtom
+      SelectedRectAtom,
+      CanvasOptions
     ),
     CanvasEventAtom,
     IframeAtom,

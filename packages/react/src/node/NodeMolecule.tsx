@@ -2,7 +2,7 @@ import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
@@ -22,7 +22,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
-    ComponenetModelMolecule
+    ComponentModelMolecule
   );
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
