@@ -11,6 +11,9 @@
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/core"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -95,5 +98,6 @@
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false,
     "stepDefinitions": "cypress/stepsDefinition"
-  }
+  },
+  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }

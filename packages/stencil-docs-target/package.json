@@ -12,6 +12,9 @@
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/stencil-docs-target"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -63,5 +66,6 @@
   "dependencies": {
     "@raisins/schema": "^0.1.0",
     "split-on-first": "^3.0.0"
-  }
+  },
+  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }
