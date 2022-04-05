@@ -20,20 +20,23 @@ const meta: Meta = {
 };
 export default meta;
 
-const StoryScope = createScope<{ startingHtml: string }>({
+const StoryScope = createScope({
   startingHtml: '<span>I am a span</span>',
+  startingPackages: [],
 });
+
 const StoryMolecule = molecule<RaisinProps>((_, getScope) => {
   const storyScope = getScope(StoryScope);
   return {
     HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom([]),
+    PackagesAtom: atom(storyScope.startingPackages),
     uiWidgetsAtom: atom({}),
   };
 });
 
 export function Span({
   startingHtml = '<span>I am a span</span>',
+  startingPackages = [],
   children = (
     <>
       <Editor />
@@ -43,7 +46,10 @@ export function Span({
 }) {
   return (
     <>
-      <ScopeProvider scope={StoryScope} value={{ startingHtml }}>
+      <ScopeProvider
+        scope={StoryScope}
+        value={{ startingHtml, startingPackages }}
+      >
         <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}
     </>
@@ -78,7 +84,9 @@ export function ExternalHTMLControl() {
   );
 }
 
-export const Mint = () => <Span startingHtml={mintMono} />;
+export const Mint = () => (
+  <Span startingHtml={mintMono} startingPackages={MintComponents} />
+);
 export const Big = () => <Span startingHtml={big} />;
 
 export const CanvasOnly = () => (
@@ -110,6 +118,25 @@ function Editor() {
 
   return <EditorView />;
 }
+
+const MintComponents = [
+  {
+    name: '@saasquatch/mint-components',
+    filePath: '/dist/mint-components/mint-components.css',
+    version: '1.5.0-116',
+  },
+  {
+    name: '@saasquatch/bedrock-components',
+    filePath: '/dist/bedrock-components/bedrock-components.js',
+    version: '1.3.1-7',
+  },
+
+  {
+    name: '@saasquatch/mint-components',
+    filePath: '/dist/mint-components/mint-components.js',
+    version: '1.5.0-116',
+  },
+];
 
 const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">

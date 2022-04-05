@@ -32,6 +32,6 @@ export function CanvasController() {
   );
 }
 
-export function ExampleController() {
+function ExampleController() {
   return <WYSWIGCanvas {...useWYSIWYGCanvas()} />;
 }

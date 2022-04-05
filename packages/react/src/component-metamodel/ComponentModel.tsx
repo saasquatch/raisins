@@ -8,36 +8,36 @@ import {
   RaisinElementNode,
   RaisinNode,
 } from '@raisins/core';
-import { NewState } from '@raisins/core/dist/util/NewState';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { loadable } from 'jotai/utils';
 import { CoreMolecule, PropsMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { Module, ModuleDetails } from './ModuleManagement';
+import { Module } from './ModuleManagement';
 
 export const GlobalBlocksAtom = atom([] as Block[]);
 
-type ModuleDerivedState = {
-  loading: boolean;
-  moduleDetails: ModuleDetails[];
-};
-
 export const ComponenetModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
-
   const { PackagesAtom } = getMol(PropsMolecule);
 
-  const Ste = atom<ModuleDerivedState>({
-    loading: false,
-    moduleDetails: [],
-  });
+  const ModuleDetailsAync = atom(
+    async (get) => await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
+  );
+  const ModuleDetailsSync = loadable(ModuleDetailsAync);
   const ModulesAtom = PackagesAtom;
-  const ModuleDetailsAtom = atom((get) => get(Ste).moduleDetails ?? []);
-  const ModulesLoadingAtom = atom((get) => get(Ste).loading);
+  const ModuleDetailsAtom = atom((get) => {
+    const state = get(ModuleDetailsSync);
+    if (state.state === 'hasData') return state.data;
+    return [];
+  });
+  const ModulesLoadingAtom = atom(
+    (get) => get(ModuleDetailsSync).state === 'loading'
+  );
 
   const ComponentsAtom = atom((get) => {
     const moduleDetails = get(ModuleDetailsAtom);
@@ -78,27 +78,7 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   /**
    * Allows modules to be edited, with their additional details provided asynchronously
    */
-  const SetModulesAtom = atom(null, (get, set, m: NewState<Module[]>) => {
-    set(Ste, (i) => {
-      const next = typeof m === 'function' ? m(get(PackagesAtom)) : m;
-
-      const localUrl = get(LocalURLAtom);
-      (async () => {
-        set(PackagesAtom, next);
-        set(Ste, {
-          loading: false,
-          moduleDetails: await modulesToDetails(next, localUrl),
-        });
-      })();
-
-      return {
-        modules: next,
-        loading: true,
-        moduleDetails: i.moduleDetails,
-      };
-    });
-  });
-  SetModulesAtom.debugLabel = 'SetModulesAtom';
+  const SetModulesAtom = PackagesAtom;
 
   const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
     const components = get(ComponentsAtom);
@@ -215,7 +195,6 @@ export const ComponenetModelMolecule = molecule((getMol) => {
 /**
  * For managing the types of components that are edited and their properties
  */
-
 export type Block = {
   title: string;
   content: RaisinElementNode;
