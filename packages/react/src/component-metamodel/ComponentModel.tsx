@@ -24,21 +24,42 @@ export const GlobalBlocksAtom = atom([] as Block[]);
 export const ComponenetModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
   const { PackagesAtom } = getMol(PropsMolecule);
+  /**
+   * When an NPM package is just `@local` then it is loaded from this URL
+   */
+  const LocalURLAtom = atom<string | undefined>(undefined);
+  LocalURLAtom.debugLabel = 'LocalURLAtom';
 
+  /**
+   * Module details from NPM (loaded async)
+   */
   const ModuleDetailsAync = atom(
     async (get) => await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
   );
-  const ModuleDetailsSync = loadable(ModuleDetailsAync);
-  const ModulesAtom = PackagesAtom;
+  /**
+   * Module details from NPM (or loading or error)
+   */
+  const ModuleDetailsStateAtom = loadable(ModuleDetailsAync);
+
+  /**
+   * List of modules from NPM
+   */
   const ModuleDetailsAtom = atom((get) => {
-    const state = get(ModuleDetailsSync);
+    const state = get(ModuleDetailsStateAtom);
     if (state.state === 'hasData') return state.data;
     return [];
   });
+
+  /**
+   * `true` while module information is being loaded from NPM
+   */
   const ModulesLoadingAtom = atom(
-    (get) => get(ModuleDetailsSync).state === 'loading'
+    (get) => get(ModuleDetailsStateAtom).state === 'loading'
   );
 
+  /**
+   * The array of {@link CustomElement} from ALL packages
+   */
   const ComponentsAtom = atom((get) => {
     const moduleDetails = get(ModuleDetailsAtom);
     return [
@@ -48,11 +69,8 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   });
 
   /**
-   * When an NPM package is just `@local` then it is loaded from this URL
+   * The array of {@link Block} from ALL packages
    */
-  const LocalURLAtom = atom<string | undefined>(undefined);
-  LocalURLAtom.debugLabel = 'LocalURLAtom';
-
   const BlocksAtom = atom((get) => {
     const globalBlocks = get(GlobalBlocksAtom);
     const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
@@ -60,26 +78,33 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   });
   BlocksAtom.debugLabel = 'BlocksAtom';
 
+  /**
+   * Add another NPM package
+   */
   const AddModuleAtom = atom(null, (_, set, next: Module) =>
-    set(SetModulesAtom, (modules) => [...modules, next])
+    set(PackagesAtom, (modules) => [...modules, next])
   );
   AddModuleAtom.debugLabel = 'AddModuleAtom';
 
+  /**
+   * Remove an NPM package
+   */
   const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
-    set(SetModulesAtom, (modules) => modules.filter((e) => e !== next))
+    set(PackagesAtom, (modules) => modules.filter((e) => e !== next))
   );
   RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
 
+  /**
+   * Remove all packages based on their NPM name
+   */
   const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-    set(SetModulesAtom, (modules) => modules.filter((e) => e.name !== name))
+    set(PackagesAtom, (modules) => modules.filter((e) => e.name !== name))
   );
   RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
 
   /**
-   * Allows modules to be edited, with their additional details provided asynchronously
+   * A function used to find components details
    */
-  const SetModulesAtom = PackagesAtom;
-
   const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
     const components = get(ComponentsAtom);
     function getComponentMeta(tagName: string): CustomElement {
@@ -97,6 +122,9 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   });
   ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
 
+  /**
+   * A function to get a list of possible children for a node/slot combo
+   */
   const ValidChildrenAtom = atom((get) => {
     const blocks = get(BlocksAtom);
     const getComponentMeta = get(ComponentMetaAtom);
@@ -139,6 +167,12 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   });
   ValidChildrenAtom.debugLabel = 'ValidChildrenAtom';
 
+  /**
+   * Returns the {@link ComponentModel}
+   *
+   * A mixed bag of functions used to grab data from the NPM package details
+   * and enforce validation
+   */
   const ComponentModelAtom = atom<ComponentModel>((get) => {
     const getComponentMeta = get(ComponentMetaAtom);
     const blocks: Block[] = get(BlocksAtom);
@@ -176,8 +210,9 @@ export const ComponenetModelMolecule = molecule((getMol) => {
   ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
   return {
-    ModulesAtom,
+    ModulesAtom: PackagesAtom,
     ModuleDetailsAtom,
+    ModuleDetailsStateAtom,
     ModulesLoadingAtom,
     ComponentsAtom,
     LocalURLAtom,
@@ -185,9 +220,12 @@ export const ComponenetModelMolecule = molecule((getMol) => {
     AddModuleAtom,
     RemoveModuleAtom,
     RemoveModuleByNameAtom,
-    SetModulesAtom,
+    SetModulesAtom: PackagesAtom,
     ComponentMetaAtom,
     ValidChildrenAtom,
+    /**
+     * @inheritdoc
+     */
     ComponentModelAtom,
   };
 });
