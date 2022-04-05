@@ -4,11 +4,11 @@ import { molecule } from 'jotai-molecules';
 import { ComponenetModelMolecule } from '../../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../CoreAtoms';
 import { Soul } from '../souls/Soul';
-import { SouldsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
+import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
 
 export const HoveredNodeMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
-  const { SoulToNodeAtom } = getMol(SouldsInDocMolecule);
+  const { SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentMetaAtom } = getMol(ComponenetModelMolecule);
 
   const HoveredSoulAtom = atom<Soul | undefined>(undefined);

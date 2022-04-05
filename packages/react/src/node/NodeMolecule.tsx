@@ -7,7 +7,7 @@ import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
-import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { atomForAttributes } from './atoms/atomForAttributes';
@@ -19,7 +19,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     PickedNodeMolecule
   );
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
-  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
     ComponenetModelMolecule

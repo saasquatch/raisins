@@ -6,7 +6,7 @@ import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { RaisinScope } from '../core/RaisinScope';
-import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { NodeAtomMolecule, NodeAtomProvider } from '../node/NodeScope';
 import { isElementNode } from '../util/isNode';
@@ -17,7 +17,7 @@ import {
 } from './prosemirror/ProseEditor';
 
 const SelectedNodeRichTextEditorMolecule = molecule((getMol) => {
-  const { SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { EditSelectedNodeAtom } = getMol(EditSelectedMolecule);
   const IsSelectedAnElement = atom((get) =>
     isElementNode(get(SelectedNodeAtom))

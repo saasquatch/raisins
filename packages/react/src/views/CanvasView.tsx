@@ -10,7 +10,7 @@ import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { RaisinScope } from '../core/RaisinScope';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
-import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
 
 const Wrapper: CSSProperties = {
@@ -59,7 +59,7 @@ const CanvasViewMolecule = molecule((getMol) => {
   const CanvasScope = getMol(CanvasScopedMolecule);
   const { ComponentMetaAtom } = getMol(ComponenetModelMolecule);
   const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);
-  const { SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const CanvasStyle = getMol(CanvasStyleMolecule);
 
   const HoveredNodeContent = atom((get) => {

@@ -6,7 +6,7 @@ import { Soul, SoulsMolecule, soulToString } from './Soul';
 
 const { visitAll } = htmlUtil;
 
-export const SouldsInDocMolecule = molecule((getMol) => {
+export const SoulsInDocMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
 

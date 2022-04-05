@@ -6,7 +6,7 @@ import { ComponenetModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
-import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { CanvasScriptsMolecule } from './CanvasScriptsAtom';
 import {
@@ -37,7 +37,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
   const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);
   const { PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
-  const { SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const OutlineAtom = atom(true);
   const ModeAtom = atom<Mode>('edit');

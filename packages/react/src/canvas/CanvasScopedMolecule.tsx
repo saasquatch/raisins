@@ -4,9 +4,9 @@ import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
 import React from 'react';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
-import { SelectedMolecule } from '../core/selection/SelectedNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
-import { SouldsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
+import { SoulsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
 import { dependentAtom } from '../util/atoms/dependentAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { Rect } from './api/Rect';
@@ -32,10 +32,10 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { IdToSoulAtom, SoulToNodeAtom, SoulIdToNodeAtom } = getMol(
-    SouldsInDocMolecule
+    SoulsInDocMolecule
   );
   const { GetSoulAtom } = getMol(SoulsMolecule);
-  const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedMolecule);
+  const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
 
   // TODO: Path might not be the right thing to depend on. Might be worth switching ID
   const HoveredRectAtom = dependentAtom<Rect | undefined>(

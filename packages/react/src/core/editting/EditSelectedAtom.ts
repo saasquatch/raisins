@@ -4,7 +4,7 @@ import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
 import { PickedNodeMolecule } from '../selection/PickedNode';
-import { SelectedMolecule } from '../selection/SelectedNode';
+import { SelectedNodeMolecule } from '../selection/SelectedNode';
 import { EditMolecule, generateNextState } from './EditAtoms';
 
 const { removePath } = htmlUtil;
@@ -12,7 +12,7 @@ const { removePath } = htmlUtil;
 export const EditSelectedMolecule = molecule((getMol) => {
   const { InternalStateAtom } = getMol(CoreMolecule);
   const { DuplicateNodeAtom, ReplaceNodeAtom } = getMol(EditMolecule);
-  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedMolecule);
+  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
 
   const { PickedAtom } = getMol(PickedNodeMolecule);
 
