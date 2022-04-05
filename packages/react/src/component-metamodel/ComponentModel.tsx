@@ -19,16 +19,10 @@ import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
 import { Module } from './ModuleManagement';
 
-export const GlobalBlocksAtom = atom([] as Block[]);
-
 export const ComponenetModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
-  const { PackagesAtom } = getMol(PropsMolecule);
-  /**
-   * When an NPM package is just `@local` then it is loaded from this URL
-   */
-  const LocalURLAtom = atom<string | undefined>(undefined);
-  LocalURLAtom.debugLabel = 'LocalURLAtom';
+  const { PackagesAtom, LocalURLAtom } = getMol(PropsMolecule);
+
 
   /**
    * Module details from NPM (loaded async)
@@ -72,9 +66,8 @@ export const ComponenetModelMolecule = molecule((getMol) => {
    * The array of {@link Block} from ALL packages
    */
   const BlocksAtom = atom((get) => {
-    const globalBlocks = get(GlobalBlocksAtom);
     const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-    return [...blocksFromModules, ...globalBlocks];
+    return [...blocksFromModules];
   });
   BlocksAtom.debugLabel = 'BlocksAtom';
 

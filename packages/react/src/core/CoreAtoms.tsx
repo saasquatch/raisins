@@ -26,30 +26,56 @@ export type InternalState = {
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
 export type RaisinProps = {
+  /**
+   * Atom for the primitive string value that will be read
+   */
   HTMLAtom: PrimitiveAtom<string>;
+  /**
+   * Atom for the set of NPM packages
+   */
   PackagesAtom: PrimitiveAtom<Module[]>;
+  /**
+   * Atom for the set of UI Widgets that can be use for editing attributes
+   *
+   * Read-only
+   */
   uiWidgetsAtom: Atom<Record<string, React.FC>>;
+  /**
+   * When an NPM package is just `@local` then it is loaded from this URL
+   *
+   * Read-only
+   */
+  LocalURLAtom: Atom<string | undefined>;
 };
-export type RaisinPropsMolecule = Molecule<RaisinProps>;
+export type RaisinPropsMolecule = Molecule<Partial<RaisinProps>>;
 
 export const PropsScope = createScope<RaisinPropsMolecule | undefined>(
   undefined
 );
 
-export const PropsMolecule: RaisinPropsMolecule = molecule<RaisinProps>(
-  (getMol, getScope) => {
-    /**
-     * This will create a new set of atoms for every CoreEditorScope scope provider
-     */
-    const props = getScope(PropsScope);
-    if (!props)
-      throw new Error(
-        'Must use this molecule in a wrapping <RaisinsProvider> element'
-      );
+export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
+  /**
+   * This will create a new set of atoms for every CoreEditorScope scope provider
+   */
+  const props = getScope(PropsScope);
+  if (!props)
+    throw new Error(
+      'Must use this molecule in a wrapping <RaisinsProvider> element'
+    );
 
-    return getMol(props);
-  }
-);
+  const LocalURLAtom = atom<string | undefined>(undefined);
+  LocalURLAtom.debugLabel = 'LocalURLAtom';
+
+  const HTMLAtom = atom('');
+  const provided = getMol(props);
+
+  return {
+    LocalURLAtom: provided.LocalURLAtom ?? atom(undefined),
+    PackagesAtom: provided.PackagesAtom ?? atom<Module[]>([]),
+    uiWidgetsAtom: provided.uiWidgetsAtom ?? atom({}),
+    HTMLAtom: provided.HTMLAtom ?? HTMLAtom,
+  };
+});
 
 export const CoreMolecule = molecule((getMol, getScope) => {
   const { HTMLAtom } = getMol(PropsMolecule);
