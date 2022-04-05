@@ -12,13 +12,16 @@ const GLOBAL_ENTRY = 'body';
 
 /**
  * Modifies a Snabbdom node
- * 
+ *
  * Useful for adding additional styling (e.g. selected styling) and props
- * 
+ *
  */
 export type SnabdomRenderer = (d: VNodeData, n: RaisinNode) => VNodeData;
 
-export type SnabdomAppender = (children:Array<VNode | string> | undefined, n: RaisinNode) => Array<VNode | string> | undefined;
+export type SnabdomAppender = (
+  children: Array<VNode | string> | undefined,
+  n: RaisinNode
+) => Array<VNode | string> | undefined;
 
 export function raisintoSnabdom(
   node: RaisinDocumentNode,
@@ -27,7 +30,7 @@ export function raisintoSnabdom(
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onComment(c) {
-      return undefined;
+      return h('!', c.data);
     },
     onStyle(el) {
       return h('style', {}, el.contents && cssSerializer(el.contents));
