@@ -127,7 +127,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     });
 
     myConnection.promise.then(function (parent: ParentRPC) {
-      const ro = new ResizeObserver(function (entries) {
+      const ro = new window.ResizeObserver(function (entries) {
         parent.resizeHeight(entries[0].contentRect.height + '');
       });
       ro.observe(document.body);
