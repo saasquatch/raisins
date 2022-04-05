@@ -4,6 +4,8 @@
   "compilerOptions": {
     "module": "esnext",
     "lib": ["dom", "esnext"],
+    // To prevent this error: https://stackoverflow.com/questions/60270925/finding-resizeobserver-with-typescript-in-angular-9
+    "types": ["resize-observer-browser"],
     "importHelpers": true,
     // output .d.ts declaration files for consumers
     "declaration": true,
