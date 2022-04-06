@@ -136,8 +136,8 @@ describe("Parse + serialize", () => {
           isHtmlEquivalent(
             source,
             raisinString,
-            { scriptingEnabled: false },
-            { ignoreComments }
+            { ignoreComments },
+            { scriptingEnabled: false }
           )
         ).toBe(true);
       });

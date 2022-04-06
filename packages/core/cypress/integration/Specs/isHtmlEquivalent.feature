@@ -204,3 +204,16 @@ Feature: HTML Equivalency Checker
 			| <style> body {display: none;} </style>          | <style> body {DISPLAY : NONE} </style>                        |
 			| <style> body {/* color: red; */} </style>       | <style> body {/* color: blue; */} </style>                    |
 			| <style> body {} </style>                        | <style> body {/* color: blue; */} </style>                    |
+
+	Scenario Outline: Ignore comments flag will ignore comments in comparison
+
+		Given one HTML string <First>
+		And another HTML string <Second>
+		And ignoreComments option is true
+		Then they will be equivalent
+
+		Examples:
+			| First                                | Second                               |
+			| <div>hello world</div>               | <!--comment--><div>hello world</div> |
+			| <!--a--><div>hello world</div>       | <!--b--><div>hello world</div>       |
+			| <div>hello world</div><!--comment--> | <div>hello world</div>               |

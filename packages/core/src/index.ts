@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import cssParser from "./css-om/parser";
 import cssSerializer from "./css-om/serializer";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
