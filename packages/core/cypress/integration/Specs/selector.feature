@@ -148,7 +148,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1       |
 			| <b>I am an b</b>         | b        |
 
-	Scenario Outline: Hovered
+	Scenario Outline: Pseudo-classes selectors
 		Given an html document
 			"""
 			<HTML>
@@ -162,4 +162,46 @@ Feature: Selecting by CSS selectors
 			| <span>I am a span</span> | span:active |
 			| <h1>I am an h1</h1>      | h1:visited  |
 			| <b>I am an b</b>         | b:link      |
-			| <div>I am a div</div>    | span:first-child   |
+
+
+	Scenario Outline: Contains selector
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should return "<JSONata>"
+
+		Examples:
+			| HTML                       | Selector             | JSONata                      |
+			| <div></div>                | div:contains('Solo') | []                           |
+			| <div>Princess Leia</div>   | div:contains('Solo') | []                           |
+			| <div>Han Solo</div>        | div:contains('Solo') | node.children[0]             |
+			| <div><b>Han Solo</b></div> | div:contains('Solo') | node.children[0]             |
+			| <div><b>Han Solo</b></div> | b:contains('Solo')   | node.children[0].children[0] |
+			| <div><b>Chewbaca</b></div> | b:contains('Solo')   | []                           |
+
+	Scenario Outline: Enabled and disabled selectors
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should return "<JSONata>"
+
+		Examples:
+			| HTML                     | Selector       | JSONata          |
+			| <input></input>          | input:enabled  | node.children[0] |
+			| <input disabled></input> | input:enabled  | []               |
+			| <input></input>          | input:disabled | []               |
+			| <input disabled></input> | input:disabled | node.children[0] |
+			| <input></input>          | input:required | []               |
+			| <input required></input> | input:required | node.children[0] |
+			| <input></input>          | input:required | []               |
+			| <input optional></input> | input:optional | node.children[0] |
+			| <input></input>          | input:optional | []               |
+
+
+
+
+
