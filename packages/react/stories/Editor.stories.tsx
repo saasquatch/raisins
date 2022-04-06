@@ -9,7 +9,7 @@ import {
 import React, { useMemo } from 'react';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { RaisinProps } from '../src/core/CoreAtoms';
-import { RaisinsProvider } from '../src/core/RaisinScope';
+import { RaisinsProvider } from '../src/core/RaisinsProvider';
 import { useHotkeys } from '../src/core/useHotkeys';
 import { EditorView } from '../src/views/EditorView';
 import { RegisteredAtoms } from './DevTools';

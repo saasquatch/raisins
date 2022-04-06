@@ -5,7 +5,7 @@ export { CanvasController } from './canvas/CanvasController';
 export { CoreMolecule } from './core/CoreAtoms';
 export { EditMolecule } from './core/editting/EditAtoms';
 export { HistoryMolecule } from './core/editting/HistoryAtoms';
-export { RaisinsProvider } from './core/RaisinScope';
+export { RaisinsProvider } from './core/RaisinsProvider';
 export { HoveredNodeMolecule } from './core/selection/HoveredNode';
 export { PickedNodeMolecule } from './core/selection/PickedNode';
 export { SelectedNodeMolecule } from './core/selection/SelectedNode';
