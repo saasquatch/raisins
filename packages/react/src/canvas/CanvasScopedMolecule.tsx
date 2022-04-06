@@ -14,7 +14,7 @@ import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
 import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
 import { createAtoms } from './SnabbdomSanboxedIframeAtom';
-import { CanvasStyleMolecule } from './useCanvas';
+import { CanvasStyleMolecule } from './CanvasStyleMolecule';
 
 const CanvasScope = createScope();
 

@@ -6,7 +6,7 @@ import { RaisinScope } from '../core/RaisinScope';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
 import { CanvasProvider, CanvasScopedMolecule } from './CanvasScopedMolecule';
-import { CanvasStyleMolecule } from './useCanvas';
+import { CanvasStyleMolecule } from './CanvasStyleMolecule';
 
 export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   const { SizeAtom } = useMolecule(CanvasStyleMolecule);

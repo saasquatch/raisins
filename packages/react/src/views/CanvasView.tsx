@@ -5,7 +5,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
 import { Rect } from '../canvas/api/Rect';
 import { CanvasScopedMolecule } from '../canvas/CanvasScopedMolecule';
-import { CanvasStyleMolecule, Size } from '../canvas/useCanvas';
+import { CanvasStyleMolecule, Size } from '../canvas/CanvasStyleMolecule';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { RaisinScope } from '../core/RaisinScope';

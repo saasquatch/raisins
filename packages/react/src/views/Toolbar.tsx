@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
-import { CanvasStyleMolecule, sizes } from '../canvas/useCanvas';
+import { CanvasStyleMolecule, sizes } from '../canvas/CanvasStyleMolecule';
 import { HistoryMolecule } from '../core/editting/HistoryAtoms';
 import { RaisinScope } from '../core/RaisinScope';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';

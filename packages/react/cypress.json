@@ -1,0 +1,4 @@
+{
+  "integrationFolder": "src",
+  "testFiles": "**/*.cypress.test.@(ts|tsx|js|jsx)"
+}
