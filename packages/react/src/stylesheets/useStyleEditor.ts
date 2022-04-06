@@ -9,7 +9,6 @@ import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useMemo, useState } from 'react';
 import { CoreMolecule } from '../core/CoreAtoms';
-import { RaisinScope } from '../core/RaisinScope';
 import { StateUpdater } from '../util/NewState';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
@@ -22,7 +21,7 @@ type Props = {
 // TODO: Color functions: https://github.com/scttcper/tinycolor
 export function useStyleEditor() {
   const { RootNodeAtom } = useMolecule(CoreMolecule);
-  const [node, setNode] = useAtom(RootNodeAtom, RaisinScope);
+  const [node, setNode] = useAtom(RootNodeAtom);
   // const componentModel = useAtomValue(ComponentModelAtom);
   const sheets = useMemo(() => {
     // Finds all style nodes.

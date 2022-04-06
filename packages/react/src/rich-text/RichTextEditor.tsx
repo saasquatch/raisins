@@ -5,7 +5,6 @@ import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { RaisinScope } from '../core/RaisinScope';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { NodeAtomMolecule, NodeAtomProvider } from '../node/NodeScope';
@@ -31,7 +30,7 @@ const SelectedNodeRichTextEditorMolecule = molecule((getMol) => {
 
 export default function SelectedNodeRichTextEditor() {
   const atoms = useMolecule(SelectedNodeRichTextEditorMolecule);
-  const isElement = useAtomValue(atoms.IsSelectedAnElement, RaisinScope);
+  const isElement = useAtomValue(atoms.IsSelectedAnElement);
   if (!isElement) return <div>Not an element</div>;
 
   return (

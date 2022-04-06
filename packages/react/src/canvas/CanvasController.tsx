@@ -2,7 +2,6 @@ import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { RaisinScope } from '../core/RaisinScope';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
 import { CanvasProvider, CanvasScopedMolecule } from './CanvasScopedMolecule';
@@ -12,9 +11,9 @@ export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   const { SizeAtom } = useMolecule(CanvasStyleMolecule);
   const { SelectedAtom } = useMolecule(SelectedNodeMolecule);
   const atoms = useMolecule(CanvasScopedMolecule);
-  const [_, setContainer] = useAtom(atoms.IframeAtom, RaisinScope);
-  const size = useAtomValue(SizeAtom, RaisinScope);
-  const setSelected = useUpdateAtom(SelectedAtom, RaisinScope);
+  const [_, setContainer] = useAtom(atoms.IframeAtom);
+  const size = useAtomValue(SizeAtom);
+  const setSelected = useUpdateAtom(SelectedAtom);
 
   return {
     setHtmlRef: setContainer,

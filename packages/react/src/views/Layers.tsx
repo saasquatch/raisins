@@ -22,7 +22,6 @@ import React, {
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
-import { RaisinScope } from '../core/RaisinScope';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import {
   ChildrenEditor,
@@ -89,7 +88,7 @@ const AddBlock: CSSProperties = {
 
 export const LayersController: FC<{}> = () => {
   const atoms = useMolecule(LayersMolecule);
-  const hasChildren = useAtomValue(atoms.RootHasChildren, RaisinScope);
+  const hasChildren = useAtomValue(atoms.RootHasChildren);
 
   return (
     <div data-layers>
@@ -107,9 +106,9 @@ export const LayersController: FC<{}> = () => {
 
 function AddNew(props: { idx: number; slot?: string }) {
   const atoms = useMolecule(LayersMolecule);
-  const node = useAtomValue(useNodeAtom(), RaisinScope);
-  const insert = useSetAtom(atoms.InsertNodeAtom, RaisinScope);
-  const comp = useAtomValue(atoms.ComponentModelAtom, RaisinScope);
+  const node = useAtomValue(useNodeAtom());
+  const insert = useSetAtom(atoms.InsertNodeAtom);
+  const comp = useAtomValue(atoms.ComponentModelAtom);
 
   const [open, setOpen] = useState(false);
   const validChildren = comp.getValidChildren(node, props.slot);
@@ -184,20 +183,20 @@ function ElementLayer() {
     togglePickNode,
   } = useMolecule(NodeMolecule);
   const atoms = useMolecule(LayersMolecule);
-  const setSelected = useSetAtom(setSelectedForNode, RaisinScope);
-  const isAnElement = useAtomValue(isNodeAnElement, RaisinScope);
-  const isSelected = useAtomValue(isSelectedForNode, RaisinScope);
-  const isPicked = useAtomValue(isNodePicked, RaisinScope);
-  const [isHovered, setHovered] = useAtom(nodeHovered, RaisinScope);
-  const nodeWithSlots = useAtomValue(slotsForNode, RaisinScope);
+  const setSelected = useSetAtom(setSelectedForNode);
+  const isAnElement = useAtomValue(isNodeAnElement);
+  const isSelected = useAtomValue(isSelectedForNode);
+  const isPicked = useAtomValue(isNodePicked);
+  const [isHovered, setHovered] = useAtom(nodeHovered);
+  const nodeWithSlots = useAtomValue(slotsForNode);
 
-  const removeNode = useSetAtom(removeForNode, RaisinScope);
-  const duplicate = useSetAtom(duplicateForNode, RaisinScope);
-  const title = useAtomValue(nameForNode, RaisinScope);
-  const moveNode = useSetAtom(togglePickNode, RaisinScope);
-  const soul = useAtomValue(nodeSoul, RaisinScope);
+  const removeNode = useSetAtom(removeForNode);
+  const duplicate = useSetAtom(duplicateForNode);
+  const title = useAtomValue(nameForNode);
+  const moveNode = useSetAtom(togglePickNode);
+  const soul = useAtomValue(nodeSoul);
 
-  const isPlopping = useAtomValue(atoms.PloppingIsActive, RaisinScope);
+  const isPlopping = useAtomValue(atoms.PloppingIsActive);
   const canMove = isPicked || !isPlopping;
   // Don't render non-element layers
   if (!isAnElement) return <></>;
@@ -313,7 +312,7 @@ function useSlotChildNodes(slotName: string) {
       )
     );
   }, [slotName, nodeAtom]);
-  const childNodes = useAtomValue(slotChildrenAtom, RaisinScope);
+  const childNodes = useAtomValue(slotChildrenAtom);
   return childNodes;
 }
 
@@ -330,8 +329,8 @@ function isInSlot(c: RaisinNode, slotName: string): boolean {
 
 function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
-  const canPlop = useAtomValue(canPlopHereAtom, RaisinScope);
-  const plopNode = useSetAtom(plopNodeHere, RaisinScope);
+  const canPlop = useAtomValue(canPlopHereAtom);
+  const plopNode = useSetAtom(plopNodeHere);
   const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
 
   const isPloppablable = canPlop({ slot, idx });

@@ -3,7 +3,6 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { Module, ModuleDetails } from '../component-metamodel/ModuleManagement';
-import { RaisinScope } from '../core/RaisinScope';
 
 export const PACKAGES = [
   '@local',
@@ -48,12 +47,12 @@ function usePackageEditor(): ModuleManagement {
     RemoveModuleByNameAtom,
   } = useMolecule(ComponentModelMolecule);
   return {
-    loadingModules: useAtomValue(ModulesLoadingAtom, RaisinScope),
-    modules: useAtomValue(ModulesAtom, RaisinScope),
-    moduleDetails: useAtomValue(ModuleDetailsAtom, RaisinScope),
-    addModule: useUpdateAtom(AddModuleAtom, RaisinScope),
-    removeModule: useUpdateAtom(RemoveModuleAtom, RaisinScope),
-    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom, RaisinScope),
+    loadingModules: useAtomValue(ModulesLoadingAtom),
+    modules: useAtomValue(ModulesAtom),
+    moduleDetails: useAtomValue(ModuleDetailsAtom),
+    addModule: useUpdateAtom(AddModuleAtom),
+    removeModule: useUpdateAtom(RemoveModuleAtom),
+    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom),
   };
 }
 

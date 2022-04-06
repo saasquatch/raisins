@@ -2,7 +2,6 @@ import { htmlParser, RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, PrimitiveAtom, useAtom } from 'jotai';
 import React, { useMemo } from 'react';
-import { RaisinScope } from '../src/core/RaisinScope';
 import { ExampleProseEditor } from '../src/rich-text/prosemirror/ExampleProseEditor';
 import { ProseTextSelection } from '../src/rich-text/prosemirror/ProseEditor';
 const meta: Meta = {
@@ -46,8 +45,8 @@ function AtomEditor({ initial }: { initial: RaisinNode }) {
     };
   }, []);
 
-  const [selection] = useAtom(selectionAtomRef, RaisinScope);
-  const [node] = useAtom(nodeAtom, RaisinScope);
+  const [selection] = useAtom(selectionAtomRef);
+  const [node] = useAtom(nodeAtom);
   return (
     <div>
       <ExampleProseEditor

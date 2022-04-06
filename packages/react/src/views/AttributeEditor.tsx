@@ -2,14 +2,12 @@ import { Attribute } from '@raisins/schema/schema';
 import { useAtom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React, { Fragment } from 'react';
-import { RaisinScope } from '../core/RaisinScope';
 import { NodeMolecule } from '../node/NodeMolecule';
 
 export function AttributesEditor() {
   const { attributesForNode, componentMetaForNode } = useMolecule(NodeMolecule);
-  const [attributes, setAttributes] = useAtom(attributesForNode, RaisinScope);
-  const attributeSchema = useAtomValue(componentMetaForNode, RaisinScope)
-    .attributes;
+  const [attributes, setAttributes] = useAtom(attributesForNode);
+  const attributeSchema = useAtomValue(componentMetaForNode).attributes;
   const attribs = attributes ?? {};
 
   const onchange = (key: string) => {

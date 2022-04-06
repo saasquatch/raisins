@@ -9,7 +9,7 @@ import {
 import React, { useMemo } from 'react';
 import { CanvasController } from '../src/canvas/CanvasController';
 import { RaisinProps } from '../src/core/CoreAtoms';
-import { RaisinScope, RaisinsProvider } from '../src/core/RaisinScope';
+import { RaisinsProvider } from '../src/core/RaisinScope';
 import { useHotkeys } from '../src/core/useHotkeys';
 import { EditorView } from '../src/views/EditorView';
 import { RegisteredAtoms } from './DevTools';
@@ -69,7 +69,7 @@ export function ExternalHTMLControl() {
     []
   );
 
-  const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom, RaisinScope);
+  const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom);
   return (
     <>
       <textarea

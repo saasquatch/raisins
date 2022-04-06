@@ -5,7 +5,6 @@ import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { useMemo } from 'react';
-import { RaisinScope } from '../../core/RaisinScope';
 import connectedAtom from '../../util/atoms/connectedAtom';
 import { HistoryKeyMapPluginMolecule } from '../HistoryKeyMapPluginAtom';
 import { NewLinePlugin } from './NewLineBreak';
@@ -46,7 +45,7 @@ export function useProseEditorOnAtom(
     [node, selection]
   );
 
-  const [, mountRef] = useAtom(elementRef, RaisinScope);
+  const [, mountRef] = useAtom(elementRef);
 
   return {
     mountRef,

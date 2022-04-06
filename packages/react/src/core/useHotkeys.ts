@@ -4,7 +4,6 @@ import { molecule, useMolecule } from 'jotai-molecules';
 import connectedAtom from '../util/atoms/connectedAtom';
 import { EditSelectedMolecule } from './editting/EditSelectedAtom';
 import { HistoryMolecule } from './editting/HistoryAtoms';
-import { RaisinScope } from './RaisinScope';
 
 export const HotkeysMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);
@@ -55,5 +54,5 @@ export const HotkeysMolecule = molecule((getMol) => {
 
 export function useHotkeys() {
   const { HotKeysAtom } = useMolecule(HotkeysMolecule);
-  useAtomValue(HotKeysAtom, RaisinScope);
+  useAtomValue(HotKeysAtom);
 }

@@ -3,7 +3,6 @@ import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { RaisinScope } from '../core/RaisinScope';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { NodeAtomProvider } from '../node/NodeScope';
 import { isElementNode } from '../util/isNode';
@@ -19,7 +18,7 @@ const mol = molecule((getMol) => {
 
 export function SelectedElementEditorController() {
   const { SelectedIsElement, EditSelectedNodeAtom } = useMolecule(mol);
-  const isElement = useAtomValue(SelectedIsElement, RaisinScope);
+  const isElement = useAtomValue(SelectedIsElement);
   if (isElement) {
     return (
       <div>

@@ -8,11 +8,9 @@ import { CanvasScopedMolecule } from '../canvas/CanvasScopedMolecule';
 import { CanvasStyleMolecule, Size } from '../canvas/CanvasStyleMolecule';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { RaisinScope } from '../core/RaisinScope';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
-
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),
@@ -89,7 +87,7 @@ const CanvasViewMolecule = molecule((getMol) => {
 
 export const CanvasHoveredToolbar = () => {
   const atoms = useMolecule(CanvasViewMolecule);
-  const nodeDetails = useAtomValue(atoms.HoveredNodeContent, RaisinScope);
+  const nodeDetails = useAtomValue(atoms.HoveredNodeContent);
   return (
     <Suspense fallback={null}>
       <PositionedToolbar rectAtom={atoms.HoveredRectAtom}>
@@ -101,11 +99,11 @@ export const CanvasHoveredToolbar = () => {
 
 export const CanvasSelectedToolbar = () => {
   const atoms = useMolecule(CanvasViewMolecule);
-  const seleted = useAtomValue(atoms.SelectedNodeAtom, RaisinScope);
-  const deleteSelected = useUpdateAtom(atoms.DeleteSelectedAtom, RaisinScope);
-  const cloneSelected = useUpdateAtom(atoms.DuplicateSelectedAtom, RaisinScope);
-  const moveSelected = useUpdateAtom(atoms.PickSelectedAtom, RaisinScope);
-  const nodeContent = useAtomValue(atoms.SelectedNodeContent, RaisinScope);
+  const seleted = useAtomValue(atoms.SelectedNodeAtom);
+  const deleteSelected = useUpdateAtom(atoms.DeleteSelectedAtom);
+  const cloneSelected = useUpdateAtom(atoms.DuplicateSelectedAtom);
+  const moveSelected = useUpdateAtom(atoms.PickSelectedAtom);
+  const nodeContent = useAtomValue(atoms.SelectedNodeContent);
   if (!seleted) return <div />;
   return (
     <Suspense fallback={null}>
@@ -129,7 +127,7 @@ export const PositionedToolbar = ({
   rectAtom: Atom<Promise<Rect | undefined>>;
   children: React.ReactNode;
 }) => {
-  const rect = useAtomValue(rectAtom, RaisinScope);
+  const rect = useAtomValue(rectAtom);
   if (!rect)
     return (
       <div style={{ position: 'absolute', top: 0, left: 0, display: 'none' }} />
