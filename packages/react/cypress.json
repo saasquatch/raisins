@@ -1,4 +1,6 @@
 {
   "integrationFolder": "src",
-  "testFiles": "**/*.test.@(ts|tsx|js|jsx)"
+  "testFiles": "**/*.test.@(ts|tsx|js|jsx)",
+  "video": false,
+  "screenshotOnRunFailure": false
 }

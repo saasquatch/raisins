@@ -3,7 +3,7 @@ import { Atom, atom } from 'jotai';
 import { Soul, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
 import { CanvasOptions } from './CanvasOptionsMolecule';
-import type { ConnectionState } from './SnabbdomSanboxedIframeAtom';
+import type { ConnectionState } from './iframe/SnabbdomSanboxedIframeAtom';
 
 /**
  * Creates an asynchronous `Rect` atom that will poll for

@@ -13,7 +13,7 @@ import { Rect } from './api/Rect';
 import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
 import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
-import { createAtoms } from './SnabbdomSanboxedIframeAtom';
+import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
 import { CanvasStyleMolecule } from './CanvasStyleMolecule';
 
 const CanvasScope = createScope();

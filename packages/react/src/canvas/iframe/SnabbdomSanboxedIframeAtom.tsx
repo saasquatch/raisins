@@ -1,15 +1,17 @@
 import { Atom, atom, WritableAtom } from 'jotai';
+import { createScope, molecule } from 'jotai-molecules';
+import { Molecule } from 'jotai-molecules/dist/molecule';
 import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';
-import { NPMRegistry } from '../util/NPMRegistry';
-import { childApiSrc } from './injected/childApiSrc';
+import { NPMRegistry } from '../../util/NPMRegistry';
 import {
   CanvasEvent,
   ChildRPC,
   GeometryDetail,
   ParentRPC,
-} from './api/_CanvasRPCContract';
+} from '../api/_CanvasRPCContract';
+import { childApiSrc } from '../injected/childApiSrc';
 
 const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
 <!DOCTYPE html>
@@ -29,17 +31,38 @@ function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
 export type ConnectionState =
   | { type: 'uninitialized' }
   | { type: 'initializing'; connection: Connection<ChildRPC> }
-  | { type: 'loaded'; childRpc: AsyncMethodReturns<ChildRPC>; connection: Connection<ChildRPC> }
+  | {
+      type: 'loaded';
+      childRpc: AsyncMethodReturns<ChildRPC>;
+      connection: Connection<ChildRPC>;
+    }
   | { type: 'error'; error: unknown; connection: Connection<ChildRPC> };
 
-export function createAtoms(props: {
+export const SnabbdomIframeScope = createScope<
+  Molecule<SnabbdomIframeProps> | undefined
+>(undefined);
+
+export const SnabbdomIframeMolecule = molecule((getMol, getScope) => {
+  const propsMol = getScope(SnabbdomIframeScope);
+  if (!propsMol)
+    throw new Error(
+      'Missing SnabbdomIframeScope for SnabbdomIframeMolecule, make sure this molecule is used inside a <ScopeProvider/>'
+    );
+  const props = getMol(propsMol);
+  return createAtoms(props);
+});
+
+
+export type SnabbdomIframeProps = {
   vnodeAtom: Atom<VNode>;
   head: Atom<string>;
   selector: Atom<string>;
   registry: Atom<NPMRegistry>;
   onEvent: WritableAtom<null, CanvasEvent>;
   onResize: WritableAtom<null, GeometryDetail>;
-}) {
+};
+
+export function createAtoms(props: SnabbdomIframeProps) {
   /**
    * We put our iframe in here and manage it's state
    */
