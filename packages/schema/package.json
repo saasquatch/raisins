@@ -1,6 +1,6 @@
 {
   "name": "@raisins/schema",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Types (a.k.a. schema) for the Raisins ecosystem",
   "author": "Logan Volkers <logan@saasquat.ch>",
   "license": "MIT",
@@ -12,7 +12,6 @@
   "publishConfig": {
     "access": "public"
   },
-
   "scripts": {
     "build": "typescript-json-schema --required --ignoreErrors schema.d.ts -o schema.json Package",
     "prepublishOnly": "npm run build",
