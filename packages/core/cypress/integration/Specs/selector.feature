@@ -154,7 +154,7 @@ Feature: Selecting by CSS selectors
 			<HTML>
 			"""
 		When we select "<Selector>"
-		Then it should return "[]"
+		Then it should return "undefined"
 
 		Examples:
 			| HTML                     | Selector    |
@@ -163,8 +163,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1:visited  |
 			| <b>I am an b</b>         | b:link      |
 
-
-	Scenario Outline: Contains selector
+	Scenario Outline: Pseudo contains selector
 		Given an html document
 			"""
 			<HTML>
@@ -174,14 +173,28 @@ Feature: Selecting by CSS selectors
 
 		Examples:
 			| HTML                       | Selector             | JSONata                      |
-			| <div></div>                | div:contains('Solo') | []                           |
-			| <div>Princess Leia</div>   | div:contains('Solo') | []                           |
+			| <div></div>                | div:contains('Solo') | undefined                    |
+			| <div>Princess Leia</div>   | div:contains('Solo') | undefined                    |
 			| <div>Han Solo</div>        | div:contains('Solo') | node.children[0]             |
 			| <div><b>Han Solo</b></div> | div:contains('Solo') | node.children[0]             |
 			| <div><b>Han Solo</b></div> | b:contains('Solo')   | node.children[0].children[0] |
-			| <div><b>Chewbaca</b></div> | b:contains('Solo')   | []                           |
+			| <div><b>Chewbaca</b></div> | b:contains('Solo')   | undefined                    |
 
-	Scenario Outline: Enabled and disabled selectors
+	Scenario Outline: Nth-child selector
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should return "<JSONata>"
+
+		Examples:
+			| HTML                                    | Selector        | JSONata          |
+			| <ul><li>1</li><li>2</li><li>3</li></ul> | ul:nth-child(1) | node.children[0] |
+			| <ul><li>1</li><li>2</li><li>3</li></ul> | ul:nth-child(2) | node.children[1] |
+			| <ul><li>1</li><li>2</li><li>3</li></ul> | ul:nth-child(3) | node.children[1] |
+
+	Scenario Outline: Pseudo input enabled/disabled selectors
 		Given an html document
 			"""
 			<HTML>
@@ -192,16 +205,50 @@ Feature: Selecting by CSS selectors
 		Examples:
 			| HTML                     | Selector       | JSONata          |
 			| <input></input>          | input:enabled  | node.children[0] |
-			| <input disabled></input> | input:enabled  | []               |
-			| <input></input>          | input:disabled | []               |
+			| <input disabled></input> | input:enabled  | undefined        |
+			| <input></input>          | input:disabled | undefined        |
 			| <input disabled></input> | input:disabled | node.children[0] |
-			| <input></input>          | input:required | []               |
+
+
+	Scenario Outline: Pseudo input required/optional selectors
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should return "<JSONata>"
+
+		Examples:
+			| HTML                     | Selector       | JSONata          |
+			| <input></input>          | input:required | undefined        |
 			| <input required></input> | input:required | node.children[0] |
-			| <input></input>          | input:required | []               |
+			| <input></input>          | input:required | undefined        |
+			| <input required></input> | input:optional | undefined        |
 			| <input optional></input> | input:optional | node.children[0] |
-			| <input></input>          | input:optional | []               |
+			| <input></input>          | input:optional | node.children[0] |
 
 
+	Scenario Outline: Pseudo input type selectors
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should return "<JSONata>"
 
+		Examples:
+			| HTML                            | Selector       | JSONata          |
+			| <input></input>                 | input:text     | node.children[0] |
+			| <input></input>                 | input:radio    | undefined        |
+			| <input></input>                 | input:button   | undefined        |
+			| <input></input>                 | input:checkbox | undefined        |
+			| <input></input>                 | input:password | undefined        |
+			| <input></input>                 | input:file     | undefined        |
+			| <input type="text"></input>     | input:text     | node.children[0] |
+			| <input type="radio"></input>    | input:radio    | node.children[0] |
+			| <input type="button"></input>   | input:button   | node.children[0] |
+			| <input type="checkbox"></input> | input:checkbox | node.children[0] |
+			| <input type="password"></input> | input:password | node.children[0] |
+			| <input type="file"></input>     | input:file     | node.children[0] |
 
 
