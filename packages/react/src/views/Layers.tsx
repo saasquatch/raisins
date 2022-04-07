@@ -1,24 +1,8 @@
-import {
-  htmlUtil,
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
-} from '@raisins/core';
-import { Slot } from '@raisins/schema/schema';
+import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
 import { atom, useAtom, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
-import { focusAtom } from 'jotai/optics';
-import { splitAtom, useAtomValue } from 'jotai/utils';
-import { optic_ } from 'optics-ts';
-import React, {
-  CSSProperties,
-  FC,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
+import { useAtomValue } from 'jotai/utils';
+import React, { CSSProperties, FC, useCallback, useState } from 'react';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
@@ -29,8 +13,8 @@ import {
 } from '../node/children/ChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { NodeAtomProvider, useNodeAtom } from '../node/NodeScope';
+import { SlotMolecule, SlotScopeProvider } from '../node/slots/SlotScope';
 import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
-import { isElementNode } from '../util/isNode';
 const { clone } = htmlUtil;
 
 const Label: CSSProperties = {
@@ -96,7 +80,11 @@ export const LayersController: FC<{}> = () => {
       Don't re-render unless number of children changes!
       <div data-layers-root>
         <NodeAtomProvider nodeAtom={atoms.RootNodeAtom}>
-          {hasChildren && <ChildrenEditor Component={ElementLayer} />}
+          {hasChildren && (
+            <SlotScopeProvider slot="">
+              <ChildrenEditor Component={ElementLayer} />
+            </SlotScopeProvider>
+          )}
           {!hasChildren && <AddNew idx={0} />}
         </NodeAtomProvider>
       </div>
@@ -179,16 +167,18 @@ function ElementLayer() {
     nodeSoul,
     removeForNode,
     setSelectedForNode,
-    slotsForNode,
+    childSlotsAtom,
     togglePickNode,
   } = useMolecule(NodeMolecule);
+
+  const slotMol = useMolecule(SlotMolecule);
   const atoms = useMolecule(LayersMolecule);
   const setSelected = useSetAtom(setSelectedForNode);
   const isAnElement = useAtomValue(isNodeAnElement);
   const isSelected = useAtomValue(isSelectedForNode);
   const isPicked = useAtomValue(isNodePicked);
   const [isHovered, setHovered] = useAtom(nodeHovered);
-  const nodeWithSlots = useAtomValue(slotsForNode);
+  const slots = useAtomValue(childSlotsAtom);
 
   const removeNode = useSetAtom(removeForNode);
   const duplicate = useSetAtom(duplicateForNode);
@@ -221,7 +211,6 @@ function ElementLayer() {
   );
   // const hasChildren = children?.length > 0;
 
-  const slots = nodeWithSlots ?? [];
   const hasSlots = slots?.length > 0;
   const style = {
     ...Layer,
@@ -236,9 +225,11 @@ function ElementLayer() {
           {name}
           {hasSlots && (
             <div>
-              {slots.map((s) => (
-                <SlotWidget s={s} key={s.name} />
-              ))}
+              {/* {slots.map((s) => (
+                <SlotScopeProvider slot={s} key={s}>
+                  <SlotWidget />
+                </SlotScopeProvider>
+              ))} */}
             </div>
           )}{' '}
         </div>
@@ -247,85 +238,56 @@ function ElementLayer() {
   );
 }
 
-function SlotWidget({ s }: { s: Slot }) {
-  const childNodes = useSlotChildNodes(s.name);
+// function SlotWidget() {
+//   const atoms = useMolecule(SlotMolecule);
+//   const childNodes = useAtomValue(atoms.childrenInSlot);
 
-  const slotWidget = s.editor;
-  const hasEditor = slotWidget === 'inline';
-  const isEmpty = (childNodes?.length ?? 0) <= 0;
+//   const slotDetails = useAtomValue(atoms.slotDetails);
+//   const slotWidget = slotDetails.editor;
+//   const hasEditor = slotWidget === 'inline';
+//   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
-  return (
-    <>
-      <div style={SlotContainer}>
-        <div style={SlotName}>
-          {s.title ?? s.name} ({childNodes.length})
-        </div>
-        {hasEditor && (
-          // Rich Text Editor<>
-          <RichTextEditorForAtom />
-        )}
-        {!hasEditor && (
-          // Block Editor
-          <>
-            {isEmpty && <AddNew idx={childNodes?.length ?? 0} slot={s.name} />}
-            {!isEmpty && (
-              <div style={SlotChildren}>
-                <PlopTarget idx={0} slot={s.name} />
-                <SlotContext.Provider value={s.name}>
-                  <ChildrenEditorForAtoms
-                    childAtoms={childNodes}
-                    Component={SlotChild}
-                  />
-                </SlotContext.Provider>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </>
-  );
-}
+//   return (
+//     <>
+//       <div style={SlotContainer}>
+//         <div style={SlotName}>
+//           {slotDetails.title ?? slotDetails.name} ({childNodes.length})
+//         </div>
+//         {hasEditor && (
+//           // Rich Text Editor<>
+//           <RichTextEditorForAtom />
+//         )}
+//         {!hasEditor && (
+//           // Block Editor
+//           <>
+//             {isEmpty && (
+//               <AddNew idx={childNodes?.length ?? 0} slot={slotDetails.name} />
+//             )}
+//             {!isEmpty && (
+//               <div style={SlotChildren}>
+//                 <PlopTarget idx={0} slot={slotDetails.name} />
+//                 <ChildrenEditorForAtoms
+//                   childAtoms={childNodes}
+//                   Component={SlotChild}
+//                 />
+//               </div>
+//             )}
+//           </>
+//         )}
+//       </div>
+//     </>
+//   );
+// }
 
-const SlotContext = React.createContext<string | undefined>(undefined);
-SlotContext.displayName = 'SlotContext';
-
-const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
-  const slotName = useContext(SlotContext)!;
-  return (
-    <>
-      <ElementLayer />
-      <PlopTarget idx={idx} slot={slotName} />
-    </>
-  );
-};
-
-// TODO: Move to a molecule?
-function useSlotChildNodes(slotName: string) {
-  const nodeAtom = useNodeAtom();
-  const slotChildrenAtom = useMemo(() => {
-    return splitAtom(
-      // Need to replace this to not replace souls
-      focusAtom(nodeAtom, (o) =>
-        optic_<RaisinNodeWithChildren>()
-          .prop('children')
-          .filter((c) => isInSlot(c, slotName))
-      )
-    );
-  }, [slotName, nodeAtom]);
-  const childNodes = useAtomValue(slotChildrenAtom);
-  return childNodes;
-}
-
-// TODO: Move this util functions
-function isInSlot(c: RaisinNode, slotName: string): boolean {
-  const slotNameForNode = isElementNode(c) ? c.attribs.slot : undefined;
-  if (!slotName && !slotNameForNode) {
-    // Default slot (might not have a slot attributes)
-    // Have to hanlde undefined.
-    return true;
-  }
-  return slotName === slotNameForNode;
-}
+// const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
+//   const atoms = useMolecule(SlotMolecule);
+//   return (
+//     <>
+//       <ElementLayer />
+//       <PlopTarget idx={idx} slot={atoms.slotName} />
+//     </>
+//   );
+// };
 
 function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);

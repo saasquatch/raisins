@@ -1,4 +1,4 @@
-import { getPath, RaisinElementNode, RaisinNode } from '@raisins/core';
+import { getPath, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
@@ -11,6 +11,7 @@ import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { atomForAttributes } from './atoms/atomForAttributes';
+import { atomForChildren } from './atoms/atomForChildren';
 import { atomForTagName } from './atoms/atomForTagName';
 import { NodeAtomMolecule } from './NodeScope';
 
@@ -121,7 +122,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
 
   const childSlotsAtom = atom((get) => {
     // FIXME: This is updated too frequently, causing a new referentially unequal array and a rerender
-    const children = [] as RaisinNode[]; //get(atomForChildren(n));
+    const children = get(atomForChildren(n));
     const childSlots = children.map((child) => {
       const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
       return slotName;
@@ -180,6 +181,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   });
 
   return {
+    nodeAtom: n,
     isSelectedForNode,
     nodeSoul,
     nodeHovered,

@@ -3,7 +3,7 @@ import { CanvasController } from '../canvas/CanvasController';
 import { StyleEditorController } from '../stylesheets/StyleEditor';
 import { SelectedElementEditorController } from './SelectedElementEditorController';
 import { LayersController } from './Layers';
-import { PackageEditorController } from './PackageEditorView';
+import { PackageEditorController } from './PackageEditorController';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
 import { ToolbarController } from './Toolbar';
 
