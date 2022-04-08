@@ -39,27 +39,30 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     }, {});
   }
 
-  const resizeObserver = new ResizeObserver((entries) => {
-    document.body.dispatchEvent(
-      new CustomEvent(geometryEvent, {
-        bubbles: true,
-        detail: {
-          entries: entries.map((e) => {
-            const { target } = e;
-            const mappedEntry: GeometryEntry = {
-              contentRect: e.target.getBoundingClientRect(),
-              target: isElement(target)
-                ? {
-                    attributes: getAttributes(target),
-                  }
-                : undefined,
-            };
-            return mappedEntry;
-          }),
-        },
-      })
-    );
-  });
+  // @ts-ignore - fails only for build, not local dev
+  const resizeObserver = new window.ResizeObserver(
+    (entries: ResizeObserverEntry[]) => {
+      document.body.dispatchEvent(
+        new CustomEvent(geometryEvent, {
+          bubbles: true,
+          detail: {
+            entries: entries.map((e) => {
+              const { target } = e;
+              const mappedEntry: GeometryEntry = {
+                contentRect: e.target.getBoundingClientRect(),
+                target: isElement(target)
+                  ? {
+                      attributes: getAttributes(target),
+                    }
+                  : undefined,
+              };
+              return mappedEntry;
+            }),
+          },
+        })
+      );
+    }
+  );
 
   const resizeModule: Module = {
     create: function (empty, next) {
@@ -127,7 +130,10 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     });
 
     myConnection.promise.then(function (parent: ParentRPC) {
-      const ro = new ResizeObserver(function (entries) {
+      // @ts-ignore - fails only for build, not local dev
+      const ro = new window.ResizeObserver(function (
+        entries: ResizeObserverEntry[]
+      ) {
         parent.resizeHeight(entries[0].contentRect.height + '');
       });
       ro.observe(document.body);

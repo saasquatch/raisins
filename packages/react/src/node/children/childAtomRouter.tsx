@@ -1,10 +1,9 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom, useAtom } from 'jotai';
 import { splitAtom } from 'jotai/utils';
-import { atomForChildren } from '../atoms/atomForChildren';
 import { polymorphicAtom } from '../../util/atoms/polymorphicAtom';
-import { RaisinScope } from '../../core/RaisinScope';
 import { isElementNode, isRoot } from '../../util/isNode';
+import { atomForChildren } from '../atoms/atomForChildren';
 
 /**
  * Returns a child atom when children exist. Prevents exceptions by returning undefined when not.
@@ -26,7 +25,7 @@ export function useChildAtoms(nodeAtom: PrimitiveAtom<RaisinNode>) {
     childAtoms,
     // TODO: At some point, figure out how to provide `removeChild` down the tree.
     removeChild,
-  ] = useAtom(childrenOrUndefined, RaisinScope) ?? [undefined, undefined];
+  ] = useAtom(childrenOrUndefined) ?? [undefined, undefined];
 
   return {
     childAtoms: childAtoms ?? [],

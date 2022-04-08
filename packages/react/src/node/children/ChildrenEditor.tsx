@@ -1,7 +1,7 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom } from 'jotai';
 import React from 'react';
-import { NodeAtomProvider, useNodeAtom } from '../node-context';
+import { NodeAtomProvider, useNodeAtom } from '../NodeScope';
 import { useChildAtoms } from './childAtomRouter';
 
 /**

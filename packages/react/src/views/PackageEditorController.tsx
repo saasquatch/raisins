@@ -1,14 +1,7 @@
+import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { RaisinScope } from '../core/RaisinScope';
-import {
-  AddModuleAtom,
-  ModuleDetailsAtom,
-  ModulesAtom,
-  ModulesLoadingAtom,
-  RemoveModuleAtom,
-  RemoveModuleByNameAtom,
-} from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { Module, ModuleDetails } from '../component-metamodel/ModuleManagement';
 
 export const PACKAGES = [
@@ -45,13 +38,21 @@ const setOfThings: Module[] = [
 ];
 
 function usePackageEditor(): ModuleManagement {
+  const {
+    AddModuleAtom,
+    ModuleDetailsAtom,
+    ModulesAtom,
+    ModulesLoadingAtom,
+    RemoveModuleAtom,
+    RemoveModuleByNameAtom,
+  } = useMolecule(ComponentModelMolecule);
   return {
-    loadingModules: useAtomValue(ModulesLoadingAtom, RaisinScope),
-    modules: useAtomValue(ModulesAtom, RaisinScope),
-    moduleDetails: useAtomValue(ModuleDetailsAtom, RaisinScope),
-    addModule: useUpdateAtom(AddModuleAtom, RaisinScope),
-    removeModule: useUpdateAtom(RemoveModuleAtom, RaisinScope),
-    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom, RaisinScope),
+    loadingModules: useAtomValue(ModulesLoadingAtom),
+    modules: useAtomValue(ModulesAtom),
+    moduleDetails: useAtomValue(ModuleDetailsAtom),
+    addModule: useUpdateAtom(AddModuleAtom),
+    removeModule: useUpdateAtom(RemoveModuleAtom),
+    removeModuleByName: useUpdateAtom(RemoveModuleByNameAtom),
   };
 }
 

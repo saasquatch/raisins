@@ -1,12 +1,12 @@
 import { RaisinDocumentNode } from '@raisins/core';
 import { Atom, atom, PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
+import { useMolecule } from 'jotai-molecules';
 import { DOMParser, Node } from 'prosemirror-model';
 import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
 import { EditorView } from 'prosemirror-view';
 import { useMemo } from 'react';
 import connectedAtom from '../../util/atoms/connectedAtom';
-import { RaisinScope } from '../../core/RaisinScope';
-import { HistoryKeyMapPluginAtom } from '../HistoryKeyMapPluginAtom';
+import { HistoryKeyMapPluginMolecule } from '../HistoryKeyMapPluginAtom';
 import { NewLinePlugin } from './NewLineBreak';
 import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
 import { inlineSchema as schema } from './ProseSchemas';
@@ -38,13 +38,14 @@ export function useProseEditorOnAtom(
   node: PrimitiveAtom<RaisinDocumentNode>,
   selection: PrimitiveAtom<ProseTextSelection | undefined>
 ) {
+  const atoms = useMolecule(HistoryKeyMapPluginMolecule);
   // Memoize derived parsed doc
-  const elementRef = useMemo(() => createAtoms(node, selection), [
-    node,
-    selection,
-  ]);
+  const elementRef = useMemo(
+    () => createAtoms(node, selection, atoms.PluginsAtom),
+    [node, selection]
+  );
 
-  const [, mountRef] = useAtom(elementRef, RaisinScope);
+  const [, mountRef] = useAtom(elementRef);
 
   return {
     mountRef,
@@ -54,15 +55,16 @@ export function useProseEditorOnAtom(
 // TODO: pluginAtom as a prop, allow plugins to be hot-swapped
 function createAtoms(
   node: PrimitiveAtom<RaisinDocumentNode>,
-  selection: PrimitiveAtom<ProseTextSelection | undefined>
+  selection: PrimitiveAtom<ProseTextSelection | undefined>,
+  plugins: Atom<Plugin[]>
 ) {
   const proseDocAtom = atom((get) => raisinToProseDoc(get(node)));
 
   // Build editor state
 
   const editorStateAtom = atom<EditorState | null>((get) => {
-    const historyPlugin = get(HistoryKeyMapPluginAtom);
-    if (!historyPlugin) return null;
+    const pluginsArray = get(plugins);
+    if (!pluginsArray) return null;
     const sState: SerialState = {
       doc: get(proseDocAtom),
       selection: get(selection),
@@ -71,7 +73,7 @@ function createAtoms(
       //
       NewLinePlugin(),
       //
-      historyPlugin,
+      ...pluginsArray,
     ]);
   });
 
@@ -85,7 +87,7 @@ function createAtoms(
       // FIXME: Re-bundle this state. Since node and selection are independently updated,
       // their derived state can become inconsistent.
       // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
-      
+
       // NOTE: This currently works ONLY if selection is updated BEFORE document.
       // Otherwise deleting from the end of the text will throw an error
       if (nextState.state.selection !== currentState.selection) {
@@ -137,8 +139,6 @@ function createAtoms(
     (_, set, next: SetStateAction<HTMLElement | null>) => set(elementRef, next)
   );
 }
-
-
 
 function hydratedState(
   sState: SerialState,

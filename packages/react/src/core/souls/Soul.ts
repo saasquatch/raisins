@@ -1,5 +1,7 @@
 import { htmlUtil, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
+import { molecule } from 'jotai-molecules';
+import { CoreMolecule } from '../CoreAtoms';
 const { visit } = htmlUtil;
 
 export type Soul = { id: string };
@@ -28,35 +30,62 @@ export function generateSoulTree(
   });
 }
 
-export const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => {
-  return new WeakMap();
-});
+export const SoulsMolecule = molecule((getMol) => {
+  getMol(CoreMolecule);
 
-/**
- * Get (or create) a soul
- */
-export const GetSoulAtom = atom<(node: RaisinNode) => Soul>((get) => {
-  const souls = get(SoulsAtom);
+  const SoulsAtom = atom<WeakMap<RaisinNode, Soul>>(() => {
+    return new WeakMap();
+  });
 
-  return (n: RaisinNode) => {
-    let soul = souls.get(n);
-    if (soul) return soul;
-    soul = createSoul();
-    souls.set(n, soul);
-    return soul;
+  /**
+   * Get (or create) a soul
+   */
+  const GetSoulAtom = atom<(node: RaisinNode) => Soul>((get) => {
+    const souls = get(SoulsAtom);
+
+    return (n: RaisinNode) => {
+      let soul = souls.get(n);
+      if (soul) return soul;
+      soul = createSoul();
+      souls.set(n, soul);
+      return soul;
+    };
+  });
+
+  let soulNumber = 1;
+  function createSoul(): Soul {
+    return {
+      created: Date.now(),
+      id: 'soul-' + ++soulNumber,
+      toString() {
+        return this.id;
+      },
+    } as Soul;
+  }
+
+  /**
+   * A `onReplace` function atom that will
+   * save the previous node's soul as the replacement
+   * node's soul
+   */
+  const SoulSaverAtom = atom((get) => {
+    const getSoul = get(GetSoulAtom);
+    const souls = get(SoulsAtom);
+    return (prev: RaisinNode, next: RaisinNode) => {
+      const prevSoul = getSoul(prev);
+      souls.set(next, prevSoul);
+      // const nextSoul = souls.get(next);
+      return next;
+    };
+  });
+
+  return {
+    SoulsAtom,
+    GetSoulAtom,
+    SoulSaverAtom,
   };
 });
 
-let soulNumber = 1;
-export function createSoul(): Soul {
-  return {
-    created: Date.now(),
-    id: 'soul-' + ++soulNumber,
-    toString() {
-      return this.id;
-    },
-  } as Soul;
-}
 export function soulToString(soul: Soul): string {
   return soul.toString();
 }

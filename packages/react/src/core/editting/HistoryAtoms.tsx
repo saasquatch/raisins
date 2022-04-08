@@ -1,57 +1,72 @@
 import { atom } from 'jotai';
-import { InternalStateAtom } from '../CoreAtoms';
+import { molecule } from 'jotai-molecules';
+import { CoreMolecule } from '../CoreAtoms';
 
 /**
- * Returns the sizes of the undo/redo stacks for the UI
+ * A set of atoms for dealing with undo/redo history
+ *
  */
-export const HistorySizeAtom = atom((get) => {
-  const intState = get(InternalStateAtom);
+export const HistoryMolecule = molecule((getMol) => {
+  const { InternalStateAtom } = getMol(CoreMolecule);
+
+  /**
+   * Returns the sizes of the undo/redo stacks for the UI
+   */
+  const HistorySizeAtom = atom((get) => {
+    const intState = get(InternalStateAtom);
+    return {
+      undoSize: intState.undoStack.length,
+      redoSize: intState.redoStack.length,
+    };
+  });
+  HistorySizeAtom.debugLabel = 'HistorySizeAtom';
+
+  const UndoAtom = atom(null, (_, set) => {
+    set(InternalStateAtom, (previous) => {
+      if (!previous.undoStack.length) {
+        return previous;
+      }
+      const [current, ...undoStack] = previous.undoStack;
+      const redoStack = [previous.current, ...previous.redoStack];
+
+      const nextCurrent = current;
+      const newState = {
+        ...previous,
+        current: nextCurrent,
+        undoStack,
+        redoStack,
+        selected: previous.selected,
+      };
+      return newState;
+    });
+  });
+  UndoAtom.debugLabel = 'UndoAtom';
+
+  const RedoAtom = atom(null, (_, set) => {
+    set(InternalStateAtom, (previous) => {
+      if (!previous.redoStack.length) {
+        return previous;
+      }
+      const [current, ...redoStack] = previous.redoStack;
+      const undoStack = [previous.current, ...previous.undoStack];
+
+      const nextCurrent = current;
+      const newState = {
+        ...previous,
+        current: nextCurrent,
+        immutableCopy: current,
+        undoStack,
+        redoStack,
+        selected: previous.selected,
+      };
+      return newState;
+    });
+  });
+  RedoAtom.debugLabel = 'RedoAtom';
+
   return {
-    undoSize: intState.undoStack.length,
-    redoSize: intState.redoStack.length,
+    HistorySizeAtom,
+    UndoAtom,
+    RedoAtom,
   };
 });
-HistorySizeAtom.debugLabel = 'HistorySizeAtom';
-
-export const UndoAtom = atom(null, (_, set) => {
-  set(InternalStateAtom, (previous) => {
-    if (!previous.undoStack.length) {
-      return previous;
-    }
-    const [current, ...undoStack] = previous.undoStack;
-    const redoStack = [previous.current, ...previous.redoStack];
-
-    const nextCurrent = current;
-    const newState = {
-      ...previous,
-      current: nextCurrent,
-      undoStack,
-      redoStack,
-      selected: previous.selected,
-    };
-    return newState;
-  });
-});
-UndoAtom.debugLabel = 'UndoAtom';
-
-export const RedoAtom = atom(null, (_, set) => {
-  set(InternalStateAtom, (previous) => {
-    if (!previous.redoStack.length) {
-      return previous;
-    }
-    const [current, ...redoStack] = previous.redoStack;
-    const undoStack = [previous.current, ...previous.undoStack];
-
-    const nextCurrent = current;
-    const newState = {
-      ...previous,
-      current: nextCurrent,
-      immutableCopy: current,
-      undoStack,
-      redoStack,
-      selected: previous.selected,
-    };
-    return newState;
-  });
-});
-RedoAtom.debugLabel = 'RedoAtom';

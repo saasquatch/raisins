@@ -1,20 +1,29 @@
 import { useAtom } from 'jotai';
+import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties } from 'react';
-import { RaisinScope } from '../core/RaisinScope';
-import { HoveredBreadcrumbsAtom } from '../core/selection/HoveredNode';
-import { ModeAtom, OutlineAtom, SizeAtom, sizes } from '../canvas/useCanvas';
-import { HistorySizeAtom, RedoAtom, UndoAtom } from '../core/editting/HistoryAtoms';
+import { CanvasStyleMolecule, sizes } from '../canvas/CanvasStyleMolecule';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
+
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasStyleMolecule),
+  };
+});
 
 export function ToolbarController() {
-  const historySize = useAtom(HistorySizeAtom, RaisinScope)[0];
-  const undo = useUpdateAtom(UndoAtom, RaisinScope);
-  const redo = useUpdateAtom(RedoAtom, RaisinScope);
-  const [mode, setMode] = useAtom(ModeAtom, RaisinScope);
-  const [size, setSize] = useAtom(SizeAtom, RaisinScope);
-  const [outlined, setOutlined] = useAtom(OutlineAtom, RaisinScope);
+  const atoms = useMolecule(ToolbarMolecule);
+  const historySize = useAtom(atoms.HistorySizeAtom)[0];
+  const undo = useUpdateAtom(atoms.UndoAtom);
+  const redo = useUpdateAtom(atoms.RedoAtom);
+  const [mode, setMode] = useAtom(atoms.ModeAtom);
+  const [size, setSize] = useAtom(atoms.SizeAtom);
+  const [outlined, setOutlined] = useAtom(atoms.OutlineAtom);
 
-  const hovered = useAtomValue(HoveredBreadcrumbsAtom, RaisinScope);
+  const hovered = useAtomValue(atoms.HoveredBreadcrumbsAtom);
 
   return (
     <div>
@@ -31,9 +40,6 @@ export function ToolbarController() {
       </button>
       <button disabled={mode === 'preview'} onClick={() => setMode('preview')}>
         Preview
-      </button>
-      <button disabled={mode === 'html'} onClick={() => setMode('html')}>
-        HTML
       </button>
       <button
         disabled

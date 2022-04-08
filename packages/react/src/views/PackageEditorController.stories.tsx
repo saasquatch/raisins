@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import React from 'react';
-import { PackageEditorController } from '../src/views/PackageEditorView';
+import { PackageEditorController } from './PackageEditorController';
 
 const meta: Meta = {
   title: 'Metamodel',
