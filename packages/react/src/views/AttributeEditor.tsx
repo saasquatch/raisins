@@ -7,7 +7,7 @@ import { NodeMolecule } from '../node/NodeMolecule';
 export function AttributesEditor() {
   const { attributesForNode, componentMetaForNode } = useMolecule(NodeMolecule);
   const [attributes, setAttributes] = useAtom(attributesForNode);
-  const attributeSchema = useAtomValue(componentMetaForNode).attributes;
+  const attributeSchema = useAtomValue(componentMetaForNode)?.attributes;
   const attribs = attributes ?? {};
 
   const onchange = (key: string) => {

@@ -7,12 +7,13 @@ import {
   useMolecule,
 } from 'jotai-molecules';
 import React, { useMemo } from 'react';
-import { CanvasController } from '../src/canvas/CanvasController';
-import { RaisinProps } from '../src/core/CoreAtoms';
-import { RaisinsProvider } from '../src/core/RaisinsProvider';
-import { useHotkeys } from '../src/core/useHotkeys';
-import { EditorView } from '../src/views/EditorView';
-import { RegisteredAtoms } from './DevTools';
+import { CanvasController } from '../canvas/CanvasController';
+import { RaisinProps } from '../core/CoreAtoms';
+import { RaisinsProvider } from '../core/RaisinsProvider';
+import { useHotkeys } from '../core/useHotkeys';
+import { Module } from '../util/NPMRegistry';
+import { EditorView } from './EditorView';
+import { LayersController } from './Layers';
 
 const meta: Meta = {
   title: 'Editor',
@@ -22,7 +23,7 @@ export default meta;
 
 const StoryScope = createScope({
   startingHtml: '<span>I am a span</span>',
-  startingPackages: [],
+  startingPackages: [] as Module[],
 });
 
 const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
@@ -34,13 +35,13 @@ const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
   };
 });
 
-export function Span({
+export function BasicStory({
   startingHtml = '<span>I am a span</span>',
-  startingPackages = [],
+  startingPackages = [] as Module[],
   children = (
     <>
       <Editor />
-      <RegisteredAtoms />
+      {/* <RegisteredAtoms /> */}
     </>
   ),
 }) {
@@ -59,10 +60,12 @@ export function Span({
 export function ExternalHTMLControl() {
   const state = useMemo(
     () =>
-      molecule<Partial<RaisinProps>>(() => {
+      molecule(() => {
         return {
-          HTMLAtom: atom('<span>I am a span</span>'),
-          PackagesAtom: atom([]),
+          HTMLAtom: atom(
+            '<div><my-thing><span slot="default">I am a span</span></my-thing></div>'
+          ),
+          PackagesAtom: atom([] as Module[]),
           uiWidgetsAtom: atom({}),
         };
       }),
@@ -78,28 +81,60 @@ export function ExternalHTMLControl() {
       />
       <RaisinsProvider molecule={state}>
         <Editor />
-        <RegisteredAtoms />
+        {/* <RegisteredAtoms /> */}
       </RaisinsProvider>
     </>
   );
 }
 
 export const Mint = () => (
-  <Span startingHtml={mintMono} startingPackages={MintComponents} />
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents} />
 );
-export const Big = () => <Span startingHtml={big} />;
+export const Big = () => <BasicStory startingHtml={big} />;
 
-export const CanvasOnly = () => (
-  <Span startingHtml={big}>
+export const BigCanvasOnly = () => (
+  <BasicStory startingHtml={big}>
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%' }}>
         <CanvasController />
       </div>
       {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
-  </Span>
+  </BasicStory>
 );
-
+export const BigLayersOnly = () => (
+  <BasicStory startingHtml={big}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+export const MintLayersOnly = () => (
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+export const MintCanvasOnly = () => (
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <CanvasController />
+      </div>
+      <div style={{ width: '50%' }}>
+        <CanvasController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
 // export function LayersOnly() {
 //   const htmlAtom = useMemo(() => atom(big), []);
 //   return (

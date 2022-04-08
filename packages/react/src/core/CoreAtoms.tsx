@@ -53,6 +53,8 @@ export type RaisinPropsMolecule = Molecule<Partial<RaisinProps>>;
 export const PropsScope = createScope<RaisinPropsMolecule | undefined>(
   undefined
 );
+// @ts-ignore
+PropsScope.displayName = 'PropsScope';
 
 export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
   /**

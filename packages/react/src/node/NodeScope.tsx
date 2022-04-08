@@ -15,6 +15,8 @@ import { createMemoizeAtom } from '../util/weakCache';
 export const NodeScope = createScope<PrimitiveAtom<RaisinNode> | undefined>(
   undefined
 );
+//@ts-ignore
+NodeScope['displayName'] = 'NodeScope';
 
 /**
  * Uses atom for the "current node"

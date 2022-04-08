@@ -167,18 +167,17 @@ function ElementLayer() {
     nodeSoul,
     removeForNode,
     setSelectedForNode,
-    childSlotsAtom,
+    allSlotsForNode,
     togglePickNode,
   } = useMolecule(NodeMolecule);
 
-  const slotMol = useMolecule(SlotMolecule);
   const atoms = useMolecule(LayersMolecule);
   const setSelected = useSetAtom(setSelectedForNode);
   const isAnElement = useAtomValue(isNodeAnElement);
   const isSelected = useAtomValue(isSelectedForNode);
   const isPicked = useAtomValue(isNodePicked);
   const [isHovered, setHovered] = useAtom(nodeHovered);
-  const slots = useAtomValue(childSlotsAtom);
+  const slots = useAtomValue(allSlotsForNode);
 
   const removeNode = useSetAtom(removeForNode);
   const duplicate = useSetAtom(duplicateForNode);
@@ -225,69 +224,70 @@ function ElementLayer() {
           {name}
           {hasSlots && (
             <div>
-              {/* {slots.map((s) => (
+              {slots.map((s) => (
                 <SlotScopeProvider slot={s} key={s}>
                   <SlotWidget />
                 </SlotScopeProvider>
-              ))} */}
+              ))}
             </div>
-          )}{' '}
+          )}
         </div>
       )}
     </div>
   );
 }
 
-// function SlotWidget() {
-//   const atoms = useMolecule(SlotMolecule);
-//   const childNodes = useAtomValue(atoms.childrenInSlot);
+function SlotWidget() {
+  const atoms = useMolecule(SlotMolecule);
+  const childNodes = useAtomValue(atoms.childrenInSlot);
 
-//   const slotDetails = useAtomValue(atoms.slotDetails);
-//   const slotWidget = slotDetails.editor;
-//   const hasEditor = slotWidget === 'inline';
-//   const isEmpty = (childNodes?.length ?? 0) <= 0;
+  const slotDetails = useAtomValue(atoms.slotDetails);
+  const slotWidget = slotDetails.editor;
+  const hasEditor = slotWidget === 'inline';
+  const isEmpty = (childNodes?.length ?? 0) <= 0;
 
-//   return (
-//     <>
-//       <div style={SlotContainer}>
-//         <div style={SlotName}>
-//           {slotDetails.title ?? slotDetails.name} ({childNodes.length})
-//         </div>
-//         {hasEditor && (
-//           // Rich Text Editor<>
-//           <RichTextEditorForAtom />
-//         )}
-//         {!hasEditor && (
-//           // Block Editor
-//           <>
-//             {isEmpty && (
-//               <AddNew idx={childNodes?.length ?? 0} slot={slotDetails.name} />
-//             )}
-//             {!isEmpty && (
-//               <div style={SlotChildren}>
-//                 <PlopTarget idx={0} slot={slotDetails.name} />
-//                 <ChildrenEditorForAtoms
-//                   childAtoms={childNodes}
-//                   Component={SlotChild}
-//                 />
-//               </div>
-//             )}
-//           </>
-//         )}
-//       </div>
-//     </>
-//   );
-// }
+  return (
+    <>
+      <div style={SlotContainer}>
+        <div style={SlotName}>
+          {slotDetails.title ?? slotDetails.name} ({childNodes.length})
+        </div>
+        {hasEditor && (
+          // Rich Text Editor<>
+          <RichTextEditorForAtom />
+        )}
+        {!hasEditor && (
+          // Block Editor
+          <>
+            {isEmpty && (
+              <AddNew idx={childNodes?.length ?? 0} slot={slotDetails.name} />
+            )}
+            {!isEmpty && (
+              <div style={SlotChildren}>
+                <PlopTarget idx={0} slot={slotDetails.name} />
+                {childNodes.length} children in this slot ({slotDetails.name})
+                <ChildrenEditorForAtoms
+                  childAtoms={childNodes}
+                  Component={SlotChild}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
 
-// const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
-//   const atoms = useMolecule(SlotMolecule);
-//   return (
-//     <>
-//       <ElementLayer />
-//       <PlopTarget idx={idx} slot={atoms.slotName} />
-//     </>
-//   );
-// };
+const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
+  const atoms = useMolecule(SlotMolecule);
+  return (
+    <>
+      <ElementLayer />
+      <PlopTarget idx={idx} slot={atoms.slotName} />
+    </>
+  );
+};
 
 function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);

@@ -11,6 +11,8 @@ import { NodeMolecule } from '../NodeMolecule';
 import { isInSlot } from './isInSlot';
 
 export const SlotScope = createScope<string | undefined>(undefined);
+//@ts-ignore
+SlotScope['displayName'] = 'SlotScope';
 
 export const SlotScopeProvider: React.FC<{
   slot?: string;

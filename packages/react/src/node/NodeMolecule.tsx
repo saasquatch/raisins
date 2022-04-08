@@ -114,15 +114,18 @@ export const NodeMolecule = molecule((getMol, getScope) => {
    */
   const componentMetaForNode = atom((get) => {
     const comp = get(ComponentModelAtom);
-    const node = get(n);
-    return comp.getComponentMeta((node as RaisinElementNode).tagName);
+    const tagName = get(tagNameAtom);
+    if (!tagName) return undefined;
+    return comp.getComponentMeta(tagName);
   });
 
   const tagNameAtom = atomForTagName(n);
 
   const childSlotsAtom = atom((get) => {
     // FIXME: This is updated too frequently, causing a new referentially unequal array and a rerender
+    // return focusAtom(n, (o) => optic_().path('children.attribs.slot'));
     const children = get(atomForChildren(n));
+
     const childSlots = children.map((child) => {
       const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
       return slotName;
@@ -130,24 +133,26 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     return childSlots;
   });
 
-  /**
-   * Gets slots for the node in context
-   */
-  const slotsForNode = atom((get) => {
-    const comp = get(ComponentModelAtom);
-    const tagName = get(tagNameAtom);
-    // Root has just one slot
-    if (!tagName) return [] as Slot[];
-    const meta = comp.getComponentMeta(tagName);
-
+  const allSlotsForNode = atom((get) => {
+    const meta = get(componentMetaForNode);
     const childSlots = get(childSlotsAtom);
 
     const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
 
     const allSlots = [...definedSlots, ...childSlots];
-    const dedupedSet = new Set(allSlots);
-    const allSlotsWithMeta = [...dedupedSet.keys()].sort().map((k) => {
-      const slot: Slot = meta.slots?.find((s) => s.name === k) ?? { name: k };
+    const dedupedSet = new Set<string>(allSlots);
+
+    return [...dedupedSet.keys()].sort();
+  });
+
+  /**
+   * Gets slots for the node in context
+   */
+  const slotsForNode = atom((get) => {
+    const meta = get(componentMetaForNode);
+    const allSlots = get(allSlotsForNode);
+    const allSlotsWithMeta = allSlots.map((k) => {
+      const slot: Slot = meta?.slots?.find((s) => s.name === k) ?? { name: k };
       return slot;
     });
     // TODO: Filter slots so they don't show text nodes?
@@ -194,10 +199,12 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     attributesForNode,
     componentMetaForNode,
     tagNameAtom,
-    childSlotsAtom,
-    slotsForNode,
     removeForNode,
     duplicateForNode,
     nameForNode,
+    // Slots
+    allSlotsForNode,
+    childSlotsAtom,
+    slotsForNode,
   };
 });
