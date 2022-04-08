@@ -1,8 +1,8 @@
 import { ElementType } from "domelementtype";
-import { RaisinNode } from "../../../src/html-dom/RaisinNode";
-import parse from "../../../src/html-dom/parser";
 import expect from "expect";
-import serializer from "../../../src/html-dom/serializer";
+import parse from "./parser";
+import { RaisinNode } from "./RaisinNode";
+import serializer from "./serializer";
 
 describe("Parse simple nodes", () => {
   function parseElement(src: string, tagName: string, attribs: any = {}) {

@@ -1,10 +1,11 @@
+import expect from "expect";
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import jsonata from "jsonata";
-import { parse } from "./parser";
+import parse from "./parser";
 import { RaisinDocumentNode, RaisinElementNode } from "./RaisinNode";
 import selector from "./selector";
 
-const feature = loadFeature("cypress/integration/Specs/selector.feature");
+const feature = loadFeature("./selector.feature", { loadRelativePath: true });
 
 export const selectorSteps: StepDefinitions = ({ given, when, then }) => {
   let source: string;

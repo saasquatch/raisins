@@ -1,4 +1,5 @@
 import { CustomElement } from "@raisins/schema/schema";
+import expect from "expect";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -10,7 +11,7 @@ import {
 import { doesChildAllowParent } from "./doesChildAllowParent";
 
 describe("doesChildAllowParent", () => {
-  test("Child allows root element as parent", () => {
+  it("Child allows root element as parent", () => {
     const childMeta: CustomElement = {
       tagName: ""
     };
@@ -22,7 +23,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, root)).toBe(true);
   });
 
-  test("Child allows all non elements as parents", () => {
+  it("Child allows all non elements as parents", () => {
     const childMeta: CustomElement = {
       tagName: ""
     };
@@ -51,7 +52,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, instruction)).toBe(true);
   });
 
-  test("Child without constraint allows parents", () => {
+  it("Child without constraint allows parents", () => {
     const childMeta: CustomElement = {
       tagName: "",
       validParents: undefined
@@ -66,7 +67,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, element)).toBe(true);
   });
 
-  test("Child with * constraint allows parents", () => {
+  it("Child with * constraint allows parents", () => {
     const childMeta: CustomElement = {
       tagName: "",
       validParents: ["*"]
@@ -81,7 +82,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, element)).toBe(true);
   });
 
-  test("Child element with constraints allows parent with matching tagname", () => {
+  it("Child element with constraints allows parent with matching tagname", () => {
     const childMeta: CustomElement = {
       tagName: "",
       validParents: ["div"]
@@ -96,7 +97,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, element)).toBe(true);
   });
 
-  test("Child with constraints does not allow parent without matching tagname", () => {
+  it("Child with constraints does not allow parent without matching tagname", () => {
     const childMeta: CustomElement = {
       tagName: "",
       validParents: ["div"]
@@ -111,7 +112,7 @@ describe("doesChildAllowParent", () => {
     expect(doesChildAllowParent(childMeta, element)).toBe(false);
   });
 
-  test("Child with constraint does not allow parent without tagname", () => {
+  it("Child with constraint does not allow parent without tagname", () => {
     const childMeta: CustomElement = {
       tagName: "",
       validParents: ["div"]

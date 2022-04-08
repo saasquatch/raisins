@@ -1,13 +1,13 @@
 import { CustomElement } from "@raisins/schema/schema";
+import expect from "expect";
 import {
   RaisinCommentNode,
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "../../../src/html-dom/RaisinNode";
-import { doesParentAllowChild } from "../../../src/validation/rules/doesParentAllowChild";
-import expect from "expect";
+} from "../../html-dom/RaisinNode";
+import { doesParentAllowChild } from "./doesParentAllowChild";
 
 describe("doesParentAllowChild", () => {
   it("Parent without slots does not allow child", () => {

@@ -1,9 +1,10 @@
 import { CustomElement } from "@raisins/schema/schema";
+import expect from "expect";
 import { RaisinElementNode } from "../../html-dom/RaisinNode";
 import { isNodeAllowed } from "./isNodeAllowed";
 
 describe("isNodeAllowed", () => {
-  test("Node is allowed", () => {
+  it("Node is allowed", () => {
     const child: RaisinElementNode = {
       type: "tag",
       tagName: "div",
@@ -32,7 +33,7 @@ describe("isNodeAllowed", () => {
       true
     );
   });
-  test("Node is not allowed", () => {
+  it("Node is not allowed", () => {
     const child: RaisinElementNode = {
       type: "tag",
       tagName: "div",

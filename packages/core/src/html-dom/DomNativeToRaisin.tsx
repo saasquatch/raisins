@@ -1,6 +1,6 @@
-import cssParser from "../../css-om/parser";
+import cssParser from "../css-om/parser";
 import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType";
-import { RaisinDocumentNode, RaisinNode } from "../RaisinNode";
+import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
 
 /**
  * Parses a DOM (Document or Document Fragment) into a Raisin object

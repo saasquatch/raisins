@@ -1,11 +1,12 @@
 import { CustomElement, Slot } from "@raisins/schema/schema";
+import expect from "expect";
 import { RaisinDocumentNode, RaisinNode } from "../index";
 import { ComponentMetaProvider, getSlots } from "./getSlots";
 import * as HTMLComponents from "./HTMLComponents";
 import { DefaultSlot, DefaultSlotMeta, NamedSlot } from "./SlotModel";
 
 describe("Slot Model", () => {
-  test("Default slot types use slot interfaces", () => {
+  it("Default slot types use slot interfaces", () => {
     const slot: Slot = { name: "" };
     const namedSlot: NamedSlot = {
       slot: slot
@@ -17,7 +18,7 @@ describe("Slot Model", () => {
 });
 
 describe("Get Slots", () => {
-  test("No slots", () => {
+  it("No slots", () => {
     const node: RaisinNode = {
       type: "tag",
       tagName: "div",
@@ -32,7 +33,7 @@ describe("Get Slots", () => {
     expect(getSlots(node, getComponentMeta)).toBeTruthy();
   });
 
-  test("Multiple slots and multiple children", () => {
+  it("Multiple slots and multiple children", () => {
     const node: RaisinNode = {
       type: "tag",
       tagName: "div",
@@ -54,7 +55,7 @@ describe("Get Slots", () => {
     expect(getSlots(node, meta)).toBeTruthy();
   });
 
-  test("Root as slot", () => {
+  it("Root as slot", () => {
     const root: RaisinDocumentNode = {
       type: "root",
       children: []
@@ -70,7 +71,7 @@ describe("Get Slots", () => {
 });
 
 describe("HTML Components", () => {
-  test("Element types use custom element interfaces", () => {
+  it("Element types use custom element interfaces", () => {
     const CustomElement: CustomElement = {
       tagName: ""
     };

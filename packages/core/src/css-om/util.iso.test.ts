@@ -1,8 +1,8 @@
 import { CssNodePlain } from "css-tree";
-import { StateUpdater } from "../../../src/util/NewState";
-import { StyleNodeWithChildren } from "../../../src/css-om/Types";
-import { createChildUpdater, createUpdater } from "../../../src/css-om/util";
 import expect from "expect";
+import { StateUpdater } from "../util/NewState";
+import { StyleNodeWithChildren } from "./Types";
+import { createChildUpdater, createUpdater } from "./util";
 
 describe("createChildUpdater", () => {
   it("With function", () => {

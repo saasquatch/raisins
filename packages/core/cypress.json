@@ -1,1 +1,4 @@
-{}
+{
+  "integrationFolder": ".",
+  "testFiles": ["**/*.@(iso|web).test.@(ts|tsx|js|jsx)", "**/*.feature"]
+}

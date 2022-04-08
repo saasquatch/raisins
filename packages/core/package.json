@@ -47,7 +47,7 @@
     "@types/css-tree": "^1.0.5",
     "@types/cypress-cucumber-preprocessor": "^4.0.1",
     "@types/domelementtype": "^2.0.1",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.4.1",
     "@types/lodash.clonedeep": "^4.5.6",
     "@types/mz": "^2.7.4",
     "@types/parse5": "^6.0.3",
@@ -83,8 +83,8 @@
     "styled-components": "^5.3.1"
   },
   "jest": {
-    "testPathIgnorePatterns": [
-      "<rootDir>/cypress/"
+    "testMatch": [
+      "**/*.@(iso|node).test.@(ts|tsx|js|jsx)"
     ]
   },
   "cypress-cucumber-preprocessor": {

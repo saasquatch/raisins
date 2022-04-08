@@ -1,4 +1,4 @@
-import foreignNames from "./parser/foreignNames";
+import foreignNames from "./foreignNames";
 import { encodeXML } from "entities";
 import type {
   RaisinCommentNode,

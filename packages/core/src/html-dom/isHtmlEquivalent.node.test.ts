@@ -1,9 +1,10 @@
+import expect from "expect";
 import { autoBindSteps, loadFeature, StepDefinitions } from "jest-cucumber";
 import { isHtmlEquivalent } from "./isHtmlEquivalent";
 
-const feature = loadFeature(
-  "cypress/integration/Specs/isHtmlEquivalent.feature"
-);
+const feature = loadFeature("./isHtmlEquivalent.feature", {
+  loadRelativePath: true
+});
 
 export const htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
   var html_a: string;
@@ -23,9 +24,7 @@ export const htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
   });
 
   then(/^they will be equivalent$/, () => {
-    expect(
-      isHtmlEquivalent(html_a, html_b, { ignoreComments })
-    ).toBe(true);
+    expect(isHtmlEquivalent(html_a, html_b, { ignoreComments })).toBe(true);
   });
 
   then(/^they will not be equivalent$/, () => {
