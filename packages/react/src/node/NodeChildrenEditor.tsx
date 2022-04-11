@@ -1,13 +1,14 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom } from 'jotai';
 import React, { useContext } from 'react';
-import { NodeAtomProvider, useNodeAtom } from '../NodeScope';
-import {
-  useChildAtoms as useOriginal,
-  useChildAtomsForked,
-} from './childAtomRouter';
+import { useChildAtomsForked } from './children/childAtomRouter';
+import { NodeScopeProvider, useNodeAtom } from './NodeScope';
 
 const useChildAtoms = useChildAtomsForked;
+
+export type NodeChildrenEditorProps = {
+  Component: React.ComponentType<{ idx?: number }>;
+};
 /**
  * Provides a simple way of handling recursive controllers.
  *
@@ -17,7 +18,7 @@ const useChildAtoms = useChildAtomsForked;
  * @param props.Component - the inner component that will be rendered for each child
  * @returns
  */
-export function ChildrenEditor({ Component }: { Component: React.FC }) {
+export function NodeChildrenEditor({ Component }: NodeChildrenEditorProps) {
   const base = useNodeAtom();
   const childAtoms = useChildAtoms(base);
   return (
@@ -25,20 +26,24 @@ export function ChildrenEditor({ Component }: { Component: React.FC }) {
   );
 }
 
+type ChildComponentType = React.ComponentType<{
+  idx?: number;
+}>;
+
 export function ChildrenEditorForAtoms({
   Component,
   childAtoms,
 }: {
-  Component: React.FC<{ idx: number }>;
+  Component: ChildComponentType;
   childAtoms: PrimitiveAtom<RaisinNode>[];
 }) {
   return (
     <>
       {childAtoms.map((childAtom, idx: number) => {
         return (
-          <NodeAtomProvider nodeAtom={childAtom} key={`${childAtom}`}>
+          <NodeScopeProvider nodeAtom={childAtom} key={`${childAtom}`}>
             <Component idx={idx} />
-          </NodeAtomProvider>
+          </NodeScopeProvider>
         );
       })}
     </>

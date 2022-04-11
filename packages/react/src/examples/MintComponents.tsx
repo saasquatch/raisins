@@ -1,180 +1,22 @@
-import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
-import {
-  createScope,
-  molecule,
-  ScopeProvider,
-  useMolecule,
-} from 'jotai-molecules';
-import React, { useMemo } from 'react';
-import { CanvasController } from '../canvas/CanvasController';
-import { RaisinProps } from '../core/CoreAtoms';
-import { RaisinsProvider } from '../core/RaisinsProvider';
-import { useHotkeys } from '../core/useHotkeys';
-import { Module } from '../util/NPMRegistry';
-import { EditorView } from './EditorView';
-import { LayersController } from './Layers';
-
-const meta: Meta = {
-  title: 'Editor',
-  component: Editor,
-};
-export default meta;
-
-const StoryScope = createScope({
-  startingHtml: '<span>I am a span</span>',
-  startingPackages: [] as Module[],
-});
-
-const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
-  const storyScope = getScope(StoryScope);
-  return {
-    HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom(storyScope.startingPackages),
-    uiWidgetsAtom: atom({}),
-  };
-});
-
-export function BasicStory({
-  startingHtml = '<span>I am a span</span>',
-  startingPackages = [] as Module[],
-  children = (
-    <>
-      <Editor />
-      {/* <RegisteredAtoms /> */}
-    </>
-  ),
-}) {
-  return (
-    <>
-      <ScopeProvider
-        scope={StoryScope}
-        value={{ startingHtml, startingPackages }}
-      >
-        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
-      </ScopeProvider>{' '}
-    </>
-  );
-}
-
-export function ExternalHTMLControl() {
-  const state = useMemo(
-    () =>
-      molecule(() => {
-        return {
-          HTMLAtom: atom(
-            '<div><my-thing><span slot="default">I am a span</span></my-thing></div>'
-          ),
-          PackagesAtom: atom([] as Module[]),
-          uiWidgetsAtom: atom({}),
-        };
-      }),
-    []
-  );
-
-  const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom);
-  return (
-    <>
-      <textarea
-        value={html}
-        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-      />
-      <RaisinsProvider molecule={state}>
-        <Editor />
-        {/* <RegisteredAtoms /> */}
-      </RaisinsProvider>
-    </>
-  );
-}
-
-export const Mint = () => (
-  <BasicStory startingHtml={mintMono} startingPackages={MintComponents} />
-);
-export const Big = () => <BasicStory startingHtml={big} />;
-
-export const BigCanvasOnly = () => (
-  <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <CanvasController />
-      </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-    </div>
-  </BasicStory>
-);
-export const BigLayersOnly = () => (
-  <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <LayersController />
-      </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-    </div>
-  </BasicStory>
-);
-export const MintLayersOnly = () => (
-  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <LayersController />
-      </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-    </div>
-  </BasicStory>
-);
-export const MintCanvasOnly = () => (
-  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <CanvasController />
-      </div>
-      <div style={{ width: '50%' }}>
-        <CanvasController />
-      </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-    </div>
-  </BasicStory>
-);
-// export function LayersOnly() {
-//   const htmlAtom = useMemo(() => atom(big), []);
-//   return (
-//     <>
-//       <RaisinsProvider htmlAtom={htmlAtom}>
-//         <div style={{ display: 'flex' }}>
-//           <LayersController />
-//           {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-//         </div>
-//       </RaisinsProvider>
-//     </>
-//   );
-// }
-
-function Editor() {
-  useHotkeys();
-
-  return <EditorView />;
-}
-
-const MintComponents = [
+export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.css',
-    version: '1.5.0-116',
+    version: '1.5.0-116'
   },
   {
     name: '@saasquatch/bedrock-components',
     filePath: '/dist/bedrock-components/bedrock-components.js',
-    version: '1.3.1-7',
+    version: '1.3.1-7'
   },
 
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '1.5.0-116',
+    version: '1.5.0-116'
   },
 ];
-
-const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
+export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">
     <sqm-hero-image
@@ -445,8 +287,7 @@ const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 </sqm-portal-container>
 </sqm-brand>
 `;
-
-const big = `
+export const big = `
 <div style="--sl-color-primary-600: pink;">
 <my-component></my-component>
 <my-split>
@@ -503,10 +344,3 @@ I am a template
 }
 </style>
 `;
-
-Editor.args = {
-  /**
-   * Used for serving local packages
-   */
-  domain: 'https://localhost:5000',
-};

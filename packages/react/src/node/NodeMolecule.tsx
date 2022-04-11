@@ -13,9 +13,16 @@ import { isElementNode } from '../util/isNode';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForChildren } from './atoms/atomForChildren';
 import { atomForTagName } from './atoms/atomForTagName';
-import { NodeAtomMolecule } from './NodeScope';
+import { NodeScopeMolecule } from './NodeScope';
 
+/**
+ *  Scoped based on the {@link NodeScopeMolecule}, defaulting to the root molecule.
+ *
+ * Returns useful atoms for querying or modifying a node
+ */
 export const NodeMolecule = molecule((getMol, getScope) => {
+  const n = getMol(NodeScopeMolecule);
+
   const { PickedAtom, PickedNodeAtom, DropPloppedNodeInSlotAtom } = getMol(
     PickedNodeMolecule
   );
@@ -27,7 +34,6 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   );
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
-  const n = getMol(NodeAtomMolecule);
 
   /**
    * Is the node in context currently selected?

@@ -12,12 +12,13 @@ import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { loadable } from 'jotai/utils';
-import { CoreMolecule, PropsMolecule } from '../core/CoreAtoms';
+import { PropsMolecule } from '../core';
+import { CoreMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { Module } from './ModuleManagement';
+import { Module } from './types';
 
 export const ComponentModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
@@ -212,12 +213,8 @@ export const ComponentModelMolecule = molecule((getMol) => {
     AddModuleAtom,
     RemoveModuleAtom,
     RemoveModuleByNameAtom,
-    SetModulesAtom: PackagesAtom,
     ComponentMetaAtom,
     ValidChildrenAtom,
-    /**
-     * @inheritdoc
-     */
     ComponentModelAtom,
   };
 });
@@ -230,7 +227,7 @@ export type Block = {
   content: RaisinElementNode;
 };
 
-export type ComponentDetails = {
+export type ComponentModel = {
   getComponentMeta: ComponentMetaProvider;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
@@ -243,5 +240,3 @@ export type ComponentDetails = {
 };
 
 export type ComponentMetaProvider = (tagName: string) => CustomElement;
-
-export type ComponentModel = ComponentDetails;

@@ -1,20 +1,31 @@
 import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
+import { Meta } from '@storybook/react';
 import { atom, useAtom, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue } from 'jotai/utils';
 import React, { CSSProperties, FC, useCallback, useState } from 'react';
-import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { EditMolecule } from '../core/editting/EditAtoms';
-import { PickedNodeMolecule } from '../core/selection/PickedNode';
+import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
+import { CoreMolecule } from '../../core/CoreAtoms';
+import { EditMolecule } from '../../core/editting/EditAtoms';
+import { PickedNodeMolecule } from '../../core/selection/PickedNode';
+import { NodeRichTextController } from '../../rich-text/RichTextEditor';
+import { BasicStory } from '../../index.stories';
+import { big, MintComponents, mintMono } from '../../examples/MintComponents';
 import {
-  ChildrenEditor,
   ChildrenEditorForAtoms,
-} from '../node/children/ChildrenEditor';
-import { NodeMolecule } from '../node/NodeMolecule';
-import { NodeAtomProvider, useNodeAtom } from '../node/NodeScope';
-import { SlotMolecule, SlotScopeProvider } from '../node/slots/SlotScope';
-import { RichTextEditorForAtom } from '../rich-text/RichTextEditor';
+  NodeChildrenEditor,
+} from '../NodeChildrenEditor';
+import { NodeMolecule } from '../NodeMolecule';
+import { NodeScopeProvider, useNodeAtom } from '../NodeScope';
+import { SlotChildrenController } from './SlotChildrenController';
+import { SlotMolecule, SlotScopeProvider } from './SlotScope';
+
+const meta: Meta = {
+  title: 'Slot Children Controller',
+  excludeStories: ['LayersController'],
+};
+export default meta;
+
 const { clone } = htmlUtil;
 
 const Label: CSSProperties = {
@@ -70,6 +81,27 @@ const AddBlock: CSSProperties = {
   justifyContent: 'center',
 };
 
+export const BigLayersOnly = () => (
+  <BasicStory startingHtml={big}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+export const MintLayersOnly = () => (
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+
 export const LayersController: FC<{}> = () => {
   const atoms = useMolecule(LayersMolecule);
   const hasChildren = useAtomValue(atoms.RootHasChildren);
@@ -79,14 +111,14 @@ export const LayersController: FC<{}> = () => {
       {' '}
       Don't re-render unless number of children changes!
       <div data-layers-root>
-        <NodeAtomProvider nodeAtom={atoms.RootNodeAtom}>
+        <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
           {hasChildren && (
             <SlotScopeProvider slot="">
-              <ChildrenEditor Component={ElementLayer} />
+              <NodeChildrenEditor Component={ElementLayer} />
             </SlotScopeProvider>
           )}
           {!hasChildren && <AddNew idx={0} />}
-        </NodeAtomProvider>
+        </NodeScopeProvider>
       </div>
     </div>
   );
@@ -224,11 +256,7 @@ function ElementLayer() {
           {name}
           {hasSlots && (
             <div>
-              {slots.map((s) => (
-                <SlotScopeProvider slot={s} key={s}>
-                  <SlotWidget />
-                </SlotScopeProvider>
-              ))}
+              <SlotChildrenController Component={SlotWidget} />
             </div>
           )}
         </div>
@@ -254,7 +282,7 @@ function SlotWidget() {
         </div>
         {hasEditor && (
           // Rich Text Editor<>
-          <RichTextEditorForAtom />
+          <NodeRichTextController />
         )}
         {!hasEditor && (
           // Block Editor
@@ -279,12 +307,12 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx: number }> = ({ idx }: { idx: number }) => {
+const SlotChild: React.FC<{ idx?: number }> = ({ idx }) => {
   const atoms = useMolecule(SlotMolecule);
   return (
     <>
       <ElementLayer />
-      <PlopTarget idx={idx} slot={atoms.slotName} />
+      <PlopTarget idx={idx ?? 0} slot={atoms.slotName} />
     </>
   );
 };

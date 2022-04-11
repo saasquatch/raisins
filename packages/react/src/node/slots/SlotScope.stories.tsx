@@ -2,10 +2,9 @@ import { htmlParser } from '@raisins/core';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { RaisinProps } from '../../core/CoreAtoms';
-import { RaisinsProvider } from '../../core/RaisinsProvider';
-import { ChildrenEditor } from '../children/ChildrenEditor';
-import { NodeAtomMolecule, NodeAtomProvider } from '../NodeScope';
+import { RaisinProps, RaisinsProvider } from '../../core/RaisinPropsScope';
+import { NodeChildrenEditor } from '../NodeChildrenEditor';
+import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope';
 import { SlotScope, SlotScopeMolecule, SlotScopeProvider } from './SlotScope';
 
 export default {
@@ -30,27 +29,27 @@ export const Test2 = () => {
 export const Test1 = () => {
   return (
     <RaisinsProvider molecule={StoryMolecule}>
-      <NodeAtomProvider
+      <NodeScopeProvider
         nodeAtom={atom(htmlParser('<div>I am a div</div>')) as any}
       >
         <TestComponent />
         <ScopeProvider scope={SlotScope} value={'foo'}>
           <TestComponent />
-          <ChildrenEditor Component={TestComponent as any} />
-          <NodeAtomProvider
+          <NodeChildrenEditor Component={TestComponent as any} />
+          <NodeScopeProvider
             nodeAtom={atom(htmlParser('<div>I am a div</div>')) as any}
           >
             <TestComponent />
-          </NodeAtomProvider>
+          </NodeScopeProvider>
           <TestComponent />
         </ScopeProvider>
-      </NodeAtomProvider>
+      </NodeScopeProvider>
     </RaisinsProvider>
   );
 };
 const TestComponent = () => {
   const slot = useMolecule(SlotScopeMolecule);
-  const nodeAtom = useMolecule(NodeAtomMolecule);
+  const nodeAtom = useMolecule(NodeScopeMolecule);
   const [node] = useAtom(nodeAtom);
   return (
     <div>

@@ -26,9 +26,12 @@ NodeScope['displayName'] = 'NodeScope';
  *
  * @returns
  */
-export const useNodeAtom = () => useMolecule(NodeAtomMolecule);
+export const useNodeAtom = () => useMolecule(NodeScopeMolecule);
 
-export const NodeAtomMolecule = molecule((getMol, getScope) => {
+/**
+ * An {@link PrimitiveAtom} for the node in scope (defaults to the root node of the {@link CoreMolecule})
+ */
+export const NodeScopeMolecule = molecule((getMol, getScope) => {
   const nodeAtom = getScope(NodeScope);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SoulsAtom } = getMol(SoulsMolecule);
@@ -59,7 +62,7 @@ export const NodeAtomMolecule = molecule((getMol, getScope) => {
           });
         }
       );
-    }, [nodeAtom]);
+    }, [SoulsAtom, nodeAtom]);
   }
   return nodeAtomWithSoulSaved(nodeAtom ?? RootNodeAtom);
 });
@@ -67,7 +70,7 @@ export const NodeAtomMolecule = molecule((getMol, getScope) => {
 /**
  * Provides the "current node" context.
  */
-export const NodeAtomProvider = ({
+export const NodeScopeProvider = ({
   nodeAtom,
   children,
 }: {

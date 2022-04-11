@@ -2,15 +2,15 @@ import { isElementNode, isRoot, RaisinNode } from '@raisins/core';
 import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React, { useContext } from 'react';
-import { CoreMolecule } from '../../core/CoreAtoms';
-import { BasicStory } from '../../views/Editor.stories';
-import { NodeAtomMolecule } from '../NodeScope';
+import { CoreMolecule } from '../core/CoreAtoms';
+import { BasicStory } from '../index.stories';
+import { NodeScopeMolecule } from './NodeScope';
 import {
-  ChildrenEditor,
+  NodeChildrenEditor,
   ForkedChildrenEditor,
   ForkedContext,
-} from './ChildrenEditor';
-import { example } from './ChildrenEditor.example';
+} from './NodeChildrenEditor';
+import { example } from './children/LoadTest.example';
 
 export default {
   title: 'Children Editor',
@@ -57,14 +57,14 @@ const ForkedTestEditor = () => {
   );
 };
 const TestEditor = () => {
-  const nodeAtom = useMolecule(NodeAtomMolecule);
+  const nodeAtom = useMolecule(NodeScopeMolecule);
   const [node] = useAtom(nodeAtom);
   const tagName = isElementNode(node) ? node.tagName : node.type;
   return (
     <div>
       {tagName}
       <div style={{ borderLeft: '4px solid #CCC' }}>
-        <ChildrenEditor Component={TestEditor} />
+        <NodeChildrenEditor Component={TestEditor} />
       </div>
     </div>
   );
