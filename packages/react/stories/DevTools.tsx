@@ -1,8 +1,7 @@
 import { useAtomsSnapshot } from 'jotai/devtools';
-import { RaisinScope } from '../src/core/RaisinScope';
 
 export const RegisteredAtoms = () => {
-  const atoms = useAtomsSnapshot(RaisinScope);
+  const atoms = useAtomsSnapshot();
 
   return (
     <div>
@@ -21,7 +20,7 @@ export const RegisteredAtoms = () => {
               }
               return (
                 <tr key={`${atom}`}>
-                  <td>{`${atom} - ${atom.debugLabel??""}`}</td>
+                  <td>{`${atom} - ${atom.debugLabel ?? ''}`}</td>
                   <td>
                     <details>
                       <summary>{typeof atomValue}</summary>

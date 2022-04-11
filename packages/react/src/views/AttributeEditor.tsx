@@ -1,10 +1,13 @@
 import { Attribute } from '@raisins/schema/schema';
+import { useAtom, useAtomValue } from 'jotai';
+import { useMolecule } from 'jotai-molecules';
 import React, { Fragment } from 'react';
-import { attributesForNode, componentMetaForNode } from '../node/AtomsForNode';
+import { NodeMolecule } from '../node/NodeMolecule';
 
 export function AttributesEditor() {
-  const [attributes, setAttributes] = attributesForNode.useAtom();
-  const attributeSchema = componentMetaForNode.useValue().attributes;
+  const { attributesForNode, componentMetaForNode } = useMolecule(NodeMolecule);
+  const [attributes, setAttributes] = useAtom(attributesForNode);
+  const attributeSchema = useAtomValue(componentMetaForNode).attributes;
   const attribs = attributes ?? {};
 
   const onchange = (key: string) => {

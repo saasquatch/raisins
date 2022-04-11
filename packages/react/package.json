@@ -1,11 +1,19 @@
 {
   "name": "@raisins/react",
   "author": "Logan Volkers",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/raisins",
+    "directory": "packages/react"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -17,6 +25,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test --passWithNoTests",
+    "test:watch": "tsdx test --passWithNoTests --watch",
     "lint": "tsdx lint",
     "size": "size-limit",
     "analyze": "size-limit --why",
@@ -48,11 +57,12 @@
     }
   ],
   "dependencies": {
-    "@raisins/core": "^0.0.1",
-    "@raisins/schema": "^0.0.1",
+    "@raisins/core": "^0.2.0",
+    "@raisins/schema": "^0.2.0",
     "css-tree": "^1.1.3",
     "hotkeys-js": "^3.8.7",
     "jotai": "^1.6.0",
+    "jotai-molecules": "^1.0.0",
     "optics-ts": "^2.2.0",
     "penpal": "^6.1.0",
     "prosemirror-commands": "^1.1.11",
@@ -72,6 +82,7 @@
     "@storybook/react": "^6.3.8",
     "@testing-library/react-hooks": "^7.0.2",
     "@types/css-tree": "^1.0.6",
+    "@types/jest": "^27.0.2",
     "@types/prosemirror-commands": "^1.0.4",
     "@types/prosemirror-keymap": "^1.0.4",
     "@types/prosemirror-schema-basic": "^1.0.2",
@@ -79,16 +90,21 @@
     "@types/prosemirror-view": "^1.19.1",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
+    "@types/resize-observer-browser": "^0.1.7",
     "@types/styled-components": "^5.1.14",
     "babel-loader": "^8.2.2",
     "custom-elements-manifest": "^1.0.0",
+    "cypress": "^9.5.3",
     "husky": "^7.0.2",
+    "local-cypress": "^1.2.5",
     "react": "*",
     "react-dom": "^16.14.0",
+    "react-hooks-testing-library": "^0.6.0",
     "react-is": "^17.0.2",
     "size-limit": "^5.0.4",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
-  }
+  },
+  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }

@@ -1,19 +1,16 @@
 import { isElementNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
+import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
-import { RaisinScope } from '../core/RaisinScope';
-import { HoveredNodeAtom } from '../core/selection/HoveredNode';
 import { Rect } from '../canvas/api/Rect';
-import { Size, useCanvasAtoms } from '../canvas/useCanvas';
-import { ComponentMetaAtom } from '../component-metamodel/ComponentModel';
-import {
-  DeleteSelectedAtom,
-  DuplicateSelectedAtom,
-  PickSelectedAtom,
-} from '../core/editting/EditSelectedAtom';
+import { CanvasScopedMolecule } from '../canvas/CanvasScopedMolecule';
+import { CanvasStyleMolecule, Size } from '../canvas/CanvasStyleMolecule';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
+import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
-import { SelectedNodeAtom } from '../core/selection/SelectedNode';
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),
@@ -57,23 +54,40 @@ export const WYSWIGCanvas: FC<WYSWIGCanvasProps> = (props) => {
   );
 };
 
-const HoveredNodeContent = atom((get) => {
-  const node = get(HoveredNodeAtom);
-  const metamodel = get(ComponentMetaAtom);
-  if (!isElementNode(node)) return;
-  return metamodel(node.tagName).title ?? node.tagName;
-});
+const CanvasViewMolecule = molecule((getMol) => {
+  const CanvasScope = getMol(CanvasScopedMolecule);
+  const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
+  const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);
+  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
+  const CanvasStyle = getMol(CanvasStyleMolecule);
 
-const SelectedNodeContent = atom((get) => {
-  const node = get(SelectedNodeAtom);
-  const metamodel = get(ComponentMetaAtom);
-  if (!isElementNode(node)) return;
-  return metamodel(node.tagName).title ?? node.tagName;
+  const HoveredNodeContent = atom((get) => {
+    const node = get(HoveredNodeAtom);
+    const metamodel = get(ComponentMetaAtom);
+    if (!isElementNode(node)) return;
+    return metamodel(node.tagName).title ?? node.tagName;
+  });
+
+  const SelectedNodeContent = atom((get) => {
+    const node = get(SelectedNodeAtom);
+    const metamodel = get(ComponentMetaAtom);
+    if (!isElementNode(node)) return;
+    return metamodel(node.tagName).title ?? node.tagName;
+  });
+
+  return {
+    ...CanvasScope,
+    ...CanvasStyle,
+    ...getMol(EditSelectedMolecule),
+    SelectedNodeAtom,
+    HoveredNodeContent,
+    SelectedNodeContent,
+  };
 });
 
 export const CanvasHoveredToolbar = () => {
-  const atoms = useCanvasAtoms();
-  const nodeDetails = useAtomValue(HoveredNodeContent, RaisinScope);
+  const atoms = useMolecule(CanvasViewMolecule);
+  const nodeDetails = useAtomValue(atoms.HoveredNodeContent);
   return (
     <Suspense fallback={null}>
       <PositionedToolbar rectAtom={atoms.HoveredRectAtom}>
@@ -84,12 +98,12 @@ export const CanvasHoveredToolbar = () => {
 };
 
 export const CanvasSelectedToolbar = () => {
-  const atoms = useCanvasAtoms();
-  const seleted = useAtomValue(SelectedNodeAtom, RaisinScope);
-  const deleteSelected = useUpdateAtom(DeleteSelectedAtom, RaisinScope);
-  const cloneSelected = useUpdateAtom(DuplicateSelectedAtom, RaisinScope);
-  const moveSelected = useUpdateAtom(PickSelectedAtom, RaisinScope);
-  const nodeContent = useAtomValue(SelectedNodeContent, RaisinScope);
+  const atoms = useMolecule(CanvasViewMolecule);
+  const seleted = useAtomValue(atoms.SelectedNodeAtom);
+  const deleteSelected = useUpdateAtom(atoms.DeleteSelectedAtom);
+  const cloneSelected = useUpdateAtom(atoms.DuplicateSelectedAtom);
+  const moveSelected = useUpdateAtom(atoms.PickSelectedAtom);
+  const nodeContent = useAtomValue(atoms.SelectedNodeContent);
   if (!seleted) return <div />;
   return (
     <Suspense fallback={null}>
@@ -113,7 +127,7 @@ export const PositionedToolbar = ({
   rectAtom: Atom<Promise<Rect | undefined>>;
   children: React.ReactNode;
 }) => {
-  const rect = useAtomValue(rectAtom, RaisinScope);
+  const rect = useAtomValue(rectAtom);
   if (!rect)
     return (
       <div style={{ position: 'absolute', top: 0, left: 0, display: 'none' }} />

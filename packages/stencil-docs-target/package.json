@@ -1,12 +1,20 @@
 {
   "name": "@raisins/stencil-docs-target",
   "description": "A custom docs target for Stencil components. Edit in Raisins.",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Logan Volkers",
   "module": "dist/stencil.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/raisins",
+    "directory": "packages/stencil-docs-target"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -56,7 +64,8 @@
     "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@raisins/schema": "^0.0.1",
+    "@raisins/schema": "^0.2.0",
     "split-on-first": "^3.0.0"
-  }
+  },
+  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }
