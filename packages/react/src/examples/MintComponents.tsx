@@ -2,20 +2,47 @@ export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.css',
-    version: '1.5.0-116'
+    version: '1.5.3-7',
   },
   {
     name: '@saasquatch/bedrock-components',
     filePath: '/dist/bedrock-components/bedrock-components.js',
-    version: '1.3.1-7'
+    version: '1.3.x',
   },
 
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '1.5.0-116'
+    version: '1.5.3-7',
   },
 ];
+
+export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
+
+export const mintHeroImage = `<sqm-hero-image
+image-url="https://res.cloudinary.com/saasquatch/image/upload/v1644000275/squatch-assets/yr6ER3R.png"
+header="Klip Rewards"
+description="Refer friends and complete tasks while using Klip to earn rewards"
+layout="columns"
+image-pos="right"
+background-color="#F9F9F9"
+>
+</sqm-hero-image>`;
+
+export const mintTaskCard = `<sqm-task-card
+reward-amount="50"
+card-title="Follow Us on Twitter"
+description="Earn 50 points when you follow us on Twitter!"
+button-text="Follow"
+button-link="https://twitter.com/"
+goal="1"
+stat-type="/programGoals/count/Follow-on-Social-Media"
+open-new-tab="true"
+event-key="socialFollow"
+program-id="klip-loyalty"
+>
+</sqm-task-card>`;
+
 export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">

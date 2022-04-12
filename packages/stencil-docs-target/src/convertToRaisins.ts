@@ -29,19 +29,31 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           .filter(p => typeof p.attr !== 'undefined')
           .filter(isUndocumented)
           .map(p => {
-            const attr: schema.Attribute = {
+            const attr: schema.Attribute & Enums & UiSchema = {
               name: p.attr ?? p.name,
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
               description: p.docs,
               default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
               // TODO: Support enums -- need to add to Raisins model
-              // enum: jsonTagValue(p, 'uiEnum'),
-              // enumNames: jsonTagValue(p, 'uiEnumNames'),
+              enum: jsonTagValue(p, 'uiEnum'),
+              enumNames: jsonTagValue(p, 'uiEnumNames'),
+              uiSchema: {
+                'ui:help': comp.docs,
+                'ui:widget': uiWidget(p),
+                'ui:options': jsonTagValue(p, 'uiOptions'),
+                // needs to be on top level
+                // 'ui:order': jsonTagValue(comp, 'uiOrder'),
+              },
             };
 
             return attr;
           });
+
+        type Enums = {
+          enum: string[];
+          enumNames: string[];
+        };
 
         // TODO: Widget, help, etc.
         // 'ui:widget': tagValue(prop.docsTags, 'uiWidget'),
@@ -49,6 +61,15 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         // 'ui:help': prop.docs,
         // 'ui:options': jsonTagValue(prop, 'uiOptions'),
         // 'ui:order': jsonTagValue(comp, 'uiOrder'),
+
+        type UiSchema = {
+          uiSchema: {
+            'ui:widget'?: string;
+            'ui:help'?: string;
+            'ui:options'?: { [key: string]: any };
+            'ui:order'?: string[];
+          };
+        };
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
@@ -82,8 +103,11 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                 content,
               };
             }),
-            // 
-            demoStates: (demos.length > 0) ? demos : undefined
+          demoStates: demos.length > 0 ? demos : undefined,
+
+          // 'ui:widget': uiWidget(comp),
+          // 'ui:options': jsonTagValue(comp, 'uiOptions'),
+          // 'ui:order': jsonTagValue(comp, 'uiOrder'),
         };
         return elem;
       } catch (e) {
@@ -100,10 +124,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
 function tagValue(tags: JsonDocsTag[], name: string): string | undefined {
   return tags.find(t => t.name === name)?.text;
 }
-// function jsonTagValue(tags: HasDocsTags, name: string) {
-//   const value = tagValue(tags.docsTags, name);
-//   return value && JSON.parse(value);
-// }
+function jsonTagValue(tags: HasDocsTags, name: string) {
+  const value = tagValue(tags.docsTags, name);
+  try {
+    return value && JSON.parse(value);
+  } catch (e) {
+    throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e);
+  }
+}
 function hasTag(tagName: string) {
   return (d: HasDocsTags) =>
     d.docsTags?.find(t => t.name === tagName) ? true : false;
@@ -112,4 +140,5 @@ const isUndocumented = () => hasTag('undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
+const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');

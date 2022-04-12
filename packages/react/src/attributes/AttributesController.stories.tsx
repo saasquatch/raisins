@@ -4,7 +4,14 @@ import React, { Fragment } from 'react';
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { BasicStory } from '../index.stories';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  big,
+  mintBigStat,
+  MintComponents,
+  mintHeroImage,
+  mintMono,
+  mintTaskCard,
+} from '../examples/MintComponents';
 import { AttributeMolecule } from './AttributeMolecule';
 import { AttributesController } from './AttributesController';
 
@@ -15,6 +22,30 @@ export default {
 export const Mint = () => {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <NodeChildrenEditor Component={AttributesEditor} />
+    </BasicStory>
+  );
+};
+
+export const MintBigStat = () => {
+  return (
+    <BasicStory startingHtml={mintBigStat} startingPackages={MintComponents}>
+      <NodeChildrenEditor Component={AttributesEditor} />
+    </BasicStory>
+  );
+};
+
+export const MintHeroImage = () => {
+  return (
+    <BasicStory startingHtml={mintHeroImage} startingPackages={MintComponents}>
+      <NodeChildrenEditor Component={AttributesEditor} />
+    </BasicStory>
+  );
+};
+
+export const MintTaskCard = () => {
+  return (
+    <BasicStory startingHtml={mintTaskCard} startingPackages={MintComponents}>
       <NodeChildrenEditor Component={AttributesEditor} />
     </BasicStory>
   );
@@ -95,10 +126,11 @@ const AttributeComponent = () => {
 };
 
 function AttributeEditor() {
-  const { schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
+  const { name, schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
 
+  console.log(name, schema);
   if (value === undefined) {
     return (
       <div>
