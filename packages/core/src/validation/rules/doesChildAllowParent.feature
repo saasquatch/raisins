@@ -1,6 +1,6 @@
 Feature: Does Child Allow Parent
 
-    # From a tag's metadata, checks if it allows parent.
+    From a tag's metadata, checks if it allows parent.
 
     Scenario: Child allows root element as parent
         Given a child meta
@@ -24,6 +24,7 @@ Feature: Does Child Allow Parent
 
         Examples:
             | type        |
+            | root        |
             | text        |
             | style       |
             | comment     |
@@ -40,7 +41,7 @@ Feature: Does Child Allow Parent
         Then child allows node as parent
 
         Examples:
-            | node        |
+            | type        |
             | root        |
             | text        |
             | style       |
@@ -59,11 +60,12 @@ Feature: Does Child Allow Parent
                 ]
             }
             """
+        # And validParents includes "*"
         And a <type> node
         Then child allows node as parent
 
         Examples:
-            | node        |
+            | type        |
             | root        |
             | text        |
             | style       |
