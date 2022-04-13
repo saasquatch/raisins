@@ -1,7 +1,7 @@
 import * as schema from '@raisins/schema/schema';
 import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry';
 
-import { Module, ModuleDetails } from '../ModuleManagement';
+import { Module, ModuleDetails } from '../types';
 import { LOCAL_REPO } from './LOCAL_REPO';
 
 /**

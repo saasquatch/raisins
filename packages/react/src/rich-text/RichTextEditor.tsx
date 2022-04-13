@@ -2,12 +2,11 @@ import { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
 import { ElementType } from 'domelementtype';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
-import { useAtomValue } from 'jotai/utils';
 import React from 'react';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
-import { NodeAtomMolecule, NodeAtomProvider } from '../node/NodeScope';
+import { NodeScopeMolecule } from '../node/NodeScope';
 import { isElementNode } from '../util/isNode';
 import { createMemoizeAtom } from '../util/weakCache';
 import {
@@ -15,7 +14,7 @@ import {
   useProseEditorOnAtom,
 } from './prosemirror/ProseEditor';
 
-const SelectedNodeRichTextEditorMolecule = molecule((getMol) => {
+export const SelectedNodeRichTextEditorMolecule = molecule((getMol) => {
   const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { EditSelectedNodeAtom } = getMol(EditSelectedMolecule);
   const IsSelectedAnElement = atom((get) =>
@@ -28,18 +27,6 @@ const SelectedNodeRichTextEditorMolecule = molecule((getMol) => {
   };
 });
 
-export default function SelectedNodeRichTextEditor() {
-  const atoms = useMolecule(SelectedNodeRichTextEditorMolecule);
-  const isElement = useAtomValue(atoms.IsSelectedAnElement);
-  if (!isElement) return <div>Not an element</div>;
-
-  return (
-    <NodeAtomProvider nodeAtom={atoms.EditSelectedNodeAtom}>
-      <RichTextEditorForAtom />
-    </NodeAtomProvider>
-  );
-}
-
 export function useRichTextEditorForAtom() {
   const { docNodeAtom, selection } = useMolecule(RichTextMolecule);
 
@@ -50,7 +37,9 @@ export function useRichTextEditorForAtom() {
 const memoized = createMemoizeAtom();
 
 const RichTextMolecule = molecule((getMol) => {
-  const nodeAtom = getMol(NodeAtomMolecule) as PrimitiveAtom<RaisinElementNode>;
+  const nodeAtom = getMol(
+    NodeScopeMolecule
+  ) as PrimitiveAtom<RaisinElementNode>;
 
   const { GetSoulAtom, SoulSaverAtom } = getMol(SoulsMolecule);
 
@@ -105,11 +94,11 @@ const RichTextMolecule = molecule((getMol) => {
 });
 
 /**
- * A controller for editing rich text via a Prose Editor
+ * A controller for editing the {@link NodeScopeMolecule} as rich text via a Prose Editor
  *
  * @returns
  */
-export function RichTextEditorForAtom() {
+export function NodeRichTextController() {
   const { mountRef } = useRichTextEditorForAtom();
   return <div ref={mountRef} />;
 }

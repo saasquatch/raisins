@@ -1,6 +1,6 @@
 import { atom, Atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { PropsMolecule } from '../core/CoreAtoms';
+import { PropsMolecule } from '../core/RaisinPropsScope';
 
 export type CanvasOptions = {
   /**

@@ -1,6 +1,6 @@
 import * as schema from '@raisins/schema/schema';
 import { CustomElement } from '../Component';
-import { ModuleDetails } from '../ModuleManagement';
+import { ModuleDetails } from '../types';
 
 /**
  * Reduces a set of ModuleDetails into a set of CustomElement definitions.

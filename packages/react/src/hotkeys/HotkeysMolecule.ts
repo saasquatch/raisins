@@ -1,9 +1,8 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
-import { useAtomValue } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule } from 'jotai-molecules';
+import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms';
 import connectedAtom from '../util/atoms/connectedAtom';
-import { EditSelectedMolecule } from './editting/EditSelectedAtom';
-import { HistoryMolecule } from './editting/HistoryAtoms';
 
 export const HotkeysMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);
@@ -51,8 +50,3 @@ export const HotkeysMolecule = molecule((getMol) => {
   );
   return { HotKeysAtom };
 });
-
-export function useHotkeys() {
-  const { HotKeysAtom } = useMolecule(HotkeysMolecule);
-  useAtomValue(HotKeysAtom);
-}

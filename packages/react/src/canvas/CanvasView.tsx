@@ -3,14 +3,13 @@ import { Atom, atom } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, FC, Suspense } from 'react';
-import { Rect } from '../canvas/api/Rect';
-import { CanvasScopedMolecule } from '../canvas/CanvasScopedMolecule';
-import { CanvasStyleMolecule, Size } from '../canvas/CanvasStyleMolecule';
-import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
+import { ComponentModelMolecule } from '../component-metamodel/';
+import { HoveredNodeMolecule, SelectedNodeMolecule } from '../core/';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
-import SelectedNodeRichTextEditor from '../rich-text/RichTextEditor';
+import { SelectedNodeRichTextEditor } from '../rich-text/';
+import { Rect } from './api/Rect';
+import { CanvasScopedMolecule } from './CanvasScopedMolecule';
+import { CanvasStyleMolecule, Size } from './CanvasStyleMolecule';
 
 const Wrapper: CSSProperties = {
   backgroundImage: `linear-gradient(45deg, #cccccc 25%, transparent 25%),

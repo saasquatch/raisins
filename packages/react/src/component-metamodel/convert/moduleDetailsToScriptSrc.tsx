@@ -1,4 +1,4 @@
-import { ModuleDetails } from '../ModuleManagement';
+import { ModuleDetails } from '../types';
 import { makeLocalRegistry, NPMRegistry } from '../../util/NPMRegistry';
 import { LOCAL_REPO } from './LOCAL_REPO';
 

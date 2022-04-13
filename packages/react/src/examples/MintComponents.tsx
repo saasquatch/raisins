@@ -1,145 +1,22 @@
-import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
-import {
-  createScope,
-  molecule,
-  ScopeProvider,
-  useMolecule,
-} from 'jotai-molecules';
-import React, { useMemo } from 'react';
-import { CanvasController } from '../src/canvas/CanvasController';
-import { RaisinProps } from '../src/core/CoreAtoms';
-import { RaisinsProvider } from '../src/core/RaisinsProvider';
-import { useHotkeys } from '../src/core/useHotkeys';
-import { EditorView } from '../src/views/EditorView';
-import { RegisteredAtoms } from './DevTools';
-
-const meta: Meta = {
-  title: 'Editor',
-  component: Editor,
-};
-export default meta;
-
-const StoryScope = createScope({
-  startingHtml: '<span>I am a span</span>',
-  startingPackages: [],
-});
-
-const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
-  const storyScope = getScope(StoryScope);
-  return {
-    HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom(storyScope.startingPackages),
-    uiWidgetsAtom: atom({}),
-  };
-});
-
-export function Span({
-  startingHtml = '<span>I am a span</span>',
-  startingPackages = [],
-  children = (
-    <>
-      <Editor />
-      <RegisteredAtoms />
-    </>
-  ),
-}) {
-  return (
-    <>
-      <ScopeProvider
-        scope={StoryScope}
-        value={{ startingHtml, startingPackages }}
-      >
-        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
-      </ScopeProvider>{' '}
-    </>
-  );
-}
-
-export function ExternalHTMLControl() {
-  const state = useMemo(
-    () =>
-      molecule<Partial<RaisinProps>>(() => {
-        return {
-          HTMLAtom: atom('<span>I am a span</span>'),
-          PackagesAtom: atom([]),
-          uiWidgetsAtom: atom({}),
-        };
-      }),
-    []
-  );
-
-  const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom);
-  return (
-    <>
-      <textarea
-        value={html}
-        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-      />
-      <RaisinsProvider molecule={state}>
-        <Editor />
-        <RegisteredAtoms />
-      </RaisinsProvider>
-    </>
-  );
-}
-
-export const Mint = () => (
-  <Span startingHtml={mintMono} startingPackages={MintComponents} />
-);
-export const Big = () => <Span startingHtml={big} />;
-
-export const CanvasOnly = () => (
-  <Span startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <CanvasController />
-      </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-    </div>
-  </Span>
-);
-
-// export function LayersOnly() {
-//   const htmlAtom = useMemo(() => atom(big), []);
-//   return (
-//     <>
-//       <RaisinsProvider htmlAtom={htmlAtom}>
-//         <div style={{ display: 'flex' }}>
-//           <LayersController />
-//           {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
-//         </div>
-//       </RaisinsProvider>
-//     </>
-//   );
-// }
-
-function Editor() {
-  useHotkeys();
-
-  return <EditorView />;
-}
-
-const MintComponents = [
+export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.css',
-    version: '1.5.0-116',
+    version: '1.5.0-116'
   },
   {
     name: '@saasquatch/bedrock-components',
     filePath: '/dist/bedrock-components/bedrock-components.js',
-    version: '1.3.1-7',
+    version: '1.3.1-7'
   },
 
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '1.5.0-116',
+    version: '1.5.0-116'
   },
 ];
-
-const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
+export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">
     <sqm-hero-image
@@ -410,8 +287,7 @@ const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 </sqm-portal-container>
 </sqm-brand>
 `;
-
-const big = `
+export const big = `
 <div style="--sl-color-primary-600: pink;">
 <my-component></my-component>
 <my-split>
@@ -468,10 +344,3 @@ I am a template
 }
 </style>
 `;
-
-Editor.args = {
-  /**
-   * Used for serving local packages
-   */
-  domain: 'https://localhost:5000',
-};
