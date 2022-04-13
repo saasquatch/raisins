@@ -3,7 +3,6 @@ import {
   doesParentAllowChild,
   isElementNode,
   isRoot,
-  RaisinElementNode,
   RaisinNode,
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
@@ -39,12 +38,14 @@ function validateAttributes(
   const nodeMeta = meta.find((m) => m.tagName === node.tagName);
 
   // TODO: Implement validation for attributes based on new schema properties
-  return Object.keys(node.attribs).map((k) => {
-    return {
-      jsonPointer: '/attribs/' + k,
-      error: "Attribute validation doesn't exist",
-    };
-  });
+  return Object.keys(node.attribs)
+    .filter((k) => k === 'class')
+    .map((k) => {
+      return {
+        jsonPointer: '/attribs/' + k,
+        error: 'Classes are never allowed!',
+      };
+    });
 }
 
 function validateNode(node: RaisinNode, meta: CustomElement[]): ErrorStack {
@@ -101,10 +102,28 @@ function validateChildNodes(
   const childErrors = node.children
     .map((child, childIdx) =>
       validateNode(child, meta).map((error) => ({
-        jsonPointer: `/children/${childIdx}/${error.jsonPointer}`,
+        jsonPointer: `/children/${childIdx}${error.jsonPointer}`,
         error: error.error,
       }))
     )
     .reduce((acc, curr) => [...acc, ...curr], []);
   return childErrors;
+}
+
+/**
+ * Generate a set of JSON Paths for all descendents of a {@link RaisinNode}
+ */
+export function generateJsonPointers(
+  node: RaisinNode,
+  path = '',
+  map = new WeakMap()
+): WeakMap<RaisinNode, string> {
+  map.set(node, path);
+  if (isElementNode(node) || isRoot(node)) {
+    return node.children.reduce(
+      (acc, c, idx) => generateJsonPointers(c, `${path}/children/${idx}`, acc),
+      map
+    );
+  }
+  return map;
 }

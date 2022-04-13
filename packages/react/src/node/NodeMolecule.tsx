@@ -10,6 +10,8 @@ import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
+import { getSubErrors } from '../validation';
+import { ValidationMolecule } from '../validation/ValidationMolecule';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForChildren } from './atoms/atomForChildren';
 import { atomForTagName } from './atoms/atomForTagName';
@@ -32,8 +34,33 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
     ComponentModelMolecule
   );
-  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { RootNodeAtom, JsonPointersAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
+
+  const ValidationAtoms = getMol(ValidationMolecule);
+
+  const jsonPointerAtom = atom((get) => {
+    const node = get(n);
+    const map = get(JsonPointersAtom);
+    return map.get(node)!;
+  });
+  const errorsAtom = atom((get) => {
+    const jsonPointer = get(jsonPointerAtom);
+    const errors = get(ValidationAtoms.errorsAtom);
+    return getSubErrors(errors, jsonPointer);
+  });
+  const childrenErrorsAtom = atom((get) => {
+    const jsonPointer = get(jsonPointerAtom);
+    const errors = get(ValidationAtoms.errorsAtom);
+    return getSubErrors(errors, jsonPointer + '/children');
+  });
+  const attributeErrorsAtom = atom((get) => {
+    const jsonPointer = get(jsonPointerAtom);
+    const errors = get(ValidationAtoms.errorsAtom);
+    return getSubErrors(errors, jsonPointer + '/attribs');
+  });
+
+  const hasErrors = atom((get) => get(errorsAtom).length > 0);
 
   /**
    * Is the node in context currently selected?
@@ -192,25 +219,56 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   });
 
   return {
-    nodeAtom: n,
-    isSelectedForNode,
+    /*
+    Identifiers
+    */
     nodeSoul,
+    jsonPointerAtom,
+
+    /*
+    Values
+    */
+    nodeAtom: n,
+    attributesForNode,
+    isNodeAnElement,
+    removeForNode,
+    duplicateForNode,
+    /*
+    Meta
+    */
+    nameForNode,
+    componentMetaForNode,
+    tagNameAtom,
+
+    /*
+    Selection
+    */
+    isSelectedForNode,
+    setSelectedForNode,
+    /*
+    Hover
+    */
     nodeHovered,
+    /*
+    Pick and plop
+    */
     isNodePicked,
     togglePickNode,
     canPlopHereAtom,
     plopNodeHere,
-    setSelectedForNode,
-    isNodeAnElement,
-    attributesForNode,
-    componentMetaForNode,
-    tagNameAtom,
-    removeForNode,
-    duplicateForNode,
-    nameForNode,
-    // Slots
+
+    /*
+     Slots
+     */
     allSlotsForNode,
     childSlotsAtom,
     slotsForNode,
+    /*
+    Validation
+    */
+    errorsAtom,
+    childrenErrorsAtom,
+    attributeErrorsAtom,
+    hasErrorsAtom: hasErrors,
   };
 });
