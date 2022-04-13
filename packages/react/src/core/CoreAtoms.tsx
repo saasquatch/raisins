@@ -12,6 +12,7 @@ import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
 import { isFunction } from '../util/isFunction';
+import { generateJsonPointers } from "../validation/validateNode";
 import { generateNextState } from './editting/EditAtoms';
 import { PropsMolecule } from './RaisinPropsScope';
 
@@ -136,6 +137,11 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   });
   ParentsAtom.debugLabel = 'ParentsAtom';
 
+  const JsonPointersAtom = atom((get) =>
+    generateJsonPointers(get(RootNodeAtom))
+  );
+  JsonPointersAtom.debugLabel = 'JsonPointersAtom';
+
   return {
     NodeFromHtml,
     NodeWithHtmlRefAtom,
@@ -144,6 +150,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     RootNodeAtom,
     IdentifierModelAtom,
     ParentsAtom,
+    JsonPointersAtom,
   };
 });
 
