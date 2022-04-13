@@ -36,22 +36,22 @@ const cucumber = (
         }
       });
     } else {
-      let jsonata = require("jsonata");
-      let expected = jsonata(jsSelector).evaluate({
-        node,
-        undefined: undefined
-      });
-      if (!Array.isArray(expected)) {
-        expected = [expected];
-      }
-      found.forEach((f, idx) => {
-        expect(f).toBe(expected[idx]);
-      });
+      //   let jsonata = require("jsonata");
+      //   let expected = jsonata(jsSelector).evaluate({
+      //     node,
+      //     undefined: undefined
+      //   });
+      //   if (!Array.isArray(expected)) {
+      //     expected = [expected];
+      //   }
+      //   found.forEach((f, idx) => {
+      //     expect(f).toBe(expected[idx]);
+      //   });
     }
   });
 };
 
-var selectorSteps: StepDefinitions = () => {};
+var jestSteps: StepDefinitions = () => {};
 
 if (!JEST) {
   cucumber(given, when, then);
@@ -62,11 +62,11 @@ if (!JEST) {
     loadRelativePath: true
   });
 
-  var selectorSteps: StepDefinitions = ({ given, when, then }) => {
+  var jestSteps: StepDefinitions = ({ given, when, then }) => {
     cucumber(given, when, then);
   };
 
-  jest_cucumber.autoBindSteps([feature], [selectorSteps]);
+  jest_cucumber.autoBindSteps([feature], [jestSteps]);
 }
 
-export const steps = selectorSteps;
+export const steps = jestSteps;

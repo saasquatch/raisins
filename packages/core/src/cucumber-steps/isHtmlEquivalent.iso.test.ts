@@ -5,7 +5,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
 import { StepDefinitions } from "jest-cucumber";
-import { isHtmlEquivalent } from "../../../src/html-dom/isHtmlEquivalent";
+import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent";
 
 const JEST = process.env.JEST_WORKER_ID !== undefined;
 
@@ -41,21 +41,25 @@ const cucumber = (
   });
 };
 
-var htmlEquivalencySteps: StepDefinitions = () => {};
+var jestSteps: StepDefinitions = () => {};
 
 if (!JEST) {
   cucumber(given, and, then);
 } else {
   const jest_cucumber = require("jest-cucumber");
 
-  const feature = jest_cucumber.loadFeature("./isHtmlEquivalent.feature", {
-    loadRelativePath: true
-  });
+  const feature = jest_cucumber.loadFeature(
+    "../html-dom/isHtmlEquivalent.feature",
+    {
+      loadRelativePath: true
+    }
+  );
 
-  var htmlEquivalencySteps: StepDefinitions = ({ given, and, then }) => {
+  var jestSteps: StepDefinitions = ({ given, and, then }) => {
     cucumber(given, and, then);
   };
 
-  jest_cucumber.autoBindSteps([feature], [htmlEquivalencySteps]);
+  jest_cucumber.autoBindSteps([feature], [jestSteps]);
 }
-export const steps = JEST ? htmlEquivalencySteps : "";
+
+export const steps = jestSteps;

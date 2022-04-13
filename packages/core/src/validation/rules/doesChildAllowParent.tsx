@@ -32,16 +32,20 @@ export function doesChildAllowParent(
     return true;
   }
 
+  // TODO: Use CSS selectors engine or ProseMirror content engine
+  if (
+    childMeta.validParents.includes(tagName) ||
+    childMeta.validParents.includes("*")
+  ) {
+    // Child allows parent
+    return true;
+  }
+
   if (childMeta.validParents !== undefined && !tagName) {
     // Constraints, if a child specifies a set of valid parents,
     // then it will not allow it parent elements without tag names (e.g. comments)
     return false;
   }
 
-  // TODO: Use CSS selectors engine or ProseMirror content engine
-  if (childMeta.validParents.includes(tagName) || childMeta.validParents.includes("*")) {
-    // Child allows parent
-    return true;
-  }
   return false;
 }

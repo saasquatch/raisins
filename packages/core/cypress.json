@@ -1,4 +1,8 @@
 {
   "integrationFolder": ".",
-  "testFiles": ["./src/**/*.@(iso|web).test.@(ts|tsx|js|jsx)", "./src/**/*.feature"]
+  "testFiles": [
+    "./src/**/*.@(iso|web).test.@(ts|tsx|js|jsx)",
+    "./src/**/*.feature"
+  ],
+  "ignoreTestFiles": "**/cucumber-steps/*"
 }

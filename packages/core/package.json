@@ -97,7 +97,7 @@
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false,
-    "stepDefinitions": "cypress/stepsDefinition"
+    "stepDefinitions": "src/cucumber-steps"
   },
   "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }
