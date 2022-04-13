@@ -81,7 +81,7 @@ const JsonPointers = () => {
           <ul>
             {errors.map((e) => (
               <li>
-                {e.jsonPointer} - {e.error}
+                {e.jsonPointer} - {e.error.rule}
               </li>
             ))}
           </ul>
