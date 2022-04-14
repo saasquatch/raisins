@@ -109,18 +109,9 @@ const AttributeComponent = () => {
     <Fragment key={name}>
       <tr>
         <td>
-          <b>{schema.title ?? name}</b>
-          <br />
           <AttributeEditor />
         </td>
       </tr>
-      {schema.description && (
-        <tr>
-          <td colSpan={2}>
-            <span style={{ color: 'grey' }}>{schema.description}</span>
-          </td>
-        </tr>
-      )}
     </Fragment>
   );
 };
@@ -130,11 +121,16 @@ function AttributeEditor() {
   const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
 
+  const Title = () => (
+    <div>
+      <b>{schema.title ?? name}</b>
+    </div>
+  );
   console.log(name, schema);
   if (value === undefined) {
     return (
       <div>
-        {schema?.default ?? <i>Empty</i>}
+        <b>{schema.title ?? name}</b>{' '}
         <button onClick={() => setValue(schema?.default?.toString() ?? '')}>
           Edit
         </button>
@@ -145,6 +141,7 @@ function AttributeEditor() {
   if (schema?.type === 'boolean') {
     return (
       <div>
+        <Title />
         <input
           type="checkbox"
           checked={value === undefined || value === null ? false : true}
@@ -156,12 +153,15 @@ function AttributeEditor() {
           }
         />
         <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
       </div>
     );
   }
   if (schema?.type === 'number') {
     return (
       <div>
+        <Title />
+
         <input
           type="number"
           value={value}
@@ -170,17 +170,21 @@ function AttributeEditor() {
           }
         />
         <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
       </div>
     );
   }
   return (
     <div>
+      {' '}
+      <Title />
       <input
         type="text"
         value={value}
         onInput={(e) => setValue((e.target as HTMLInputElement).value)}
       />
       <Clear />
+      <div style={{ color: 'grey' }}>{schema.description}</div>
     </div>
   );
 }

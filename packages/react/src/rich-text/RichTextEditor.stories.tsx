@@ -1,9 +1,8 @@
-import { htmlParser, RaisinDocumentNode, RaisinNode } from '@raisins/core';
+import { htmlParser, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { atom, PrimitiveAtom, useAtom } from 'jotai';
-import React, { useMemo } from 'react';
-import { ExampleProseEditor } from './prosemirror/ExampleProseEditor';
-import { ProseTextSelection } from './prosemirror/ProseEditor';
+import React from 'react';
+import { BasicStory } from '../index.stories';
+import { NodeRichTextController } from './RichTextEditor';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };
@@ -14,52 +13,28 @@ const span: RaisinNode = htmlParser(
 );
 
 export const Span = () => (
-  <div>
-    <AtomEditor
-      initial={htmlParser(
-        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
-      )}
-    />
-    <AtomEditor
-      initial={htmlParser(
-        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
-      )}
-    />
-  </div>
+  <BasicStory
+    startingHtml={`A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`}
+  >
+    <AtomEditor />
+  </BasicStory>
 );
 
 export const TextWithBreaks = () => (
-  <AtomEditor initial={htmlParser(`Text<br/>with<br/>breaks`)} />
+  <BasicStory startingHtml={`Text<br/>with<br/>breaks`}>
+    <AtomEditor />
+  </BasicStory>
 );
 export const Paragraphs = () => (
-  <AtomEditor
-    initial={htmlParser(`<p>First paragrpah</p><p>second paragrapj</p>`)}
-  />
+  <BasicStory startingHtml={`<p>First paragrpah</p><p>second paragrapj</p>`}>
+    <AtomEditor />
+  </BasicStory>
 );
 
-function AtomEditor({ initial }: { initial: RaisinNode }) {
-  const { nodeAtom, selectionAtomRef } = useMemo(() => {
-    return {
-      nodeAtom: atom<RaisinDocumentNode>(initial as RaisinDocumentNode),
-      selectionAtomRef: atom(undefined) as PrimitiveAtom<
-        ProseTextSelection | undefined
-      >,
-    };
-  }, []);
-
-  const [selection] = useAtom(selectionAtomRef);
-  const [node] = useAtom(nodeAtom);
+function AtomEditor() {
   return (
     <div>
-      <ExampleProseEditor
-        {...{
-          nodeAtom: nodeAtom,
-          selectionAtom: selectionAtomRef,
-        }}
-      />
-      <hr />
-      Here is my state:
-      <pre>{JSON.stringify({ selection, node }, null, 2)}</pre>
+      <NodeRichTextController />
     </div>
   );
 }

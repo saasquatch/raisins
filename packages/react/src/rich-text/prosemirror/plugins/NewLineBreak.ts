@@ -8,7 +8,7 @@ import {
 } from 'prosemirror-commands';
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Transaction } from 'prosemirror-state';
-import { inlineSchema } from './ProseSchemas';
+import { inlineSchema } from '../ProseSchemas';
 
 export const NewLinePlugin = () => {
   //     let brcmd = chainCommands(

@@ -40,7 +40,6 @@ export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
   });
 
   return {
-    HistoryKeyMapPluginAtom,
     PluginsAtom,
   };
 });
