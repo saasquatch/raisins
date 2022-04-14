@@ -199,7 +199,7 @@ export interface Attribute {
   uiOrder?: number;
 
   /**
-   * This attribute must exist on node with a value if required is set to true.
+   * if required is set to true this attribute must not be undefined.
    */
   required?: boolean;
 }
