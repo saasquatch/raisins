@@ -56,8 +56,8 @@ export const ProseEditorViewMolecule = molecule((getMol, getScope) => {
   );
   return {
     viewAtom,
-    elementAtom
-  }
+    elementAtom,
+  };
 });
 
 /**

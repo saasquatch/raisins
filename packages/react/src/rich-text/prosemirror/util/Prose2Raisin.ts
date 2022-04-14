@@ -1,4 +1,4 @@
-import { inlineSchema as defaultSchema } from '../ProseSchemas';
+import { DefaultProseSchema as defaultSchema } from '../default-schema/DefaultProseSchema';
 import { htmlParser, htmlSerializer, RaisinNode } from '@raisins/core';
 import { DOMParser, DOMSerializer, Node, Fragment } from 'prosemirror-model';
 import { stringToNativeDom, nativeDomToString } from './nativeDom';

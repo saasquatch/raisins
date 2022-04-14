@@ -17,12 +17,6 @@ export const ProseToggleMarkMolecule = molecule((getMol) => {
     }
   );
 
-  const isBold = atom(get=>{
-
-    const selection = get(stateAtom).selection;
-    
-  })
-
   return {
     toggleMarkAtom,
   };

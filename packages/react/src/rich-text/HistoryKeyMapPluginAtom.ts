@@ -1,6 +1,6 @@
-import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { keymap } from 'prosemirror-keymap';
+import { Plugin } from 'prosemirror-state';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { HistoryMolecule } from '../core/editting/HistoryAtoms';
 import connectedAtom from '../util/atoms/connectedAtom';
@@ -11,7 +11,7 @@ export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
   const HistoryKeyMapPluginAtom = connectedAtom((_, set) => {
     // FIXME: on undo/redo, we also need to update the selection to move the cursor
 
-    const plugin = keymap({
+    const plugin: Plugin = keymap({
       //  Uppercase Z implies "Shift" is used
       'Mod-Z': () => {
         set(RedoAtom);
@@ -33,13 +33,7 @@ export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
     return plugin;
   });
 
-  const PluginsAtom = atom((get) => {
-    const connected = get(HistoryKeyMapPluginAtom);
-    if (!connected) return [];
-    return [connected];
-  });
-
   return {
-    PluginsAtom,
+    HistoryKeyMapPluginAtom,
   };
 });

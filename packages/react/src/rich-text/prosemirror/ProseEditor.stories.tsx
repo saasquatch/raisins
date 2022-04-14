@@ -1,17 +1,17 @@
 import { htmlParser } from '@raisins/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
+import { SelectionBookmark } from 'prosemirror-state';
 import React from 'react';
-import { NewLinePlugin } from './plugins/NewLineBreak';
+import { DefaultProseSchema } from './default-schema/DefaultProseSchema';
+import { DefaultProseSchemaHotkeysPlugin } from './default-schema/DefaultProseSchemaHotkeysPlugin';
+import { DefaultProseSchemaMarkMolecule } from './default-schema/DefaultProseSchemaMarkMolecule';
 import { ProseEditor } from './ProseEditor';
 import {
   ProseEditorScopeProps,
   ProseEditorScopeProvider,
   ProseEditorScopeType,
-  ProseTextSelection,
 } from './ProseEditorScope';
-import { inlineSchema } from './ProseSchemas';
-import { ProseToggleMarkMolecule } from './ProseToggleMarkMolecule';
 
 export default { title: 'Prose Editor' };
 
@@ -22,9 +22,9 @@ const proseAtom: ProseEditorScopeType = atom(() => {
         `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
       )
     ),
-    plugins: atom([NewLinePlugin()]),
-    schema: atom(inlineSchema),
-    selection: atom(undefined as ProseTextSelection | undefined),
+    plugins: atom([DefaultProseSchemaHotkeysPlugin]),
+    schema: atom(DefaultProseSchema),
+    selection: atom(undefined as SelectionBookmark | undefined),
   };
   return props;
 });
@@ -39,7 +39,7 @@ export const MarkDetections = () => {
   return (
     <pre>
       {`
-      Scenario: Mark detection is active
+      Scenario: Mark detection is active (TODO)
       When you select something in bold
       Then the bold button should show that bold is activated
       `}
@@ -50,7 +50,7 @@ export const StoredMarks = () => {
   return (
     <pre>
       {`
-      Scenario: StoredMarks work
+      Scenario: StoredMarks work (TODO)
       Given your input area is empty
       When you press the bold button
       Then the bold button shows as active
@@ -104,24 +104,16 @@ export const WithToolbarSynchronized = () => (
   </>
 );
 const Toolbar = () => {
-  const ToggleMarks = useMolecule(ProseToggleMarkMolecule);
-  const toggle = useSetAtom(ToggleMarks.toggleMarkAtom);
+  const ToggleMarks = useMolecule(DefaultProseSchemaMarkMolecule);
+  const toggleBold = useSetAtom(ToggleMarks.toggleBold);
+  const toggleItalic = useSetAtom(ToggleMarks.toggleItalic);
+  const toggleUnderline = useSetAtom(ToggleMarks.toggleUnderline);
 
   return (
     <>
-      <button
-        onMouseDown={(e) => toggle({ e, mark: inlineSchema.marks.strong })}
-      >
-        B
-      </button>
-      <button onMouseDown={(e) => toggle({ e, mark: inlineSchema.marks.em })}>
-        I
-      </button>
-      <button
-        onMouseDown={(e) => toggle({ e, mark: inlineSchema.marks.underline })}
-      >
-        U
-      </button>
+      <button onMouseDown={toggleBold}>B</button>
+      <button onMouseDown={toggleItalic}>I</button>
+      <button onMouseDown={toggleUnderline}>U</button>
     </>
   );
 };
@@ -132,7 +124,7 @@ export const SwappablePlugin = () => {
   return (
     <>
       <span>{plugins.length} plugins</span>
-      <button onClick={() => setPlugin([NewLinePlugin()])}>
+      <button onClick={() => setPlugin([DefaultProseSchemaHotkeysPlugin])}>
         Enable Hotkeys Plugin
       </button>
       <button onClick={() => setPlugin([])}>Disable All Plugins</button>
