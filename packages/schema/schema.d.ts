@@ -142,34 +142,34 @@ export interface Attribute {
   default?: string;
 
   /**
-   * Array of possible values to select from
+   * Array of possible values to select from where elements might be of any type, including null.
    */
   enum?: any[];
 
   /**
-   * Human readable string to represent each of the values from `enum`
+   * Human readable string to represent each of the values from `enum`.
    */
   enumNames?: string[];
 
   /**
-   * Inclusive maximum value of attribute
+   * Inclusive maximum value of the attribute, only valid for number type.
    */
   maximum?: number;
 
   /**
-   * Inclusive minimum value of attribute
+   * Inclusive minimum value of the attribute, only valid for number type.
    */
   minimum?: number;
 
   /**
-   * Maximum length of the value of the attribute
+   * Maximum length of the value of the attribute, only valid for string type.
    */
   maxLength?: number;
 
   /**
-   * Minimum length of the value of the attribute
+   * Minimum length of the value of the attribute, only valid for string type.
    */
-  minLength: number;
+  minLength?: number;
 
   /**
    * Valid format of the attribute's value
@@ -179,7 +179,7 @@ export interface Attribute {
   format?: string;
 
   /**
-   * The type of editor that should be used to edit this attribute
+   * The type of editor that should be used to edit this attribute.
    */
   uiWidget?: string;
 
@@ -189,14 +189,19 @@ export interface Attribute {
   uiWidgetOptions?: object;
 
   /**
-   * Group that the attribute will be displayed within
+   * Group that the attribute will be displayed within.
    */
   uiGroup?: string;
 
   /**
-   * Order that the attribute will be displayed in
+   * Order that the attribute will be displayed in.
    */
   uiOrder?: number;
+
+  /**
+   * This attribute must exist on node with a value if required is set to true.
+   */
+  required?: boolean;
 }
 
 export interface ComponentState {
