@@ -6,7 +6,7 @@ const { strong, em } = marks;
 
 const uDOM = ['u', 0] as const;
 
-export const inlineSchema = new Schema({
+export const DefaultProseSchema = new Schema({
   marks: {
     strong,
     em,

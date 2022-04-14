@@ -1,8 +1,8 @@
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { Node } from 'prosemirror-model';
-import { EditorState, Selection, Transaction } from 'prosemirror-state';
-import { ProseEditorScope, ProseTextSelection } from './ProseEditorScope';
+import { EditorState, SelectionBookmark, Transaction } from 'prosemirror-state';
+import { ProseEditorScope } from './ProseEditorScope';
 import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin';
 
 /**
@@ -25,16 +25,9 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
   });
   const proseSelectionAtom = atom((get) => {
     const doc = get(proseNodeAtom);
-    const selection = get(get(scope).selection);
-    let richSelect: Selection | undefined = undefined;
-    try {
-      richSelect = selection ? Selection.fromJSON(doc, selection) : undefined;
-    } catch (e) {
-      // Selection out of range caught here
-      // TODO: There's probably a smarter way to validate and replace selections
-      // Read: https://github.com/ProseMirror/prosemirror-history/blob/master/src/history.js
-    }
-    return richSelect;
+    const bookmark: SelectionBookmark | undefined = get(get(scope).selection);
+    if (!bookmark) return undefined;
+    return bookmark.resolve(doc);
   });
 
   // Build editor state
@@ -49,7 +42,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       return state;
     },
     (get, set, trans) => {
-      const currentState = get(editorStateAtom);
+      const currentState = get(editorStateAtom) as EditorState;
       if (!currentState) return;
       const nextState = currentState.applyTransaction(trans);
 
@@ -60,8 +53,8 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       // Otherwise deleting from the end of the text will throw an error
       if (nextState.state.selection !== currentState.selection) {
         // Only lazily serializes changes
-        const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
-        set(get(scope).selection, neextSelection);
+        const nextSelection = nextState.state.selection.getBookmark();
+        set(get(scope).selection, nextSelection);
       }
       if (nextState.state.doc !== currentState.doc) {
         // Only lazily serializes changes
