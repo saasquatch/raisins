@@ -29,7 +29,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           .filter(p => typeof p.attr !== 'undefined')
           .filter(isUndocumented)
           .map(p => {
-            const attr: schema.Attribute & Enums & UiSchema = {
+            const attr: schema.Attribute & Enums & UiWidgetOptions = {
               name: p.attr ?? p.name,
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
@@ -38,13 +38,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               // TODO: Support enums -- need to add to Raisins model
               enum: jsonTagValue(p, 'uiEnum'),
               enumNames: jsonTagValue(p, 'uiEnumNames'),
-              uiSchema: {
-                'ui:help': comp.docs,
-                'ui:widget': uiWidget(p),
-                'ui:options': jsonTagValue(p, 'uiOptions'),
-                // needs to be on top level
-                // 'ui:order': jsonTagValue(comp, 'uiOrder'),
-              },
+              uiWidget: uiWidget(p),
+              uiWidgetOptions: jsonTagValue(p, 'uiOptions'),
             };
 
             return attr;
@@ -62,13 +57,9 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         // 'ui:options': jsonTagValue(prop, 'uiOptions'),
         // 'ui:order': jsonTagValue(comp, 'uiOrder'),
 
-        type UiSchema = {
-          uiSchema: {
-            'ui:widget'?: string;
-            'ui:help'?: string;
-            'ui:options'?: { [key: string]: any };
-            'ui:order'?: string[];
-          };
+        type UiWidgetOptions = {
+          uiWidget?: string;
+          uiWidgetOptions?: { [key: string]: any };
         };
 
         const elem: schema.CustomElement = {
