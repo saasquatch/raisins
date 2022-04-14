@@ -90,10 +90,14 @@ export const StatTypeSelectWidget = () => {
     <div>
       <b>{schema.title ?? name}</b>{' '}
       <input
-        type="text"
         value={value}
+        list="stats"
         onInput={(e) => setValue((e.target as HTMLInputElement).value)}
       />
+      <datalist id="stats">
+        <option value="/referralsCount" />
+        <option value="/rewardsCount" />
+      </datalist>
     </div>
   );
 };

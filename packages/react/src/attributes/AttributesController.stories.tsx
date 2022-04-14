@@ -24,89 +24,99 @@ import { Widgets, widgets } from '../examples/MockWidgets';
 
 export default {
   title: 'Attributes Controller',
+  argTypes: {
+    canvas: {
+      control: 'boolean',
+    },
+  },
 };
 
-export const MyKitchenSink = () => {
+const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
+  const Canvas = () =>
+    canvas ? (
+      <div style={{ flex: 1 }}>
+        <CanvasController />
+      </div>
+    ) : (
+      <></>
+    );
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <NodeChildrenEditor Component={AttributesEditor} />
+      <Canvas />
+    </div>
+  );
+};
+
+export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory
       startingHtml={`<my-ui-component first="Stencil" last="'Don't call me a framework' JS" picked-date="1649799530937" text-color="#F00"></my-ui-component>`}
       startingPackages={MintComponents}
     >
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const Mint = () => {
+export const Mint = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const MintBigStat = () => {
+export const MintBigStat = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={mintBigStat} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const MintHeroImage = () => {
+export const MintHeroImage = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={mintHeroImage} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const MintHeroImageWithCanvas = () => {
-  return (
-    <BasicStory startingHtml={mintHeroImage} startingPackages={MintComponents}>
-      <div style={{ display: 'flex' }}>
-        <NodeChildrenEditor Component={AttributesEditor} />
-        <div style={{ flex: 1 }}>
-          <CanvasController />
-        </div>
-      </div>
-    </BasicStory>
-  );
-};
-
-export const MintTaskCard = () => {
+export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={mintTaskCard} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const Vanilla = () => {
+export const Vanilla = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory
       startingHtml={referrerWidget}
       startingPackages={VanillaComponents}
     >
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
-export const VanillaReferralList = () => {
+export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory
       startingHtml={referralList}
       startingPackages={VanillaComponents}
     >
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const Big = () => {
+export const Big = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={big} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
