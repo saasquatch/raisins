@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
 import splitOnFirst from './split-on-first';
@@ -29,7 +30,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           .filter(p => typeof p.attr !== 'undefined')
           .filter(isUndocumented)
           .map(p => {
-            const attr: schema.Attribute & Enums & UiWidgetOptions = {
+            const attr: schema.Attribute = {
               name: p.attr ?? p.name,
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
@@ -40,27 +41,17 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               enumNames: jsonTagValue(p, 'uiEnumNames'),
               uiWidget: uiWidget(p),
               uiWidgetOptions: jsonTagValue(p, 'uiOptions'),
+              maximum: jsonTagValue(p, 'maximum'),
+              minimum: jsonTagValue(p, 'minimum'),
+              maxLength: jsonTagValue(p, 'maxLength'),
+              minLength: jsonTagValue(p, 'minLength'),
+              format: tagValue(p.docsTags, 'format'),
+              uiGroup: tagValue(p.docsTags, 'uiGroup'),
+              uiOrder: jsonTagValue(p, 'uiOrder'),
             };
 
             return attr;
           });
-
-        type Enums = {
-          enum: string[];
-          enumNames: string[];
-        };
-
-        // TODO: Widget, help, etc.
-        // 'ui:widget': tagValue(prop.docsTags, 'uiWidget'),
-        // 'ui:name': uiName(prop),
-        // 'ui:help': prop.docs,
-        // 'ui:options': jsonTagValue(prop, 'uiOptions'),
-        // 'ui:order': jsonTagValue(comp, 'uiOrder'),
-
-        type UiWidgetOptions = {
-          uiWidget?: string;
-          uiWidgetOptions?: { [key: string]: any };
-        };
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
