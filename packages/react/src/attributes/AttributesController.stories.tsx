@@ -15,6 +15,12 @@ import {
 import { AttributeMolecule } from './AttributeMolecule';
 import { AttributesController } from './AttributesController';
 import { CanvasController } from '../canvas';
+import {
+  referralList,
+  referrerWidget,
+  VanillaComponents,
+} from '../examples/VanillaComponents';
+import { Widgets, widgets } from '../examples/MockWidgets';
 
 export default {
   title: 'Attributes Controller',
@@ -76,6 +82,27 @@ export const MintTaskCard = () => {
   );
 };
 
+export const Vanilla = () => {
+  return (
+    <BasicStory
+      startingHtml={referrerWidget}
+      startingPackages={VanillaComponents}
+    >
+      <NodeChildrenEditor Component={AttributesEditor} />
+    </BasicStory>
+  );
+};
+export const VanillaReferralList = () => {
+  return (
+    <BasicStory
+      startingHtml={referralList}
+      startingPackages={VanillaComponents}
+    >
+      <NodeChildrenEditor Component={AttributesEditor} />
+    </BasicStory>
+  );
+};
+
 export const Big = () => {
   return (
     <BasicStory startingHtml={big} startingPackages={MintComponents}>
@@ -120,7 +147,7 @@ const Debugging = () => {
   );
 };
 
-const Clear = () => {
+export const Clear = () => {
   const { clearAtom } = useMolecule(AttributeMolecule);
   const clear = useSetAtom(clearAtom);
   return <button onClick={clear}>x</button>;
@@ -141,77 +168,17 @@ const AttributeComponent = () => {
   );
 };
 
-const colorStyle = {
-  height: '25px',
-  width: '25px',
-
-  cursor: 'pointer',
-  display: 'inline-block',
-  marginLeft: '5px',
-};
-const ColorWidget = ({ options }) => {
-  const { valueAtom } = useMolecule(AttributeMolecule);
-  const [value, setValue] = useAtom(valueAtom);
-  return (
-    <div>
-      <input
-        type="text"
-        value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
-      />
-      <Clear />
-      <div>
-        <div
-          style={{ ...colorStyle, backgroundColor: 'salmon' }}
-          onClick={() => setValue('salmon')}
-        ></div>
-        <div
-          style={{ ...colorStyle, backgroundColor: 'BlanchedAlmond' }}
-          onClick={() => setValue('BlanchedAlmond')}
-        ></div>
-        <div
-          style={{ ...colorStyle, backgroundColor: 'lime' }}
-          onClick={() => setValue('lime')}
-        ></div>
-        <div
-          style={{ ...colorStyle, backgroundColor: 'PeachPuff' }}
-          onClick={() => setValue('PeachPuff')}
-        ></div>
-        <div
-          style={{ ...colorStyle, backgroundColor: 'LemonChiffon' }}
-          onClick={() => setValue('LemonChiffon')}
-        ></div>
-      </div>
-    </div>
-  );
-};
-
-const DateRangeWidget = ({ options }) => {
-  const { valueAtom } = useMolecule(AttributeMolecule);
-  const [value, setValue] = useAtom(valueAtom);
-  return (
-    <div>
-      <input
-        type="date"
-        value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
-      />
-    </div>
-  );
-};
-
 function AttributeEditor() {
   const { name, schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
 
-  console.log({ name, schema });
+  // console.log({ name, schema });
 
   if (schema.uiWidget) {
-    if (schema.uiWidget === 'color')
-      return <ColorWidget options={schema.uiWidgetOptions} />;
-    if (schema.uiWidget === 'DateRange')
-      return <DateRangeWidget options={schema.uiWidgetOptions} />;
+    const Widget = widgets[schema.uiWidget as keyof Widgets];
+    console.log({ widgets, uiWidget: schema.uiWidget });
+    return <Widget />;
   }
 
   if (value === undefined) {
@@ -248,7 +215,6 @@ function AttributeEditor() {
     return (
       <div>
         <b>{schema.title ?? name}</b>{' '}
-
         <input
           type="number"
           value={value}

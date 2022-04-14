@@ -37,17 +37,20 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               description: p.docs,
               default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
               // TODO: Support enums -- need to add to Raisins model
+              // Reference: https://coda.io/d/Self-Serve-Widget_dtoEr2girWN/Raisins-Schema_sucK8#_luqov
               enum: jsonTagValue(p, 'uiEnum'),
               enumNames: jsonTagValue(p, 'uiEnumNames'),
               uiWidget: uiWidget(p),
-              uiWidgetOptions: jsonTagValue(p, 'uiOptions'),
+              uiWidgetOptions: jsonTagValue(p, 'uiWidgetsOptions'),
               maximum: jsonTagValue(p, 'maximum'),
               minimum: jsonTagValue(p, 'minimum'),
               maxLength: jsonTagValue(p, 'maxLength'),
               minLength: jsonTagValue(p, 'minLength'),
               format: tagValue(p.docsTags, 'format'),
               uiGroup: tagValue(p.docsTags, 'uiGroup'),
+              uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
               uiOrder: jsonTagValue(p, 'uiOrder'),
+              required: jsonTagValue(p, 'required'),
             };
 
             return attr;
