@@ -228,7 +228,7 @@ function AttributeEditor() {
   if (schema?.type === 'boolean') {
     return (
       <div>
-        <Title />
+        <b>{schema.title ?? name}</b>{' '}
         <input
           type="checkbox"
           checked={value === undefined || value === null ? false : true}
@@ -247,7 +247,7 @@ function AttributeEditor() {
   if (schema?.type === 'number') {
     return (
       <div>
-        <Title />
+        <b>{schema.title ?? name}</b>{' '}
 
         <input
           type="number"
@@ -264,7 +264,7 @@ function AttributeEditor() {
   return (
     <div>
       {' '}
-      <Title />
+      <b>{schema.title ?? name}</b>{' '}
       <input
         type="text"
         value={value}
