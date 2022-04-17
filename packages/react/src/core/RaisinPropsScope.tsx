@@ -58,6 +58,7 @@ export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
   const provided = getMol(props) as Partial<RaisinProps>;
 
   return {
+    ...provided,
     LocalURLAtom: provided.LocalURLAtom ?? atom(undefined),
     PackagesAtom: provided.PackagesAtom ?? atom<Module[]>([]),
     uiWidgetsAtom: provided.uiWidgetsAtom ?? atom({}),

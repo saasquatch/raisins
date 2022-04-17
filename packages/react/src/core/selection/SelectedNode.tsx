@@ -63,7 +63,7 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     SelectedAtom,
     SelectedNodeAtom,
     SelectedSoulAtom,
-    SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
+    SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString()),
     SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
   };
 });

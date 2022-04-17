@@ -11,6 +11,7 @@ import { SoulsMolecule } from '../core/souls/Soul';
 import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
 import { CanvasScriptsMolecule } from './CanvasScriptsAtom';
 import {
+  combineRenderers,
   raisintoSnabdom,
   SnabdomAppender,
   SnabdomRenderer,
@@ -45,6 +46,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
   const ModeAtom = atom<Mode>('edit');
   const SizeAtom = atom<Size>(sizes[0]);
 
+  const CanvasRenderers = getMol(CanvasOptions.CanvasRenderers);
   const VnodeAtom = atom((get) => {
     const mode = get(ModeAtom);
     const selected = get(SelectedNodeAtom);
@@ -56,6 +58,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
     const pickedNode = get(PickedNodeAtom);
     const metamodel = get(ComponentModelAtom);
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
+    const renderers = get(CanvasRenderers);
 
     const renderer: SnabdomRenderer = (d, n) => {
       if (mode === 'preview') {
@@ -118,7 +121,7 @@ export const CanvasStyleMolecule = molecule((getMol) => {
     };
     const vnode = raisintoSnabdom(
       node as RaisinDocumentNode,
-      renderer,
+      combineRenderers(renderer, ...renderers),
       appender
     );
 

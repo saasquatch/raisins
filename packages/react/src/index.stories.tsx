@@ -1,15 +1,17 @@
 import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
+import { Atom, atom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
 } from 'jotai-molecules';
+import { Molecule } from 'jotai-molecules/dist/molecule';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
 import { CanvasStyleMolecule, sizes } from './canvas/CanvasStyleMolecule';
+import { SnabdomRenderer } from './canvas/raisinToSnabdom';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinProps, RaisinsProvider } from './core/RaisinPropsScope';
@@ -28,23 +30,30 @@ const meta: Meta = {
 };
 export default meta;
 
+const noRenderers = molecule(() => atom([])) as Molecule<
+  Atom<SnabdomRenderer[]>
+>;
+
 const StoryScope = createScope({
   startingHtml: '<span>I am a span</span>',
   startingPackages: [] as Module[],
+  renderers: noRenderers,
 });
 
-const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
+const StoryMolecule = molecule<Partial<RaisinProps>>((getMol, getScope) => {
   const storyScope = getScope(StoryScope);
   return {
     HTMLAtom: atom(storyScope.startingHtml),
     PackagesAtom: atom(storyScope.startingPackages),
     uiWidgetsAtom: atom({}),
+    CanvasRenderers: storyScope.renderers,
   };
 });
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
   startingPackages = [] as Module[],
+  renderers = noRenderers,
   children = (
     <>
       <Editor />
@@ -56,7 +65,7 @@ export function BasicStory({
     <>
       <ScopeProvider
         scope={StoryScope}
-        value={{ startingHtml, startingPackages }}
+        value={{ startingHtml, startingPackages, renderers }}
       >
         <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}
