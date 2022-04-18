@@ -42,15 +42,17 @@ describe("", () => {
 
     var date;
 
-    date = "2021-12-31T08:00:00.000Z/2022-12-31T08:00:00.000Z";
+    date = "2020-07-07T12:00:00+08:00/2021-08-08T12:00:00+08:00";
+    date = "2020-07-07T12:00:00+08:00/2021-08-08T12:00:00+08:00";
     // date = "2021-12-31/2021-12-31";
+	// Check with Scott leaderboard interval filter
 
     console.log("isValidDateInterval", isValidDateInterval(date));
     console.log("\n");
 
     var url;
-    url = "https://www.kutaycinar.com";
-    // url = "localhost:3000";
+    // url = "https://www.digi.com/resources/documentation/digidocs/90001437-13/reference/r_iso_8601_duration_format.htm";
+    url = "www.asd.com";
     console.log("isValidURL", isValidURL(url));
 
     function isValidDateInterval(value: string): boolean {
@@ -78,12 +80,15 @@ describe("", () => {
     if (whitelist.includes(value)) return true;
 	*/
 
+	// test and specs
+
     function isValidURL(value: string): boolean {
       try {
         new URL(value);
       } catch {
         return false;
       }
+
       return true;
     }
 
@@ -91,7 +96,7 @@ describe("", () => {
       return new Date(value).toJSON() === value;
     }
 
-    // console.log(validateAttributes(node, [meta]));
+    console.log(validateAttributes(node, [meta]));
     // console.log(validateAttributes(node, [meta])[0]?.error || "no errors :)");
   });
 });
