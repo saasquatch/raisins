@@ -164,8 +164,7 @@ export const Clear = () => {
 };
 
 const AttributeComponent = () => {
-  const { name, schemaAtom } = useMolecule(AttributeMolecule);
-  const schema = useAtomValue(schemaAtom);
+  const { name } = useMolecule(AttributeMolecule);
 
   return (
     <Fragment key={name}>
@@ -183,11 +182,8 @@ function AttributeEditor() {
   const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
 
-  // console.log({ name, schema });
-
   if (schema.uiWidget) {
     const Widget = widgets[schema.uiWidget as keyof Widgets];
-    console.log({ widgets, uiWidget: schema.uiWidget });
     return <Widget />;
   }
 
@@ -198,6 +194,21 @@ function AttributeEditor() {
         <button onClick={() => setValue(schema?.default?.toString() ?? '')}>
           Edit
         </button>
+      </div>
+    );
+  }
+
+  if (schema.enum) {
+    return (
+      <div>
+        <b>{schema.title ?? name}</b>{' '}
+        <select>
+          {schema.enum.map((value, idx) => (
+            <option value={value}>{schema.enumNames?.[idx] || value}</option>
+          ))}
+        </select>
+        <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
       </div>
     );
   }

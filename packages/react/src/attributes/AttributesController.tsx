@@ -22,8 +22,12 @@ export type AttributesControllerProps = {
 export const AttributesController: React.FC<AttributesControllerProps> = (
   props
 ) => {
-  const { keysAtom } = useMolecule(AttributesMolecule);
+  const { keysAtom, schemaAtom, groupedSchemaAtom } = useMolecule(
+    AttributesMolecule
+  );
   const keys = useAtomValue(keysAtom);
+  const schema = useAtomValue(schemaAtom);
+  const groupedSchema = useAtomValue(groupedSchemaAtom);
 
   if (!keys) return <></>;
   return (
