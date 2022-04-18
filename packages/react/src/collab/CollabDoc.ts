@@ -21,13 +21,20 @@ export const usercolors = [
 ];
 const myColor = usercolors[Math.floor(Math.random() * usercolors.length)];
 
-export const CollabMolecule = molecule((getMol, getScope) => {
-  const docAtom = atom(new Y.Doc());
+export const CollabRaisinsMolecule = molecule((getMol) => {
+  const collabAtoms = getMol(YJSMolecule);
   const coreAtoms = getMol(CoreMolecule);
   const selectionAtoms = getMol(SelectedNodeMolecule);
 
+  const selectionSyncAtom = atom((get) => {
+    const awareness = get(collabAtoms.awarenessAtom);
+    const selection = get(selectionAtoms.SelectedAtom);
+    if (!awareness) return;
+    awareness.setLocalStateField('selection', selection?.path);
+  });
+
   const valtioState = connectedAtom((get, set) => {
-    const ydoc = get(docAtom);
+    const ydoc = get(collabAtoms.docAtom);
     const ymap = ydoc.getMap('rootNode');
 
     const proxyRootDoc = proxy(get(coreAtoms.RootNodeAtom));
@@ -66,6 +73,17 @@ export const CollabMolecule = molecule((getMol, getScope) => {
     return html;
   });
 
+  return { selectionSyncAtom, valtioAsHtml, ...collabAtoms };
+});
+
+
+
+/**
+ * Molecule for core YJS connection
+ */
+export const YJSMolecule = molecule(() => {
+  const docAtom = atom(new Y.Doc());
+
   const connectionState = atom(false);
   const providerAtom = connectedAtom<WebrtcProvider>(
     (get, set) => {
@@ -101,8 +119,11 @@ export const CollabMolecule = molecule((getMol, getScope) => {
 
   const awarenessStateAtom = atom((get) => {
     get(awarenessTick);
+    const awareness = get(providerAtom)?.awareness;
+
+    if (!awareness) return new Map();
     // For memoization, returns a copy of the map for downstream
-    return new Map(get(providerAtom)?.awareness.getStates());
+    return new Map(awareness.getStates());
   });
 
   const awarenessTick = atom(0);
@@ -115,20 +136,14 @@ export const CollabMolecule = molecule((getMol, getScope) => {
     if (!values) return [];
     return Array.from(values);
   });
-  const selectionSyncAtom = atom((get) => {
-    const awareness = get(awarenessAtom);
-    const selection = get(selectionAtoms.SelectedAtom);
-    if (!awareness) return;
-    awareness.setLocalStateField('selection', selection?.path);
-  });
 
   return {
+    docAtom,
     providerAtom,
+    awarenessAtom,
     awarenessStateAtom,
-    selectionSyncAtom,
     connectionState,
     usersAtom,
     awarenessValues,
-    valtioAsHtml,
   };
 });

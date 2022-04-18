@@ -21,8 +21,9 @@ export const EditSelectedMolecule = molecule((getMol) => {
    */
   const DeleteSelectedAtom = atom(null, (get, set) => {
     set(InternalStateAtom, (previous) => {
-      if (previous.selected) {
-        const clone = removePath(previous.current, previous.selected.path);
+      const selected = get(SelectedAtom);
+      if (selected) {
+        const clone = removePath(previous.current, selected.path);
         return generateNextState(previous, clone);
       }
       return previous;

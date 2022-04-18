@@ -1,11 +1,6 @@
 import { Meta } from '@storybook/react';
 import { Atom, atom, useAtom } from 'jotai';
-import {
-  createScope,
-  molecule,
-  ScopeProvider,
-  useMolecule,
-} from 'jotai-molecules';
+import { molecule, ScopeProvider, useMolecule } from 'jotai-molecules';
 import { Molecule } from 'jotai-molecules/dist/molecule';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, useMemo } from 'react';
@@ -14,12 +9,13 @@ import { CanvasStyleMolecule, sizes } from './canvas/CanvasStyleMolecule';
 import { SnabdomRenderer } from './canvas/raisinToSnabdom';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
-import { RaisinProps, RaisinsProvider } from './core/RaisinPropsScope';
+import { RaisinsProvider } from './core/RaisinPropsScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNode';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
+import { StoryScope, StoryMolecule } from './StoryScope';
 import { StyleEditorController } from './stylesheets/StyleEditor';
 import { Module } from './util/NPMRegistry';
 
@@ -30,32 +26,16 @@ const meta: Meta = {
 };
 export default meta;
 
-const noRenderers = molecule(() => atom([])) as Molecule<
+export const noRenderers = molecule(() => atom([])) as Molecule<
   Atom<SnabdomRenderer[]>
 >;
-
-const StoryScope = createScope({
-  startingHtml: '<span>I am a span</span>',
-  startingPackages: [] as Module[],
-  renderers: noRenderers,
-  StateWrapper: molecule(() => atom([])),
-});
-
-const StoryMolecule = molecule<Partial<RaisinProps>>((getMol, getScope) => {
-  const storyScope = getScope(StoryScope);
-  return {
-    HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom(storyScope.startingPackages),
-    uiWidgetsAtom: atom({}),
-    CanvasRenderers: storyScope.renderers,
-  };
-});
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
   startingPackages = [] as Module[],
   renderers = noRenderers,
   StateWrapper = molecule(() => atom([])),
+  Molecule = StoryMolecule,
   children = (
     <>
       <Editor />
@@ -69,7 +49,7 @@ export function BasicStory({
         scope={StoryScope}
         value={{ startingHtml, startingPackages, renderers, StateWrapper }}
       >
-        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
+        <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}
     </>
   );
