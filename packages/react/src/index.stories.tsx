@@ -38,6 +38,7 @@ const StoryScope = createScope({
   startingHtml: '<span>I am a span</span>',
   startingPackages: [] as Module[],
   renderers: noRenderers,
+  StateWrapper: molecule(() => atom([])),
 });
 
 const StoryMolecule = molecule<Partial<RaisinProps>>((getMol, getScope) => {
@@ -54,6 +55,7 @@ export function BasicStory({
   startingHtml = '<span>I am a span</span>',
   startingPackages = [] as Module[],
   renderers = noRenderers,
+  StateWrapper = molecule(() => atom([])),
   children = (
     <>
       <Editor />
@@ -65,7 +67,7 @@ export function BasicStory({
     <>
       <ScopeProvider
         scope={StoryScope}
-        value={{ startingHtml, startingPackages, renderers }}
+        value={{ startingHtml, startingPackages, renderers, StateWrapper }}
       >
         <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}

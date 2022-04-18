@@ -1,36 +1,40 @@
-import { getNode, getPath, isElementNode, RaisinNode } from '@raisins/core';
+import {
+  getNode,
+  getPath,
+  isElementNode,
+  NodeSelection,
+  RaisinNode,
+} from '@raisins/core';
 import { atom, Getter, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
-import { CoreMolecule, InternalState } from '../CoreAtoms';
+import { CoreMolecule } from '../CoreAtoms';
 import { Soul, SoulsMolecule } from '../souls/Soul';
 import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
 
 export const SelectedNodeMolecule = molecule((getMol) => {
-  const { InternalStateAtom } = getMol(CoreMolecule);
+  const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SoulToNodeAtom } = getMol(SoulsInDocMolecule);
 
+  const InternalSelectedAtom = atom(undefined as NodeSelection | undefined);
+
   const SelectedAtom = atom(
-    (get) => get(InternalStateAtom).selected,
-    (_, set, next?: RaisinNode | undefined) => {
-      set(InternalStateAtom, (prev: InternalState) => {
+    (get) => get(InternalSelectedAtom),
+    (get, set, next?: RaisinNode | undefined) => {
+      set(InternalSelectedAtom, (prev: NodeSelection | undefined) => {
         // TODO: Allows for selecting nodes that aren't part of the current tree.
         // That doesn't make sense and should be prevented
-        return {
-          ...prev,
-          selected: next
-            ? { type: 'node', path: getPath(prev.current, next)! }
-            : undefined,
-        };
+        if (!next) return undefined;
+        return { type: 'node', path: getPath(get(RootNodeAtom), next)! };
       });
     }
   );
 
   function getSelected(get: Getter) {
-    const { current } = get(InternalStateAtom);
+    const root = get(RootNodeAtom);
     const selected = get(SelectedAtom);
-    return selected?.path ? getNode(current, selected.path) : undefined;
+    return selected?.path ? getNode(root, selected.path) : undefined;
   }
 
   const SelectedNodeAtom = atom(

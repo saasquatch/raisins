@@ -4,15 +4,14 @@ import {
   htmlSerializer,
   htmlUtil,
   NodePath,
-  NodeSelection,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { Atom, atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
 import { isFunction } from '../util/isFunction';
-import { generateJsonPointers } from "../validation/validateNode";
+import { generateJsonPointers } from '../validation/validateNode';
 import { generateNextState } from './editting/EditAtoms';
 import { PropsMolecule } from './RaisinPropsScope';
 
@@ -20,13 +19,12 @@ export type InternalState = {
   current: RaisinNode;
   undoStack: RaisinNode[];
   redoStack: RaisinNode[];
-  selected?: NodeSelection;
 };
 
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
 export const CoreMolecule = molecule((getMol, getScope) => {
-  const { HTMLAtom } = getMol(PropsMolecule);
+  const { HTMLAtom, StateWrapper } = getMol(PropsMolecule);
   /*
     Scenario: Souls are presered when downstream HTML matches upstream HTML
 
@@ -92,21 +90,36 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   const HistoryAtom = atom<Omit<InternalState, 'current'>>({
     redoStack: [],
     undoStack: [],
-    selected: undefined,
   });
   HistoryAtom.debugLabel = 'HistoryAtom';
 
-  const RootNodeAtom = atom(
+  const BaseRootNodeAtom: PrimitiveAtom<RaisinNode> = atom(
     (get) => get(InternalStateAtom).current,
     (_, set, next: SetStateAction<RaisinNode>) => {
       set(InternalStateAtom, (previous) => {
         const nextNode =
           typeof next === 'function' ? next(previous.current) : next;
-        return generateNextState(previous, nextNode, false);
+        return generateNextState(previous, nextNode);
       });
     }
   );
-  RootNodeAtom.debugLabel = 'RootNodeAtom';
+  BaseRootNodeAtom.debugLabel = 'BaseRootNodeAtom';
+
+  const rootNodeWrappers = getMol(StateWrapper);
+  const WrappedRootNode: Atom<PrimitiveAtom<RaisinNode>> = atom((get) => {
+    const atomsWrappers = get(rootNodeWrappers);
+    const wrappedCoreAtom = atomsWrappers.reduce(
+      (prev, cur) => cur(prev),
+      BaseRootNodeAtom
+    );
+    return wrappedCoreAtom;
+  });
+
+  const RootNodeAtom: PrimitiveAtom<RaisinNode> = atom(
+    (get) => get(get(WrappedRootNode)),
+    (get, set, next: SetStateAction<RaisinNode>) =>
+      set(get(WrappedRootNode), next)
+  );
 
   const IdentifierModelAtom = atom<IdentifierModel>((get) => {
     const current = get(RootNodeAtom);
@@ -145,10 +158,10 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   return {
     NodeFromHtml,
     NodeWithHtmlRefAtom,
-    InternalStateAtom,
     HistoryAtom,
     RootNodeAtom,
     IdentifierModelAtom,
+    InternalStateAtom,
     ParentsAtom,
     JsonPointersAtom,
   };

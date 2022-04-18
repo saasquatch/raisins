@@ -1,25 +1,35 @@
+import { RaisinNode } from '@raisins/core';
 import { atom, Atom, PrimitiveAtom } from 'jotai';
-import { createScope, ScopeProvider } from 'jotai-molecules';
-import { molecule } from 'jotai-molecules';
+import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
+import { Molecule } from 'jotai-molecules/dist/molecule';
 import React from 'react';
 import { CanvasOptions } from '../canvas/CanvasOptionsMolecule';
 import { Module } from '../component-metamodel/types';
+import { PrimitiveAtomWrapper } from '../plugins';
 
 export type RaisinProps = Partial<CanvasOptions> & {
   /**
    * Atom for the primitive string value that will be read
    */
   HTMLAtom: PrimitiveAtom<string>;
+
+  /**
+   * Plugins for core state
+   */
+  StateWrapper: Molecule<Atom<PrimitiveAtomWrapper<RaisinNode>[]>>;
+
   /**
    * Atom for the set of NPM packages
    */
   PackagesAtom: PrimitiveAtom<Module[]>;
+
   /**
    * Atom for the set of UI Widgets that can be use for editing attributes
    *
    * Read-only
    */
   uiWidgetsAtom: Atom<Record<string, React.FC>>;
+
   /**
    * When an NPM package is just `@local` then it is loaded from this URL
    *
@@ -28,7 +38,6 @@ export type RaisinProps = Partial<CanvasOptions> & {
   LocalURLAtom: Atom<string | undefined>;
 };
 
-type Molecule<T> = ReturnType<typeof molecule>;
 /**
  * The core thing that needs to be provided to raisins for editing to be possible.
  *
@@ -59,6 +68,10 @@ export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
 
   return {
     ...provided,
+    StateWrapper: (provided.StateWrapper ??
+      molecule(() => atom([]))) as Molecule<
+      Atom<PrimitiveAtomWrapper<RaisinNode>[]>
+    >,
     LocalURLAtom: provided.LocalURLAtom ?? atom(undefined),
     PackagesAtom: provided.PackagesAtom ?? atom<Module[]>([]),
     uiWidgetsAtom: provided.uiWidgetsAtom ?? atom({}),

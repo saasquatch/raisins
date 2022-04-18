@@ -35,7 +35,6 @@ export const HistoryMolecule = molecule((getMol) => {
         current: nextCurrent,
         undoStack,
         redoStack,
-        selected: previous.selected,
       };
       return newState;
     });
@@ -57,7 +56,6 @@ export const HistoryMolecule = molecule((getMol) => {
         immutableCopy: current,
         undoStack,
         redoStack,
-        selected: previous.selected,
       };
       return newState;
     });

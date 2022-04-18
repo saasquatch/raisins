@@ -6,7 +6,6 @@ import { CanvasController } from '../canvas';
 import { SnabdomRenderer } from '../canvas/raisinToSnabdom';
 import { CoreMolecule } from '../core';
 import { BasicStory } from '../index.stories';
-import { example } from '../node/children/LoadTest.example';
 import { CollabMolecule } from './CollabDoc';
 
 export default {
@@ -18,10 +17,21 @@ export const SelectionCanvas = () => {
     <BasicStory
       startingHtml={`<div>One</div><div>two</div>`}
       renderers={CollabSelectionMolecule}
+      StateWrapper={StateWrapperMolecule}
     >
       <SelectionAwareness />
     </BasicStory>
   );
+};
+const StateWrapperMolecule = molecule((getMol) => {
+
+  return atom([]);
+});
+
+const CollabHtml = () => {
+  const { valtioAsHtml } = useMolecule(CollabMolecule);
+  const html = useAtomValue(valtioAsHtml);
+  return <pre>{html}</pre>;
 };
 
 const CollabSelectionMolecule = molecule((getMol) => {
@@ -74,6 +84,7 @@ export const SelectionAwareness = () => {
         </div>
       ))}
       <CanvasController />
+      <CollabHtml />
     </div>
   );
 };

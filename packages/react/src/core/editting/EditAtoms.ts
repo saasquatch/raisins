@@ -1,6 +1,4 @@
 import {
-  getNode,
-  getPath,
   htmlUtil,
   NodePath,
   RaisinNode,
@@ -14,17 +12,11 @@ import { SoulsMolecule } from '../souls/Soul';
 const { duplicate, insertAt, remove, replace, replacePath } = htmlUtil;
 
 export const EditMolecule = molecule((getMol) => {
-  const { InternalStateAtom, RootNodeAtom } = getMol(CoreMolecule);
+  const { RootNodeAtom } = getMol(CoreMolecule);
   const { SoulsAtom, SoulSaverAtom } = getMol(SoulsMolecule);
   const SetNodeInternalAtom = atom(
     null,
-    (get, set, next: SetStateAction<RaisinNode>) => {
-      set(InternalStateAtom, (previous) => {
-        const nextNode =
-          typeof next === 'function' ? next(previous.current) : next;
-        return generateNextState(previous, nextNode, false);
-      });
-    }
+    (_, set, next: SetStateAction<RaisinNode>) => set(RootNodeAtom, next)
   );
   SetNodeInternalAtom.debugLabel = 'SetNodeInternalAtom';
 
@@ -78,60 +70,28 @@ export const EditMolecule = molecule((getMol) => {
     null,
     (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
       const soulSaver = get(SoulSaverAtom);
-      set(InternalStateAtom, (previous) => {
-        let newSelection: RaisinNode;
-        const nextRoot = replace(
-          previous.current,
-          prev,
-          next,
-          (old: RaisinNode, replacement: RaisinNode) => {
-            if (
-              previous.selected &&
-              old === getNode(previous.current, previous.selected.path)
-            ) {
-              newSelection = replacement;
-            }
-            return soulSaver(old, replacement);
-          }
-        );
-
-        const undoStack = [previous.current, ...previous.undoStack];
-        const newState: InternalState = {
-          ...previous,
-          selected: {
-            type: 'node',
-            path: getPath(nextRoot, newSelection!)!,
-          },
-          current: nextRoot,
-          undoStack,
-          redoStack: [],
-        };
-        return newState;
-      });
+      const nextRoot = replace(
+        get(RootNodeAtom),
+        prev,
+        next,
+        (old: RaisinNode, replacement: RaisinNode) => {
+          return soulSaver(old, replacement);
+        }
+      );
+      set(RootNodeAtom, nextRoot);
     }
   );
 
   const ReplacePathAtom = atom(
     null,
     (get, set, { prev, next }: { prev: NodePath; next: RaisinNode }) => {
-      set(InternalStateAtom, (previous) => {
-        const nextRoot = replacePath(
-          previous.current,
-          prev,
-          next,
-          get(SoulSaverAtom)
-        );
-
-        const undoStack = [previous.current, ...previous.undoStack];
-        const newState: InternalState = {
-          ...previous,
-          selected: previous.selected,
-          current: nextRoot,
-          undoStack,
-          redoStack: [],
-        };
-        return newState;
-      });
+      const nextRoot = replacePath(
+        get(RootNodeAtom),
+        prev,
+        next,
+        get(SoulSaverAtom)
+      );
+      set(RootNodeAtom, nextRoot);
     }
   );
   return {
@@ -147,18 +107,10 @@ export const EditMolecule = molecule((getMol) => {
 
 export function generateNextState(
   previous: InternalState,
-  nextNode: RaisinNode,
-  clearSelection = false
+  nextNode: RaisinNode
 ) {
   const undoStack = [previous.current, ...previous.undoStack];
   const newState: InternalState = {
-    selected: clearSelection ? undefined : previous.selected,
-    // newSelection === undefined
-    //   ? undefined
-    //   : {
-    //       type: 'node',
-    //       path: getPath(nextNode, newSelection)!,
-    //     },
     current: nextNode,
     undoStack,
     redoStack: [],
