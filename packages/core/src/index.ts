@@ -22,6 +22,7 @@ import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
 import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
 import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
 import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
+import { validateNode } from "./validation/validateNode/validateNode";
 
 export {
   htmlSerializer,
@@ -41,6 +42,7 @@ export {
   doesChildAllowParent,
   doesParentAllowChild,
   isNodeAllowed,
+  validateNode,
   HTMLComponents,
   // Path / selection
   getNode,

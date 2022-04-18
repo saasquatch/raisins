@@ -45,5 +45,8 @@
         "cache": false
       }
     }
+  },
+  "dependencies": {
+    "validate-color": "^2.2.1"
   }
 }

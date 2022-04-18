@@ -142,14 +142,66 @@ export interface Attribute {
   default?: string;
 
   /**
-   * The type of editor that should be used to edit this attribute
+   * Array of possible values to select from where elements might be of any type, including null.
+   */
+  enum?: any[];
+
+  /**
+   * Human readable string to represent each of the values from `enum`.
+   */
+  enumNames?: string[];
+
+  /**
+   * Inclusive maximum value of the attribute, only valid for number type.
+   */
+  maximum?: number;
+
+  /**
+   * Inclusive minimum value of the attribute, only valid for number type.
+   */
+  minimum?: number;
+
+  /**
+   * Maximum length of the value of the attribute, only valid for string type.
+   */
+  maxLength?: number;
+
+  /**
+   * Minimum length of the value of the attribute, only valid for string type.
+   */
+  minLength?: number;
+
+  /**
+   * Valid format of the attribute's value
+   * TODO: need to decide how much of this we want to support
+   * https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.7.3
+   */
+  format?: string;
+
+  /**
+   * The type of editor that should be used to edit this attribute.
    */
   uiWidget?: string;
 
   /**
    * Additional data for the widget editor to use.
    */
-  uiOptions?: object;
+  uiWidgetOptions?: object;
+
+  /**
+   * Group that the attribute will be displayed within.
+   */
+  uiGroup?: string;
+
+  /**
+   * Order that the attribute will be displayed in.
+   */
+  uiOrder?: number;
+
+  /**
+   * This attribute must exist on node with a value if required is set to true.
+   */
+  required?: boolean;
 }
 
 export interface ComponentState {

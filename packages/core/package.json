@@ -79,6 +79,7 @@
   "dependencies": {
     "@raisins/schema": "^0.2.0",
     "classnames": "^2.3.1",
+    "color2k": "^2.0.0",
     "css": "^3.0.0",
     "css-select": "^4.1.3",
     "css-tree": "*",
