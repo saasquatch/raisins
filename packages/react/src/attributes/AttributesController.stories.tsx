@@ -37,7 +37,7 @@ const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
   return {
     ...getMol(StoryConfigMolecule),
     AttributeTheme: {
-      widgets: atom({}),
+      widgets: atom(widgets),
     },
   };
 });
