@@ -1,5 +1,5 @@
-import { Attribute } from '@raisins/schema';
-import { atom, useAtomValue } from 'jotai';
+import type { Attribute } from '@raisins/schema/schema';
+import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { NodeMolecule } from '../node/NodeMolecule';
 
@@ -17,11 +17,11 @@ export const AttributesMolecule = molecule((getMol) => {
     return attributes;
   });
 
-  const groupedSchemaAtom = atom((get) => {
+  const groupedSchemaAtom:Atom<AttributeGroups> = atom((get) => {
     const attributes = get(componentMetaForNode)?.attributes;
-    const groupedList = attributes ? group(attributes, 'uiGroup') : undefined;
+    const groupedList = attributes ? group(attributes) : {};
     console.log({ groupedList });
-    return attributes;
+    return groupedList;
   });
 
   const keysAtom = atom(
@@ -45,10 +45,22 @@ function sortByGroup(attributes?: Attribute[]) {
   });
 }
 
-function group(list: Attribute[], key: string) {
-  return list?.reduce(function (allGroups: Attribute[], attribute: Attribute) {
-    var group = attribute[key];
-    (allGroups[group] = allGroups[group] || []).push(attribute);
-    return allGroups;
-  }, {});
+// TODO: Config we want this name, it could conflict
+const DEFAULT_GROUP = 'default';
+
+type AttributeGroups = Record<string, Attribute[]>;
+function group(list: Attribute[]): AttributeGroups {
+  return list.reduce(function (
+    allGroups: AttributeGroups,
+    attribute: Attribute
+  ) {
+    const key = attribute.uiGroup ?? DEFAULT_GROUP;
+    const groupArray = allGroups[key] ?? [];
+    const withAttribute = [...groupArray, attribute];
+    return {
+      ...allGroups,
+      [key]: withAttribute,
+    };
+  },
+  {} as AttributeGroups);
 }

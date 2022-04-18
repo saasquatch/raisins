@@ -20,7 +20,7 @@ import {
   referrerWidget,
   VanillaComponents,
 } from '../examples/VanillaComponents';
-import { Widgets, widgets } from '../examples/MockWidgets';
+import { Clear, Widgets, widgets } from '../examples/MockWidgets';
 
 export default {
   title: 'Attributes Controller',
@@ -130,6 +130,7 @@ function AttributesEditor() {
           <AttributesController Component={AttributeComponent} />
         </tbody>
       </table>
+      <AttributesController />
       <Debugging />
     </div>
   );
@@ -157,12 +158,6 @@ const Debugging = () => {
   );
 };
 
-export const Clear = () => {
-  const { clearAtom } = useMolecule(AttributeMolecule);
-  const clear = useSetAtom(clearAtom);
-  return <button onClick={clear}>x</button>;
-};
-
 const AttributeComponent = () => {
   const { name } = useMolecule(AttributeMolecule);
 
@@ -179,10 +174,11 @@ const AttributeComponent = () => {
 
 function AttributeEditor() {
   const { name, schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
-  const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
+  const [value, setValue] = useAtom(valueAtom);
 
   if (schema.uiWidget) {
+    // TODO: get widgets from uiWidgetsAtom
     const Widget = widgets[schema.uiWidget as keyof Widgets];
     return <Widget />;
   }

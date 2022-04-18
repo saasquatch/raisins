@@ -2,10 +2,10 @@ export { CoreMolecule } from './CoreAtoms';
 export { EditMolecule } from './editting/EditAtoms';
 export { HistoryMolecule } from './editting/HistoryAtoms';
 export {
-  PropsMolecule,
-  PropsScopeProvider,
-  RaisinProps,
-  RaisinPropsMolecule,
+  ConfigMolecule as PropsMolecule,
+  ConfigScopeProvider as PropsScopeProvider,
+  RaisinConfig as RaisinProps,
+  RaisinConfigMolecule as RaisinPropsMolecule,
   RaisinsProvider,
 } from './RaisinPropsScope';
 export { HoveredNodeMolecule } from './selection/HoveredNode';

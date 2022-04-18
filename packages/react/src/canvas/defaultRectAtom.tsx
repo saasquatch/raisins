@@ -2,7 +2,7 @@ import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
 import { Soul, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
-import { CanvasOptions } from './CanvasOptionsMolecule';
+import { CanvasConfig } from './CanvasConfig';
 import type { ConnectionState } from './iframe/SnabbdomSanboxedIframeAtom';
 
 /**
@@ -19,7 +19,7 @@ export function defaultRectAtom(
   nodeAtom: Atom<RaisinNode | undefined>,
   soulAtom: Atom<(node: RaisinNode) => Soul>,
   listenedPosition: Atom<Rect | undefined>,
-  CanvasOptions: CanvasOptions
+  CanvasOptions: CanvasConfig
 ): Atom<Promise<Rect | undefined>> {
   const rectAtom = atom(async (get) => {
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);

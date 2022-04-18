@@ -8,7 +8,7 @@ import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
-import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
+import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScriptsMolecule } from './CanvasScriptsAtom';
 import {
   raisintoSnabdom,
@@ -33,7 +33,7 @@ export const sizes: Size[] = [
 ];
 
 export const CanvasStyleMolecule = molecule((getMol) => {
-  const CanvasOptions = getMol(CanvasOptionsMolecule);
+  const CanvasOptions = getMol(CanvasConfigMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { HoveredNodeAtom } = getMol(HoveredNodeMolecule);

@@ -1,8 +1,7 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { AttributeMolecule } from '../attributes';
-import { Clear } from '../attributes/AttributesController.stories';
 
 const colorStyle = {
   height: '25px',
@@ -104,6 +103,12 @@ export const StatTypeSelectWidget = () => {
 
 export type Widgets = {
   [key: string]: React.FC;
+};
+
+export const Clear = () => {
+  const { clearAtom } = useMolecule(AttributeMolecule);
+  const clear = useSetAtom(clearAtom);
+  return <button onClick={clear}>x</button>;
 };
 
 export const widgets: Widgets = {

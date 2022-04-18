@@ -3,7 +3,9 @@ import { Atom, atom, SetStateAction } from 'jotai';
 import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
 import React from 'react';
 import { isFunction } from '../util/isFunction';
+import { AttributeConfigMolecule } from './AttributeConfig';
 import { AttributesMolecule } from './AttributesMolecule';
+import { resolveComponent } from './resolveComponent';
 
 const AttributeScope = createScope<string | undefined>(undefined);
 
@@ -24,6 +26,7 @@ export const AttributeScopeMolecule = molecule((_, getScope) => {
 export const AttributeMolecule = molecule((getMol) => {
   const attributesAtoms = getMol(AttributesMolecule);
   const name = getMol(AttributeScopeMolecule);
+  const config = getMol(AttributeConfigMolecule);
 
   const valueAtom = atom(
     (get) => {
@@ -49,11 +52,24 @@ export const AttributeMolecule = molecule((getMol) => {
 
   const clearAtom = atom(null, (_, set) => set(valueAtom, undefined));
 
+  const WidgetAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.widgets))
+  );
+  const FieldAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.fields))
+  );
+  const TemplateAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.templates))
+  );
+
   return {
     name,
     valueAtom,
     schemaAtom,
     clearAtom,
+    WidgetAtom,
+    FieldAtom,
+    TemplateAtom,
   };
 });
 

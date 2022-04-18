@@ -2,31 +2,33 @@ import { atom, Atom, PrimitiveAtom } from 'jotai';
 import { createScope, ScopeProvider } from 'jotai-molecules';
 import { molecule } from 'jotai-molecules';
 import React from 'react';
-import { CanvasOptions } from '../canvas/CanvasOptionsMolecule';
+import { AttributeConfig } from '../attributes/AttributeConfig';
+import { CanvasConfig } from '../canvas/CanvasConfig';
 import { Module } from '../component-metamodel/types';
 
-export type RaisinProps = Partial<CanvasOptions> & {
-  /**
-   * Atom for the primitive string value that will be read
-   */
-  HTMLAtom: PrimitiveAtom<string>;
-  /**
-   * Atom for the set of NPM packages
-   */
-  PackagesAtom: PrimitiveAtom<Module[]>;
-  /**
-   * Atom for the set of UI Widgets that can be use for editing attributes
-   *
-   * Read-only
-   */
-  uiWidgetsAtom: Atom<Record<string, React.FC>>;
-  /**
-   * When an NPM package is just `@local` then it is loaded from this URL
-   *
-   * Read-only
-   */
-  LocalURLAtom: Atom<string | undefined>;
-};
+export type RaisinConfig = Partial<CanvasConfig> &
+  Partial<AttributeConfig> & {
+    /**
+     * Atom for the primitive string value that will be read
+     */
+    HTMLAtom: PrimitiveAtom<string>;
+    /**
+     * Atom for the set of NPM packages
+     */
+    PackagesAtom: PrimitiveAtom<Module[]>;
+    /**
+     * Atom for the set of UI Widgets that can be use for editing attributes
+     *
+     * Read-only
+     */
+    uiWidgetsAtom: Atom<Record<string, React.FC>>;
+    /**
+     * When an NPM package is just `@local` then it is loaded from this URL
+     *
+     * Read-only
+     */
+    LocalURLAtom: Atom<string | undefined>;
+  };
 
 type Molecule<T> = ReturnType<typeof molecule>;
 /**
@@ -34,17 +36,17 @@ type Molecule<T> = ReturnType<typeof molecule>;
  *
  * Everything in raisins is in some way *derived state* from this molecule
  */
-export type RaisinPropsMolecule = Molecule<Partial<RaisinProps>>;
+export type RaisinConfigMolecule = Molecule<Partial<RaisinConfig>>;
 
-const PropsScope = createScope<RaisinPropsMolecule | undefined>(undefined);
-PropsScope.displayName = 'PropsScope';
+const configScope = createScope<RaisinConfigMolecule | undefined>(undefined);
+configScope.displayName = 'ConfigScope';
 
-export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
+export const ConfigMolecule = molecule<RaisinConfig>((getMol, getScope) => {
   /**
-   * This will create a new set of atoms for every {@link PropsScope}
+   * This will create a new set of atoms for every {@link configScope}
    */
-  const props = getScope(PropsScope);
-  if (!props)
+  const config = getScope(configScope);
+  if (!config)
     throw new Error(
       'Must use this molecule in a wrapping <RaisinsProvider> element'
     );
@@ -55,9 +57,10 @@ export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
   const HTMLAtom = atom('');
   HTMLAtom.debugLabel = 'HTMLAtom';
 
-  const provided = getMol(props) as Partial<RaisinProps>;
+  const provided = getMol(config) as Partial<RaisinConfig>;
 
   return {
+    ...provided,
     LocalURLAtom: provided.LocalURLAtom ?? atom(undefined),
     PackagesAtom: provided.PackagesAtom ?? atom<Module[]>([]),
     uiWidgetsAtom: provided.uiWidgetsAtom ?? atom({}),
@@ -66,20 +69,20 @@ export const PropsMolecule = molecule<RaisinProps>((getMol, getScope) => {
 });
 
 /**
- * Provides a scope for editing a {@link RaisinPropsMolecule}
+ * Provides a scope for editing a {@link RaisinConfigMolecule}
  */
-export const PropsScopeProvider = ({
+export const ConfigScopeProvider = ({
   molecule,
   children,
 }: {
-  molecule: RaisinPropsMolecule;
+  molecule: RaisinConfigMolecule;
   children: React.ReactNode;
 }) => {
   return (
-    <ScopeProvider scope={PropsScope} value={molecule}>
+    <ScopeProvider scope={configScope} value={molecule}>
       {children}
     </ScopeProvider>
   );
 };
 
-export const RaisinsProvider = PropsScopeProvider;
+export const RaisinsProvider = ConfigScopeProvider;

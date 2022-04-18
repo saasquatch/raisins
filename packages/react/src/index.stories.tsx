@@ -12,7 +12,7 @@ import { CanvasController } from './canvas/CanvasController';
 import { CanvasStyleMolecule, sizes } from './canvas/CanvasStyleMolecule';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
-import { RaisinProps, RaisinsProvider } from './core/RaisinPropsScope';
+import { RaisinConfig, RaisinsProvider } from './core/RaisinPropsScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNode';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
@@ -33,7 +33,7 @@ const StoryScope = createScope({
   startingPackages: [] as Module[],
 });
 
-const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
+const StoryMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
   const storyScope = getScope(StoryScope);
   return {
     HTMLAtom: atom(storyScope.startingHtml),

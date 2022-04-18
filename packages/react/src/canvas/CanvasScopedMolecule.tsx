@@ -11,7 +11,7 @@ import { dependentAtom } from '../util/atoms/dependentAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import { Rect } from './api/Rect';
 import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
-import { CanvasOptionsMolecule } from './CanvasOptionsMolecule';
+import { CanvasConfigMolecule } from './CanvasConfig';
 import { defaultRectAtom } from './defaultRectAtom';
 import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
 import { CanvasStyleMolecule } from './CanvasStyleMolecule';
@@ -29,7 +29,7 @@ export function CanvasProvider({ children }: { children: React.ReactNode }) {
 export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   getScope(CanvasScope);
 
-  const CanvasOptions = getMol(CanvasOptionsMolecule);
+  const CanvasOptions = getMol(CanvasConfigMolecule);
   const { VnodeAtom, IframeHeadAtom } = getMol(CanvasStyleMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
