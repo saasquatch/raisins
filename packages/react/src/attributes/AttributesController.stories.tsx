@@ -4,26 +4,119 @@ import React, { Fragment } from 'react';
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { BasicStory } from '../index.stories';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  big,
+  mintBigStat,
+  MintComponents,
+  mintHeroImage,
+  mintMono,
+  mintTaskCard,
+} from '../examples/MintComponents';
 import { AttributeMolecule } from './AttributeMolecule';
 import { AttributesController } from './AttributesController';
+import { CanvasController } from '../canvas';
+import {
+  referralList,
+  referrerWidget,
+  VanillaComponents,
+} from '../examples/VanillaComponents';
+import { Widgets, widgets } from '../examples/MockWidgets';
 
 export default {
   title: 'Attributes Controller',
+  argTypes: {
+    canvas: {
+      control: 'boolean',
+    },
+  },
 };
 
-export const Mint = () => {
+const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
+  const Canvas = () =>
+    canvas ? (
+      <div style={{ flex: 1 }}>
+        <CanvasController />
+      </div>
+    ) : (
+      <></>
+    );
+
   return (
-    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <div style={{ display: 'flex' }}>
       <NodeChildrenEditor Component={AttributesEditor} />
+      <Canvas />
+    </div>
+  );
+};
+
+export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory
+      startingHtml={`<my-ui-component first="Stencil" last="'Don't call me a framework' JS" picked-date="1649799530937" text-color="#F00"></my-ui-component>`}
+      startingPackages={MintComponents}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
 
-export const Big = () => {
+export const Mint = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintBigStat = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory startingHtml={mintBigStat} startingPackages={MintComponents}>
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintHeroImage = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory startingHtml={mintHeroImage} startingPackages={MintComponents}>
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory startingHtml={mintTaskCard} startingPackages={MintComponents}>
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const Vanilla = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory
+      startingHtml={referrerWidget}
+      startingPackages={VanillaComponents}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory
+      startingHtml={referralList}
+      startingPackages={VanillaComponents}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const Big = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory startingHtml={big} startingPackages={MintComponents}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -64,45 +157,40 @@ const Debugging = () => {
   );
 };
 
-const Clear = () => {
+export const Clear = () => {
   const { clearAtom } = useMolecule(AttributeMolecule);
   const clear = useSetAtom(clearAtom);
   return <button onClick={clear}>x</button>;
 };
 
 const AttributeComponent = () => {
-  const { name, schemaAtom } = useMolecule(AttributeMolecule);
-  const schema = useAtomValue(schemaAtom);
+  const { name } = useMolecule(AttributeMolecule);
 
   return (
     <Fragment key={name}>
       <tr>
         <td>
-          <b>{schema.title ?? name}</b>
-          <br />
           <AttributeEditor />
         </td>
       </tr>
-      {schema.description && (
-        <tr>
-          <td colSpan={2}>
-            <span style={{ color: 'grey' }}>{schema.description}</span>
-          </td>
-        </tr>
-      )}
     </Fragment>
   );
 };
 
 function AttributeEditor() {
-  const { schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
+  const { name, schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
   const schema = useAtomValue(schemaAtom);
+
+  if (schema.uiWidget) {
+    const Widget = widgets[schema.uiWidget as keyof Widgets];
+    return <Widget />;
+  }
 
   if (value === undefined) {
     return (
       <div>
-        {schema?.default ?? <i>Empty</i>}
+        <b>{schema.title ?? name}</b>{' '}
         <button onClick={() => setValue(schema?.default?.toString() ?? '')}>
           Edit
         </button>
@@ -110,9 +198,25 @@ function AttributeEditor() {
     );
   }
 
+  if (schema.enum) {
+    return (
+      <div>
+        <b>{schema.title ?? name}</b>{' '}
+        <select>
+          {schema.enum.map((value, idx) => (
+            <option value={value}>{schema.enumNames?.[idx] || value}</option>
+          ))}
+        </select>
+        <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
+      </div>
+    );
+  }
+
   if (schema?.type === 'boolean') {
     return (
       <div>
+        <b>{schema.title ?? name}</b>{' '}
         <input
           type="checkbox"
           checked={value === undefined || value === null ? false : true}
@@ -124,12 +228,14 @@ function AttributeEditor() {
           }
         />
         <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
       </div>
     );
   }
   if (schema?.type === 'number') {
     return (
       <div>
+        <b>{schema.title ?? name}</b>{' '}
         <input
           type="number"
           value={value}
@@ -138,17 +244,21 @@ function AttributeEditor() {
           }
         />
         <Clear />
+        <div style={{ color: 'grey' }}>{schema.description}</div>
       </div>
     );
   }
   return (
     <div>
+      {' '}
+      <b>{schema.title ?? name}</b>{' '}
       <input
         type="text"
         value={value}
         onInput={(e) => setValue((e.target as HTMLInputElement).value)}
       />
       <Clear />
+      <div style={{ color: 'grey' }}>{schema.description}</div>
     </div>
   );
 }

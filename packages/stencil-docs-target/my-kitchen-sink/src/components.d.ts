@@ -60,6 +60,65 @@ export namespace Components {
          */
         "reverse": boolean;
     }
+    interface MyUiComponent {
+        /**
+          * What to call people if we don't have their name
+          * @uiName Anonymous Label
+          * @uiEnum ["Friend", "Buddy", "Pal"]
+          * @uiDefault Friend
+         */
+        "anonymousLabel": string;
+        /**
+          * The first name of the user to display to their friends
+          * @uiName First Name
+          * @uiDefault Your
+         */
+        "first": string;
+        /**
+          * The last name
+          * @uiName Last Name
+          * @uiDefault Friend
+         */
+        "last": string;
+        /**
+          * Truncates names longer than this
+          * @uiName Max Length
+          * @uiDefault 6
+         */
+        "maxLength": number;
+        /**
+          * The middle name
+          * @uiName Middle Name
+          * @uiDefault Best
+         */
+        "middle": string;
+        /**
+          * @demo Jeff - {"person": "Jeff"}
+          * @demo Jess - {"person": "Jess"}
+          * @demo No Name - {}
+         */
+        "myDemoProp": {
+    person: string;
+  };
+        /**
+          * Date to display
+          * @uiName Pick a Date
+          * @uiWidget DatePicker
+          * @uiOptions {"format":"milliseconds"}
+         */
+        "pickedDate": number;
+        /**
+          * Should show backwards?
+         */
+        "reverse": boolean;
+        /**
+          * @uiName Text Color
+          * @uiEnum ["#F00", "#00F", "#0F0"]
+          * @uiEnumNames ["Red", "Blue", "Green"]
+          * @uiDefault #F00
+         */
+        "textColor": string;
+    }
 }
 declare global {
     interface HTMLMyCardElement extends Components.MyCard, HTMLStencilElement {
@@ -80,10 +139,17 @@ declare global {
         prototype: HTMLMySplitElement;
         new (): HTMLMySplitElement;
     };
+    interface HTMLMyUiComponentElement extends Components.MyUiComponent, HTMLStencilElement {
+    }
+    var HTMLMyUiComponentElement: {
+        prototype: HTMLMyUiComponentElement;
+        new (): HTMLMyUiComponentElement;
+    };
     interface HTMLElementTagNameMap {
         "my-card": HTMLMyCardElement;
         "my-component": HTMLMyComponentElement;
         "my-split": HTMLMySplitElement;
+        "my-ui-component": HTMLMyUiComponentElement;
     }
 }
 declare namespace LocalJSX {
@@ -141,10 +207,70 @@ declare namespace LocalJSX {
          */
         "reverse"?: boolean;
     }
+    interface MyUiComponent {
+        /**
+          * What to call people if we don't have their name
+          * @uiName Anonymous Label
+          * @uiEnum ["Friend", "Buddy", "Pal"]
+          * @uiDefault Friend
+         */
+        "anonymousLabel"?: string;
+        /**
+          * The first name of the user to display to their friends
+          * @uiName First Name
+          * @uiDefault Your
+         */
+        "first"?: string;
+        /**
+          * The last name
+          * @uiName Last Name
+          * @uiDefault Friend
+         */
+        "last"?: string;
+        /**
+          * Truncates names longer than this
+          * @uiName Max Length
+          * @uiDefault 6
+         */
+        "maxLength"?: number;
+        /**
+          * The middle name
+          * @uiName Middle Name
+          * @uiDefault Best
+         */
+        "middle"?: string;
+        /**
+          * @demo Jeff - {"person": "Jeff"}
+          * @demo Jess - {"person": "Jess"}
+          * @demo No Name - {}
+         */
+        "myDemoProp"?: {
+    person: string;
+  };
+        /**
+          * Date to display
+          * @uiName Pick a Date
+          * @uiWidget DatePicker
+          * @uiOptions {"format":"milliseconds"}
+         */
+        "pickedDate"?: number;
+        /**
+          * Should show backwards?
+         */
+        "reverse"?: boolean;
+        /**
+          * @uiName Text Color
+          * @uiEnum ["#F00", "#00F", "#0F0"]
+          * @uiEnumNames ["Red", "Blue", "Green"]
+          * @uiDefault #F00
+         */
+        "textColor"?: string;
+    }
     interface IntrinsicElements {
         "my-card": MyCard;
         "my-component": MyComponent;
         "my-split": MySplit;
+        "my-ui-component": MyUiComponent;
     }
 }
 export { LocalJSX as JSX };
@@ -154,6 +280,7 @@ declare module "@stencil/core" {
             "my-card": LocalJSX.MyCard & JSXBase.HTMLAttributes<HTMLMyCardElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             "my-split": LocalJSX.MySplit & JSXBase.HTMLAttributes<HTMLMySplitElement>;
+            "my-ui-component": LocalJSX.MyUiComponent & JSXBase.HTMLAttributes<HTMLMyUiComponentElement>;
         }
     }
 }

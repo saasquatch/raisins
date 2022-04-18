@@ -1,164 +1,23 @@
-import { RaisinDocumentNode } from '@raisins/core';
-import { Atom, atom, PrimitiveAtom, SetStateAction, useAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
-import { DOMParser, Node } from 'prosemirror-model';
-import { EditorState, Plugin, Selection, Transaction } from 'prosemirror-state';
-import { EditorView } from 'prosemirror-view';
-import { useMemo } from 'react';
-import connectedAtom from '../../util/atoms/connectedAtom';
-import { HistoryKeyMapPluginMolecule } from '../HistoryKeyMapPluginAtom';
-import { NewLinePlugin } from './NewLineBreak';
-import { proseRichDocToRaisin, raisinToProseDoc } from './Prose2Raisin';
-import { inlineSchema as schema } from './ProseSchemas';
+import { useAtom } from 'jotai';
+import { ScopeProvider, useMolecule } from 'jotai-molecules';
+import React from 'react';
+import { ProseEditorMolecule } from './ProseEditorMolecule';
+import { ProseEditorViewScope } from './ProseEditorViewMolecule';
 
-type SerialState = {
-  selection?: ProseTextSelection;
-  doc: { [key: string]: any };
+export const ProseEditor = () => {
+  return (
+    <ScopeProvider scope={ProseEditorViewScope} uniqueValue>
+      <ProseEditorInner />
+    </ScopeProvider>
+  );
 };
 
-export type ProseTextSelection = {
-  type: 'text';
-  anchor: number;
-  head: number;
+const ProseEditorInner = () => {
+  const elementRef = useMolecule(ProseEditorMolecule);
+  /*
+   * NOTE(lv): Needs to subscribe to value, even though it is never used.
+   * Otherwise nothing kicks off the atom subscription process
+   */
+  const [, mountRef] = useAtom(elementRef.view.elementAtom);
+  return <div ref={mountRef} />;
 };
-
-export type RaisinProseState = {
-  node: RaisinDocumentNode;
-  selection?: ProseTextSelection;
-};
-
-/**
- * A prose editor that stores it's state in the `node` and `selection` atoms that are provided to this hook.
- *
- * @param node
- * @param selection
- * @returns
- */
-export function useProseEditorOnAtom(
-  node: PrimitiveAtom<RaisinDocumentNode>,
-  selection: PrimitiveAtom<ProseTextSelection | undefined>
-) {
-  const atoms = useMolecule(HistoryKeyMapPluginMolecule);
-  // Memoize derived parsed doc
-  const elementRef = useMemo(
-    () => createAtoms(node, selection, atoms.PluginsAtom),
-    [node, selection]
-  );
-
-  const [, mountRef] = useAtom(elementRef);
-
-  return {
-    mountRef,
-  };
-}
-
-// TODO: pluginAtom as a prop, allow plugins to be hot-swapped
-function createAtoms(
-  node: PrimitiveAtom<RaisinDocumentNode>,
-  selection: PrimitiveAtom<ProseTextSelection | undefined>,
-  plugins: Atom<Plugin[]>
-) {
-  const proseDocAtom = atom((get) => raisinToProseDoc(get(node)));
-
-  // Build editor state
-
-  const editorStateAtom = atom<EditorState | null>((get) => {
-    const pluginsArray = get(plugins);
-    if (!pluginsArray) return null;
-    const sState: SerialState = {
-      doc: get(proseDocAtom),
-      selection: get(selection),
-    };
-    return hydratedState(sState, [
-      //
-      NewLinePlugin(),
-      //
-      ...pluginsArray,
-    ]);
-  });
-
-  const handleTransactionAtion = atom<null, Transaction>(
-    null,
-    (get, set, trans) => {
-      const currentState = get(editorStateAtom);
-      if (!currentState) return;
-      const nextState = currentState.applyTransaction(trans);
-
-      // FIXME: Re-bundle this state. Since node and selection are independently updated,
-      // their derived state can become inconsistent.
-      // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
-
-      // NOTE: This currently works ONLY if selection is updated BEFORE document.
-      // Otherwise deleting from the end of the text will throw an error
-      if (nextState.state.selection !== currentState.selection) {
-        // Only lazily serializes changes
-        const neextSelection = nextState.state.selection.toJSON() as ProseTextSelection;
-        set(selection, neextSelection);
-      }
-      if (nextState.state.doc !== currentState.doc) {
-        // Only lazily serializes changes
-        const nextRaisinNode = proseRichDocToRaisin(
-          nextState.state.doc.content
-        );
-        set(node, nextRaisinNode);
-      }
-    }
-  );
-
-  const elementRef = atom<HTMLElement | null>(null);
-
-  const editorViewAtom: Atom<Atom<EditorView | null>> = atom((get) => {
-    const el = get(elementRef);
-    if (!el) return atom(null);
-
-    return connectedAtom<EditorView | null>(
-      (get, set) => {
-        const state = get(editorStateAtom);
-        if (!state) return null;
-
-        return new EditorView(el, {
-          state,
-          dispatchTransaction: (tr) => set(handleTransactionAtion, tr),
-          domParser: DOMParser.fromSchema(schema),
-          clipboardParser: DOMParser.fromSchema(schema),
-        });
-      },
-      (view) => view && view.destroy()
-    );
-  });
-
-  return atom(
-    (get) => {
-      // Subscribes but doesn't listen
-      const state = get(editorStateAtom);
-      const view = get(get(editorViewAtom));
-      if (state) view?.updateState(state);
-
-      return get(elementRef);
-    },
-    (_, set, next: SetStateAction<HTMLElement | null>) => set(elementRef, next)
-  );
-}
-
-function hydratedState(
-  sState: SerialState,
-  plugins: Plugin[] = []
-): EditorState {
-  const { doc, selection } = sState;
-  const richDoc = Node.fromJSON(schema, doc);
-  let richSelect: Selection | undefined = undefined;
-  try {
-    richSelect = selection ? Selection.fromJSON(richDoc, selection) : undefined;
-  } catch (e) {
-    // Selection out of range caught here
-    // TODO: There's probably a smarter way to validate and replace selections
-  }
-
-  let state = EditorState.create({
-    doc: richDoc,
-    selection: richSelect,
-    schema,
-    plugins,
-  });
-  return state;
-}

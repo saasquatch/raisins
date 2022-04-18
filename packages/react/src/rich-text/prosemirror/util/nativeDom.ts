@@ -4,7 +4,7 @@
  * @param node - a browser node
  * @returns
  */
-export function nativeDomToString(node: Node) {
+export function nativeDomToString(node: Node): string {
   const tmpl = document.createElement('template');
   const clone = node.cloneNode(true);
   tmpl.content.appendChild(clone);

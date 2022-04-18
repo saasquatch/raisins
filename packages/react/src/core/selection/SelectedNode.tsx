@@ -1,4 +1,4 @@
-import { getNode, getPath, RaisinNode } from '@raisins/core';
+import { getNode, getPath, isElementNode, RaisinNode } from '@raisins/core';
 import { atom, Getter, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
@@ -27,7 +27,11 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     }
   );
 
-  const SelectedPathString = atom((get) => get(SelectedAtom)?.path.toString);
+  function getSelected(get: Getter) {
+    const { current } = get(InternalStateAtom);
+    const selected = get(SelectedAtom);
+    return selected?.path ? getNode(current, selected.path) : undefined;
+  }
 
   const SelectedNodeAtom = atom(
     (get) => {
@@ -55,16 +59,11 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     }
   );
 
-  function getSelected(get: Getter) {
-    const { current } = get(InternalStateAtom);
-    const selected = get(SelectedAtom);
-    return selected?.path ? getNode(current, selected.path) : undefined;
-  }
-
   return {
     SelectedAtom,
     SelectedNodeAtom,
-    SelectedPathString,
     SelectedSoulAtom,
+    SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
+    SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
   };
 });

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
 import splitOnFirst from './split-on-first';
@@ -36,19 +37,24 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               description: p.docs,
               default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
               // TODO: Support enums -- need to add to Raisins model
-              // enum: jsonTagValue(p, 'uiEnum'),
-              // enumNames: jsonTagValue(p, 'uiEnumNames'),
+              // Reference: https://coda.io/d/Self-Serve-Widget_dtoEr2girWN/Raisins-Schema_sucK8#_luqov
+              enum: jsonTagValue(p, 'uiEnum'),
+              enumNames: jsonTagValue(p, 'uiEnumNames'),
+              uiWidget: uiWidget(p),
+              uiWidgetOptions: jsonTagValue(p, 'uiWidgetsOptions'),
+              maximum: jsonTagValue(p, 'maximum'),
+              minimum: jsonTagValue(p, 'minimum'),
+              maxLength: jsonTagValue(p, 'maxLength'),
+              minLength: jsonTagValue(p, 'minLength'),
+              format: tagValue(p.docsTags, 'format'),
+              uiGroup: tagValue(p.docsTags, 'uiGroup'),
+              uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
+              uiOrder: jsonTagValue(p, 'uiOrder'),
+              required: jsonTagValue(p, 'required'),
             };
 
             return attr;
           });
-
-        // TODO: Widget, help, etc.
-        // 'ui:widget': tagValue(prop.docsTags, 'uiWidget'),
-        // 'ui:name': uiName(prop),
-        // 'ui:help': prop.docs,
-        // 'ui:options': jsonTagValue(prop, 'uiOptions'),
-        // 'ui:order': jsonTagValue(comp, 'uiOrder'),
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
@@ -82,8 +88,11 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                 content,
               };
             }),
-            // 
-            demoStates: (demos.length > 0) ? demos : undefined
+          demoStates: demos.length > 0 ? demos : undefined,
+
+          // 'ui:widget': uiWidget(comp),
+          // 'ui:options': jsonTagValue(comp, 'uiOptions'),
+          // 'ui:order': jsonTagValue(comp, 'uiOrder'),
         };
         return elem;
       } catch (e) {
@@ -100,10 +109,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
 function tagValue(tags: JsonDocsTag[], name: string): string | undefined {
   return tags.find(t => t.name === name)?.text;
 }
-// function jsonTagValue(tags: HasDocsTags, name: string) {
-//   const value = tagValue(tags.docsTags, name);
-//   return value && JSON.parse(value);
-// }
+function jsonTagValue(tags: HasDocsTags, name: string) {
+  const value = tagValue(tags.docsTags, name);
+  try {
+    return value && JSON.parse(value);
+  } catch (e) {
+    throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e);
+  }
+}
 function hasTag(tagName: string) {
   return (d: HasDocsTags) =>
     d.docsTags?.find(t => t.name === tagName) ? true : false;
@@ -112,4 +125,5 @@ const isUndocumented = () => hasTag('undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
+const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
