@@ -24,7 +24,7 @@ import { Module } from './util/NPMRegistry';
 const meta: Meta = {
   title: 'Editor',
   component: Editor,
-  excludeStories: ['EditorView'],
+  excludeStories: ['EditorView', 'StoryConfigMolecule'],
 };
 export default meta;
 
@@ -33,14 +33,16 @@ const StoryScope = createScope({
   startingPackages: [] as Module[],
 });
 
-const StoryMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
-  const storyScope = getScope(StoryScope);
-  return {
-    HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom(storyScope.startingPackages),
-    uiWidgetsAtom: atom({}),
-  };
-});
+export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
+  (_, getScope) => {
+    const storyScope = getScope(StoryScope);
+    return {
+      HTMLAtom: atom(storyScope.startingHtml),
+      PackagesAtom: atom(storyScope.startingPackages),
+      uiWidgetsAtom: atom({}),
+    };
+  }
+);
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
@@ -51,6 +53,7 @@ export function BasicStory({
       {/* <RegisteredAtoms /> */}
     </>
   ),
+  Molecule = StoryConfigMolecule,
 }) {
   return (
     <>
@@ -58,7 +61,7 @@ export function BasicStory({
         scope={StoryScope}
         value={{ startingHtml, startingPackages }}
       >
-        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
+        <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}
     </>
   );

@@ -1,9 +1,9 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useMolecule, molecule } from 'jotai-molecules';
 import React, { Fragment } from 'react';
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
-import { BasicStory } from '../index.stories';
+import { BasicStory, StoryConfigMolecule } from '../index.stories';
 import {
   big,
   mintBigStat,
@@ -21,6 +21,8 @@ import {
   VanillaComponents,
 } from '../examples/VanillaComponents';
 import { Clear, Widgets, widgets } from '../examples/MockWidgets';
+import { RaisinConfig } from '../core/RaisinPropsScope';
+import { AttributeTemplateProps } from './AttributeThemeMolecule';
 
 export default {
   title: 'Attributes Controller',
@@ -29,6 +31,50 @@ export default {
       control: 'boolean',
     },
   },
+};
+
+const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+  return {
+    ...getMol(StoryConfigMolecule),
+    AttributeTheme: {
+      widgets: atom({}),
+    },
+  };
+});
+
+const CustomTemplate = (
+  props: React.PropsWithChildren<AttributeTemplateProps>
+) => {
+  const { name, schemaAtom } = useMolecule(AttributeMolecule);
+  const schema = useAtomValue(schemaAtom);
+
+  return (
+    <div>
+      <p>
+        <b>{schema.title ?? name}</b>
+      </p>
+      <div>{props.children}</div>
+      <p style={{ color: 'red' }}>Description override</p>
+    </div>
+  );
+};
+
+const CustomField = () => {
+  const { WidgetAtom, TemplateAtom, schemaAtom } = useMolecule(
+    AttributeMolecule
+  );
+  const Widget = useAtomValue(WidgetAtom);
+  const Template = useAtomValue(TemplateAtom);
+
+  const widgetUsed = useAtomValue(schemaAtom).uiWidget;
+  return (
+    <Template>
+      <p>
+        <b>Your widget: {widgetUsed || 'default'}</b>
+      </p>
+      <Widget />
+    </Template>
+  );
 };
 
 const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
@@ -54,6 +100,7 @@ export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
     <BasicStory
       startingHtml={`<my-ui-component first="Stencil" last="'Don't call me a framework' JS" picked-date="1649799530937" text-color="#F00"></my-ui-component>`}
       startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
     >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
@@ -62,7 +109,11 @@ export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
 
 export const Mint = ({ canvas }: { canvas: boolean }) => {
   return (
-    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <BasicStory
+      startingHtml={mintMono}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
@@ -70,7 +121,11 @@ export const Mint = ({ canvas }: { canvas: boolean }) => {
 
 export const MintBigStat = ({ canvas }: { canvas: boolean }) => {
   return (
-    <BasicStory startingHtml={mintBigStat} startingPackages={MintComponents}>
+    <BasicStory
+      startingHtml={mintBigStat}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
@@ -78,7 +133,11 @@ export const MintBigStat = ({ canvas }: { canvas: boolean }) => {
 
 export const MintHeroImage = ({ canvas }: { canvas: boolean }) => {
   return (
-    <BasicStory startingHtml={mintHeroImage} startingPackages={MintComponents}>
+    <BasicStory
+      startingHtml={mintHeroImage}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
@@ -86,7 +145,73 @@ export const MintHeroImage = ({ canvas }: { canvas: boolean }) => {
 
 export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
   return (
-    <BasicStory startingHtml={mintTaskCard} startingPackages={MintComponents}>
+    <BasicStory
+      startingHtml={mintTaskCard}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintTaskCardWidgets = ({ canvas }: { canvas: boolean }) => {
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+    return {
+      ...getMol(StoryConfigMolecule),
+      AttributeTheme: {
+        widgets: atom(widgets),
+      },
+    };
+  });
+
+  return (
+    <BasicStory
+      startingHtml={mintTaskCard}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintTaskCardTemplate = ({ canvas }: { canvas: boolean }) => {
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+    return {
+      ...getMol(StoryConfigMolecule),
+      AttributeTheme: {
+        templates: atom({ default: CustomTemplate }),
+      },
+    };
+  });
+  return (
+    <BasicStory
+      startingHtml={mintTaskCard}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
+      <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintTaskCardField = ({ canvas }: { canvas: boolean }) => {
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+    return {
+      ...getMol(StoryConfigMolecule),
+      AttributeTheme: {
+        widgets: atom(widgets),
+        fields: atom({ default: CustomField }),
+      },
+    };
+  });
+  return (
+    <BasicStory
+      startingHtml={mintTaskCard}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
@@ -97,6 +222,7 @@ export const Vanilla = ({ canvas }: { canvas: boolean }) => {
     <BasicStory
       startingHtml={referrerWidget}
       startingPackages={VanillaComponents}
+      Molecule={ConfigMolecule}
     >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
@@ -107,6 +233,7 @@ export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
     <BasicStory
       startingHtml={referralList}
       startingPackages={VanillaComponents}
+      Molecule={ConfigMolecule}
     >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
@@ -115,7 +242,11 @@ export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
 
 export const Big = ({ canvas }: { canvas: boolean }) => {
   return (
-    <BasicStory startingHtml={big} startingPackages={MintComponents}>
+    <BasicStory
+      startingHtml={big}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
       <NodeChildrenEditorStory canvas={canvas} />
     </BasicStory>
   );
@@ -125,11 +256,11 @@ function AttributesEditor() {
   return (
     <div data-attributes-editor>
       <TagName />
-      <table>
+      {/* <table>
         <tbody>
           <AttributesController Component={AttributeComponent} />
         </tbody>
-      </table>
+      </table> */}
       <AttributesController />
       <Debugging />
     </div>
