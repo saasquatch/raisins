@@ -12,7 +12,7 @@ import { CustomElement, Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { loadable } from 'jotai/utils';
-import { PropsMolecule } from '../core';
+import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
@@ -22,7 +22,7 @@ import { Module } from './types';
 
 export const ComponentModelMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
-  const { PackagesAtom, LocalURLAtom } = getMol(PropsMolecule);
+  const { PackagesAtom, LocalURLAtom } = getMol(ConfigMolecule);
 
   /**
    * Module details from NPM (loaded async)

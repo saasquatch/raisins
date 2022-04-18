@@ -155,27 +155,6 @@ export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
   );
 };
 
-export const MintTaskCardWidgets = ({ canvas }: { canvas: boolean }) => {
-  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
-    return {
-      ...getMol(StoryConfigMolecule),
-      AttributeTheme: {
-        widgets: atom(widgets),
-      },
-    };
-  });
-
-  return (
-    <BasicStory
-      startingHtml={mintTaskCard}
-      startingPackages={MintComponents}
-      Molecule={ConfigMolecule}
-    >
-      <NodeChildrenEditorStory canvas={canvas} />
-    </BasicStory>
-  );
-};
-
 export const MintTaskCardTemplate = ({ canvas }: { canvas: boolean }) => {
   const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
     return {
@@ -201,7 +180,6 @@ export const MintTaskCardField = ({ canvas }: { canvas: boolean }) => {
     return {
       ...getMol(StoryConfigMolecule),
       AttributeTheme: {
-        widgets: atom(widgets),
         fields: atom({ default: CustomField }),
       },
     };
