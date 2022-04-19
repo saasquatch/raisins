@@ -3,9 +3,9 @@ import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
-import { WYSWIGCanvas, WYSWIGCanvasProps } from './CanvasView';
 import { CanvasProvider, CanvasScopedMolecule } from './CanvasScopedMolecule';
 import { CanvasStyleMolecule } from './CanvasStyleMolecule';
+import { WYSWIGCanvas, WYSWIGCanvasProps } from './CanvasView';
 
 export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   const { SizeAtom } = useMolecule(CanvasStyleMolecule);
