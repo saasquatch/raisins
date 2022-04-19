@@ -15,6 +15,7 @@ export const AttributesMolecule = molecule((getMol) => {
   const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
   const { attributesForNode, componentMetaForNode } = getMol(NodeMolecule);
+
   const schemaAtom = atom((get) => {
     const selectedNode = get(SelectedNodeAtom) as RaisinElementNode;
     const metamodel = get(ComponentMetaAtom);
@@ -40,6 +41,7 @@ export const AttributesMolecule = molecule((getMol) => {
   );
 
   return {
+    // TODO: attributesForNode is not the currently selectedNode
     valuesAtom: attributesForNode,
     schemaAtom,
     groupedSchemaAtom,

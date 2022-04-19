@@ -2,7 +2,7 @@ import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { CanvasController } from '../canvas';
-import { RaisinConfig } from '../core/RaisinPropsScope';
+import { RaisinConfig } from '../core/RaisinConfigScope';
 import {
   big,
   mintBigStat,

@@ -7,7 +7,7 @@ export {
   RaisinConfig,
   RaisinConfigMolecule,
   RaisinsProvider,
-} from './RaisinPropsScope';
+} from './RaisinConfigScope';
 export { HoveredNodeMolecule } from './selection/HoveredNode';
 export { PickedNodeMolecule } from './selection/PickedNode';
 export { SelectedNodeMolecule } from './selection/SelectedNode';

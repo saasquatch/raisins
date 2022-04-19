@@ -1,6 +1,6 @@
 import { atom, Atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { ConfigMolecule } from '../core/RaisinPropsScope';
+import { ConfigMolecule } from '../core/RaisinConfigScope';
 
 export type CanvasConfig = {
   /**
