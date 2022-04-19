@@ -1,6 +1,7 @@
 import {
   And as and,
   Given as given,
+  When as when,
   Then as then
 } from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
@@ -13,13 +14,20 @@ import {
   RaisinStyleNode,
   RaisinTextNode
 } from "../html-dom/RaisinNode";
-import { validateChildConstraints } from "../validation/validateNode/validateNode";
+import {
+  isValidColor,
+  isValidDate,
+  isValidDateInterval,
+  isValidURL,
+  validateChildConstraints
+} from "../validation/validateNode/validateNode";
 
 const JEST = process.env.JEST_WORKER_ID !== undefined;
 
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
+  when: (...args: any[]) => void,
   then: (...args: any[]) => void
 ) => {
   const root: RaisinDocumentNode = {
@@ -138,12 +146,43 @@ const cucumber = (
       }
     ]);
   });
+
+  var input: string;
+  var result: boolean;
+
+  given(/^an input value of (.*)$/, (value: string) => {
+    input = value;
+  });
+
+  when("isValidColor is tested", () => {
+    result = isValidColor(input);
+  });
+
+  when("isValidDate is tested", () => {
+    result = isValidDate(input);
+  });
+
+  when("isValidDateInterval is tested", () => {
+    result = isValidDateInterval(input);
+  });
+
+  when("isValidURL is tested", () => {
+    result = isValidURL(input);
+  });
+
+  then("it returns true", () => {
+    expect(result).toBe(true);
+  });
+
+  then("it returns false", () => {
+    expect(result).toBe(false);
+  });
 };
 
 var jestSteps: StepDefinitions = () => {};
 
 if (!JEST) {
-  cucumber(given, and, then);
+  cucumber(given, and, when, then);
 } else {
   const jest_cucumber = require("jest-cucumber");
 
@@ -154,8 +193,8 @@ if (!JEST) {
     }
   );
 
-  var jestSteps: StepDefinitions = ({ given, and, then }) => {
-    cucumber(given, and, then);
+  var jestSteps: StepDefinitions = ({ given, and, when, then }) => {
+    cucumber(given, and, when, then);
   };
 
   jest_cucumber.autoBindSteps([feature], [jestSteps]);

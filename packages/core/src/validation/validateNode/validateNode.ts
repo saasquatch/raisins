@@ -205,10 +205,24 @@ export function validateAttributes(
                   }
                 });
               break;
-            case "date-time":
+            case "date-interval":
+              if (isValidDateInterval(value) === false)
+                errorStack.push({
+                  jsonPointer: "/attribs/" + a.name,
+                  error: {
+                    rule: `format-date-interval`
+                  }
+                });
               break;
 
             case "url":
+              if (isValidURL(value) === false)
+                errorStack.push({
+                  jsonPointer: "/attribs/" + a.name,
+                  error: {
+                    rule: `format-url`
+                  }
+                });
               break;
 
             default:
@@ -237,11 +251,45 @@ export function validateAttributes(
   return errorStack as ErrorStack;
 }
 
-function isValidColor(input: string): boolean {
+export function isValidColor(value: string): boolean {
+  if (value === "currentColor" || value === "currentcolor") return true;
+  if (/var\(--sl-color-.*\)/.test(value)) return true;
   try {
-    parseToRgba(input);
+    parseToRgba(value);
   } catch {
+    console.log("false");
     return false;
   }
   return true;
+}
+
+export function isValidURL(value: string): boolean {
+  if (!value.includes(".")) return false;
+  var url;
+  try {
+    url = new URL(value);
+  } catch {
+    try {
+      if (!value.startsWith("https://") || !value.startsWith("http://"))
+        value = "https://" + value;
+      url = new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+export function isValidDateInterval(value: string): boolean {
+  const dates = value.split("/");
+  // if there are not exactly 2 dates, it is not a valid interval
+  if (dates.length !== 2) return false;
+  // if both are valid dates, then it is a valid date interval
+  if (isValidDate(dates[0]) && isValidDate(dates[1])) return true;
+  return false;
+}
+
+export function isValidDate(value: string): boolean {
+  return !isNaN(Date.parse(value));
 }

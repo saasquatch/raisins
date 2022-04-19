@@ -1,6 +1,6 @@
 import { CustomElement } from "@raisins/schema/schema";
 import { RaisinElementNode } from "../../html-dom/RaisinNode";
-import { validateAttributes } from "./validateNode";
+import { isValidColor, isValidURL, validateAttributes } from "./validateNode";
 import validateColor from "validate-color";
 import { parseToRgba } from "color2k";
 
@@ -45,7 +45,7 @@ describe("", () => {
     date = "2020-07-07T12:00:00+08:00/2021-08-08T12:00:00+08:00";
     date = "2020-07-07T12:00:00+08:00/2021-08-08T12:00:00+08:00";
     // date = "2021-12-31/2021-12-31";
-	// Check with Scott leaderboard interval filter
+    // Check with Scott leaderboard interval filter
 
     console.log("isValidDateInterval", isValidDateInterval(date));
     console.log("\n");
@@ -64,15 +64,6 @@ describe("", () => {
       return false;
     }
 
-    function isValidColor(value: string): boolean {
-      try {
-        parseToRgba(value);
-      } catch {
-        return false;
-      }
-      return true;
-    }
-
     /*
 	const whitelist = ["currentColor", "var(--sl-color-sunshine-500)"];
 	// CSS variable support inherit/currentColor
@@ -80,20 +71,15 @@ describe("", () => {
     if (whitelist.includes(value)) return true;
 	*/
 
-	// test and specs
+    // test and specs
 
-    function isValidURL(value: string): boolean {
+    function isValidDate(value: string): boolean {
       try {
         new URL(value);
       } catch {
         return false;
       }
-
       return true;
-    }
-
-    function isValidDate(value: string): boolean {
-      return new Date(value).toJSON() === value;
     }
 
     console.log(validateAttributes(node, [meta]));
