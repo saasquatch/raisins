@@ -1,6 +1,4 @@
 import * as schema from '@raisins/schema/schema';
-import { WritableAtom } from 'jotai';
-import { Atom, SetAtom } from 'jotai/core/atom';
 import type { PackageJson } from '../util/NPMRegistry';
 
 export type Module = {

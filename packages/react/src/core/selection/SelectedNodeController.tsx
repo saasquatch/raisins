@@ -5,7 +5,7 @@ import { SelectedNodeMolecule } from '..';
 import { NodeScopeProvider } from '../../node';
 import { EditSelectedMolecule } from '../editting/EditSelectedAtom';
 
-type SelectedNodeControllerProps = {
+export type SelectedNodeControllerProps = {
   HasSelectionComponent: React.ComponentType;
   NoSelectionComponent?: React.ComponentType;
 };
