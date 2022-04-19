@@ -42,25 +42,8 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   // @ts-ignore - fails only for build, not local dev
   const resizeObserver = new window.ResizeObserver(
     (entries: ResizeObserverEntry[]) => {
-      document.body.dispatchEvent(
-        new CustomEvent(geometryEvent, {
-          bubbles: true,
-          detail: {
-            entries: entries.map((e) => {
-              const { target } = e;
-              const mappedEntry: GeometryEntry = {
-                contentRect: e.target.getBoundingClientRect(),
-                target: isElement(target)
-                  ? {
-                      attributes: getAttributes(target),
-                    }
-                  : undefined,
-              };
-              return mappedEntry;
-            }),
-          },
-        })
-      );
+      const elements = entries.map((e) => e.target);
+      dispatchResize(elements);
     }
   );
 
@@ -82,6 +65,27 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     snabbdom.datasetModule,
   ]);
 
+  function dispatchResize(elements: Element[]) {
+    document.body.dispatchEvent(
+      new CustomEvent(geometryEvent, {
+        bubbles: true,
+        detail: {
+          entries: elements.map((e) => {
+            const mappedEntry: GeometryEntry = {
+              contentRect: e.getBoundingClientRect(),
+              target: isElement(e)
+                ? {
+                    attributes: getAttributes(e),
+                  }
+                : undefined,
+            };
+            return mappedEntry;
+          }),
+        },
+      })
+    );
+  }
+
   function patchAndCache(next: VNode) {
     patch(currentNode, next);
     currentNode = next;
@@ -90,38 +94,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     const methods: ChildRPC = {
       render(content) {
         patchAndCache(content);
-      },
-      geometry() {
-        if (isElement(currentNode)) {
-          // No VNode rendered yet
-          return {
-            entries: [],
-          };
-        }
-
-        function children(
-          start: HTMLElement[],
-          n: VNode | string
-        ): HTMLElement[] {
-          if (typeof n === 'string') return [];
-          if (n.children) {
-            const childArray = n.children.reduce(children, start);
-            if (isElement(n.elm)) childArray.push(n.elm);
-            return childArray;
-          }
-          if (isElement(n.elm)) start.push(n.elm);
-          return start;
-        }
-        return {
-          entries: children([], currentNode).map((e) => {
-            return {
-              contentRect: e.getBoundingClientRect(),
-              target: {
-                attributes: getAttributes(e),
-              },
-            };
-          }),
-        };
+        dispatchResizeAll();
       },
     };
     let myConnection = (window as any).Penpal.connectToParent({
@@ -141,6 +114,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       document.addEventListener(geometryEvent, (e: Event) =>
         parent.geometry((e as CustomEvent).detail)
       );
+      dispatchResizeAll();
 
       function sendEventToParent(e: Event) {
         const target = e.target;
@@ -173,4 +147,8 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       });
     });
   });
+
+  function dispatchResizeAll() {
+    dispatchResize(Array.from(document.querySelectorAll('*')));
+  }
 }.toString();

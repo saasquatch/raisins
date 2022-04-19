@@ -4,7 +4,7 @@ export type GeometryDetail = {
   entries: GeometryEntry[];
 };
 export type GeometryEntry = {
-  contentRect: Omit<DOMRectReadOnly,"toJSON">
+  contentRect: Omit<DOMRectReadOnly, 'toJSON'>;
   target?: {
     attributes: Record<string, string>;
   };
@@ -39,5 +39,4 @@ export type ParentRPC = {
 
 export type ChildRPC = {
   render(html: VNode): void;
-  geometry(): GeometryDetail;
 };

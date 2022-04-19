@@ -2,40 +2,26 @@ import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
 import { Soul, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
+import { GeometryDetail } from './api/_CanvasRPCContract';
 import { CanvasConfig } from './CanvasConfig';
-import type { ConnectionState } from './iframe/SnabbdomSanboxedIframeAtom';
 
 /**
  * Creates an asynchronous `Rect` atom that will poll for
  * the position of a node when it's undefined.
  *
- * @param connection
- * @param nodeAtom
- * @param listenedPosition
- * @returns
  */
 export function defaultRectAtom(
-  connection: Atom<ConnectionState>,
+  geometryAtom: Atom<GeometryDetail>,
   nodeAtom: Atom<RaisinNode | undefined>,
   soulAtom: Atom<(node: RaisinNode) => Soul>,
-  listenedPosition: Atom<Rect | undefined>,
   CanvasOptions: CanvasConfig
 ): Atom<Promise<Rect | undefined>> {
   const rectAtom = atom(async (get) => {
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
     const node = get(nodeAtom);
     if (!node) return undefined;
-    // When node changes, then lookup initial value
-    const latest = get(listenedPosition);
-    if (latest) return latest;
 
-    const connState = get(connection);
-
-    if (connState.type !== 'loaded') {
-      return undefined;
-    }
-
-    const geometry = await connState.childRpc.geometry();
+    const geometry = get(geometryAtom);
     const getSoul = get(soulAtom);
     const soul = getSoul(node);
     const rect = geometry.entries.find(

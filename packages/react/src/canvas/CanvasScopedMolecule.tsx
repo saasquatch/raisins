@@ -7,14 +7,12 @@ import { PickedNodeMolecule } from '../core/selection/PickedNode';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { SoulsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
-import { dependentAtom } from '../util/atoms/dependentAtom';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { Rect } from './api/Rect';
 import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
+import { CanvasStyleMolecule } from './CanvasStyleMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
 import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
-import { CanvasStyleMolecule } from './CanvasStyleMolecule';
 
 const CanvasScope = createScope();
 
@@ -38,16 +36,6 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   );
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
-
-  // TODO: Path might not be the right thing to depend on. Might be worth switching ID
-  const HoveredRectAtom = dependentAtom<Rect | undefined>(
-    HoveredSoulAtom,
-    undefined
-  );
-  const SelectedRectAtom = dependentAtom<Rect | undefined>(
-    SelectedSoulAtom,
-    undefined
-  );
 
   const CanvasEventAtom = atom(
     null,
@@ -75,61 +63,20 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
         if (soulId) {
           const soul = soulId ? idToSoul(soulId) : undefined;
           set(SelectedSoulAtom, soul);
-          if (target) {
-            // TODO: This doesn't handle when selection is changed in different canvas
-            // We need to "pull" the size on THIS canvas when selection is set on the OTHER canvas
-            set(SelectedRectAtom, {
-              x: target.rect.x,
-              y: target.rect.y,
-              height: target.rect.height,
-              width: target.rect.width,
-            });
-          }
         }
       }
       if (type === 'mouseover') {
         const soulId = target?.attributes[raisinsAttribute];
         const soul = soulId ? idToSoul(soulId) : undefined;
         set(HoveredSoulAtom, soul);
-        if (target) {
-          // TODO: This doesn't handle when hover is changed in different canvas
-          set(HoveredRectAtom, {
-            x: target.rect.x,
-            y: target.rect.y,
-            height: target.rect.height,
-            width: target.rect.width,
-          });
-        }
       }
     }
   );
 
-  const ResizeAtom = atom(null, (get, set, geometry: GeometryDetail) => {
-    const raisinsAttribute = get(CanvasOptions.SoulAttributeAtom);
-    const selected = get(SelectedNodeAtom);
-    const hovered = get(HoveredNodeAtom);
-    const getNode = get(SoulIdToNodeAtom);
-    geometry.entries.forEach((e) => {
-      const id = e.target?.attributes[raisinsAttribute];
-      const node = id && getNode(id);
-      if (node && node === selected) {
-        set(SelectedRectAtom, {
-          x: e.contentRect.x,
-          y: e.contentRect.y,
-          height: e.contentRect.height,
-          width: e.contentRect.width,
-        });
-      }
-      if (node && node === hovered) {
-        set(HoveredRectAtom, {
-          x: e.contentRect.x,
-          y: e.contentRect.y,
-          height: e.contentRect.height,
-          width: e.contentRect.width,
-        });
-      }
-    });
-  });
+  const GeometryAtom = atom({ entries: [] } as GeometryDetail);
+  const SetGeometryAtom = atom(null, (_, set, next: GeometryDetail) =>
+    set(GeometryAtom, next)
+  );
 
   const IframeAtom = createAtoms({
     head: IframeHeadAtom,
@@ -137,22 +84,20 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     selector: atom('[raisins-events]'),
     vnodeAtom: VnodeAtom,
     onEvent: CanvasEventAtom,
-    onResize: ResizeAtom,
+    onResize: SetGeometryAtom,
   });
 
   return {
     HoveredRectAtom: defaultRectAtom(
-      IframeAtom,
+      GeometryAtom,
       HoveredNodeAtom,
       GetSoulAtom,
-      HoveredRectAtom,
       CanvasOptions
     ),
     SelectedRectAtom: defaultRectAtom(
-      IframeAtom,
+      GeometryAtom,
       SelectedNodeAtom,
       GetSoulAtom,
-      SelectedRectAtom,
       CanvasOptions
     ),
     CanvasEventAtom,
