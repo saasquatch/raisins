@@ -1,9 +1,8 @@
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useMolecule, molecule } from 'jotai-molecules';
-import React, { Fragment } from 'react';
-import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
-import { NodeMolecule } from '../node/NodeMolecule';
-import { BasicStory, StoryConfigMolecule } from '../index.stories';
+import { atom, useAtomValue } from 'jotai';
+import { molecule, useMolecule } from 'jotai-molecules';
+import React from 'react';
+import { CanvasController } from '../canvas';
+import { RaisinConfig } from '../core/RaisinPropsScope';
 import {
   big,
   mintBigStat,
@@ -12,16 +11,17 @@ import {
   mintMono,
   mintTaskCard,
 } from '../examples/MintComponents';
-import { AttributeMolecule } from './AttributeMolecule';
-import { AttributesController } from './AttributesController';
-import { CanvasController } from '../canvas';
+import { widgets } from '../examples/MockWidgets';
 import {
   referralList,
   referrerWidget,
   VanillaComponents,
 } from '../examples/VanillaComponents';
-import { Clear, Widgets, widgets } from '../examples/MockWidgets';
-import { RaisinConfig } from '../core/RaisinPropsScope';
+import { BasicStory, StoryConfigMolecule } from '../index.stories';
+import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
+import { NodeMolecule } from '../node/NodeMolecule';
+import { AttributeMolecule } from './AttributeMolecule';
+import { AttributesController } from './AttributesController';
 import { AttributeTemplateProps } from './AttributeThemeMolecule';
 
 export default {
@@ -65,12 +65,14 @@ const CustomField = () => {
   );
   const Widget = useAtomValue(WidgetAtom);
   const Template = useAtomValue(TemplateAtom);
+  const schema = useAtomValue(schemaAtom);
 
-  const widgetUsed = useAtomValue(schemaAtom).uiWidget;
   return (
     <Template>
       <p>
-        <b>Your widget: {widgetUsed || 'default'}</b>
+        <b>Your widget: {schema.uiWidget || 'default'}</b>
+        {' - '}
+        <b>Group: {schema.uiGroup || 'default'}</b>
       </p>
       <Widget />
     </Template>
@@ -234,11 +236,6 @@ function AttributesEditor() {
   return (
     <div data-attributes-editor>
       <TagName />
-      {/* <table>
-        <tbody>
-          <AttributesController Component={AttributeComponent} />
-        </tbody>
-      </table> */}
       <AttributesController />
       <Debugging />
     </div>
@@ -266,104 +263,3 @@ const Debugging = () => {
     </details>
   );
 };
-
-const AttributeComponent = () => {
-  const { name } = useMolecule(AttributeMolecule);
-
-  return (
-    <Fragment key={name}>
-      <tr>
-        <td>
-          <AttributeEditor />
-        </td>
-      </tr>
-    </Fragment>
-  );
-};
-
-function AttributeEditor() {
-  const { name, schemaAtom, valueAtom } = useMolecule(AttributeMolecule);
-  const schema = useAtomValue(schemaAtom);
-  const [value, setValue] = useAtom(valueAtom);
-
-  if (schema.uiWidget) {
-    // TODO: get widgets from uiWidgetsAtom
-    const Widget = widgets[schema.uiWidget as keyof Widgets];
-    return <Widget />;
-  }
-
-  if (value === undefined) {
-    return (
-      <div>
-        <b>{schema.title ?? name}</b>{' '}
-        <button onClick={() => setValue(schema?.default?.toString() ?? '')}>
-          Edit
-        </button>
-      </div>
-    );
-  }
-
-  if (schema.enum) {
-    return (
-      <div>
-        <b>{schema.title ?? name}</b>{' '}
-        <select>
-          {schema.enum.map((value, idx) => (
-            <option value={value}>{schema.enumNames?.[idx] || value}</option>
-          ))}
-        </select>
-        <Clear />
-        <div style={{ color: 'grey' }}>{schema.description}</div>
-      </div>
-    );
-  }
-
-  if (schema?.type === 'boolean') {
-    return (
-      <div>
-        <b>{schema.title ?? name}</b>{' '}
-        <input
-          type="checkbox"
-          checked={value === undefined || value === null ? false : true}
-          onChange={(e) =>
-            setValue(
-              // ''
-              (e.target as HTMLInputElement).checked ? '' : undefined
-            )
-          }
-        />
-        <Clear />
-        <div style={{ color: 'grey' }}>{schema.description}</div>
-      </div>
-    );
-  }
-  if (schema?.type === 'number') {
-    return (
-      <div>
-        <b>{schema.title ?? name}</b>{' '}
-        <input
-          type="number"
-          value={value}
-          onInput={(e) =>
-            setValue((e.target as HTMLInputElement).value.toString())
-          }
-        />
-        <Clear />
-        <div style={{ color: 'grey' }}>{schema.description}</div>
-      </div>
-    );
-  }
-  return (
-    <div>
-      {' '}
-      <b>{schema.title ?? name}</b>{' '}
-      <input
-        type="text"
-        value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
-      />
-      <Clear />
-      <div style={{ color: 'grey' }}>{schema.description}</div>
-    </div>
-  );
-}
