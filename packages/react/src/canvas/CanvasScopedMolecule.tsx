@@ -31,9 +31,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   const { VnodeAtom, IframeHeadAtom } = getMol(CanvasStyleMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
-  const { IdToSoulAtom, SoulToNodeAtom, SoulIdToNodeAtom } = getMol(
-    SoulsInDocMolecule
-  );
+  const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
 
