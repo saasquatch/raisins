@@ -11,8 +11,8 @@ const FormatToComponent: Record<string, string> = {
 };
 const TypeToComponent: Record<string, string> = {
   string: 'text',
-  boolean: 'text',
-  number: 'text',
+  boolean: 'boolean',
+  number: 'number',
 };
 
 export function resolveComponent<T>(

@@ -63,10 +63,10 @@ export const AttributeMolecule = molecule((getMol) => {
   );
 
   const booleanValueAtom: PrimitiveAtom<boolean | undefined> = atom(
-    (get) => get(valueAtom) !== undefined,
+    (get) => toBoolean(get(valueAtom)),
     (_, set, next) => {
       set(valueAtom, (prev) => {
-        const value = isFunction(next) ? next(prev !== undefined) : next;
+        const value = isFunction(next) ? next(toBoolean(prev)) : next;
         // Empty string for true, undefined for false
         return value ? '' : undefined;
       });
@@ -97,6 +97,10 @@ export const AttributeMolecule = molecule((getMol) => {
   };
 });
 
+function toBoolean(value: string | undefined): boolean | undefined {
+  if (value === undefined) return undefined;
+  return typeof value !== 'undefined';
+}
 function toNumber(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
   const number = Number(value);

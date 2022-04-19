@@ -53,7 +53,7 @@ export const DefaultBooleanWidget: AttributeWidget = () => {
     <input
       type="checkbox"
       checked={value}
-      onInput={(e) => setValue((e.target as HTMLInputElement).checked)}
+      onChange={(e) => setValue((e.target as HTMLInputElement).checked)}
     />
   );
 };
