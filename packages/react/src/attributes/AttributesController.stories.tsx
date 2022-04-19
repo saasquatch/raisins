@@ -92,11 +92,20 @@ const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditor Component={AttributesAndChildren} />
       <Canvas />
     </div>
   );
 };
+
+const AttributesAndChildren = () => {
+    return <div>
+      <AttributesEditor />
+      <div style={{borderLeft:"10px solid grey"}}>
+        <NodeChildrenEditor Component={AttributesAndChildren} />
+      </div>
+    </div>
+}
 
 export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
   return (

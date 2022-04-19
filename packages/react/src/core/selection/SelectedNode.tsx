@@ -59,11 +59,14 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     }
   );
 
+  const HasSelectionAtom = atom((get) => get(SelectedNodeAtom) !== undefined);
+
   return {
     SelectedAtom,
     SelectedNodeAtom,
     SelectedSoulAtom,
     SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
     SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
+    HasSelectionAtom,
   };
 });
