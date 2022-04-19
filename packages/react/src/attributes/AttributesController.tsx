@@ -9,7 +9,7 @@ export type AttributesControllerProps = {
    * A component to render for every attribute.
    *
    * Values provided contextually via {@link AttributeMolecule}
-   * 
+   *
    * Will default to a Field component from {@link AttributeMolecule}
    */
   Component?: React.ComponentType;
@@ -17,8 +17,8 @@ export type AttributesControllerProps = {
 
 /**
  * Renders a Component in {@link AttributeProvider} for every attribute
- * in scope for the {@link AttributesMolecule} 
-*/
+ * in scope for the {@link AttributesMolecule}
+ */
 export const AttributesController: React.FC<AttributesControllerProps> = (
   props
 ) => {

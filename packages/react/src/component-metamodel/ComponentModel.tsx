@@ -9,7 +9,7 @@ import {
   RaisinNode,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { atom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
@@ -18,206 +18,227 @@ import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { Module } from './types';
+import { Loadable, Module, ModuleDetails } from './types';
 
-export const ComponentModelMolecule = molecule((getMol) => {
-  const { ParentsAtom } = getMol(CoreMolecule);
-  const { PackagesAtom, LocalURLAtom } = getMol(ConfigMolecule);
+export type ComponentModelMoleculeType = {
+  ModulesAtom: PrimitiveAtom<Module[]>;
+  ModuleDetailsAtom: Atom<ModuleDetails[]>;
+  ModuleDetailsStateAtom: Atom<Loadable<Promise<ModuleDetails[]>>>;
+  ModulesLoadingAtom: Atom<boolean>;
+  ComponentsAtom: Atom<CustomElement[]>;
+  LocalURLAtom: Atom<string | undefined>;
+  BlocksAtom: Atom<Block[]>;
+  AddModuleAtom: WritableAtom<null, SetStateAction<Module>>;
+  RemoveModuleAtom: WritableAtom<null, SetStateAction<Module>>;
+  RemoveModuleByNameAtom: WritableAtom<null, string>;
+  ComponentMetaAtom: Atom<ComponentMetaProvider>;
+  ValidChildrenAtom: Atom<
+    (node: RaisinNode, slot?: string | undefined) => Block[]
+  >;
+  ComponentModelAtom: Atom<ComponentModel>;
+};
 
-  /**
-   * Module details from NPM (loaded async)
-   */
-  const ModuleDetailsAync = atom(
-    async (get) => await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
-  );
-  /**
-   * Module details from NPM (or loading or error)
-   */
-  const ModuleDetailsStateAtom = loadable(ModuleDetailsAync);
+export const ComponentModelMolecule = molecule(
+  (getMol): ComponentModelMoleculeType => {
+    const { ParentsAtom } = getMol(CoreMolecule);
+    const { PackagesAtom, LocalURLAtom } = getMol(ConfigMolecule);
 
-  /**
-   * List of modules from NPM
-   */
-  const ModuleDetailsAtom = atom((get) => {
-    const state = get(ModuleDetailsStateAtom);
-    if (state.state === 'hasData') return state.data;
-    return [];
-  });
+    /**
+     * Module details from NPM (loaded async)
+     */
+    const ModuleDetailsAync = atom(
+      async (get) =>
+        await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
+    );
+    /**
+     * Module details from NPM (or loading or error)
+     */
+    const ModuleDetailsStateAtom = loadable(ModuleDetailsAync);
 
-  /**
-   * `true` while module information is being loaded from NPM
-   */
-  const ModulesLoadingAtom = atom(
-    (get) => get(ModuleDetailsStateAtom).state === 'loading'
-  );
+    /**
+     * List of modules from NPM
+     */
+    const ModuleDetailsAtom = atom((get) => {
+      const state = get(ModuleDetailsStateAtom);
+      if (state.state === 'hasData') return state.data;
+      return [];
+    });
 
-  /**
-   * The array of {@link CustomElement} from ALL packages
-   */
-  const ComponentsAtom = atom((get) => {
-    const moduleDetails = get(ModuleDetailsAtom);
-    return [
-      ...Object.values(HTMLComponents),
-      ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
-    ];
-  });
+    /**
+     * `true` while module information is being loaded from NPM
+     */
+    const ModulesLoadingAtom = atom(
+      (get) => get(ModuleDetailsStateAtom).state === 'loading'
+    );
 
-  /**
-   * The array of {@link Block} from ALL packages
-   */
-  const BlocksAtom = atom((get) => {
-    const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-    return [...blocksFromModules];
-  });
-  BlocksAtom.debugLabel = 'BlocksAtom';
+    /**
+     * The array of {@link CustomElement} from ALL packages
+     */
+    const ComponentsAtom = atom((get) => {
+      const moduleDetails = get(ModuleDetailsAtom);
+      return [
+        ...Object.values(HTMLComponents),
+        ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
+      ];
+    });
 
-  /**
-   * Add another NPM package
-   */
-  const AddModuleAtom = atom(null, (_, set, next: Module) =>
-    set(PackagesAtom, (modules) => [...modules, next])
-  );
-  AddModuleAtom.debugLabel = 'AddModuleAtom';
+    /**
+     * The array of {@link Block} from ALL packages
+     */
+    const BlocksAtom = atom((get) => {
+      const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
+      return [...blocksFromModules];
+    });
+    BlocksAtom.debugLabel = 'BlocksAtom';
 
-  /**
-   * Remove an NPM package
-   */
-  const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
-    set(PackagesAtom, (modules) => modules.filter((e) => e !== next))
-  );
-  RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
+    /**
+     * Add another NPM package
+     */
+    const AddModuleAtom = atom(null, (_, set, next: Module) =>
+      set(PackagesAtom, (modules) => [...modules, next])
+    );
+    AddModuleAtom.debugLabel = 'AddModuleAtom';
 
-  /**
-   * Remove all packages based on their NPM name
-   */
-  const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-    set(PackagesAtom, (modules) => modules.filter((e) => e.name !== name))
-  );
-  RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
+    /**
+     * Remove an NPM package
+     */
+    const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
+      set(PackagesAtom, (modules) => modules.filter((e) => e !== next))
+    );
+    RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
 
-  /**
-   * A function used to find components details
-   */
-  const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
-    const components = get(ComponentsAtom);
-    function getComponentMeta(tagName: string): CustomElement {
-      const found = components.find((c) => c.tagName === tagName);
-      if (found) return found;
+    /**
+     * Remove all packages based on their NPM name
+     */
+    const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
+      set(PackagesAtom, (modules) => modules.filter((e) => e.name !== name))
+    );
+    RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
+
+    /**
+     * A function used to find components details
+     */
+    const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
+      const components = get(ComponentsAtom);
+      function getComponentMeta(tagName: string): CustomElement {
+        const found = components.find((c) => c.tagName === tagName);
+        if (found) return found;
+
+        return {
+          tagName: tagName,
+          title: tagName,
+          // Default slot meta assumes no children. We may want to assume a permissive default slot.
+          slots: [],
+        };
+      }
+      return getComponentMeta;
+    });
+    ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
+
+    /**
+     * A function to get a list of possible children for a node/slot combo
+     */
+    const ValidChildrenAtom = atom((get) => {
+      const blocks = get(BlocksAtom);
+      const getComponentMeta = get(ComponentMetaAtom);
+
+      function getValidChildren(node: RaisinNode, slot?: string): Block[] {
+        // Non-documents and elements aren't allowed children
+        if (!isElementNode(node) || !isRoot(node)) return [];
+
+        const allowedInParent = blocks.filter((block) => {
+          const childMeta = getComponentMeta(block.content.tagName);
+          const childAllowsParents = doesChildAllowParent(childMeta, node);
+          return childAllowsParents;
+        });
+
+        if (isRoot(node)) {
+          return allowedInParent;
+        }
+        if (!isElementNode(node)) {
+          // Only Root and Element nodes allow children
+          return [];
+        }
+        const nodeMeta = getComponentMeta(node);
+        const slotMeta = nodeMeta?.slots?.find((s: Slot) => s.name === slot);
+
+        if (!slotMeta) {
+          // No meta for slot, so we assume anything is allowed
+          return allowedInParent;
+        }
+
+        const filter = (block: Block) =>
+          doesParentAllowChild(block.content, nodeMeta, slot);
+        const validChildren = blocks.filter(filter);
+        if (!validChildren.length) {
+          return [];
+        }
+        return validChildren;
+      }
+
+      return getValidChildren;
+    });
+    ValidChildrenAtom.debugLabel = 'ValidChildrenAtom';
+
+    /**
+     * Returns the {@link ComponentModel}
+     *
+     * A mixed bag of functions used to grab data from the NPM package details
+     * and enforce validation
+     */
+    const ComponentModelAtom = atom<ComponentModel>((get) => {
+      const getComponentMeta = get(ComponentMetaAtom);
+      const blocks: Block[] = get(BlocksAtom);
+      const getValidChildren = get(ValidChildrenAtom);
+
+      function isValidChild(
+        child: RaisinElementNode,
+        parent: RaisinElementNode,
+        slot: string
+      ): boolean {
+        if (child === parent) {
+          // Can't drop into yourself
+          // FIXME: Check for all ancestors
+          return false;
+        }
+        ParentsAtom;
+        const parentMeta = getComponentMeta(parent.tagName);
+        const childMeta = getComponentMeta(child.tagName);
+        return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
+      }
+
+      function getSlotsInternal(node: RaisinNode): NodeWithSlots {
+        return getSlots(node, getComponentMeta)!;
+      }
 
       return {
-        tagName: tagName,
-        title: tagName,
-        // Default slot meta assumes no children. We may want to assume a permissive default slot.
-        slots: [],
+        // Component metadata
+        getComponentMeta,
+        getSlots: getSlotsInternal,
+        blocks,
+        getValidChildren,
+        isValidChild,
       };
-    }
-    return getComponentMeta;
-  });
-  ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
-
-  /**
-   * A function to get a list of possible children for a node/slot combo
-   */
-  const ValidChildrenAtom = atom((get) => {
-    const blocks = get(BlocksAtom);
-    const getComponentMeta = get(ComponentMetaAtom);
-
-    function getValidChildren(node: RaisinNode, slot?: string): Block[] {
-      // Non-documents and elements aren't allowed children
-      if (!isElementNode(node) || !isRoot(node)) return [];
-
-      const allowedInParent = blocks.filter((block) => {
-        const childMeta = getComponentMeta(block.content.tagName);
-        const childAllowsParents = doesChildAllowParent(childMeta, node);
-        return childAllowsParents;
-      });
-
-      if (isRoot(node)) {
-        return allowedInParent;
-      }
-      if (!isElementNode(node)) {
-        // Only Root and Element nodes allow children
-        return [];
-      }
-      const nodeMeta = getComponentMeta(node);
-      const slotMeta = nodeMeta?.slots?.find((s: Slot) => s.name === slot);
-
-      if (!slotMeta) {
-        // No meta for slot, so we assume anything is allowed
-        return allowedInParent;
-      }
-
-      const filter = (block: Block) =>
-        doesParentAllowChild(block.content, nodeMeta, slot);
-      const validChildren = blocks.filter(filter);
-      if (!validChildren.length) {
-        return [];
-      }
-      return validChildren;
-    }
-
-    return getValidChildren;
-  });
-  ValidChildrenAtom.debugLabel = 'ValidChildrenAtom';
-
-  /**
-   * Returns the {@link ComponentModel}
-   *
-   * A mixed bag of functions used to grab data from the NPM package details
-   * and enforce validation
-   */
-  const ComponentModelAtom = atom<ComponentModel>((get) => {
-    const getComponentMeta = get(ComponentMetaAtom);
-    const blocks: Block[] = get(BlocksAtom);
-    const getValidChildren = get(ValidChildrenAtom);
-
-    function isValidChild(
-      child: RaisinElementNode,
-      parent: RaisinElementNode,
-      slot: string
-    ): boolean {
-      if (child === parent) {
-        // Can't drop into yourself
-        // FIXME: Check for all ancestors
-        return false;
-      }
-      ParentsAtom;
-      const parentMeta = getComponentMeta(parent.tagName);
-      const childMeta = getComponentMeta(child.tagName);
-      return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
-    }
-
-    function getSlotsInternal(node: RaisinNode): NodeWithSlots {
-      return getSlots(node, getComponentMeta)!;
-    }
+    });
+    ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
     return {
-      // Component metadata
-      getComponentMeta,
-      getSlots: getSlotsInternal,
-      blocks,
-      getValidChildren,
-      isValidChild,
+      ModulesAtom: PackagesAtom,
+      ModuleDetailsAtom,
+      ModuleDetailsStateAtom,
+      ModulesLoadingAtom,
+      ComponentsAtom,
+      LocalURLAtom,
+      BlocksAtom,
+      AddModuleAtom,
+      RemoveModuleAtom,
+      RemoveModuleByNameAtom,
+      ComponentMetaAtom,
+      ValidChildrenAtom,
+      ComponentModelAtom,
     };
-  });
-  ComponentModelAtom.debugLabel = 'ComponentModelAtom';
-
-  return {
-    ModulesAtom: PackagesAtom,
-    ModuleDetailsAtom,
-    ModuleDetailsStateAtom,
-    ModulesLoadingAtom,
-    ComponentsAtom,
-    LocalURLAtom,
-    BlocksAtom,
-    AddModuleAtom,
-    RemoveModuleAtom,
-    RemoveModuleByNameAtom,
-    ComponentMetaAtom,
-    ValidChildrenAtom,
-    ComponentModelAtom,
-  };
-});
+  }
+);
 
 /**
  * For managing the types of components that are edited and their properties

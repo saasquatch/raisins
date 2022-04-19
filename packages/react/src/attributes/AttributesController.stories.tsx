@@ -69,12 +69,13 @@ const CustomField = () => {
 
   return (
     <Template>
-      <p>
+      <p style={{ margin: '0' }}>
         <b>Your widget: {schema.uiWidget || 'default'}</b>
         {' - '}
         <b>Group: {schema.uiGroup || 'default'}</b>
       </p>
       <Widget />
+      <br />
     </Template>
   );
 };
