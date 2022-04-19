@@ -235,7 +235,7 @@ export const Big = ({ canvas }: { canvas: boolean }) => {
 
 function AttributesEditor() {
   return (
-    <div data-attributes-editor>
+    <div data-attributes-editor style={{ flex: '1' }}>
       <TagName />
       <AttributesController />
       <Debugging />
