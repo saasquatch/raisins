@@ -22,13 +22,27 @@ export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
   };
 }
 
+function useCanvas() {
+  const atoms = useMolecule(CanvasScopedMolecule);
+
+  const [
+    // Doesn't use the subscribed value, but triggers the subscribe to start
+    _,
+    setRef,
+  ] = useAtom(atoms.IframeAtom);
+  return setRef;
+}
+
 // No props allowed -- should all come from context, or atoms
 export function CanvasController() {
   return (
     <CanvasProvider>
-      <ExampleController />
+      <Container />
     </CanvasProvider>
   );
+}
+function Container() {
+  return <div ref={useCanvas()}></div>;
 }
 
 function ExampleController() {
