@@ -1,5 +1,5 @@
 import { Attribute } from '@raisins/schema/schema';
-import { Atom, atom, SetStateAction } from 'jotai';
+import { Atom, atom, PrimitiveAtom, SetStateAction } from 'jotai';
 import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
 import React from 'react';
 import { isFunction } from '../util/isFunction';
@@ -62,9 +62,33 @@ export const AttributeMolecule = molecule((getMol) => {
     resolveComponent(get(schemaAtom), get(config.AttributeTheme.templates))
   );
 
+  const booleanValueAtom: PrimitiveAtom<boolean | undefined> = atom(
+    (get) => get(valueAtom) !== undefined,
+    (_, set, next) => {
+      set(valueAtom, (prev) => {
+        const value = isFunction(next) ? next(prev !== undefined) : next;
+        // Empty string for true, undefined for false
+        return value ? '' : undefined;
+      });
+    }
+  );
+
+  const numberValueAtom: PrimitiveAtom<number | undefined> = atom(
+    (get) => toNumber(get(valueAtom)),
+    (_, set, next) => {
+      set(valueAtom, (prev) => {
+        const value = isFunction(next) ? next(toNumber(prev)) : next;
+        // Empty string for true, undefined for false
+        return value?.toString();
+      });
+    }
+  );
+
   return {
     name,
     valueAtom,
+    booleanValueAtom,
+    numberValueAtom,
     schemaAtom,
     clearAtom,
     WidgetAtom,
@@ -72,6 +96,14 @@ export const AttributeMolecule = molecule((getMol) => {
     TemplateAtom,
   };
 });
+
+function toNumber(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const number = Number(value);
+  // This might cause weird bugs
+  if (Number.isNaN(number)) return undefined;
+  return number;
+}
 
 /**
  * Provides scope for a {@link AttributeScopeMolecule} and {@link AttributeMolecule}

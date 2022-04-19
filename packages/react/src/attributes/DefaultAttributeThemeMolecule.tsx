@@ -46,11 +46,37 @@ export const DefaultTextWidget: AttributeWidget = () => {
   );
 };
 
+export const DefaultBooleanWidget: AttributeWidget = () => {
+  const { booleanValueAtom } = useMolecule(AttributeMolecule);
+  const [value, setValue] = useAtom(booleanValueAtom);
+  return (
+    <input
+      type="checkbox"
+      checked={value}
+      onInput={(e) => setValue((e.target as HTMLInputElement).checked)}
+    />
+  );
+};
+
+export const DefaultNumberWidget: AttributeWidget = () => {
+  const { numberValueAtom } = useMolecule(AttributeMolecule);
+  const [value, setValue] = useAtom(numberValueAtom);
+  return (
+    <input
+      type="number"
+      value={value}
+      onInput={(e) => setValue(+(e.target as HTMLInputElement).value)}
+    />
+  );
+};
+
 export const DefaultAttributeThemeMolecule: AttributeThemeMolecule = molecule(
   () => {
     return {
       widgets: atom({
         text: DefaultTextWidget,
+        boolean: DefaultBooleanWidget,
+        number: DefaultNumberWidget,
         [DefaultAttributeComponent]: DefaultTextWidget,
       }),
       templates: atom({
