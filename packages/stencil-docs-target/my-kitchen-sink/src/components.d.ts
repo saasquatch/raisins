@@ -104,7 +104,7 @@ export namespace Components {
           * Date to display
           * @uiName Pick a Date
           * @uiWidget DatePicker
-          * @uiOptions {"format":"milliseconds"}
+          * @uiWidgetOptions {"format":"milliseconds"}
          */
         "pickedDate": number;
         /**
@@ -251,7 +251,7 @@ declare namespace LocalJSX {
           * Date to display
           * @uiName Pick a Date
           * @uiWidget DatePicker
-          * @uiOptions {"format":"milliseconds"}
+          * @uiWidgetOptions {"format":"milliseconds"}
          */
         "pickedDate"?: number;
         /**

@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
 import splitOnFirst from './split-on-first';
@@ -41,14 +40,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               enum: jsonTagValue(p, 'uiEnum'),
               enumNames: jsonTagValue(p, 'uiEnumNames'),
               uiWidget: uiWidget(p),
-              uiWidgetOptions: jsonTagValue(p, 'uiWidgetsOptions'),
+              uiWidgetOptions: jsonTagValue(p, 'uiWidgetOptions'),
               maximum: jsonTagValue(p, 'maximum'),
               minimum: jsonTagValue(p, 'minimum'),
               maxLength: jsonTagValue(p, 'maxLength'),
               minLength: jsonTagValue(p, 'minLength'),
               format: tagValue(p.docsTags, 'format'),
               uiGroup: tagValue(p.docsTags, 'uiGroup'),
-              uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
+              // uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
               uiOrder: jsonTagValue(p, 'uiOrder'),
               required: jsonTagValue(p, 'required'),
             };
@@ -70,6 +69,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               title,
               description,
               editor,
+              // TODO: validChildren
             };
             return rSlot;
           }),
@@ -89,10 +89,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               };
             }),
           demoStates: demos.length > 0 ? demos : undefined,
-
-          // 'ui:widget': uiWidget(comp),
-          // 'ui:options': jsonTagValue(comp, 'uiOptions'),
-          // 'ui:order': jsonTagValue(comp, 'uiOrder'),
+          validParents: jsonTagValue(comp, 'validParents'),
         };
         return elem;
       } catch (e) {
@@ -107,7 +104,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
   };
 }
 function tagValue(tags: JsonDocsTag[], name: string): string | undefined {
-  return tags.find(t => t.name === name)?.text;
+  return tags?.find(t => t.name === name)?.text;
 }
 function jsonTagValue(tags: HasDocsTags, name: string) {
   const value = tagValue(tags.docsTags, name);

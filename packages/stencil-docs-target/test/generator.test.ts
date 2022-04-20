@@ -43,6 +43,8 @@ describe('Stencil docs target', () => {
     if (!dataStr.includes('uiWidgetOptions'))
       throw new Error('No uiWidgetOptions found');
     if (!dataStr.includes('uiWidget')) throw new Error('No uiWidget found');
+    if (!dataStr.includes('validParents'))
+      throw new Error('No validParents found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
   });
 });
