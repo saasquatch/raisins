@@ -1,18 +1,18 @@
-import { isElementNode } from '@raisins/core';
+import { isElementNode, RaisinElementNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { h, VNode } from 'snabbdom';
-import { ComponentModelMolecule } from '../component-metamodel';
+import { ComponentModelMolecule } from '../../component-metamodel';
 import {
   CoreMolecule,
   PickedNodeMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../core';
-import { CanvasEvent } from './api/_CanvasRPCContract';
-import { CanvasConfigMolecule } from './CanvasConfig';
-import { CanvasScopedMolecule } from './CanvasScopedMolecule';
-import { SnabdomAppender } from './raisinToSnabdom';
+} from '../../core';
+import { RawCanvasEvent } from '../api/_CanvasRPCContract';
+import { CanvasConfigMolecule } from '../CanvasConfig';
+import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { SnabdomAppender } from '../util/raisinToSnabdom';
 
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const canvasAtoms = getMol(CanvasScopedMolecule);
@@ -23,10 +23,20 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
+  /**
+   * Listens for click events, marks clicked elements as selected
+   */
+  const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
+    if (e.type === 'dblclick') {
+      set(PickedNodeAtom, e.node);
+    }
+  });
+  DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
+  canvasAtoms.addListenerAtom(DoubleClickAtom);
 
   const PickAndPlopListenerAtom = atom(
     null,
-    (get, set, { type, target }: CanvasEvent) => {
+    (get, set, { type, target }: RawCanvasEvent) => {
       const idToSoul = get(IdToSoulAtom);
       if (type === 'click') {
         const plopParentSoulId = target?.attributes['raisin-plop-parent'];
@@ -57,10 +67,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const metamodel = get(ComponentModelAtom);
 
     const appender: SnabdomAppender = (c, n) => {
-      // 0 - infer plop targets from slot names and metamodel
-      // 1 - only render appropriate plop targets
-      // 2 - render pretty plop targets (See Head atom)
-      // 3 - add appropriate attrs to make `onClick` work (and rewrite select-on-click stuff)
       if (!pickedNode || !isElementNode(pickedNode)) return c;
       if (!isPloppingActive || !isElementNode(n)) return c;
       const parent = n;
@@ -75,7 +81,12 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
       const newChildren =
         c?.reduce((acc, child, idx) => {
-          const plopTarget = createPlopTargetNode({ idx, slot, soulId });
+          const plopTarget = createPlopTargetNode({
+            idx,
+            slot,
+            soulId,
+            parent,
+          });
           return [...acc, plopTarget, child];
         }, [] as Array<string | VNode>) ?? [];
       return newChildren;
@@ -89,14 +100,19 @@ function createPlopTargetNode({
   soulId,
   slot,
   idx,
+  parent,
 }: {
   idx: number;
   soulId: string;
   slot: string;
+  parent: RaisinElementNode;
 }) {
   return h(
     'div',
     {
+      style: {
+        background: 'yellow',
+      },
       attrs: {
         slot,
         'raisin-plop-target': true,
@@ -106,6 +122,6 @@ function createPlopTargetNode({
         'raisins-events': true,
       },
     },
-    'Plop here'
+    `Plop in ${parent.tagName} index ${idx}`
   );
 }

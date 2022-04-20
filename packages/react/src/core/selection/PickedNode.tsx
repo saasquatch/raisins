@@ -7,8 +7,9 @@ import {
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom } from 'jotai';
+import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
 import { EditMolecule } from '../editting/EditAtoms';
 
@@ -23,12 +24,25 @@ export const PickedNodeMolecule = molecule((getMol) => {
    */
   const PickedAtom = atom<NodePath | undefined>(undefined);
 
-  const PickedNodeAtom = atom<RaisinNode | undefined>((get) => {
-    const currrentDoc = get(RootNodeAtom);
-    const pickedPath = get(PickedAtom);
-    if (!pickedPath) return undefined;
-    return getNode(currrentDoc, pickedPath);
-  });
+  const PickedNodeAtom: PrimitiveAtom<RaisinNode | undefined> = atom(
+    (get) => {
+      const currrentDoc = get(RootNodeAtom);
+      const pickedPath = get(PickedAtom);
+      if (!pickedPath) return undefined;
+      return getNode(currrentDoc, pickedPath);
+    },
+    (get, set, next) => {
+      const node = isFunction(next) ? next(get(PickedNodeAtom)) : next;
+
+      if (!node) {
+        set(PickedAtom, undefined);
+        return;
+      }
+      const currrentDoc = get(RootNodeAtom);
+      const path = getPath(currrentDoc, node);
+      set(PickedAtom, path);
+    }
+  );
 
   /**
    * For tracking if a node can be plopped

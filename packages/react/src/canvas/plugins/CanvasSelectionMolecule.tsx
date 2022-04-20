@@ -1,37 +1,28 @@
 import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { VNodeStyle } from 'snabbdom';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
-import { SoulsMolecule } from '../core/souls/Soul';
-import { SoulsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
-import { CanvasEvent } from './api/_CanvasRPCContract';
-import { CanvasConfigMolecule } from './CanvasConfig';
-import { CanvasScopedMolecule } from './CanvasScopedMolecule';
-import { defaultRectAtom } from './defaultRectAtom';
-import { SnabdomRenderer } from './raisinToSnabdom';
+import { SelectedNodeMolecule } from '../../core/selection/SelectedNode';
+import { SoulsMolecule } from '../../core/souls/Soul';
+import { CanvasConfigMolecule } from '../CanvasConfig';
+import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { defaultRectAtom } from '../util/defaultRectAtom';
+import { SnabdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
   const canvasAtoms = getMol(CanvasScopedMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
-  const { IdToSoulAtom } = getMol(SoulsInDocMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
 
   /**
    * Listens for click events, marks clicked elements as selected
    */
-  const SelectedClickedAtom = atom(null, (get, set, e: CanvasEvent) => {
-    const { target, type } = e;
-    const idToSoul = get(IdToSoulAtom);
-    const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
-    if (type === 'click') {
-      const soulId = target?.attributes[raisinsAttribute];
-      if (soulId) {
-        const soul = soulId ? idToSoul(soulId) : undefined;
-        set(SelectedSoulAtom, soul);
-      }
+  const SelectedClickedAtom = atom(null, (_, set, e: RichCanvasEvent) => {
+    if (e.type === 'dblclick') {
+      set(SelectedSoulAtom, e.soul);
     }
   });
+  SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
   canvasAtoms.addListenerAtom(SelectedClickedAtom);
 
   const Renderer: Atom<SnabdomRenderer> = atom((get) => {
@@ -43,7 +34,9 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isSelected ? '2px solid rgba(255,0,0,0.5)' : '',
+        outline: isSelected
+          ? '2px solid rgba(255,0,0,0.5)'
+          : rest.outline ?? '',
         outlineOffset: isOutlined ? '-2px' : '',
       };
 

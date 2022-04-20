@@ -2,7 +2,7 @@ import { atom, Atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { atomWithProxy } from 'jotai/valtio';
 import { proxySet } from 'valtio/utils';
-import { SnabdomAppender, SnabdomRenderer } from './raisinToSnabdom';
+import { SnabdomAppender, SnabdomRenderer } from './util/raisinToSnabdom';
 import { ConfigMolecule } from '../core/RaisinConfigScope';
 
 export type CanvasConfig = {

@@ -1,7 +1,8 @@
 import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { CanvasProvider, CanvasScopedMolecule } from './CanvasScopedMolecule';
+import { CanvasScopedMolecule } from './CanvasScopeMolecule';
+import { CanvasProvider } from "./CanvasScope";
 
 function useCanvas() {
   const atoms = useMolecule(CanvasScopedMolecule);

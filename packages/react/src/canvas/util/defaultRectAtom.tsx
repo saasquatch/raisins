@@ -1,8 +1,8 @@
 import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
-import { Soul, soulToString } from '../core/souls/Soul';
-import type { Rect } from './api/Rect';
-import { GeometryDetail } from './api/_CanvasRPCContract';
+import { Soul, soulToString } from '../../core/souls/Soul';
+import type { Rect } from '../api/Rect';
+import { GeometryDetail } from '../api/_CanvasRPCContract';
 
 /**
  * Creates an asynchronous `Rect` atom that will poll for

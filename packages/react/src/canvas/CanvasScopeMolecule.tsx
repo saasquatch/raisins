@@ -1,36 +1,29 @@
-import { RaisinDocumentNode } from '@raisins/core';
+import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { atom, WritableAtom } from 'jotai';
-import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
-import { atomWithProxy } from 'jotai/valtio';
-import React from 'react';
+import { molecule } from 'jotai-molecules';
+import { ref } from 'valtio';
 import { proxySet } from 'valtio/utils';
-import { CoreMolecule, SoulsMolecule } from '../core';
+import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
+import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { CanvasEvent, GeometryDetail } from './api/_CanvasRPCContract';
+import { GeometryDetail, RawCanvasEvent } from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
-import { CanvasScriptsMolecule } from './CanvasScriptsAtom';
+import { CanvasScope } from './CanvasScope';
+import { CanvasScriptsMolecule } from './CanvasScriptsMolecule';
 import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
 import {
   combineAppenders,
   combineRenderers,
   raisintoSnabdom,
   SnabdomRenderer,
-} from './raisinToSnabdom';
+} from './util/raisinToSnabdom';
 
-const CanvasScope = createScope();
-
-export function CanvasProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <ScopeProvider scope={CanvasScope} uniqueValue>
-      {children}
-    </ScopeProvider>
-  );
-}
-
-type CanvasEventListener = WritableAtom<null, CanvasEvent>;
+type CanvasEventListener = WritableAtom<null, RichCanvasEvent>;
 
 /**
  * A molecule used for tracking events and geometry for an iframe canvas.
+ *
+ * Has mutable a set of listeners for dealing with events
  *
  * Must be used inside a {@link CanvasProvider}
  */
@@ -44,6 +37,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
+  const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
 
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
@@ -83,15 +77,23 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
 
   const canvasListeners = proxySet<CanvasEventListener>([]);
   function addListenerAtom(listener: CanvasEventListener) {
-    canvasListeners.add(listener);
+    canvasListeners.add(ref(listener));
   }
   function removeListenerAtom(listener: CanvasEventListener) {
     canvasListeners.delete(listener);
   }
 
-  const CanvasEventAtom = atom(null, (_, set, e: CanvasEvent) => {
+  const CanvasEventAtom = atom(null, (get, set, e: RawCanvasEvent) => {
+    const idToSoul = get(IdToSoulAtom);
+    const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
+    const soulId = e.target?.attributes[raisinsAttribute];
+    const soul = soulId ? idToSoul(soulId) : undefined;
+    const soulToNode = get(SoulToNodeAtom);
+    const node = soul ? soulToNode(soul) : undefined;
+
+    const betterEvent:RichCanvasEvent = { ...e, soul, node };
     for (const listener of canvasListeners.values()) {
-      set(listener, e);
+      set(listener, betterEvent);
     }
   });
 
@@ -122,3 +124,8 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     IframeAtom,
   };
 });
+
+export type RichCanvasEvent = RawCanvasEvent & {
+  soul?: Soul;
+  node?: RaisinNode;
+};
