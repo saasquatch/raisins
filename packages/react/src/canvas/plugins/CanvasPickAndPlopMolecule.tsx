@@ -1,7 +1,7 @@
 import { isElementNode, RaisinElementNode } from '@raisins/core';
-import { atom } from 'jotai';
+import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { h, VNode } from 'snabbdom';
+import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
   CoreMolecule,
@@ -12,13 +12,14 @@ import {
 import { RawCanvasEvent } from '../api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
-import { SnabdomAppender } from '../util/raisinToSnabdom';
+import { defaultRectAtom } from '../util/defaultRectAtom';
+import { SnabdomAppender, SnabdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
+  const CanvasConfig = getMol(CanvasConfigMolecule);
   const canvasAtoms = getMol(CanvasScopedMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
-  const CanvasOptions = getMol(CanvasConfigMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
@@ -93,7 +94,39 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     };
     return appender;
   });
-  CanvasOptions.AppendersSet.add(AppenderAtom);
+  // CanvasConfig.AppendersSet.add(AppenderAtom);
+
+  const Renderer: Atom<SnabdomRenderer> = atom((get) => {
+    const picked = get(PickedNodeAtom);
+    const renderer: SnabdomRenderer = (d, n) => {
+      const isPicked = picked === n;
+      const { delayed, remove, ...rest } = d.style || {};
+      const style: VNodeStyle = {
+        ...rest,
+        cursor: 'pointer',
+        outline: isPicked ? '2px solid rgba(0,0,255,0.5)' : rest.outline ?? '',
+        outlineOffset: isPicked ? '-2px' : '',
+      };
+
+      return {
+        ...d,
+        style,
+      };
+    };
+    return renderer;
+  });
+
+  // Registers this renderer
+  CanvasConfig.RendererSet.add(Renderer);
+
+  return {
+    PickedRectAtom: defaultRectAtom(
+      canvasAtoms.GeometryAtom,
+      PickedNodeAtom,
+      GetSoulAtom,
+      CanvasConfig.SoulAttributeAtom
+    ),
+  };
 });
 
 function createPlopTargetNode({
@@ -111,17 +144,30 @@ function createPlopTargetNode({
     'div',
     {
       style: {
-        background: 'yellow',
-      },
-      attrs: {
-        slot,
-        'raisin-plop-target': true,
-        'raisin-plop-parent': soulId,
-        'raisin-plop-slot': slot,
-        'raisin-plop-idx': idx,
-        'raisins-events': true,
+        height: '0px',
+        overflow: 'visible',
       },
     },
-    `Plop in ${parent.tagName} index ${idx}`
+    h(
+      'div',
+      {
+        style: {
+          background: 'yellow',
+          height: '8px',
+          top: '-4px',
+          zIndex: '999',
+          position: 'relative',
+        },
+        attrs: {
+          slot,
+          'raisin-plop-target': true,
+          'raisin-plop-parent': soulId,
+          'raisin-plop-slot': slot,
+          'raisin-plop-idx': idx,
+          'raisins-events': true,
+        },
+      },
+      ` `
+    )
   );
 }
