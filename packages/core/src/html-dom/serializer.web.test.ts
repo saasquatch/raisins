@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 /// <reference types="cypress" />
 
 import expect from "expect";

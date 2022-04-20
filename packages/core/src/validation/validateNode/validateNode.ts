@@ -8,6 +8,7 @@ import {
   ErrorStack as BaseErrorStack
 } from "./types";
 import { parseToRgba } from "color2k";
+import { Interval } from "luxon";
 
 type ErrorType = {
   /**
@@ -123,8 +124,7 @@ export function validateAttributes(
   nodeMeta.attributes.forEach(a => {
     // check if attribute exists on the node
     if (node.attribs[a.name] === undefined) {
-      // log error if attribute is required and does not exist
-      if (a.required === true)
+      if (a.required === true && a.type !== "boolean")
         errorStack.push({
           jsonPointer: "/attribs/" + a.name,
           error: {
@@ -142,18 +142,18 @@ export function validateAttributes(
 
     switch (a.type) {
       case "number":
-        if (isNaN(Number(value)))
+        if (isNaN(Number(value)) || value === "")
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `type`
+              rule: `type/number`
             }
           });
-        if (a.enum !== undefined && !a.enum.includes(value))
+        if (a.enum !== undefined && !a.enum.includes(Number(value)))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `enum`
+              rule: `enum/number`
             }
           });
         if (a.maximum !== undefined && Number(value) > Number(a.maximum))
@@ -172,12 +172,11 @@ export function validateAttributes(
           });
         break;
       case "string":
-        // value is always a string so no type check necessary
         if (a.enum !== undefined && !a.enum.includes(value))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `enum`
+              rule: `enum/string`
             }
           });
         if (a.maxLength !== undefined && value.length > Number(a.maxLength))
@@ -201,7 +200,7 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format-color`
+                    rule: `format/color`
                   }
                 });
               break;
@@ -210,40 +209,30 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format-date-interval`
+                    rule: `format/date-interval`
                   }
                 });
               break;
-
             case "url":
               if (isValidURL(value) === false)
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format-url`
+                    rule: `format/url`
                   }
                 });
               break;
-
-            default:
-              errorStack.push({
-                jsonPointer: "/attribs/" + a.name,
-                error: {
-                  rule: `format-unsupported`
-                }
-              });
           }
         }
         break;
       case "boolean":
-        if (!(value === "true" || value === "false"))
+        if (a.enum !== undefined && !a.enum.includes(value))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `type`
+              rule: `enum/boolean`
             }
           });
-        // unnecessary to check for if in enum list or max/min length
         break;
     }
   });
@@ -257,39 +246,22 @@ export function isValidColor(value: string): boolean {
   try {
     parseToRgba(value);
   } catch {
-    console.log("false");
     return false;
   }
   return true;
 }
 
 export function isValidURL(value: string): boolean {
-  if (!value.includes(".")) return false;
   var url;
+  if (value.startsWith("//")) value = "https:" + value;
   try {
     url = new URL(value);
   } catch {
-    try {
-      if (!value.startsWith("https://") || !value.startsWith("http://"))
-        value = "https://" + value;
-      url = new URL(value);
-      return true;
-    } catch {
-      return false;
-    }
+    return false;
   }
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
 export function isValidDateInterval(value: string): boolean {
-  const dates = value.split("/");
-  // if there are not exactly 2 dates, it is not a valid interval
-  if (dates.length !== 2) return false;
-  // if both are valid dates, then it is a valid date interval
-  if (isValidDate(dates[0]) && isValidDate(dates[1])) return true;
-  return false;
-}
-
-export function isValidDate(value: string): boolean {
-  return !isNaN(Date.parse(value));
+  return Interval.fromISO(value).isValid;
 }

@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import {
   Given as given,
   Then as then,

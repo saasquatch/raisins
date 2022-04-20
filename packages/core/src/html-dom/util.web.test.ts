@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { RaisinNode } from "./RaisinNode";
 import { visit, visitAll } from "./util";
 

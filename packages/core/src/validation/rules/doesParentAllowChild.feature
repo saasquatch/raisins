@@ -6,67 +6,92 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-			tagName: "",
+				"tagName": ""
 			}
 			"""
-		And a <node>
-		Then parent does not allow child
+		And a node of <type>
+		Then parent does not allow node as child
 
 		Examples:
-			| node      |
-			| root      |
-			| text      |
-			| style     |
-			| element   |
-			| comment   |
-			| directive |
+			| type        |
+			| root        |
+			| text        |
+			| style       |
+			| element     |
+			| comment     |
+			| instruction |
 
 	Scenario Outline: Parent does not allow child if child is not an element node
 		Given a parent meta
 			"""
 			{
-			tagName: "",
-			slots: [{ name: "child" }]
+				"tagName": "",
+				"slots": [
+					{
+						"name": "child"
+					}
+				]
 			}
 			"""
-		And a <node>
-		Then parent does not allow child
+		And a node of <type>
+		Then parent does not allow node as child
 
 		Examples:
-			| node      |
-			| text      |
-			| style     |
-			| comment   |
-			| directive |
+			| node        |
+			| text        |
+			| style       |
+			| comment     |
+			| instruction |
 
 	Scenario: Parent allows child element when its slot specifies * as valid children
 		Given a parent meta
 			"""
 			{
-			tagName: "",
-			slots: [{ name: "child", validChildren: ["*"] }]
+				"tagName": "",
+				"slots": [
+					{
+						"name": "child",
+						"validChildren": [
+							"*"
+						]
+					}
+				]
 			}
 			"""
-		And an element node
-		Then parent allows child
+		And a node of element
+		Then parent allows node as child
 
 
 	Scenario: Parent allows child element when there are no constraints on its valid children
 		Given a parent meta
 			"""
 			{
-			tagName: "",
-			slots: [{ name: "child" }]
+				"tagName": "",
+				"slots": [
+					{
+						"name": "child"
+					}
+				]
 			}
 			"""
-		And an element node
-		Then parent allows child
+		And a node of element
+		Then parent allows node as child
 
 
 	Scenario Outline: Parent allows child when its slots have constraints and matches child's tagname
 		Given a parent meta
+			"""
+			{
+				"tagName": "",
+				"slots": [
+					{
+						"name": "child"
+					}
+				]
+			}
+			"""
 		And validChildren has <tagName>
-		And an element node
+		And a node of element
 		And node has <tagName>
 		Then parent allows node as child
 
@@ -80,8 +105,18 @@ Feature: Does Parent Allow Child
 
 	Scenario Outline: Parent does not allow child if its slot constraints does not match child's tagname
 		Given a parent meta
+			"""
+			{
+				"tagName": "",
+				"slots": [
+					{
+						"name": "child"
+					}
+				]
+			}
+			"""
 		And validChildren has <tagName1>
-		And an element node
+		And a node of element
 		And node has <tagName2>
 		Then parent does not allow node as child
 

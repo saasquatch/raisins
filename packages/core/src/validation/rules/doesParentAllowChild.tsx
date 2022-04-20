@@ -28,5 +28,6 @@ export function doesParentAllowChild(
     (tagName && slotMeta.validChildren?.includes(tagName)) ||
     slotMeta.validChildren === undefined || // if no constraints, child should be allowed (similar to doesChildAllowParent)
     false;
+
   return parentAllowsChild;
 }

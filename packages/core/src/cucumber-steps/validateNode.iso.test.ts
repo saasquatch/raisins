@@ -6,6 +6,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
 import { StepDefinitions } from "jest-cucumber";
+import parse from "../html-dom/parser";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -16,9 +17,9 @@ import {
 } from "../html-dom/RaisinNode";
 import {
   isValidColor,
-  isValidDate,
   isValidDateInterval,
   isValidURL,
+  validateAttributes,
   validateChildConstraints
 } from "../validation/validateNode/validateNode";
 
@@ -158,10 +159,6 @@ const cucumber = (
     result = isValidColor(input);
   });
 
-  when("isValidDate is tested", () => {
-    result = isValidDate(input);
-  });
-
   when("isValidDateInterval is tested", () => {
     result = isValidDateInterval(input);
   });
@@ -176,6 +173,44 @@ const cucumber = (
 
   then("it returns false", () => {
     expect(result).toBe(false);
+  });
+
+  and("it has attribute", () => {
+    metalist = [
+      {
+        tagName: "div",
+        attributes: [{ name: "" }]
+      }
+    ];
+  });
+
+  and(/^enum is (.*)$/, (value: string) => {
+    metalist[0].attributes[0].enum = JSON.parse(value);
+  });
+
+  and(/^required is (\w*)$/, (value: string) => {
+    if (value === "true") metalist[0].attributes[0].required = true;
+    else metalist[0].attributes[0].required = false;
+  });
+
+  and(
+    /^(?:(?!required|no error|error|doesChildAllowParent|enum|no validation error|isValidURL|isValidDateInterval|isValidColor))(.*) is (.*)$/,
+    (prop: string, value: string) => {
+      metalist[0].attributes[0][prop] = value;
+    }
+  );
+
+  and(/^a parsed (.*)$/, (html: string) => {
+    node = parse(html).children[0];
+  });
+
+  then(/^(.*) validation error is received$/, (rule: string) => {
+    if (rule === "no")
+      expect(validateAttributes(node, metalist)).toStrictEqual([]);
+    else
+      expect(validateAttributes(node, metalist)[0]?.error?.rule).toStrictEqual(
+        rule
+      );
   });
 };
 

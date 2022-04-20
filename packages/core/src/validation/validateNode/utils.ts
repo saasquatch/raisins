@@ -1,13 +1,13 @@
-import { ErrorEntry, ErrorStack } from './types';
+import { ErrorEntry, ErrorStack } from "./types";
 
 export function getSubErrors<T>(
   stack: ErrorStack<T>,
   jsonPointer: string
 ): ErrorStack<T> {
   return stack.filter(
-    (error) =>
+    error =>
       error.jsonPointer === jsonPointer ||
-      error.jsonPointer.startsWith(jsonPointer + '/')
+      error.jsonPointer.startsWith(jsonPointer + "/")
   );
 }
 
@@ -23,10 +23,10 @@ export function removeError<T>(
   jsonPointer: string
 ): ErrorStack<T> {
   return stack.filter(
-    (error) =>
+    error =>
       !(
         error.jsonPointer === jsonPointer ||
-        error.jsonPointer.startsWith(jsonPointer + '/')
+        error.jsonPointer.startsWith(jsonPointer + "/")
       )
   );
 }

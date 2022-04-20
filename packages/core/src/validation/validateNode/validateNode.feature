@@ -1,6 +1,6 @@
 Feature: Validate Node
 
-	Node validation specifications
+	# Node validation specifications
 
 	Scenario Outline: Non element nodes return no errors
 		Given a <nonElement> node
@@ -32,55 +32,152 @@ Feature: Validate Node
 			| does not allow     | does not allow     | doesChildAllowParent |
 
 
-	# URL TEST SUITE
+	Scenario Outline: Validate attributes handles enums
+		Given a meta list
+		And it has attribute
+		And name is prop
+		And type is <type>
+		And enum is <enum>
+		And a parsed <node>
+		Then <rule> validation error is received
+		Examples:
+			| type    | enum              | node                | rule         |
+			| string  | ["left", "right"] | <div>               | no           |
+			| string  | ["left", "right"] | <div prop="left">   | no           |
+			| string  | ["left", "right"] | <div prop="right">  | no           |
+			| string  | ["left", "right"] | <div prop="center"> | enum/string  |
+			| number  | [0, 1]            | <div>               | no           |
+			| number  | [0, 1]            | <div prop="0">      | no           |
+			| number  | [0, 1]            | <div prop="1">      | no           |
+			| number  | [0, 1]            | <div prop="2">      | enum/number  |
+			| boolean | ["true", "false"] | <div>               | no           |
+			| boolean | ["true", "false"] | <div prop="true">   | no           |
+			| boolean | ["true", "false"] | <div prop="false">  | no           |
+			| boolean | ["true", "false"] | <div prop="maybe">  | enum/boolean |
+
+	Scenario Outline: Validate attributes handles string minLength and maxLength
+		Given a meta list
+		And it has attribute
+		And name is prop
+		And type is string
+		And minLength is 3
+		And maxLength is 5
+		And a parsed <node>
+		Then <rule> validation error is received
+		Examples:
+			| node                   | rule      |
+			| <div>                  | no        |
+			| <div prop="hi">        | minLength |
+			| <div prop="hey">       | no        |
+			| <div prop="heyo">      | no        |
+			| <div prop="hello">     | no        |
+			| <div prop="greetings"> | maxLength |
+
+	Scenario Outline: Validate attributes handles number minimum and maximum
+		Given a meta list
+		And it has attribute
+		And name is prop
+		And type is number
+		And minimum is 5
+		And maximum is 10
+		And a parsed <node>
+		Then <rule> validation error is received
+		Examples:
+			| node            | rule    |
+			| <div>           | no      |
+			| <div prop="0">  | minimum |
+			| <div prop="5">  | no      |
+			| <div prop="8">  | no      |
+			| <div prop="10"> | no      |
+			| <div prop="11"> | maximum |
+
+	Scenario Outline: Validate attributes handles number types
+		Given a meta list
+		And it has attribute
+		And name is age
+		And type is number
+		And a parsed <node>
+		Then <rule> validation error is received
+		Examples:
+			| node              | rule        |
+			| <div>             | no          |
+			| <div age>         | type/number |
+			| <div age="">      | type/number |
+			| <div age="hello"> | type/number |
+			| <div age="10">    | no          |
+
+	Scenario Outline: Validate attributes handles boolean types
+		Given a meta list
+		And it has attribute
+		And name is center
+		And type is boolean
+		And a parsed <node>
+		Then no validation error is received
+		Examples:
+			| node                 |
+			| <div>                |
+			| <div center>         |
+			| <div center="">      |
+			| <div center="true">  |
+			| <div center="false"> |
+			| <div center="123">   |
+			| <div center="any">   |
+
+	@landmine
+	Scenario Outline: Validate attributes handles required
+		Given a meta list
+		And it has attribute
+		And name is id
+		And type is <type>
+		And required is true
+		And a parsed <node>
+		Then <rule> validation error is received
+		Examples:
+			| type    | node           | rule     |
+			| string  | <div>          | required |
+			| number  | <div>          | required |
+			| boolean | <div>          | no       |
+			| string  | <div id="pw">  | no       |
+			| number  | <div id="123"> | no       |
+			| boolean | <div id>       | no       |
+
+	@landmine
+	Scenario Outline: Validate attributes required does not affect booleans
+		Given a meta list
+		And it has attribute
+		And name is center
+		And type is boolean
+		And required is <required>
+		And a parsed <node>
+		Then no validation error is received
+		Examples:
+			| node         | required |
+			| <div>        | true     |
+			| <div>        | false    |
+			| <div center> | true     |
+			| <div center> | false    |
 
 	Scenario Outline: Valid url should accept valid links
 		Given an input value of <url>
 		When isValidURL is tested
 		Then it returns true
 		Examples:
-			| url                        |
-			| saasquatch.com             |
-			| www.saasquatch.com         |
-			| http://www.saasquatch.com  |
-			| https://www.saasquatch.com |
+			| url                               |
+			| http://www.saasquatch.com         |
+			| https://www.saasquatch.com        |
+			| https://www.saasquatch.com/about/ |
 
 	Scenario Outline: Valid url should not accept invalid links
 		Given an input value of <url>
 		When isValidURL is tested
 		Then it returns false
 		Examples:
-			| url            |
-			| localhost:3000 |
-			| example/com    |
-			| example        |
-
-
-	# DATE TEST SUITE
-
-	Scenario Outline: Valid date test should accept ISO dates
-		Given an input value of <date>
-		When isValidDate is tested
-		Then it returns true
-		Examples:
-			| date                      |
-			| 2022-04-20T12:00:00+08:00 |
-			| 2022-04-20T12:00:00       |
-			| 2022-04-20                |
-
-
-	Scenario Outline: Valid date test should not accept bad dates
-		Given an input value of <date>
-		When isValidDate is tested
-		Then it returns false
-		Examples:
-			| date        |
-			| purple      |
-			| example.com |
-			| 12px        |
-
-
-	# DATE INTERVAL TEST SUITE
+			| url                |
+			| saasquatch.com     |
+			| www.saasquatch.com |
+			| localhost:3000     |
+			| example/com        |
+			| example            |
 
 	Scenario Outline: Valid date interval test should accept ISO dates
 		Given an input value of <date>
@@ -88,8 +185,10 @@ Feature: Validate Node
 		Then it returns true
 		Examples:
 			| date                                                |
+			| 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z           |
+			| 2007-03-01T13:00:00Z/P1Y2M10DT2H30M                 |
+			| P1Y2M10DT2H30M/2008-05-11T15:30:00Z                 |
 			| 2022-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
-			| 2022-04-20T12:00:00/2022-04-20T12:00:00             |
 			| 2022-04-20/2022-04-20                               |
 
 	Scenario Outline: Valid date interval test should not accept bad dates
@@ -103,9 +202,7 @@ Feature: Validate Node
 			| 2022-04-20                 |
 			| 2022-04-20T12:00:00+08:00/ |
 			| /2022-04-20T12:00:00+08:00 |
-
-
-	# COLOR TEST SUITE
+			| P1Y2M10DT2H30M             |
 
 	Scenario Outline: Valid color test should pass css keywords
 		Given an input value of <keyword>
