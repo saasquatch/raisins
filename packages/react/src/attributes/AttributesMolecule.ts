@@ -1,6 +1,9 @@
+import { RaisinElementNode } from '@raisins/core';
 import type { Attribute } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { ComponentModelMolecule } from '../component-metamodel';
+import { SelectedNodeMolecule } from '../core';
 import { NodeMolecule } from '../node/NodeMolecule';
 
 /**
@@ -9,15 +12,22 @@ import { NodeMolecule } from '../node/NodeMolecule';
  * Scoped to the {@link NodeMolecule}
  */
 export const AttributesMolecule = molecule((getMol) => {
+  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
+  const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
   const { attributesForNode, componentMetaForNode } = getMol(NodeMolecule);
+
   const schemaAtom = atom((get) => {
-    const attributes = get(componentMetaForNode)?.attributes;
+    const selectedNode = get(SelectedNodeAtom) as RaisinElementNode;
+    const metamodel = get(ComponentMetaAtom);
+
+    const attributes = selectedNode
+      ? metamodel(selectedNode.tagName).attributes
+      : get(componentMetaForNode)?.attributes;
     sortByGroup(attributes);
-    console.log({ sortedList: attributes });
     return attributes;
   });
 
-  const groupedSchemaAtom:Atom<AttributeGroups> = atom((get) => {
+  const groupedSchemaAtom: Atom<AttributeGroups> = atom((get) => {
     const attributes = get(componentMetaForNode)?.attributes;
     const groupedList = attributes ? group(attributes) : {};
     console.log({ groupedList });
@@ -31,6 +41,7 @@ export const AttributesMolecule = molecule((getMol) => {
   );
 
   return {
+    // TODO: attributesForNode is not the currently selectedNode
     valuesAtom: attributesForNode,
     schemaAtom,
     groupedSchemaAtom,

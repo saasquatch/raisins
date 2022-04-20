@@ -43,6 +43,27 @@ program-id="klip-loyalty"
 >
 </sqm-task-card>`;
 
+export const mintReferralTable = `
+<sqm-referral-table per-page="4" hidden-columns="2">
+<sqm-referral-table-user-column column-title="User">
+</sqm-referral-table-user-column>
+<sqm-referral-table-status-column column-title="Referral status">
+</sqm-referral-table-status-column>
+<sqm-referral-table-rewards-column>
+</sqm-referral-table-rewards-column>
+<sqm-referral-table-date-column
+  column-title="Date referred"
+  date-shown="dateReferralStarted"
+>
+</sqm-referral-table-date-column>
+<sqm-empty
+  empty-state-image="https://res.cloudinary.com/saasquatch/image/upload/v1644000223/squatch-assets/empty_referral2.png"
+  empty-state-header="View your referral details"
+  empty-state-text="Refer a friend to view the status of your referrals and rewards earned"
+></sqm-empty>
+</sqm-referral-table>
+`;
+
 export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">
@@ -314,6 +335,7 @@ export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito San
 </sqm-portal-container>
 </sqm-brand>
 `;
+
 export const big = `
 <div style="--sl-color-primary-600: pink;">
 <my-component></my-component>

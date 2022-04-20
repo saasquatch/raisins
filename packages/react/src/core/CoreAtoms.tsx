@@ -14,7 +14,7 @@ import { MutableRefObject } from 'react';
 import { isFunction } from '../util/isFunction';
 import { generateJsonPointers } from "../validation/validateNode";
 import { generateNextState } from './editting/EditAtoms';
-import { ConfigMolecule } from './RaisinPropsScope';
+import { ConfigMolecule } from './RaisinConfigScope';
 
 export type InternalState = {
   current: RaisinNode;

@@ -1,7 +1,7 @@
 {
   "name": "@raisins/react",
   "author": "Logan Volkers",
-  "version": "0.2.0",
+  "version": "0.7.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
@@ -33,7 +33,7 @@
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
-    "react": "^16.14.0"
+    "react": "^16.13.0"
   },
   "husky": {
     "hooks": {

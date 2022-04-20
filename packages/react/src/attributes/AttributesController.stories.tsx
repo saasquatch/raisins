@@ -2,7 +2,7 @@ import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { CanvasController } from '../canvas';
-import { RaisinConfig } from '../core/RaisinPropsScope';
+import { RaisinConfig } from '../core/RaisinConfigScope';
 import {
   big,
   mintBigStat,
@@ -69,12 +69,13 @@ const CustomField = () => {
 
   return (
     <Template>
-      <p>
+      <p style={{ margin: '0' }}>
         <b>Your widget: {schema.uiWidget || 'default'}</b>
         {' - '}
         <b>Group: {schema.uiGroup || 'default'}</b>
       </p>
       <Widget />
+      <br />
     </Template>
   );
 };
@@ -91,11 +92,20 @@ const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <NodeChildrenEditor Component={AttributesEditor} />
+      <NodeChildrenEditor Component={AttributesAndChildren} />
       <Canvas />
     </div>
   );
 };
+
+const AttributesAndChildren = () => {
+    return <div>
+      <AttributesEditor />
+      <div style={{borderLeft:"10px solid grey"}}>
+        <NodeChildrenEditor Component={AttributesAndChildren} />
+      </div>
+    </div>
+}
 
 export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
   return (
@@ -234,7 +244,7 @@ export const Big = ({ canvas }: { canvas: boolean }) => {
 
 function AttributesEditor() {
   return (
-    <div data-attributes-editor>
+    <div data-attributes-editor style={{ flex: '1' }}>
       <TagName />
       <AttributesController />
       <Debugging />
