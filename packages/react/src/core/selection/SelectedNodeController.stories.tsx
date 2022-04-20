@@ -1,9 +1,14 @@
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { RaisinConfig } from '..';
 import { AttributesController } from '../../attributes';
 import { CanvasController } from '../../canvas';
+import { BasicCanvasController } from '../../canvas/CanvasController';
+import { CanvasProvider } from '../../canvas/CanvasScope';
+import { CanvasHoveredMolecule } from '../../canvas/plugins/CanvasHoveredMolecule';
+import { CanvasPickAndPlopMolecule } from '../../canvas/plugins/CanvasPickAndPlopMolecule';
+import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
 import {
   mintMono,
   MintComponents,
@@ -30,20 +35,28 @@ const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
   };
 });
 
-const AttributeEditor = () => (
-  <div style={{ display: 'flex' }}>
-    <div style={{ width: '50%' }}>
-      <SelectedNodeController
-        HasSelectionComponent={AttributesController}
-        NoSelectionComponent={() => <div>no selection</div>}
-      ></SelectedNodeController>
+const AttributeEditor = () => {
+  useMolecule(CanvasSelectionMolecule);
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <SelectedNodeController
+          HasSelectionComponent={AttributesController}
+          NoSelectionComponent={() => <div>no selection</div>}
+        ></SelectedNodeController>
+      </div>
+      <div style={{ width: '50%' }}>
+        <BasicCanvasController />
+      </div>
     </div>
-    <div style={{ width: '50%' }}>
-      <CanvasController />
-    </div>
-  </div>
-);
+  );
+};
 
+const CanvasEditor = () => (
+  <CanvasProvider>
+    <AttributeEditor />
+  </CanvasProvider>
+);
 export const Mint = () => {
   return (
     <BasicStory
@@ -51,7 +64,7 @@ export const Mint = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
@@ -63,7 +76,7 @@ export const MintReferralTable = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
@@ -75,7 +88,7 @@ export const Vanilla = () => {
       startingPackages={VanillaComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
