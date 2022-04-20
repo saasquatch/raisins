@@ -18,7 +18,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
    * Listens for click events, marks clicked elements as selected
    */
   const SelectedClickedAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-    if (e.type === 'dblclick') {
+    if (e.type === 'click') {
       set(SelectedSoulAtom, e.soul);
     }
   });
