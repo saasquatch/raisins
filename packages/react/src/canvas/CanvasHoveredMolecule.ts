@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { VNodeStyle } from 'snabbdom';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { SoulsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
@@ -7,6 +8,7 @@ import { CanvasEvent } from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScopedMolecule } from './CanvasScopedMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
+import { SnabdomRenderer } from './raisinToSnabdom';
 
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
@@ -28,6 +30,30 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   });
 
   CanvasAtoms.addListenerAtom(CanvasEventAtom);
+
+  const RendererAtom = atom((get) => {
+    const hovered = get(HoveredNodeAtom);
+
+    const renderer: SnabdomRenderer = (d, n) => {
+      const isHovered = hovered === n;
+      const isOutlined = isHovered;
+      const { delayed, remove, ...rest } = d.style || {};
+      const style: VNodeStyle = {
+        ...rest,
+        cursor: 'pointer',
+        outline: isHovered ? '2px solid green' : '',
+        outlineOffset: isOutlined ? '-2px' : '',
+      };
+
+      return {
+        ...d,
+        style,
+      };
+    };
+    return renderer;
+  });
+
+  CanvasConfig.RendererSet.add(RendererAtom);
 
   return {
     HoveredRectAtom: defaultRectAtom(

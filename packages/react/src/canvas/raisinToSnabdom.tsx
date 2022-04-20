@@ -18,6 +18,19 @@ const GLOBAL_ENTRY = 'body';
  */
 export type SnabdomRenderer = (d: VNodeData, n: RaisinNode) => VNodeData;
 
+/**
+ * Combines a set of {@link SnabdomRenderer} into a single {@link SnabdomRenderer}
+ */
+export function combineRenderers(
+  ...renderers: SnabdomRenderer[]
+): SnabdomRenderer {
+  return (d, n) => {
+    return renderers.reduce((previous, renderer) => {
+      return renderer(previous, n);
+    }, d);
+  };
+}
+
 export type SnabdomAppender = (
   children: Array<VNode | string> | undefined,
   n: RaisinNode

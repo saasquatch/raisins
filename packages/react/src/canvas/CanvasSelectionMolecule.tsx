@@ -1,5 +1,6 @@
-import { atom } from 'jotai';
+import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { VNodeStyle } from 'snabbdom';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { SoulsInDocMolecule } from '../core/souls/SoulsInDocumentAtoms';
@@ -7,6 +8,7 @@ import { CanvasEvent } from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScopedMolecule } from './CanvasScopedMolecule';
 import { defaultRectAtom } from './defaultRectAtom';
+import { SnabdomRenderer } from './raisinToSnabdom';
 
 export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
   const canvasAtoms = getMol(CanvasScopedMolecule);
@@ -31,6 +33,30 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
     }
   });
   canvasAtoms.addListenerAtom(SelectedClickedAtom);
+
+  const Renderer: Atom<SnabdomRenderer> = atom((get) => {
+    const selected = get(SelectedNodeAtom);
+    const renderer: SnabdomRenderer = (d, n) => {
+      const isSelected = selected === n;
+      const isOutlined = isSelected;
+      const { delayed, remove, ...rest } = d.style || {};
+      const style: VNodeStyle = {
+        ...rest,
+        cursor: 'pointer',
+        outline: isSelected ? '2px solid rgba(255,0,0,0.5)' : '',
+        outlineOffset: isOutlined ? '-2px' : '',
+      };
+
+      return {
+        ...d,
+        style,
+      };
+    };
+    return renderer;
+  });
+
+  // Registers this renderer
+  CanvasConfig.RendererSet.add(Renderer);
 
   return {
     SelectedRectAtom: defaultRectAtom(

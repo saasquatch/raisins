@@ -25,7 +25,8 @@ type CanvasEventListener = WritableAtom<null, CanvasEvent>;
  * Must be used inside a {@link CanvasProvider}
  */
 export const CanvasScopedMolecule = molecule((getMol, getScope) => {
-  getScope(CanvasScope);
+  const value = getScope(CanvasScope);
+  if (!value) throw new Error('Must be rendered in a <CanvasProvider/>');
 
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const { EventSelectorAtom } = CanvasConfig;
