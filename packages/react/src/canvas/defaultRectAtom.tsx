@@ -3,7 +3,6 @@ import { Atom, atom } from 'jotai';
 import { Soul, soulToString } from '../core/souls/Soul';
 import type { Rect } from './api/Rect';
 import { GeometryDetail } from './api/_CanvasRPCContract';
-import { CanvasConfig } from './CanvasConfig';
 
 /**
  * Creates an asynchronous `Rect` atom that will poll for
@@ -14,10 +13,10 @@ export function defaultRectAtom(
   geometryAtom: Atom<GeometryDetail>,
   nodeAtom: Atom<RaisinNode | undefined>,
   soulAtom: Atom<(node: RaisinNode) => Soul>,
-  CanvasOptions: CanvasConfig
+  soulAttribute: Atom<string>
 ): Atom<Promise<Rect | undefined>> {
   const rectAtom = atom(async (get) => {
-    const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
+    const raisinsSoulAttribute = get(soulAttribute);
     const node = get(nodeAtom);
     if (!node) return undefined;
 

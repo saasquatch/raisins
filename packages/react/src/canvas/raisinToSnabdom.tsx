@@ -25,9 +25,15 @@ export function combineRenderers(
   ...renderers: SnabdomRenderer[]
 ): SnabdomRenderer {
   return (d, n) => {
-    return renderers.reduce((previous, renderer) => {
-      return renderer(previous, n);
-    }, d);
+    return renderers.reduce((previous, renderer) => renderer(previous, n), d);
+  };
+}
+
+export function combineAppenders(
+  ...appenders: SnabdomAppender[]
+): SnabdomAppender {
+  return (c, n) => {
+    return appenders.reduce((previous, appender) => appender(previous, n), c);
   };
 }
 

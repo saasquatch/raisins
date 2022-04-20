@@ -18,6 +18,15 @@ export type CanvasConfig = {
    *
    */
   EventSelectorAtom: Atom<string>;
+
+  /**
+   * HTML content to be rendered in the head of the iframe.
+   *
+   * NOTE: Changing this will cause a full re-render, so this
+   * should only be used for truly static content, such as styles
+   * or scripts tags.
+   */
+  IframeHead: Atom<string>;
 };
 
 export const CanvasConfigMolecule = molecule((getMol) => {
@@ -26,6 +35,7 @@ export const CanvasConfigMolecule = molecule((getMol) => {
   const AppendersSet = proxySet<Atom<SnabdomAppender>>([]);
   const RendererSet = proxySet<Atom<SnabdomRenderer>>([]);
   return {
+    IframeHead: props.IframeHead,
     SoulAttributeAtom: props.SoulAttributeAtom ?? atom('raisins-soul'),
     EventSelectorAtom: props.EventSelectorAtom ?? atom('[raisins-events]'),
     AppendersSet,

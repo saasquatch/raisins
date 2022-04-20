@@ -63,7 +63,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
       canvasAtoms.GeometryAtom,
       SelectedNodeAtom,
       GetSoulAtom,
-      CanvasConfig
+      CanvasConfig.SoulAttributeAtom
     ),
   };
 });

@@ -9,7 +9,6 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
-import { CanvasStyleMolecule, sizes } from './canvas/CanvasStyleMolecule';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
@@ -180,6 +179,34 @@ export function EditorView() {
     </>
   );
 }
+
+export type Size = {
+  name: string;
+  width: string;
+  height: number;
+};
+
+type Mode = 'preview' | 'edit';
+
+const sizes: Size[] = [
+  { name: 'Auto', width: 'auto', height: 1080 },
+  { name: 'Large', width: '992px', height: 1080 },
+  { name: 'Medium', width: '768px', height: 1080 },
+  { name: 'Small', width: '576px', height: 1080 },
+  { name: 'X-Small', width: '400px', height: 1080 },
+];
+
+const CanvasStyleMolecule = molecule((getMol) => {
+  const OutlineAtom = atom(true);
+  const ModeAtom = atom<Mode>('edit');
+  const SizeAtom = atom<Size>(sizes[0]);
+
+  return {
+    OutlineAtom,
+    ModeAtom,
+    SizeAtom,
+  };
+});
 
 const ToolbarMolecule = molecule((getMol) => {
   return {

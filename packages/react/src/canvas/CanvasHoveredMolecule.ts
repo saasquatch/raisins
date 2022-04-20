@@ -28,7 +28,6 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
       set(HoveredSoulAtom, soul);
     }
   });
-
   CanvasAtoms.addListenerAtom(CanvasEventAtom);
 
   const RendererAtom = atom((get) => {
@@ -36,13 +35,12 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
 
     const renderer: SnabdomRenderer = (d, n) => {
       const isHovered = hovered === n;
-      const isOutlined = isHovered;
       const { delayed, remove, ...rest } = d.style || {};
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
         outline: isHovered ? '2px solid green' : '',
-        outlineOffset: isOutlined ? '-2px' : '',
+        outlineOffset: isHovered ? '-2px' : '',
       };
 
       return {
@@ -60,7 +58,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
       CanvasAtoms.GeometryAtom,
       HoveredNodeAtom,
       GetSoulAtom,
-      CanvasConfig
+      CanvasConfig.SoulAttributeAtom
     ),
   };
 });
