@@ -40,7 +40,7 @@ export function calculatePlopTargets(
         // No plops around picked node (that's redundant)
         raisinChild === possiblePlop
       ) {
-	// No plop targets around element nodes
+        // No plop targets around element nodes
         return acc;
       }
       const slot = raisinChild.attribs.slot ?? "";
