@@ -55,8 +55,9 @@
     "@types/css-tree": "^1.0.5",
     "@types/cypress-cucumber-preprocessor": "^4.0.1",
     "@types/domelementtype": "^2.0.1",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.4.1",
     "@types/lodash.clonedeep": "^4.5.6",
+    "@types/luxon": "^2.3.1",
     "@types/mz": "^2.7.4",
     "@types/parse5": "^6.0.3",
     "@types/styled-components": "^5.1.14",
@@ -79,6 +80,7 @@
   "dependencies": {
     "@raisins/schema": "^0.3.0",
     "classnames": "^2.3.1",
+    "color2k": "^2.0.0",
     "css": "^3.0.0",
     "css-select": "^4.1.3",
     "css-tree": "*",
@@ -86,18 +88,19 @@
     "hotkeys-js": "^3.8.7",
     "htmlparser2": "^6.1.0",
     "lodash.clonedeep": "^4.5.0",
+    "luxon": "^2.3.2",
     "penpal": "^6.1.0",
     "snabbdom": "^3.1.0",
     "styled-components": "^5.3.1"
   },
   "jest": {
-    "testPathIgnorePatterns": [
-      "<rootDir>/cypress/"
+    "testMatch": [
+      "**/*.@(iso|node).test.@(ts|tsx|js|jsx)"
     ]
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false,
-    "stepDefinitions": "cypress/stepsDefinition"
+    "stepDefinitions": "src/cucumber-steps"
   },
   "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }

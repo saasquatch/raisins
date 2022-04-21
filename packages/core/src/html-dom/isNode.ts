@@ -1,5 +1,5 @@
 import { RaisinCommentNode, RaisinProcessingInstructionNode, RaisinStyleNode } from "..";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./parser/domElementType";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import {
   RaisinDocumentNode,
   RaisinElementNode,

@@ -199,7 +199,7 @@ export interface Attribute {
   uiOrder?: number;
 
   /**
-   * if required is set to true this attribute must not be undefined.
+   * If required is set to true this attribute must not be undefined.
    */
   required?: boolean;
 }

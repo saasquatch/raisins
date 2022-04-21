@@ -1,4 +1,4 @@
-import { domNativeToRaisin } from "./parser/DomNativeToRaisin";
+import { domNativeToRaisin } from "./DomNativeToRaisin";
 import { RaisinDocumentNode } from "./RaisinNode";
 import { removeWhitespace } from "./util";
 
@@ -17,7 +17,7 @@ type Options = {
  * @param html an HTML string
  * @returns a parsed RaisinDocumentNode
  */
-export function parse(
+export default function parse(
   html: string,
   { cleanWhitespace = false }: Options = {}
 ): RaisinDocumentNode {
@@ -65,5 +65,3 @@ function parseDomParser(html: string) {
   const documentFragment = template.content;
   return domNativeToRaisin(documentFragment) as RaisinDocumentNode;
 }
-
-export default parse;

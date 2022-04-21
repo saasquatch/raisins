@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import cssParser from "./css-om/parser";
 import cssSerializer from "./css-om/serializer";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
@@ -21,6 +22,7 @@ import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
 import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
 import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
 import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
+import { validateNode } from "./validation/validateNode/validateNode";
 
 export {
   htmlSerializer,
@@ -40,6 +42,7 @@ export {
   doesChildAllowParent,
   doesParentAllowChild,
   isNodeAllowed,
+  validateNode,
   HTMLComponents,
   // Path / selection
   getNode,
