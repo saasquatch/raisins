@@ -60,15 +60,21 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
     </div>
   </BasicStory>
 );
-export const MintCanvasOnly = () => (
+export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%' }}>
-        <CanvasController />
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
       </div>
       <div style={{ width: '50%' }}>
-        <CanvasController />
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
       </div>
     </div>
   </BasicStory>
 );
+
+export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;

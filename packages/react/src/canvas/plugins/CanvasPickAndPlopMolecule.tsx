@@ -106,16 +106,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
           return [...acc, plopBefore, vnodeChild];
         }, [] as Array<string | VNode>) ?? [];
 
-      console.log(
-        soulId,
-        appenderId,
-        'appended',
-        vnodeChildren,
-        'to',
-        newChildren,
-        'for kids',
-        raisinChildren
-      );
       return newChildren;
     };
     return appender;
