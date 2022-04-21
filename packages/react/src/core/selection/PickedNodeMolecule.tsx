@@ -92,26 +92,22 @@ export const PickedNodeMolecule = molecule((getMol) => {
         );
 
         set(SetNodeInternalAtom, newDocument);
+      } else {
+        const pickedNode = get(PickedNodeAtom);
+        if (!pickedNode) {
+          // Nothing is picked, so do nothing;
+          return;
+        }
+        const newDocument = moveNode(
+          currentDoc,
+          pickedNode,
+          slot,
+          parentPath,
+          idx
+        );
 
-        // Don't allow re-plop
-        set(PickedAtom, undefined);
-        return;
+        set(SetNodeInternalAtom, newDocument);
       }
-
-      const pickedNode = get(PickedNodeAtom);
-      if (!pickedNode) {
-        // Nothing is picked, so do nothing;
-        return;
-      }
-      const newDocument = moveNode(
-        currentDoc,
-        pickedNode,
-        slot,
-        parentPath,
-        idx
-      );
-
-      set(SetNodeInternalAtom, newDocument);
 
       // Don't allow re-plop
       set(PickedAtom, undefined);
