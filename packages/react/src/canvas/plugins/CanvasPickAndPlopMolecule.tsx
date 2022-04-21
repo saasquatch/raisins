@@ -68,7 +68,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
 
-    const appenderId = Math.random();
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
       if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;

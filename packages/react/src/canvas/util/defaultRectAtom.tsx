@@ -1,7 +1,7 @@
 import { RaisinNode } from '@raisins/core';
 import { Atom, atom } from 'jotai';
 import { Soul, soulToString } from '../../core/souls/Soul';
-import type { Rect } from '../api/Rect';
+import type { Rect } from '../types';
 import { GeometryDetail } from '../api/_CanvasRPCContract';
 
 /**
@@ -14,8 +14,8 @@ export function defaultRectAtom(
   nodeAtom: Atom<RaisinNode | undefined>,
   soulAtom: Atom<(node: RaisinNode) => Soul>,
   soulAttribute: Atom<string>
-): Atom<Promise<Rect | undefined>> {
-  const rectAtom = atom(async (get) => {
+): Atom<Rect | undefined> {
+  const rectAtom = atom((get) => {
     const raisinsSoulAttribute = get(soulAttribute);
     const node = get(nodeAtom);
     if (!node) return undefined;
