@@ -6,6 +6,7 @@ import { BasicStory } from '../index.stories';
 import { MintComponents } from '../examples/MintComponents';
 import { ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
+import { useAtom } from 'jotai';
 
 const meta: Meta = {
   title: 'Component Metamodel',
@@ -18,7 +19,31 @@ export function PackageEditor() {
   return <PackageEditorController />;
 }
 
-export function Mint() {
+const BlocksController = () => {
+  const { BlocksAtom } = useMolecule(ComponentModelMolecule);
+  const blocks = useAtomValue(BlocksAtom);
+
+  return (
+    <div>
+      <h2>Blocks</h2>
+      {blocks.map((block) => {
+        return (
+          <div style={{ borderBottom: '1px solid black' }}>{block.title}</div>
+        );
+      })}
+    </div>
+  );
+};
+
+export function MintBlocks() {
+  return (
+    <BasicStory startingPackages={MintComponents}>
+      <BlocksController />
+    </BasicStory>
+  );
+}
+
+export function MintPackageEditor() {
   return (
     <BasicStory startingPackages={MintComponents}>
       <PackageEditorController />

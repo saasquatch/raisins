@@ -6,7 +6,7 @@ import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
-import { PickedNodeMolecule } from '../core/selection/PickedNode';
+import { PickedNodeMolecule } from '../core/selection/PickedNodeMolecule';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';

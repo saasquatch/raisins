@@ -3,7 +3,7 @@ import { atom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
-import { PickedNodeMolecule } from '../selection/PickedNode';
+import { PickedNodeMolecule } from '../selection/PickedNodeMolecule';
 import { SelectedNodeMolecule } from '../selection/SelectedNode';
 import { EditMolecule, generateNextState } from './EditAtoms';
 
