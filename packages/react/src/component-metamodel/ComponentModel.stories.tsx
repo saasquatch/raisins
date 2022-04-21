@@ -1,12 +1,13 @@
 import { Meta } from '@storybook/react';
+import { useSetAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { BasicStory } from '../index.stories';
+import { PickedNodeMolecule } from '../core';
 import { MintComponents } from '../examples/MintComponents';
+import { BasicStory } from '../index.stories';
 import { ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
-import { useAtom } from 'jotai';
 
 const meta: Meta = {
   title: 'Component Metamodel',
@@ -21,14 +22,26 @@ export function PackageEditor() {
 
 const BlocksController = () => {
   const { BlocksAtom } = useMolecule(ComponentModelMolecule);
+  const { PickedAtom } = useMolecule(PickedNodeMolecule);
   const blocks = useAtomValue(BlocksAtom);
+  const pick = useSetAtom(PickedAtom);
 
   return (
     <div>
       <h2>Blocks</h2>
       {blocks.map((block) => {
         return (
-          <div style={{ borderBottom: '1px solid black' }}>{block.title}</div>
+          <div
+            style={{ borderBottom: '1px solid black' }}
+            onClick={() =>
+              pick({
+                type: 'block',
+                block,
+              })
+            }
+          >
+            {block.title}
+          </div>
         );
       })}
     </div>
