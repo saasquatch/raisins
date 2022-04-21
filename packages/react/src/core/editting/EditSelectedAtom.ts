@@ -3,8 +3,8 @@ import { atom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
-import { PickedNodeMolecule } from '../selection/PickedNodeMolecule';
-import { SelectedNodeMolecule } from '../selection/SelectedNode';
+import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
+import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';
 import { EditMolecule, generateNextState } from './EditAtoms';
 
 const { removePath } = htmlUtil;
@@ -14,7 +14,7 @@ export const EditSelectedMolecule = molecule((getMol) => {
   const { DuplicateNodeAtom, ReplaceNodeAtom } = getMol(EditMolecule);
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
 
-  const { PickedAtom } = getMol(PickedNodeMolecule);
+  const { PickedAtom } = getMol(PickAndPlopMolecule);
 
   /**
    * Deletes the selected node, if anything selected, otherwise no-op

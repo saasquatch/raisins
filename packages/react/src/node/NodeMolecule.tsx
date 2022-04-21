@@ -6,8 +6,8 @@ import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
-import { PickedNodeMolecule } from '../core/selection/PickedNodeMolecule';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
+import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { getSubErrors } from '../validation';
@@ -29,7 +29,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     PickedAtom,
     PickedNodeAtom,
     PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom,
-  } = getMol(PickedNodeMolecule);
+  } = getMol(PickAndPlopMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);

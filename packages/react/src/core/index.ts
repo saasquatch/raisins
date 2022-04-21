@@ -9,8 +9,8 @@ export {
   RaisinsProvider,
 } from './RaisinConfigScope';
 export { HoveredNodeMolecule } from './selection/HoveredNode';
-export { PickedNodeMolecule } from './selection/PickedNodeMolecule';
-export { SelectedNodeMolecule } from './selection/SelectedNode';
+export { PickAndPlopMolecule as PickedNodeMolecule } from './selection/PickAndPlopMolecule';
+export { SelectedNodeMolecule } from './selection/SelectedNodeMolecule';
 export { SoulsMolecule } from './souls/Soul';
 export { SoulsInDocMolecule } from './souls/SoulsInDocumentAtoms';
 export * from './selection';

@@ -8,6 +8,7 @@ import { AttributesMolecule } from './AttributesMolecule';
 import { resolveComponent } from './resolveComponent';
 
 const AttributeScope = createScope<string | undefined>(undefined);
+AttributeScope.displayName = 'AttributeScope';
 
 /**
  * Scope for the attribute name (i.e. key) that is in scope

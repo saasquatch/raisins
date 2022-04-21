@@ -27,7 +27,7 @@ export type PickedOption =
   | { type: 'block'; block: Block }
   | undefined;
 
-export const PickedNodeMolecule = molecule((getMol) => {
+export const PickAndPlopMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SetNodeInternalAtom } = getMol(EditMolecule);
 
@@ -131,6 +131,7 @@ function moveNode(
   idx: number
 ): RaisinNode {
   const docWithNodeRemoved = remove(root, nodeToMove);
+  // TODO: Save soul?
   const cloneOfPickedNode = clone(nodeToMove);
   const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
     ? { ...cloneOfPickedNode }
