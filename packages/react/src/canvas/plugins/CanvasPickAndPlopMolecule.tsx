@@ -5,7 +5,7 @@ import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
   CoreMolecule,
-  PickedNodeMolecule,
+  PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../../core';
@@ -18,11 +18,15 @@ import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
-  const { PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
+  const {
+    PlopNodeInSlotAtom,
+    PickedAtom,
+    PickedNodeAtom,
+    PloppingIsActive,
+  } = getMol(PickAndPlopMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
-  const { PickedAtom, PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   /**
    * Listens for click events, marks clicked elements as selected
@@ -51,7 +55,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
           if (!parentNode || !isElementNode(parentNode)) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
           const slot = target?.attributes['raisin-plop-slot'] ?? '';
-          set(DropPloppedNodeInSlotAtom, { parent: parentNode, idx, slot });
+          set(PlopNodeInSlotAtom, { parent: parentNode, idx, slot });
           // If plop, don't do select logic
           return;
         }
@@ -69,9 +73,9 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
 
-    const pickedNode = picked?.type === "block" ? picked.block.content : pickedForMove;
+    const pickedNode =
+      picked?.type === 'block' ? picked.block.content : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
-
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
       if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
       const parent = n;

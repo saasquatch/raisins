@@ -1,3 +1,4 @@
+export * from './CanvasConfig';
 export * from './CanvasController';
 export * from './CanvasScope';
 export * from './CanvasScopeMolecule';

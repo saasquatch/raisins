@@ -5,7 +5,7 @@ import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
-import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule';
 import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';

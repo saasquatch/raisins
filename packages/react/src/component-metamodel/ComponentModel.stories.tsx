@@ -6,7 +6,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { CanvasProvider } from '../canvas';
 import { CanvasFull } from '../canvas/CanvasController.stories';
-import { PickedNodeMolecule } from '../core';
+import { PickAndPlopMolecule } from '../core';
 import { big, MintComponents } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
@@ -32,11 +32,11 @@ const fakeBlocks: Block[] = [
 
 const BlocksController = () => {
   const { BlocksAtom } = useMolecule(ComponentModelMolecule);
-  const { PickedAtom } = useMolecule(PickedNodeMolecule);
+  const { PickedAtom } = useMolecule(PickAndPlopMolecule);
   const blocks = fakeBlocks ?? useAtomValue(BlocksAtom);
   const [picked, pick] = useAtom(PickedAtom);
 
-  const pickedBlock = picked?.type === "block" ? picked.block : undefined
+  const pickedBlock = picked?.type === 'block' ? picked.block : undefined;
   return (
     <div>
       <h2>Blocks</h2>

@@ -12,7 +12,7 @@ import { CanvasController } from './canvas/CanvasController';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
-import { HoveredNodeMolecule } from './core/selection/HoveredNode';
+import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { LayersController } from './node/slots/SlotChildrenController.stories';

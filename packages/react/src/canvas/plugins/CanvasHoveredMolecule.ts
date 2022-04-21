@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { VNodeStyle } from 'snabbdom';
-import { HoveredNodeMolecule } from '../../core/selection/HoveredNode';
+import { HoveredNodeMolecule } from '../../core/selection/HoveredNodeMolecule';
 import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
