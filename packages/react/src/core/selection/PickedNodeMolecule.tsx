@@ -9,11 +9,23 @@ import {
 } from '@raisins/core';
 import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
 import { EditMolecule } from '../editting/EditAtoms';
 
 const { remove, insertAtPath, clone } = htmlUtil;
+
+export type PlopDestination = {
+  parent: RaisinNodeWithChildren;
+  idx: number;
+  slot: string;
+};
+
+export type PickedOption =
+  | { type: 'element'; path: NodePath }
+  | { type: 'block'; block: Block }
+  | undefined;
 
 export const PickedNodeMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
@@ -22,14 +34,16 @@ export const PickedNodeMolecule = molecule((getMol) => {
   /**
    * For tracking which atom is picked. Can only have one atom picked at a time.
    */
-  const PickedAtom = atom<NodePath | undefined>(undefined);
+  const PickedAtom = atom<PickedOption>(undefined);
 
   const PickedNodeAtom: PrimitiveAtom<RaisinNode | undefined> = atom(
     (get) => {
-      const currrentDoc = get(RootNodeAtom);
-      const pickedPath = get(PickedAtom);
-      if (!pickedPath) return undefined;
-      return getNode(currrentDoc, pickedPath);
+      const currentDoc = get(RootNodeAtom);
+      const picked = get(PickedAtom);
+      if (!picked) return undefined;
+      if (picked.type !== 'element') return undefined;
+
+      return getNode(currentDoc, picked.path);
     },
     (get, set, next) => {
       const node = isFunction(next) ? next(get(PickedNodeAtom)) : next;
@@ -38,9 +52,16 @@ export const PickedNodeMolecule = molecule((getMol) => {
         set(PickedAtom, undefined);
         return;
       }
-      const currrentDoc = get(RootNodeAtom);
-      const path = getPath(currrentDoc, node);
-      set(PickedAtom, path);
+      const currentDoc = get(RootNodeAtom);
+      const path = getPath(currentDoc, node);
+      if (!path) {
+        set(PickedAtom, undefined);
+      } else {
+        set(PickedAtom, {
+          type: 'element',
+          path,
+        });
+      }
     }
   );
 
@@ -51,43 +72,22 @@ export const PickedNodeMolecule = molecule((getMol) => {
     (get) => (get(PickedAtom) !== undefined) as boolean
   );
 
-  const DropPloppedNodeInSlotAtom = atom(
+  const PlopNodeInSlotAtom = atom(
     null,
-    (
-      get,
-      set,
-      {
-        parent,
-        idx,
-        slot,
-      }: {
-        parent: RaisinNodeWithChildren;
-        idx: number;
-        slot: string;
-      }
-    ) => {
-      const pickedNodePath = get(PickedAtom);
-      if (!pickedNodePath) {
+    (get, set, { parent, idx, slot }: PlopDestination) => {
+      const pickedNode = get(PickedNodeAtom);
+      if (!pickedNode) {
         // Nothing is picked, so do nothing;
         return;
       }
 
-      const currrentDoc = get(RootNodeAtom);
-      const pickedNode = getNode(currrentDoc, pickedNodePath);
-      const parentPath = getPath(currrentDoc, parent)!;
-      const docWithNodeRemoved = remove(currrentDoc, pickedNode);
+      const currentDoc = get(RootNodeAtom);
+      const parentPath = getPath(currentDoc, parent)!;
 
-      const cloneOfPickedNode = clone(pickedNode);
-
-      const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
-        ? { ...cloneOfPickedNode }
-        : {
-            ...cloneOfPickedNode,
-            attribs: { ...cloneOfPickedNode.attribs, slot },
-          };
-      const newDocument = insertAtPath(
-        docWithNodeRemoved,
-        nodeWithNewSlot,
+      const newDocument = moveNode(
+        currentDoc,
+        pickedNode,
+        slot,
         parentPath,
         idx
       );
@@ -103,6 +103,31 @@ export const PickedNodeMolecule = molecule((getMol) => {
     PickedAtom,
     PickedNodeAtom,
     PloppingIsActive,
-    DropPloppedNodeInSlotAtom,
+    PlopNodeInSlotAtom,
   };
 });
+
+// TODO: Move to core html util
+function moveNode(
+  root: RaisinNode,
+  nodeToMove: RaisinNode,
+  slot: string,
+  parentPath: NodePath,
+  idx: number
+): RaisinNode {
+  const docWithNodeRemoved = remove(root, nodeToMove);
+  const cloneOfPickedNode = clone(nodeToMove);
+  const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
+    ? { ...cloneOfPickedNode }
+    : {
+        ...cloneOfPickedNode,
+        attribs: { ...cloneOfPickedNode.attribs, slot },
+      };
+  const newDocument = insertAtPath(
+    docWithNodeRemoved,
+    nodeWithNewSlot,
+    parentPath,
+    idx
+  );
+  return newDocument;
+}

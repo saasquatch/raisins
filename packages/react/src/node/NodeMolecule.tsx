@@ -25,9 +25,11 @@ import { NodeScopeMolecule } from './NodeScope';
 export const NodeMolecule = molecule((getMol, getScope) => {
   const n = getMol(NodeScopeMolecule);
 
-  const { PickedAtom, PickedNodeAtom, DropPloppedNodeInSlotAtom } = getMol(
-    PickedNodeMolecule
-  );
+  const {
+    PickedAtom,
+    PickedNodeAtom,
+    PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom,
+  } = getMol(PickedNodeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
@@ -92,8 +94,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     if (isNodePicked) {
       set(PickedAtom, undefined);
     } else {
-      const currrentDoc = get(RootNodeAtom);
-      set(PickedAtom, getPath(currrentDoc, node));
+      set(PickedNodeAtom, node);
     }
   });
 

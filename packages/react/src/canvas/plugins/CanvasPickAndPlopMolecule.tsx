@@ -18,7 +18,7 @@ import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
-  const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
+  const { PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);

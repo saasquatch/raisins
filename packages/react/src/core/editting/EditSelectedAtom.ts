@@ -40,7 +40,7 @@ export const EditSelectedMolecule = molecule((getMol) => {
 
   const PickSelectedAtom = atom(null, (get, set) => {
     const selected = get(SelectedAtom);
-    selected && set(PickedAtom, selected.path);
+    selected && set(PickedAtom, { type: 'element', path: selected.path });
   });
 
   const EditSelectedNodeAtom = atom(
