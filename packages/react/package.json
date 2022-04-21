@@ -63,6 +63,7 @@
     "hotkeys-js": "^3.8.7",
     "jotai": "^1.6.0",
     "jotai-molecules": "^1.0.3",
+    "luxon": "^2.3.2",
     "optics-ts": "^2.2.0",
     "penpal": "^6.1.0",
     "prosemirror-commands": "^1.1.11",
