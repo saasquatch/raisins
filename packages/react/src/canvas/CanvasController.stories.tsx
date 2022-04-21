@@ -45,7 +45,7 @@ export const BigCanvasWithSelection = () => (
   <BigCanvasOnly Component={CanvasWithSelection} />
 );
 export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
-  <BasicStory startingHtml={`<div><div>Inner1</div><div>Inner2</div></div>`}>
+  <BasicStory startingHtml={big}>
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%' }}>
         <CanvasProvider>
@@ -53,12 +53,6 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
         </CanvasProvider>
       </div>
       <div style={{ width: '50%' }}>
-        <CanvasProvider>
-          <Component />
-        </CanvasProvider>
-        <CanvasProvider>
-          <Component />
-        </CanvasProvider>
         <CanvasProvider>
           <Component />
         </CanvasProvider>

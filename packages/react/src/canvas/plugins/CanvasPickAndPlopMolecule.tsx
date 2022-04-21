@@ -86,7 +86,12 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const newChildren =
         vnodeChildren?.reduce((acc, vnodeChild, idx) => {
           const raisinChild = raisinChildren[idx];
-          if (!isElementNode(raisinChild)) {
+          if (
+            // No plop around text nodes
+            !isElementNode(raisinChild) ||
+            // No plops around picked node (that's redundant)
+            raisinChild === pickedNode
+          ) {
             // No plop targets around element nodes
             return [...acc, vnodeChild];
           }
