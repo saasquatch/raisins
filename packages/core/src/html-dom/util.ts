@@ -1,6 +1,7 @@
 import cloneDeep from "lodash.clonedeep";
 import { getNode, NodePath } from "../paths/Paths";
 import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { isElementNode } from "./isNode";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -284,6 +285,31 @@ export function moveToPath(
     newIdx,
     onReplace
   );
+}
+
+export function moveNode(
+  root: RaisinNode,
+  nodeToMove: RaisinNode,
+  slot: string,
+  parentPath: NodePath,
+  idx: number
+): RaisinNode {
+  const docWithNodeRemoved = remove(root, nodeToMove);
+  // TODO: Save soul?
+  const cloneOfPickedNode = clone(nodeToMove);
+  const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
+    ? { ...cloneOfPickedNode }
+    : {
+        ...cloneOfPickedNode,
+        attribs: { ...cloneOfPickedNode.attribs, slot }
+      };
+  const newDocument = insertAtPath(
+    docWithNodeRemoved,
+    nodeWithNewSlot,
+    parentPath,
+    idx
+  );
+  return newDocument;
 }
 
 /**
