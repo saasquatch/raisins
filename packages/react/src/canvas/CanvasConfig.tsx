@@ -2,7 +2,7 @@ import { atom, Atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { atomWithProxy } from 'jotai/valtio';
 import { proxySet } from 'valtio/utils';
-import { SnabdomAppender, SnabdomRenderer } from './util/raisinToSnabdom';
+import { SnabbdomAppender, SnabbdomRenderer } from './util/raisinToSnabdom';
 import { ConfigMolecule } from '../core/RaisinConfigScope';
 
 export type CanvasConfig = {
@@ -32,15 +32,9 @@ export type CanvasConfig = {
 export const CanvasConfigMolecule = molecule((getMol) => {
   const props = getMol(ConfigMolecule);
 
-  const AppendersSet = proxySet<Atom<SnabdomAppender>>([]);
-  const RendererSet = proxySet<Atom<SnabdomRenderer>>([]);
   return {
     IframeHead: props.IframeHead,
     SoulAttributeAtom: props.SoulAttributeAtom ?? atom('raisins-soul'),
-    EventSelectorAtom: props.EventSelectorAtom ?? atom('[raisins-events]'),
-    AppendersSet,
-    AppendersAtom: atomWithProxy(AppendersSet),
-    RendererSet,
-    RendererAtom: atomWithProxy(RendererSet),
+    EventAttributeAtom: props.EventSelectorAtom ?? atom('raisins-events'),
   };
 });

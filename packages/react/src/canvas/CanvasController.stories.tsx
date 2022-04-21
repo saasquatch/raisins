@@ -4,7 +4,7 @@ import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
 import { BasicCanvasController, CanvasController } from './CanvasController';
-import { CanvasProvider } from "./CanvasScope";
+import { CanvasProvider } from './CanvasScope';
 import { CanvasHoveredMolecule } from './plugins/CanvasHoveredMolecule';
 import { CanvasPickAndPlopMolecule } from './plugins/CanvasPickAndPlopMolecule';
 import { CanvasSelectionMolecule } from './plugins/CanvasSelectionMolecule';
@@ -45,7 +45,7 @@ export const BigCanvasWithSelection = () => (
   <BigCanvasOnly Component={CanvasWithSelection} />
 );
 export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
-  <BasicStory startingHtml={big}>
+  <BasicStory startingHtml={`<div><div>Inner1</div><div>Inner2</div></div>`}>
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%' }}>
         <CanvasProvider>
@@ -53,6 +53,12 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
         </CanvasProvider>
       </div>
       <div style={{ width: '50%' }}>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
         <CanvasProvider>
           <Component />
         </CanvasProvider>

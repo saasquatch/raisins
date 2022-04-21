@@ -6,7 +6,7 @@ import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabdomRenderer } from '../util/raisinToSnabdom';
+import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
@@ -25,7 +25,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const RendererAtom = atom((get) => {
     const hovered = get(HoveredNodeAtom);
 
-    const renderer: SnabdomRenderer = (d, n) => {
+    const renderer: SnabbdomRenderer = (d, n) => {
       const isHovered = hovered === n;
 
       const { delayed, remove, ...rest } = d.style || {};

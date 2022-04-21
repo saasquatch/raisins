@@ -2,7 +2,8 @@ import {
   cssSerializer,
   htmlUtil,
   RaisinDocumentNode,
-  RaisinNode,
+  RaisinElementNode,
+  RaisinNodeWithChildren,
 } from '@raisins/core';
 import { h, VNode, VNodeData } from 'snabbdom';
 import styleToObject from 'style-to-object';
@@ -16,36 +17,42 @@ const GLOBAL_ENTRY = 'body';
  * Useful for adding additional styling (e.g. selected styling) and props
  *
  */
-export type SnabdomRenderer = (d: VNodeData, n: RaisinNode) => VNodeData;
+export type SnabbdomRenderer = (
+  d: VNodeData,
+  n: RaisinElementNode
+) => VNodeData;
+
+export type SnabbdomAppender = (
+  children: Array<VNode | string> | undefined,
+  n: RaisinNodeWithChildren
+) => Array<VNode | string> | undefined;
 
 /**
- * Combines a set of {@link SnabdomRenderer} into a single {@link SnabdomRenderer}
+ * Combines a set of {@link SnabbdomRenderer} into a single {@link SnabbdomRenderer}
  */
 export function combineRenderers(
-  ...renderers: SnabdomRenderer[]
-): SnabdomRenderer {
+  ...renderers: SnabbdomRenderer[]
+): SnabbdomRenderer {
   return (d, n) => {
     return renderers.reduce((previous, renderer) => renderer(previous, n), d);
   };
 }
 
+/**
+ * Combines a set of {@link SnabbdomAppender} into a single {@link SnabbdomAppender}
+ */
 export function combineAppenders(
-  ...appenders: SnabdomAppender[]
-): SnabdomAppender {
+  ...appenders: SnabbdomAppender[]
+): SnabbdomAppender {
   return (c, n) => {
     return appenders.reduce((previous, appender) => appender(previous, n), c);
   };
 }
 
-export type SnabdomAppender = (
-  children: Array<VNode | string> | undefined,
-  n: RaisinNode
-) => Array<VNode | string> | undefined;
-
-export function raisintoSnabdom(
+export function raisinToSnabbdom(
   node: RaisinDocumentNode,
-  modifier: SnabdomRenderer = (d, n) => d,
-  appender: SnabdomAppender = (c, n) => c
+  modifier: SnabbdomRenderer = (d, n) => d,
+  appender: SnabbdomAppender = (c, n) => c
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onComment(c) {

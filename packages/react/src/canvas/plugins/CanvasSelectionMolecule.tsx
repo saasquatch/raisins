@@ -6,7 +6,7 @@ import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabdomRenderer } from '../util/raisinToSnabdom';
+import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
   const canvasAtoms = getMol(CanvasScopedMolecule);
@@ -25,9 +25,9 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
   SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
   canvasAtoms.addListenerAtom(SelectedClickedAtom);
 
-  const Renderer: Atom<SnabdomRenderer> = atom((get) => {
+  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
-    const renderer: SnabdomRenderer = (d, n) => {
+    const renderer: SnabbdomRenderer = (d, n) => {
       const isSelected = selected === n;
       const isOutlined = isSelected;
       const { delayed, remove, ...rest } = d.style || {};

@@ -13,7 +13,7 @@ import { RawCanvasEvent } from '../api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabdomAppender, SnabdomRenderer } from '../util/raisinToSnabdom';
+import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
@@ -66,39 +66,60 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const isPloppingActive = get(PloppingIsActive);
     const pickedNode = get(PickedNodeAtom);
     const metamodel = get(ComponentModelAtom);
+    const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
 
-    const appender: SnabdomAppender = (c, n) => {
-      if (!pickedNode || !isElementNode(pickedNode)) return c;
-      if (!isPloppingActive || !isElementNode(n)) return c;
+    const appenderId = Math.random();
+    const appender: SnabbdomAppender = (vnodeChildren, n) => {
+      if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
+      if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
       const parent = n;
 
       // TODO: Root node should allow any children
-      if (!isElementNode(parent)) return c;
+      if (!isElementNode(parent)) return vnodeChildren;
 
       const slot = n.attribs.slot ?? '';
       const isValid = metamodel.isValidChild(pickedNode, parent, slot);
-      if (!isValid) return c;
+      if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
 
+      const raisinChildren = parent.children;
       const newChildren =
-        c?.reduce((acc, child, idx) => {
-          const plopTarget = createPlopTargetNode({
+        vnodeChildren?.reduce((acc, vnodeChild, idx) => {
+          const raisinChild = raisinChildren[idx];
+          if (!isElementNode(raisinChild)) {
+            // No plop targets around element nodes
+            return [...acc, vnodeChild];
+          }
+
+          const plopBefore = PlopTargetView({
             idx,
             slot,
             soulId,
+            eventsAttribute,
             parent,
           });
-          return [...acc, plopTarget, child];
+          return [...acc, plopBefore, vnodeChild];
         }, [] as Array<string | VNode>) ?? [];
+
+      console.log(
+        soulId,
+        appenderId,
+        'appended',
+        vnodeChildren,
+        'to',
+        newChildren,
+        'for kids',
+        raisinChildren
+      );
       return newChildren;
     };
     return appender;
   });
-  // CanvasConfig.AppendersSet.add(AppenderAtom);
+  CanvasConfig.AppendersSet.add(AppenderAtom);
 
-  const Renderer: Atom<SnabdomRenderer> = atom((get) => {
+  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const picked = get(PickedNodeAtom);
-    const renderer: SnabdomRenderer = (d, n) => {
+    const renderer: SnabbdomRenderer = (d, n) => {
       const isPicked = picked === n;
       const { delayed, remove, ...rest } = d.style || {};
       const style: VNodeStyle = {
@@ -129,22 +150,27 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   };
 });
 
-function createPlopTargetNode({
-  soulId,
-  slot,
-  idx,
-  parent,
-}: {
+type SnabdomComponent<T> = (props: T) => VNode;
+
+type PlopTargetViewProps = {
   idx: number;
   soulId: string;
   slot: string;
+  eventsAttribute: string;
   parent: RaisinElementNode;
-}) {
+};
+const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
+  soulId,
+  slot,
+  idx,
+  eventsAttribute,
+  parent,
+}) => {
   return h(
     'div',
     {
       style: {
-        height: '0px',
+        // height: '0px',
         overflow: 'visible',
       },
     },
@@ -153,8 +179,8 @@ function createPlopTargetNode({
       {
         style: {
           background: 'yellow',
-          height: '8px',
-          top: '-4px',
+          // height: '8px',
+          // top: '-4px',
           zIndex: '999',
           position: 'relative',
         },
@@ -164,10 +190,10 @@ function createPlopTargetNode({
           'raisin-plop-parent': soulId,
           'raisin-plop-slot': slot,
           'raisin-plop-idx': idx,
-          'raisins-events': true,
+          [eventsAttribute]: true,
         },
       },
-      ` `
+      `${parent?.tagName} index ${idx}`
     )
   );
-}
+};
