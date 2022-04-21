@@ -7,7 +7,11 @@ import React from 'react';
 import { CanvasProvider } from '../canvas';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { PickAndPlopMolecule } from '../core';
-import { big, MintComponents } from '../examples/MintComponents';
+import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  referrerWidget,
+  VanillaComponents,
+} from '../examples/VanillaComponents';
 import { BasicStory } from '../index.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
@@ -26,21 +30,53 @@ export function PackageEditor() {
 const fakeBlocks: Block[] = [
   {
     title: 'div',
-    content: htmlParser('<div>I am div</div>').children[0] as RaisinElementNode,
+    content: htmlParser('<div>I am a div</div>')
+      .children[0] as RaisinElementNode,
+  },
+  {
+    title: 'tr',
+    content: htmlParser('<tr>I am a tr</tr>').children[0] as RaisinElementNode,
+  },
+  {
+    title: 'td',
+    content: htmlParser('<td>I am a td</td>').children[0] as RaisinElementNode,
+  },
+  {
+    title: 'table',
+    content: htmlParser('<table>I am a table</table>')
+      .children[0] as RaisinElementNode,
+  },
+  {
+    title: 'thead',
+    content: htmlParser('<thead>I am a thead</thead>')
+      .children[0] as RaisinElementNode,
+  },
+  {
+    title: 'tbody',
+    content: htmlParser('<tbody>I am tbody</tbody>')
+      .children[0] as RaisinElementNode,
   },
 ];
 
 const BlocksController = () => {
   const { BlocksAtom } = useMolecule(ComponentModelMolecule);
   const { PickedAtom } = useMolecule(PickAndPlopMolecule);
-  const blocks = fakeBlocks ?? useAtomValue(BlocksAtom);
+
+  const blocks = useAtomValue(BlocksAtom);
   const [picked, pick] = useAtom(PickedAtom);
 
   const pickedBlock = picked?.type === 'block' ? picked.block : undefined;
   return (
-    <div>
+    <div
+      style={{
+        width: '25%',
+        position: 'fixed',
+        overflowY: 'scroll',
+        height: '95vh',
+      }}
+    >
       <h2>Blocks</h2>
-      {blocks.map((block) => {
+      {(blocks.length ? blocks : fakeBlocks).map((block) => {
         return (
           <div
             style={{
@@ -63,15 +99,42 @@ const BlocksController = () => {
   );
 };
 
-export function MintBlocks() {
+const Editor = () => {
   return (
-    <BasicStory startingHtml={big} startingPackages={MintComponents}>
-      <>
-        <BlocksController />
+    <div style={{ display: 'flex' }}>
+      <BlocksController />
+      <div style={{ width: '74%', position: 'absolute', right: 0 }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
-      </>
+      </div>
+    </div>
+  );
+};
+
+export function BigBlocks() {
+  return (
+    <BasicStory startingHtml={big + `<table></table>`}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintBlocks() {
+  return (
+    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function VanillaBlocks() {
+  return (
+    <BasicStory
+      startingHtml={referrerWidget}
+      startingPackages={VanillaComponents}
+    >
+      <Editor />
     </BasicStory>
   );
 }

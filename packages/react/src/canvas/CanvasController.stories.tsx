@@ -45,7 +45,7 @@ export const CanvasFull = () => {
   return (
     <div style={{ position: 'relative' }}>
       <Toolbars />
-      <BasicCanvasController />;
+      <BasicCanvasController />
     </div>
   );
 };
