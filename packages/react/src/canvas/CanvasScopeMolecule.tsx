@@ -2,7 +2,6 @@ import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { atomWithProxy } from 'jotai/valtio';
-import { ref } from 'valtio';
 import { proxySet } from 'valtio/utils';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
@@ -52,6 +51,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
     const renderersAtoms = get(RendererAtom);
+    if (!renderersAtoms) return raisinToSnabbdom(node as RaisinDocumentNode);
     const renderers = Array.from(renderersAtoms.values()).map(
       (a) => get(a) as SnabbdomRenderer
     );
@@ -68,7 +68,11 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);
 
-    const appenders = Array.from(get(AppendersAtom)).map((a) => get(a));
+    if (!renderersAtoms)
+      return raisinToSnabbdom(node as RaisinDocumentNode, renderer);
+    const appendersAtoms = get(AppendersAtom);
+
+    const appenders = Array.from(appendersAtoms.values()).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
     const vnode = raisinToSnabbdom(
@@ -80,8 +84,6 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     return vnode;
   });
   VnodeAtom.debugLabel = 'VnodeAtom';
-
-
 
   const CanvasEventAtom = atom(null, (get, set, e: RawCanvasEvent) => {
     const idToSoul = get(IdToSoulAtom);

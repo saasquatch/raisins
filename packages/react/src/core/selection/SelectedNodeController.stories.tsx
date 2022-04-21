@@ -52,13 +52,23 @@ const AttributeEditor = ({
   useMolecule(CanvasSelectionMolecule);
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
-        <SelectedNodeController
-          HasSelectionComponent={AttributesController}
-          NoSelectionComponent={() => <div>no selection</div>}
-        ></SelectedNodeController>
+      <div
+        style={{
+          width: '40%',
+          position: 'fixed',
+          overflowY: 'scroll',
+          height: '95vh',
+        }}
+      >
+        <Controller />
       </div>
-      <div style={{ width: '50%' }}>
+      <div
+        style={{
+          width: '59%',
+          position: 'absolute',
+          right: 0,
+        }}
+      >
         <BasicCanvasController />
       </div>
     </div>
@@ -101,7 +111,7 @@ export const MintBigStat = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
@@ -125,19 +135,21 @@ export const CustomUnselectedComponent = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor
-        Controller={() => (
-          <SelectedNodeController
-            HasSelectionComponent={AttributesController}
-            NoSelectionComponent={() => (
-              <div>
-                <h3>No component currently selected.</h3>
-                <p>Select a component to begin customizing!</p>
-              </div>
-            )}
-          ></SelectedNodeController>
-        )}
-      />
+      <CanvasProvider>
+        <AttributeEditor
+          Controller={() => (
+            <SelectedNodeController
+              HasSelectionComponent={AttributesController}
+              NoSelectionComponent={() => (
+                <div>
+                  <h3>No component currently selected.</h3>
+                  <p>Select a component to begin customizing!</p>
+                </div>
+              )}
+            ></SelectedNodeController>
+          )}
+        />
+      </CanvasProvider>
     </BasicStory>
   );
 };
@@ -149,13 +161,15 @@ export const CustomSelectedComponentMint = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor
-        Controller={() => (
-          <SelectedNodeController
-            HasSelectionComponent={CustomAttributesController}
-          ></SelectedNodeController>
-        )}
-      />
+      <CanvasProvider>
+        <AttributeEditor
+          Controller={() => (
+            <SelectedNodeController
+              HasSelectionComponent={CustomAttributesController}
+            ></SelectedNodeController>
+          )}
+        />
+      </CanvasProvider>
     </BasicStory>
   );
 };
@@ -167,13 +181,15 @@ export const CustomSelectedComponentVanilla = () => {
       startingPackages={VanillaComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor
-        Controller={() => (
-          <SelectedNodeController
-            HasSelectionComponent={CustomAttributesController}
-          ></SelectedNodeController>
-        )}
-      />
+      <CanvasProvider>
+        <AttributeEditor
+          Controller={() => (
+            <SelectedNodeController
+              HasSelectionComponent={CustomAttributesController}
+            ></SelectedNodeController>
+          )}
+        />
+      </CanvasProvider>
     </BasicStory>
   );
 };

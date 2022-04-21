@@ -1,11 +1,11 @@
 import { htmlParser, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { useSetAtom, useAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
-import { CanvasProvider } from '../canvas';
 import { CanvasFull } from '../canvas/CanvasController.stories';
+import { CanvasProvider } from '../canvas/CanvasScope';
 import { PickAndPlopMolecule } from '../core';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import {

@@ -5,15 +5,14 @@ import React from 'react';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
+import { CanvasProvider } from './CanvasScope';
+import { BasicCanvasController, CanvasController } from './index';
 import {
-  BasicCanvasController,
-  CanvasController,
   CanvasHoveredMolecule,
-  CanvasPickAndPlopMolecule,
-  CanvasProvider,
   CanvasSelectionMolecule,
-  Rect,
-} from './index';
+  CanvasPickAndPlopMolecule,
+} from './plugins';
+import { Rect } from './types';
 
 const meta: Meta = {
   title: 'Canvas Controller',
