@@ -67,9 +67,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);
 
-    const appenders = Array.from(get(AppendersAtom)).map((a) =>
-      get(a)
-    );
+    const appenders = Array.from(get(AppendersAtom)).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
     const vnode = raisinToSnabbdom(
@@ -131,7 +129,9 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     GeometryAtom,
     IframeAtom,
     AppendersSet,
-    RendererSet,AppendersAtom,RendererAtom
+    AppendersAtom,
+    RendererSet,
+    RendererAtom,
   };
 });
 

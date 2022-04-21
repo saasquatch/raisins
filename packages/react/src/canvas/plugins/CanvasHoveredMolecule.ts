@@ -43,7 +43,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
     };
     return renderer;
   });
-  CanvasConfig.RendererSet.add(RendererAtom);
+  CanvasAtoms.RendererSet.add(RendererAtom);
 
   return {
     HoveredRectAtom: defaultRectAtom(

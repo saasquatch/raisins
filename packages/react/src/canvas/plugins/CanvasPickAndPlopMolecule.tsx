@@ -17,7 +17,7 @@ import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
-  const canvasAtoms = getMol(CanvasScopedMolecule);
+  const CanvasAtoms = getMol(CanvasScopedMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
@@ -33,7 +33,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     }
   });
   DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-  canvasAtoms.addListenerAtom(DoubleClickAtom);
+  CanvasAtoms.addListenerAtom(DoubleClickAtom);
 
   const PickAndPlopListenerAtom = atom(
     null,
@@ -58,7 +58,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       }
     }
   );
-  canvasAtoms.addListenerAtom(PickAndPlopListenerAtom);
+  CanvasAtoms.addListenerAtom(PickAndPlopListenerAtom);
 
   const AppenderAtom = atom((get) => {
     const node = get(RootNodeAtom);
@@ -115,7 +115,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     };
     return appender;
   });
-  CanvasConfig.AppendersSet.add(AppenderAtom);
+  CanvasAtoms.AppendersSet.add(AppenderAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const picked = get(PickedNodeAtom);
@@ -138,11 +138,11 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   });
 
   // Registers this renderer
-  CanvasConfig.RendererSet.add(Renderer);
+  CanvasAtoms.RendererSet.add(Renderer);
 
   return {
     PickedRectAtom: defaultRectAtom(
-      canvasAtoms.GeometryAtom,
+      CanvasAtoms.GeometryAtom,
       PickedNodeAtom,
       GetSoulAtom,
       CanvasConfig.SoulAttributeAtom
