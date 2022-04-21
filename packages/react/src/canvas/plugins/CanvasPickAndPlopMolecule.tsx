@@ -22,7 +22,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
-  const { PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
+  const { PickedAtom, PickedNodeAtom, PloppingIsActive } = getMol(PickedNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   /**
    * Listens for click events, marks clicked elements as selected
@@ -64,11 +64,14 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const isPloppingActive = get(PloppingIsActive);
-    const pickedNode = get(PickedNodeAtom);
+    const picked = get(PickedAtom);
+    const pickedForMove = get(PickedNodeAtom);
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
 
+    const pickedNode = picked?.type === "block" ? picked.block.content : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
+
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
       if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
       const parent = n;

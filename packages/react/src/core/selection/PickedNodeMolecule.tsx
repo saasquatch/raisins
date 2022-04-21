@@ -75,15 +75,34 @@ export const PickedNodeMolecule = molecule((getMol) => {
   const PlopNodeInSlotAtom = atom(
     null,
     (get, set, { parent, idx, slot }: PlopDestination) => {
+      const picked = get(PickedAtom);
+      if (!picked) return;
+
+      const currentDoc = get(RootNodeAtom);
+      const parentPath = getPath(currentDoc, parent)!;
+
+      if (picked.type === 'block') {
+        const cloneOfPickedNode = clone(picked.block.content);
+
+        const newDocument = insertAtPath(
+          currentDoc,
+          cloneOfPickedNode,
+          parentPath,
+          idx
+        );
+
+        set(SetNodeInternalAtom, newDocument);
+
+        // Don't allow re-plop
+        set(PickedAtom, undefined);
+        return;
+      }
+
       const pickedNode = get(PickedNodeAtom);
       if (!pickedNode) {
         // Nothing is picked, so do nothing;
         return;
       }
-
-      const currentDoc = get(RootNodeAtom);
-      const parentPath = getPath(currentDoc, parent)!;
-
       const newDocument = moveNode(
         currentDoc,
         pickedNode,

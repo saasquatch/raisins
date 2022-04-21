@@ -1,3 +1,4 @@
+import { Meta } from '@storybook/react';
 import { Atom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
@@ -14,9 +15,11 @@ import {
   Rect,
 } from './index';
 
-export default {
+const meta: Meta = {
   title: 'Canvas Controller',
+  excludeStories: ['CanvasFull'],
 };
+export default meta;
 
 export const LoadTest = () => {
   return (
@@ -24,7 +27,7 @@ export const LoadTest = () => {
       <CanvasController />
     </BasicStory>
   );
-}; 
+};
 
 const CanvasWithHover = () => {
   useMolecule(CanvasHoveredMolecule);
@@ -34,7 +37,8 @@ const CanvasWithSelection = () => {
   useMolecule(CanvasSelectionMolecule);
   return <BasicCanvasController />;
 };
-const CanvasFull = () => {
+
+export const CanvasFull = () => {
   useMolecule(CanvasSelectionMolecule);
   useMolecule(CanvasHoveredMolecule);
   useMolecule(CanvasPickAndPlopMolecule);

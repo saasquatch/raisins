@@ -1,12 +1,15 @@
+import { htmlParser, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { useSetAtom } from 'jotai';
+import { useSetAtom, useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
+import { CanvasProvider } from '../canvas';
+import { CanvasFull } from '../canvas/CanvasController.stories';
 import { PickedNodeMolecule } from '../core';
-import { MintComponents } from '../examples/MintComponents';
+import { big, MintComponents } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
-import { ComponentModelMolecule } from './ComponentModel';
+import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
 
 const meta: Meta = {
@@ -20,19 +23,31 @@ export function PackageEditor() {
   return <PackageEditorController />;
 }
 
+const fakeBlocks: Block[] = [
+  {
+    title: 'div',
+    content: htmlParser('<div>I am div</div>').children[0] as RaisinElementNode,
+  },
+];
+
 const BlocksController = () => {
   const { BlocksAtom } = useMolecule(ComponentModelMolecule);
   const { PickedAtom } = useMolecule(PickedNodeMolecule);
-  const blocks = useAtomValue(BlocksAtom);
-  const pick = useSetAtom(PickedAtom);
+  const blocks = fakeBlocks ?? useAtomValue(BlocksAtom);
+  const [picked, pick] = useAtom(PickedAtom);
 
+  const pickedBlock = picked?.type === "block" ? picked.block : undefined
   return (
     <div>
       <h2>Blocks</h2>
       {blocks.map((block) => {
         return (
           <div
-            style={{ borderBottom: '1px solid black' }}
+            style={{
+              border: '1px solid grey',
+              margin: '10px',
+              background: pickedBlock === block ? 'red' : 'inherit',
+            }}
             onClick={() =>
               pick({
                 type: 'block',
@@ -50,8 +65,13 @@ const BlocksController = () => {
 
 export function MintBlocks() {
   return (
-    <BasicStory startingPackages={MintComponents}>
-      <BlocksController />
+    <BasicStory startingHtml={big} startingPackages={MintComponents}>
+      <>
+        <BlocksController />
+        <CanvasProvider>
+          <CanvasFull />
+        </CanvasProvider>
+      </>
     </BasicStory>
   );
 }
