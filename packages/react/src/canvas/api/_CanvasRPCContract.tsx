@@ -13,7 +13,7 @@ export type GeometryEntry = {
 /**
  * DOM event from inside the canvas.
  */
-export type CanvasEvent = {
+export type RawCanvasEvent = {
   /**
    * A DOM event type.
    *
@@ -33,7 +33,7 @@ export type CanvasEvent = {
 
 export type ParentRPC = {
   resizeHeight(pixels: string): void;
-  event(event: CanvasEvent): void;
+  event(event: RawCanvasEvent): void;
   geometry(detail: GeometryDetail): void;
 };
 

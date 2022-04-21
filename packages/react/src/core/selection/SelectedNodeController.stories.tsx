@@ -10,6 +10,11 @@ import {
   AttributesMolecule,
 } from '../../attributes';
 import { CanvasController } from '../../canvas';
+import { BasicCanvasController } from '../../canvas/CanvasController';
+import { CanvasProvider } from '../../canvas/CanvasScope';
+import { CanvasHoveredMolecule } from '../../canvas/plugins/CanvasHoveredMolecule';
+import { CanvasPickAndPlopMolecule } from '../../canvas/plugins/CanvasPickAndPlopMolecule';
+import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
 import {
   mintMono,
   MintComponents,
@@ -43,30 +48,28 @@ const AttributeEditor = ({
       HasSelectionComponent={AttributesController}
     ></SelectedNodeController>
   ),
-}) => (
-  <div style={{ display: 'flex' }}>
-    <div
-      style={{
-        width: '50%',
-        position: 'fixed',
-        overflowY: 'scroll',
-        height: '95vh',
-      }}
-    >
-      <Controller />
+}) => {
+  useMolecule(CanvasSelectionMolecule);
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <SelectedNodeController
+          HasSelectionComponent={AttributesController}
+          NoSelectionComponent={() => <div>no selection</div>}
+        ></SelectedNodeController>
+      </div>
+      <div style={{ width: '50%' }}>
+        <BasicCanvasController />
+      </div>
     </div>
-    <div
-      style={{
-        width: '50%',
-        position: 'absolute',
-        right: 0,
-      }}
-    >
-      <CanvasController />
-    </div>
-  </div>
-);
+  );
+};
 
+const CanvasEditor = () => (
+  <CanvasProvider>
+    <AttributeEditor />
+  </CanvasProvider>
+);
 export const Mint = () => {
   return (
     <BasicStory
@@ -74,7 +77,7 @@ export const Mint = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
@@ -86,7 +89,7 @@ export const MintReferralTable = () => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };
@@ -110,7 +113,7 @@ export const Vanilla = () => {
       startingPackages={VanillaComponents}
       Molecule={ConfigMolecule}
     >
-      <AttributeEditor />
+      <CanvasEditor />
     </BasicStory>
   );
 };

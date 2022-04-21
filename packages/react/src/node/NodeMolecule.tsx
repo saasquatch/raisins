@@ -5,9 +5,9 @@ import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
-import { HoveredNodeMolecule } from '../core/selection/HoveredNode';
-import { PickedNodeMolecule } from '../core/selection/PickedNode';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNode';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule';
+import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
 import { getSubErrors } from '../validation';
@@ -25,9 +25,11 @@ import { NodeScopeMolecule } from './NodeScope';
 export const NodeMolecule = molecule((getMol, getScope) => {
   const n = getMol(NodeScopeMolecule);
 
-  const { PickedAtom, PickedNodeAtom, DropPloppedNodeInSlotAtom } = getMol(
-    PickedNodeMolecule
-  );
+  const {
+    PickedAtom,
+    PickedNodeAtom,
+    PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom,
+  } = getMol(PickAndPlopMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
@@ -92,8 +94,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     if (isNodePicked) {
       set(PickedAtom, undefined);
     } else {
-      const currrentDoc = get(RootNodeAtom);
-      set(PickedAtom, getPath(currrentDoc, node));
+      set(PickedNodeAtom, node);
     }
   });
 

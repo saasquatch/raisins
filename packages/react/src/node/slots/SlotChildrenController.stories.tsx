@@ -7,7 +7,7 @@ import React, { CSSProperties, FC, useCallback, useState } from 'react';
 import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../../core/CoreAtoms';
 import { EditMolecule } from '../../core/editting/EditAtoms';
-import { PickedNodeMolecule } from '../../core/selection/PickedNode';
+import { PickAndPlopMolecule } from '../../core/selection/PickAndPlopMolecule';
 import { NodeRichTextController } from '../../rich-text/RichTextEditor';
 import { BasicStory } from '../../index.stories';
 import { big, MintComponents, mintMono } from '../../examples/MintComponents';
@@ -180,7 +180,7 @@ const LayersMolecule = molecule((getMol) => {
   );
 
   return {
-    ...getMol(PickedNodeMolecule),
+    ...getMol(PickAndPlopMolecule),
     InsertNodeAtom,
     ComponentModelAtom,
     RootHasChildren,

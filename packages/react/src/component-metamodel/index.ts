@@ -1,2 +1,2 @@
-export { ComponentModelMolecule } from './ComponentModel';
+export * from './ComponentModel';
 export { Module } from './types';
