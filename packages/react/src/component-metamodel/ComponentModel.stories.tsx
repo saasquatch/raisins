@@ -35,26 +35,28 @@ const fakeBlocks: Block[] = [
   },
   {
     title: 'tr',
-    content: htmlParser('<tr>I am a tr</tr>').children[0] as RaisinElementNode,
+    content: htmlParser(
+      '<tr><td style="border: 1px solid black">test</td></tr>'
+    ).children[0] as RaisinElementNode,
   },
   {
     title: 'td',
-    content: htmlParser('<td>I am a td</td>').children[0] as RaisinElementNode,
+    content: htmlParser('<td style="border: 1px solid black">I am a td</td>')
+      .children[0] as RaisinElementNode,
   },
   {
     title: 'table',
-    content: htmlParser('<table>I am a table</table>')
-      .children[0] as RaisinElementNode,
+    content: htmlParser(
+      '<table><thead></thead><tbody><tr ><td style="border: 1px solid black">1</td><td style="border: 1px solid black">2</td><td style="border: 1px solid black">3</td><tr /></tbody></table>'
+    ).children[0] as RaisinElementNode,
   },
   {
     title: 'thead',
-    content: htmlParser('<thead>I am a thead</thead>')
-      .children[0] as RaisinElementNode,
+    content: htmlParser('<thead></thead>').children[0] as RaisinElementNode,
   },
   {
     title: 'tbody',
-    content: htmlParser('<tbody>I am tbody</tbody>')
-      .children[0] as RaisinElementNode,
+    content: htmlParser('<tbody></tbody>').children[0] as RaisinElementNode,
   },
 ];
 
