@@ -40,19 +40,16 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
 
-  const AppendersSet = proxySet<Atom<SnabbdomAppender>>([]);
-  const RendererSet = proxySet<Atom<SnabbdomRenderer>>([]);
-  const AppendersAtom = atomWithProxy(AppendersSet);
-  const RendererAtom = atomWithProxy(RendererSet);
-  const ListenersSet = proxySet<CanvasEventListener>([]);
+  const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
+  const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
+  const ListenersSet = new Set<CanvasEventListener>([]);
 
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
-    const renderersAtoms = get(RendererAtom);
-    if (!renderersAtoms) return raisinToSnabbdom(node as RaisinDocumentNode);
-    const renderers = Array.from(renderersAtoms.values()).map(
+
+    const renderers = Array.from(RendererSet.values()).map(
       (a) => get(a) as SnabbdomRenderer
     );
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
@@ -66,13 +63,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
         },
       };
     };
-    const renderer = combineRenderers(eventsRenderer, ...renderers);
-
-    if (!renderersAtoms)
-      return raisinToSnabbdom(node as RaisinDocumentNode, renderer);
-    const appendersAtoms = get(AppendersAtom);
-
-    const appenders = Array.from(appendersAtoms.values()).map((a) => get(a));
+    const renderer = combineRenderers(eventsRenderer, ...renderers);   
+    const appenders = Array.from(AppendersSet.values()).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
     const vnode = raisinToSnabbdom(
@@ -125,9 +117,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     GeometryAtom,
     IframeAtom,
     AppendersSet,
-    AppendersAtom,
     RendererSet,
-    RendererAtom,
   };
 });
 

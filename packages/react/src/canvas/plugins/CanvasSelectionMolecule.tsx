@@ -50,7 +50,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
 
   // Registers this renderer
   CanvasAtoms.RendererSet.add(Renderer);
-
+  
   return {
     SelectedRectAtom: defaultRectAtom(
       CanvasAtoms.GeometryAtom,

@@ -205,9 +205,9 @@ const CustomAttributesController: React.FC<AttributesControllerProps> = (
   const Component = props.Component ?? DefaultAttributeComponent;
   return (
     <>
-      {Object.keys(groupedSchema).map((key) => {
+      {Object.keys(groupedSchema).map((key, idx) => {
         return (
-          <details>
+          <details key={idx}>
             <summary>{key}</summary>
             {groupedSchema[key].map((attribute) => {
               return (
