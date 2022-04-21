@@ -11,13 +11,13 @@ import {
 } from '../../core';
 import { RawCanvasEvent } from '../api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
-  const CanvasAtoms = getMol(CanvasScopedMolecule);
+  const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { DropPloppedNodeInSlotAtom } = getMol(PickedNodeMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
@@ -33,7 +33,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     }
   });
   DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.addListenerAtom(DoubleClickAtom);
+  CanvasAtoms.ListenersSet.add(DoubleClickAtom);
 
   const PickAndPlopListenerAtom = atom(
     null,
@@ -58,7 +58,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       }
     }
   );
-  CanvasAtoms.addListenerAtom(PickAndPlopListenerAtom);
+  CanvasAtoms.ListenersSet.add(PickAndPlopListenerAtom);
 
   const AppenderAtom = atom((get) => {
     const node = get(RootNodeAtom);

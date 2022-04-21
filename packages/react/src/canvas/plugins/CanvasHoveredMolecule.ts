@@ -4,13 +4,13 @@ import { VNodeStyle } from 'snabbdom';
 import { HoveredNodeMolecule } from '../../core/selection/HoveredNode';
 import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
-  const CanvasAtoms = getMol(CanvasScopedMolecule);
+  const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
@@ -20,7 +20,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
     }
   });
   CanvasHoveredListenerAtom.debugLabel = 'CanvasHoveredListenerAtom';
-  CanvasAtoms.addListenerAtom(CanvasHoveredListenerAtom);
+  CanvasAtoms.ListenersSet.add(CanvasHoveredListenerAtom);
 
   const RendererAtom = atom((get) => {
     const hovered = get(HoveredNodeAtom);

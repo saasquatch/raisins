@@ -29,7 +29,7 @@ type CanvasEventListener = WritableAtom<null, RichCanvasEvent>;
  *
  * Must be used inside a {@link CanvasProvider}
  */
-export const CanvasScopedMolecule = molecule((getMol, getScope) => {
+export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const value = getScope(CanvasScope);
   if (!value) throw new Error('Must be rendered in a <CanvasProvider/>');
 
@@ -45,6 +45,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   const RendererSet = proxySet<Atom<SnabbdomRenderer>>([]);
   const AppendersAtom = atomWithProxy(AppendersSet);
   const RendererAtom = atomWithProxy(RendererSet);
+  const ListenersSet = proxySet<CanvasEventListener>([]);
 
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
@@ -80,13 +81,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   });
   VnodeAtom.debugLabel = 'VnodeAtom';
 
-  const canvasListeners = proxySet<CanvasEventListener>([]);
-  function addListenerAtom(listener: CanvasEventListener) {
-    canvasListeners.add(ref(listener));
-  }
-  function removeListenerAtom(listener: CanvasEventListener) {
-    canvasListeners.delete(listener);
-  }
+
 
   const CanvasEventAtom = atom(null, (get, set, e: RawCanvasEvent) => {
     const idToSoul = get(IdToSoulAtom);
@@ -97,7 +92,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
     const node = soul ? soulToNode(soul) : undefined;
 
     const betterEvent: RichCanvasEvent = { ...e, soul, node };
-    for (const listener of canvasListeners.values()) {
+    for (const listener of ListenersSet.values()) {
       set(listener, betterEvent);
     }
   });
@@ -124,8 +119,7 @@ export const CanvasScopedMolecule = molecule((getMol, getScope) => {
   });
 
   return {
-    addListenerAtom,
-    removeListenerAtom,
+    ListenersSet,
     GeometryAtom,
     IframeAtom,
     AppendersSet,

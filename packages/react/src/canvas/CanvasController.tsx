@@ -1,11 +1,11 @@
 import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { CanvasScopedMolecule } from './CanvasScopeMolecule';
+import { CanvasScopeMolecule } from './CanvasScopeMolecule';
 import { CanvasProvider } from "./CanvasScope";
 
 function useCanvas() {
-  const atoms = useMolecule(CanvasScopedMolecule);
+  const atoms = useMolecule(CanvasScopeMolecule);
 
   const [
     // Doesn't use the subscribed value, but triggers the subscribe to start

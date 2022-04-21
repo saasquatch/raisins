@@ -4,12 +4,12 @@ import { VNodeStyle } from 'snabbdom';
 import { SelectedNodeMolecule } from '../../core/selection/SelectedNode';
 import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopedMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
-  const CanvasAtoms = getMol(CanvasScopedMolecule);
+  const CanvasAtoms = getMol(CanvasScopeMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
@@ -23,7 +23,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
     }
   });
   SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.addListenerAtom(SelectedClickedAtom);
+  CanvasAtoms.ListenersSet.add(SelectedClickedAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
