@@ -6,6 +6,7 @@ Feature: HTML Equivalency Checker
 	Based roughty on `node.isEqualNode` (https://developer.mozilla.org/en-US/docs/Web/API/Node/isEqualNode) except that it's not implemented in jsdom,
 	and it doesn't look for CSS equivalency.
 
+	@motivating
 	Scenario Outline: Differences in simple nodes will fail
 		Ensures inequvalent nodes should fail when compared.
 
@@ -31,6 +32,7 @@ Feature: HTML Equivalency Checker
 			| <div style=style></div>  | <div></div>           |
 			| <noscript></noscript>    | <textarea></textarea> |
 
+	@motivating
 	Scenario Outline: Optional tags can be omitted
 		Spec: https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
 
@@ -53,6 +55,7 @@ Feature: HTML Equivalency Checker
 			| <!DOCTYPE html><div></div>                | <!DOCTYPE html><html><head></head><body><div></div></body><html>                 |
 
 
+	@motivating
 	Scenario Outline: Optional tags cannot be omitted if immediately folllowed by a comment or contain any attributes
 		Spec: https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
 
@@ -69,6 +72,7 @@ Feature: HTML Equivalency Checker
 			| <title>hello world</title><p>text ...</p> | <html lang="en"><head><title>hello world</title></head><body><p>text ...</p></body></html> |
 			| <div></div>                               | <!DOCTYPE html><html><head></head><body><div></div></body><html>                           |
 
+	@motivating
 	Scenario Outline: Misnested tags are handled as per specifications
 		Spec: https://html.spec.whatwg.org/multipage/parsing.html#misnested-tags:-b-i-/b-/i
 
@@ -82,6 +86,7 @@ Feature: HTML Equivalency Checker
 			| <b>1<p>2</b>3</p>          | <b>1</b><p><b>2</b>3</p>          |
 
 
+	@motivating
 	Scenario Outline: Attribute order does not matter
 		Spec: https://dom.spec.whatwg.org/#ref-for-dom-node-isequalnode%E2%91%A0
 
@@ -96,6 +101,7 @@ Feature: HTML Equivalency Checker
 			| <div><h1 a b></h1></div>   | <div><h1 b a></h1></div>   |
 			| <div a b><p b a></p></div> | <div b a><p a b></p></div> |
 
+	@motivating
 	Scenario Outline: Boolean attirbutes
 		Spec: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
 
@@ -110,6 +116,7 @@ Feature: HTML Equivalency Checker
 			| <details style></details>    | <details style=""></details> |
 			| <details style=""></details> | <details style=""></details> |
 
+	@motivating
 	Scenario Outline: HTML singleton tags with no closing bracket
 		Closing tag should not be needed in certain html tags (e.g. <img>)
 		Spec: https://html.spec.whatwg.org/multipage/syntax.html#void-elements
@@ -136,6 +143,7 @@ Feature: HTML Equivalency Checker
 			| <br>                   | <br/>                        |
 			| <img src="helloworld"> | <img src="helloworld"></img> |
 
+	@motivating
 	Scenario Outline: Extra whitespace does not matter
 		Given one HTML string <First>
 		And another HTML string <Second>
@@ -147,6 +155,7 @@ Feature: HTML Equivalency Checker
 			| <div     open   ></div>   | <div open></div>                |
 			| <body><div> </div></body> | <body><div>       </div></body> |
 
+	@motivating
 	Scenario Outline: Whitespace does matter
 		The presences of whitespace matters in certain situations because it affects text rendering.
 		Spec:: https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace
@@ -160,8 +169,7 @@ Feature: HTML Equivalency Checker
 			| <div>Hello <b>World</b></div>         | <div>Hello<b>World</b></div>         |
 			| <span>Hello <span>World</span></span> | <span>Hello<span>World</span></span> |
 
-	# Scenario Outline: Invalid HTML cannot be validated
-
+	@motivating
 	Scenario Outline: Encoded characters do not matter
 
 		Given one HTML string <First>
@@ -174,6 +182,7 @@ Feature: HTML Equivalency Checker
 			| <img src="" alt="(Photo: NASA&amp;JAXA/Inode)>                        | <img src="" alt="(Photo: NASA&JAXA/Inode)>                                                         |
 			| <div>And &#x2014; poof &#x2014; time is gone.</div>                   | <div>And &mdash; poof &mdash; time is gone.</div>                                                  |
 
+	@motivating
 	Scenario Outline: Unequivalent CSS styles will cause failures
 		Given one HTML string <First>
 		And another HTML string <Second>
@@ -188,6 +197,7 @@ Feature: HTML Equivalency Checker
 			| <style> body {display: none;} </style>         | <style> body {DISPLAY : CONTENTS} </style> |
 			| <style> body {color: red;} </style>            | <style> body {color: red}; </style>        |
 
+	@motivating
 	Scenario Outline: Unequivalent CSS styles will ignore text differences
 		Given one HTML string <First>
 		And another HTML string <Second>
@@ -205,6 +215,7 @@ Feature: HTML Equivalency Checker
 			| <style> body {/* color: red; */} </style>       | <style> body {/* color: blue; */} </style>                    |
 			| <style> body {} </style>                        | <style> body {/* color: blue; */} </style>                    |
 
+	@motivating
 	Scenario Outline: Ignore comments flag will ignore comments in comparison
 
 		Given one HTML string <First>

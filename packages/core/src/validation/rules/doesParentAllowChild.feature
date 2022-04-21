@@ -2,6 +2,7 @@ Feature: Does Parent Allow Child
 
 	From a tag's metadata, checks if it allows children.
 
+	@motivating
 	Scenario Outline: Parent without slots does not allow child
 		Given a parent meta
 			"""
@@ -21,6 +22,7 @@ Feature: Does Parent Allow Child
 			| comment     |
 			| instruction |
 
+	@motivating
 	Scenario Outline: Parent does not allow child if child is not an element node
 		Given a parent meta
 			"""
@@ -43,6 +45,7 @@ Feature: Does Parent Allow Child
 			| comment     |
 			| instruction |
 
+	@motivating
 	Scenario: Parent allows child element when its slot specifies * as valid children
 		Given a parent meta
 			"""
@@ -62,6 +65,7 @@ Feature: Does Parent Allow Child
 		Then parent allows node as child
 
 
+	@motivating
 	Scenario: Parent allows child element when there are no constraints on its valid children
 		Given a parent meta
 			"""
@@ -78,6 +82,7 @@ Feature: Does Parent Allow Child
 		Then parent allows node as child
 
 
+	@motivating
 	Scenario Outline: Parent allows child when its slots have constraints and matches child's tagname
 		Given a parent meta
 			"""
@@ -103,6 +108,7 @@ Feature: Does Parent Allow Child
 			| b       |
 			| p       |
 
+	@motivating
 	Scenario Outline: Parent does not allow child if its slot constraints does not match child's tagname
 		Given a parent meta
 			"""

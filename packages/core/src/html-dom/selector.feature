@@ -2,6 +2,7 @@ Feature: Selecting by CSS selectors
 
 	Raisin supports finding nodes in the document using CSS selectors.
 
+	@motivating
 	Scenario Outline: Tag selectors
 		Based on tag type https://developer.mozilla.org/en-US/docs/Web/CSS/Type_selectors
 
@@ -19,6 +20,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1       |
 			| <b>I am an b</b>         | b        |
 
+	@motivating
 	Scenario Outline: Class selectors
 		Given an html document
 			"""
@@ -36,6 +38,7 @@ Feature: Selecting by CSS selectors
 			| <div class="foo-too">I am a div</div> | .foo-too | node.children[0] |
 			| <div class="boo-too">I am a div</div> | .foo-too | undefined        |
 
+	@motivating
 	Scenario Outline: Attribute
 		Attribute ([attr=foo]), with supported comparisons https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors
 		[attr] (existential)
@@ -61,6 +64,7 @@ Feature: Selecting by CSS selectors
 			| <div foo="three four">I am a div</div> | [foo~=two]  | undefined        |
 
 
+	@motivating
 	Scenario Outline: Descendant selectors
 		Descendant ( ) https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator
 		Child (>) https://developer.mozilla.org/en-US/docs/Web/CSS/Child_combinator
@@ -80,6 +84,7 @@ Feature: Selecting by CSS selectors
 			| <div><span foo>Inner<span></div> | div > span[foo] | node.children[0].children[0] |
 
 
+	@motivating
 	Scenario Outline: Wildcard selector
 		Universal selector https://developer.mozilla.org/en-US/docs/Web/CSS/Universal_selectors
 
@@ -97,6 +102,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      |
 			| <b>I am an b</b>         |
 
+	@motivating
 	Scenario Outline: Selector lists
 		Multiple selectors in the same selector https://developer.mozilla.org/en-US/docs/Web/CSS/Selector_list
 
@@ -114,6 +120,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1, b     |
 			| <b>I am an b</b>         | h1, b     |
 
+	@motivating
 	Scenario Outline: Sibling selectors
 		General (~) siblings selectors https://developer.mozilla.org/en-US/docs/Web/CSS/General_sibling_combinator
 		Adjacent (+) siblings selectors https://developer.mozilla.org/en-US/docs/Web/CSS/Adjacent_sibling_combinator
@@ -133,6 +140,7 @@ Feature: Selecting by CSS selectors
 			| <span>one</span><div>two</div> | span + div |
 			| <span>one</span><div>two</div> | span ~ div |
 
+	@motivating
 	Scenario Outline: Match multiple tags selectors
 		Given an html document
 			"""
@@ -148,6 +156,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1       |
 			| <b>I am an b</b>         | b        |
 
+	@motivating
 	Scenario Outline: Pseudo-classes selectors
 		Given an html document
 			"""
@@ -163,6 +172,7 @@ Feature: Selecting by CSS selectors
 			| <h1>I am an h1</h1>      | h1:visited  |
 			| <b>I am an b</b>         | b:link      |
 
+	@motivating
 	Scenario Outline: Pseudo contains selector
 		Given an html document
 			"""
@@ -180,6 +190,7 @@ Feature: Selecting by CSS selectors
 			| <div><b>Han Solo</b></div> | b:contains('Solo')   | node.children[0].children[0] |
 			| <div><b>Chewbaca</b></div> | b:contains('Solo')   | undefined                    |
 
+	@motivating
 	Scenario Outline: Nth-child selector
 		Given an html document
 			"""
@@ -194,6 +205,7 @@ Feature: Selecting by CSS selectors
 			| <ul><li>1</li><li>2</li><li>3</li></ul> | ul:nth-child(2) | node.children[1] |
 			| <ul><li>1</li><li>2</li><li>3</li></ul> | ul:nth-child(3) | node.children[1] |
 
+	@motivating
 	Scenario Outline: Pseudo input enabled/disabled selectors
 		Given an html document
 			"""
@@ -210,6 +222,7 @@ Feature: Selecting by CSS selectors
 			| <input disabled></input> | input:disabled | node.children[0] |
 
 
+	@motivating
 	Scenario Outline: Pseudo input required/optional selectors
 		Given an html document
 			"""
@@ -228,6 +241,7 @@ Feature: Selecting by CSS selectors
 			| <input></input>          | input:optional | node.children[0] |
 
 
+	@motivating
 	Scenario Outline: Pseudo input type selectors
 		Given an html document
 			"""

@@ -1,7 +1,8 @@
 Feature: Validate Node
 
-	# Node validation specifications
+	Node validation specifications
 
+	@motivating
 	Scenario Outline: Non element nodes return no errors
 		Given a <nonElement> node
 		And a meta list
@@ -15,7 +16,7 @@ Feature: Validate Node
 			| comment    |
 			| directive  |
 
-
+	@motivating
 	Scenario Outline: Appropriate error handling is done for element nodes
 		Given a parent node of type element
 		And it has a child of type element
@@ -31,8 +32,8 @@ Feature: Validate Node
 			| allows             | allows             | no                   |
 			| does not allow     | does not allow     | doesChildAllowParent |
 
-
-	Scenario Outline: Validate attributes handles enums
+	@motivating
+	Scenario Outline: Enum validation is handled for all node types
 		Given a meta list
 		And it has attribute
 		And name is prop
@@ -55,7 +56,8 @@ Feature: Validate Node
 			| boolean | ["true", "false"] | <div prop="false">  | no           |
 			| boolean | ["true", "false"] | <div prop="maybe">  | enum/boolean |
 
-	Scenario Outline: Validate attributes handles string minLength and maxLength
+	@motivating
+	Scenario Outline: Min length and max length validation applies to string types
 		Given a meta list
 		And it has attribute
 		And name is prop
@@ -73,7 +75,32 @@ Feature: Validate Node
 			| <div prop="hello">     | no        |
 			| <div prop="greetings"> | maxLength |
 
-	Scenario Outline: Validate attributes handles number minimum and maximum
+	@motivating
+	Scenario Outline: Min length and max length validation does not apply to non string types
+		Given a meta list
+		And it has attribute
+		And name is prop
+		And type is <type>
+		And minLength is 3
+		And maxLength is 5
+		And a parsed <node>
+		Then no validation error is received
+		Examples:
+			| type    | node                   |
+			| boolean | <div>                  |
+			| boolean | <div prop="hi">        |
+			| boolean | <div prop="hey">       |
+			| boolean | <div prop="heyo">      |
+			| boolean | <div prop="hello">     |
+			| boolean | <div prop="greetings"> |
+			| number  | <div>                  |
+			| number  | <div prop="1">         |
+			| number  | <div prop="123">       |
+			| number  | <div prop="12345">     |
+			| number  | <div prop="123456789"> |
+
+	@motivating
+	Scenario Outline: Maximum and minimum validation applies to number types
 		Given a meta list
 		And it has attribute
 		And name is prop
@@ -91,7 +118,33 @@ Feature: Validate Node
 			| <div prop="10"> | no      |
 			| <div prop="11"> | maximum |
 
-	Scenario Outline: Validate attributes handles number types
+	@motivating
+	Scenario Outline: Maximum and minimum validation does not apply to non number types
+		Given a meta list
+		And it has attribute
+		And name is prop
+		And type is <type>
+		And minimum is 5
+		And maximum is 10
+		And a parsed <node>
+		Then no validation error is received
+		Examples:
+			| type    | node            |
+			| string  | <div>           |
+			| string  | <div prop="0">  |
+			| string  | <div prop="5">  |
+			| string  | <div prop="8">  |
+			| string  | <div prop="10"> |
+			| string  | <div prop="11"> |
+			| boolean | <div>           |
+			| boolean | <div prop="0">  |
+			| boolean | <div prop="5">  |
+			| boolean | <div prop="8">  |
+			| boolean | <div prop="10"> |
+			| boolean | <div prop="11"> |
+
+	@motivating
+	Scenario Outline: Number type validation is handled
 		Given a meta list
 		And it has attribute
 		And name is age
@@ -106,7 +159,8 @@ Feature: Validate Node
 			| <div age="hello"> | type/number |
 			| <div age="10">    | no          |
 
-	Scenario Outline: Validate attributes handles boolean types
+	@motivating
+	Scenario Outline: Boolean type validation is handled
 		Given a meta list
 		And it has attribute
 		And name is center
@@ -124,7 +178,7 @@ Feature: Validate Node
 			| <div center="any">   |
 
 	@landmine
-	Scenario Outline: Validate attributes handles required
+	Scenario Outline: Required validation is handled on all types
 		Given a meta list
 		And it has attribute
 		And name is id
@@ -142,7 +196,7 @@ Feature: Validate Node
 			| boolean | <div id>       | no       |
 
 	@landmine
-	Scenario Outline: Validate attributes required does not affect booleans
+	Scenario Outline: Required validation does not return errors for booleans
 		Given a meta list
 		And it has attribute
 		And name is center
@@ -151,23 +205,32 @@ Feature: Validate Node
 		And a parsed <node>
 		Then no validation error is received
 		Examples:
-			| node         | required |
-			| <div>        | true     |
-			| <div>        | false    |
-			| <div center> | true     |
-			| <div center> | false    |
+			| node                        | required |
+			| <div>                       | true     |
+			| <div>                       | false    |
+			| <div center>                | true     |
+			| <div center>                | false    |
+			| <div center="">             | true     |
+			| <div center="">             | false    |
+			| <div center="1">            | true     |
+			| <div center="1">            | false    |
+			| <div center="hello world!"> | true     |
+			| <div center="hello world!"> | false    |
 
-	Scenario Outline: Valid url should accept valid links
+	@motivating
+	Scenario Outline: Format validation for URL for string types
 		Given an input value of <url>
 		When isValidURL is tested
 		Then it returns true
 		Examples:
 			| url                               |
+			| //www.saasquatch.com              |
 			| http://www.saasquatch.com         |
 			| https://www.saasquatch.com        |
 			| https://www.saasquatch.com/about/ |
 
-	Scenario Outline: Valid url should not accept invalid links
+	@motivating
+	Scenario Outline: URL validation does not accept bad strings
 		Given an input value of <url>
 		When isValidURL is tested
 		Then it returns false
@@ -179,7 +242,8 @@ Feature: Validate Node
 			| example/com        |
 			| example            |
 
-	Scenario Outline: Valid date interval test should accept ISO dates
+	@landmine
+	Scenario Outline: Format validation for date interval should accept ISO 8601 dates
 		Given an input value of <date>
 		When isValidDateInterval is tested
 		Then it returns true
@@ -191,19 +255,23 @@ Feature: Validate Node
 			| 2022-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
 			| 2022-04-20/2022-04-20                               |
 
-	Scenario Outline: Valid date interval test should not accept bad dates
+	@motivating
+	Scenario Outline: Invalid date intervals should be rejected
 		Given an input value of <date>
 		When isValidDateInterval is tested
 		Then it returns false
 		Examples:
-			| date                       |
-			| 2022-04-20T12:00:00+08:00  |
-			| 2022-04-20T12:00:00        |
-			| 2022-04-20                 |
-			| 2022-04-20T12:00:00+08:00/ |
-			| /2022-04-20T12:00:00+08:00 |
-			| P1Y2M10DT2H30M             |
+			| date                                                |
+			| 2024-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
+			| 2022-04-20T12:00:00+08:00                           |
+			| 2022-04-20T12:00:00                                 |
+			| 2022-04-20                                          |
+			| 2022-04-20T12:00:00+08:00/                          |
+			| /2022-04-20T12:00:00+08:00                          |
+			| P1Y2M10DT2H30M/P1Y2M10DT2H30M                       |
+			| P1Y2M10DT2H30M                                      |
 
+	@minutiae
 	Scenario Outline: Valid color test should pass css keywords
 		Given an input value of <keyword>
 		When isValidColor is tested
@@ -213,6 +281,7 @@ Feature: Validate Node
 			| currentColor |
 			| currentcolor |
 
+	@minutiae
 	Scenario Outline: Valid color test should pass css color names
 		Given an input value of <color>
 		When isValidColor is tested
@@ -224,6 +293,7 @@ Feature: Validate Node
 			| tan           |
 			| rebeccapurple |
 
+	@motivating
 	Scenario Outline: Valid color test should accept hex color values
 		Given an input value of <hex>
 		When isValidColor is tested
@@ -235,6 +305,7 @@ Feature: Validate Node
 			| #090a     |
 			| #009900aa |
 
+	@motivating
 	Scenario Outline: Valid color test should accept rgb values
 		Given an input value of <rgb>
 		When isValidColor is tested
@@ -246,6 +317,7 @@ Feature: Validate Node
 			| rgba(34, 12, 64)      |
 			| rgba(34, 12, 64, 0.6) |
 
+	@minutiae
 	Scenario Outline: Valid color test should accept hsl values
 		Given an input value of <hsl>
 		When isValidColor is tested
@@ -257,6 +329,7 @@ Feature: Validate Node
 			| hsla(30, 100%, 50%)      |
 			| hsla(30, 100%, 50%, 0.6) |
 
+	@minutiae
 	Scenario Outline: Valid color test should allow shoelace color variables
 		Given an input value of <shoelace>
 		When isValidColor is tested
@@ -271,6 +344,7 @@ Feature: Validate Node
 			| var(--sl-color-neutral-1000) |
 			| var(--sl-color-neutral-0)    |
 
+	@motivating
 	Scenario Outline: Valid color test should fail on invalid color values
 		Given an input value of <invalid>
 		When isValidColor is tested

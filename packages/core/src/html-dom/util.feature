@@ -2,6 +2,7 @@ Feature: Util Functions
 
 	Utility function tests
 
+	@motivating
 	Scenario: Remove whitespace
 		DOM Whitespace https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Whitespace
 
@@ -16,6 +17,7 @@ Feature: Util Functions
 		When we run removeWhitespace on raisin node
 		Then it should return html "<div><div>I am a div</div></div>"
 
+	@motivating
 	Scenario Outline: Visit
 		Given the node is <type>
 		And the visitor has a <callback> function defined
