@@ -1,6 +1,9 @@
 import expect from "expect";
+import { NodePath } from "../paths/Paths";
 import {
   RaisinCommentNode,
+  RaisinDocumentNode,
+  RaisinElementNode,
   RaisinNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
@@ -12,6 +15,7 @@ import {
   getAncestry,
   insertAtPath,
   move,
+  moveNode,
   moveToPath,
   remove,
   replace,
@@ -176,6 +180,45 @@ it("Move path", () => {
     type: "root",
     children: []
   });
+});
+
+it("Move node", () => {
+  const node: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "children" },
+    children: [],
+    type: "tag"
+  };
+
+  const slot: RaisinElementNode = {
+    tagName: "slot",
+    attribs: { name: "children" },
+    children: [],
+    type: "tag"
+  };
+
+  const root: RaisinDocumentNode = {
+    type: "root",
+    children: [node, slot]
+  };
+
+  const nodepath: NodePath = [0];
+
+  const res = moveNode(root, node, "children", nodepath, 0);
+
+  const slotWithNode: RaisinElementNode = {
+    tagName: "slot",
+    attribs: { name: "children" },
+    children: [node],
+    type: "tag"
+  };
+
+  const rootExpected: RaisinDocumentNode = {
+    type: "root",
+    children: [slotWithNode]
+  };
+
+  expect(res).toStrictEqual(rootExpected);
 });
 
 it("Insert at path", () => {
