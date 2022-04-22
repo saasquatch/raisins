@@ -58,21 +58,22 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
-          slots: comp.slots.map(s => {
-            const [title, description] = splitOnFirst(s.docs, ' - ');
-            let editor = undefined;
-            if (s.name === '' || !s.name) {
-              editor = slotEditor(comp);
-            }
-            const rSlot: schema.Slot = {
-              name: s.name,
-              title,
-              description,
-              editor,
-              // TODO: validChildren
-            };
-            return rSlot;
-          }),
+          slots: jsonTagValue(comp, 'slots') as schema.Slot[],
+          // comp.slots.map(s => {
+          //   const [title, description] = splitOnFirst(s.docs, ' - ');
+          //   let editor = undefined;
+          //   if (s.name === '' || !s.name) {
+          //     editor = slotEditor(comp);
+          //   }
+          //   const rSlot: schema.Slot = {
+          //     name: s.name,
+          //     title,
+          //     description,
+          //     editor,
+          //     // TODO: validChildren
+          //   };
+          //   return rSlot;
+          // }),
           attributes,
           examples: comp.docsTags
             .filter(d => d.name === 'example')
@@ -123,4 +124,4 @@ const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
-const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
+// const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
