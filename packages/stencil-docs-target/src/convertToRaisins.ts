@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
 import splitOnFirst from './split-on-first';
@@ -41,14 +40,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               enum: jsonTagValue(p, 'uiEnum'),
               enumNames: jsonTagValue(p, 'uiEnumNames'),
               uiWidget: uiWidget(p),
-              uiWidgetOptions: jsonTagValue(p, 'uiWidgetsOptions'),
+              uiWidgetOptions: jsonTagValue(p, 'uiWidgetOptions'),
               maximum: jsonTagValue(p, 'maximum'),
               minimum: jsonTagValue(p, 'minimum'),
               maxLength: jsonTagValue(p, 'maxLength'),
               minLength: jsonTagValue(p, 'minLength'),
               format: tagValue(p.docsTags, 'format'),
               uiGroup: tagValue(p.docsTags, 'uiGroup'),
-              uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
+              // uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
               uiOrder: jsonTagValue(p, 'uiOrder'),
               required: jsonTagValue(p, 'required'),
             };
@@ -59,20 +58,22 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
-          slots: comp.slots.map(s => {
-            const [title, description] = splitOnFirst(s.docs, ' - ');
-            let editor = undefined;
-            if (s.name === '' || !s.name) {
-              editor = slotEditor(comp);
-            }
-            const rSlot: schema.Slot = {
-              name: s.name,
-              title,
-              description,
-              editor,
-            };
-            return rSlot;
-          }),
+          slots: jsonTagValue(comp, 'slots') as schema.Slot[],
+          // comp.slots.map(s => {
+          //   const [title, description] = splitOnFirst(s.docs, ' - ');
+          //   let editor = undefined;
+          //   if (s.name === '' || !s.name) {
+          //     editor = slotEditor(comp);
+          //   }
+          //   const rSlot: schema.Slot = {
+          //     name: s.name,
+          //     title,
+          //     description,
+          //     editor,
+          //     // TODO: validChildren
+          //   };
+          //   return rSlot;
+          // }),
           attributes,
           examples: comp.docsTags
             .filter(d => d.name === 'example')
@@ -89,10 +90,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               };
             }),
           demoStates: demos.length > 0 ? demos : undefined,
-
-          // 'ui:widget': uiWidget(comp),
-          // 'ui:options': jsonTagValue(comp, 'uiOptions'),
-          // 'ui:order': jsonTagValue(comp, 'uiOrder'),
+          validParents: jsonTagValue(comp, 'validParents'),
         };
         return elem;
       } catch (e) {
@@ -107,7 +105,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
   };
 }
 function tagValue(tags: JsonDocsTag[], name: string): string | undefined {
-  return tags.find(t => t.name === name)?.text;
+  return tags?.find(t => t.name === name)?.text;
 }
 function jsonTagValue(tags: HasDocsTags, name: string) {
   const value = tagValue(tags.docsTags, name);
@@ -126,4 +124,4 @@ const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
-const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
+// const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');

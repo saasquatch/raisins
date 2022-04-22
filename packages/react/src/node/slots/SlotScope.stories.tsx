@@ -2,7 +2,7 @@ import { htmlParser } from '@raisins/core';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { RaisinProps, RaisinsProvider } from '../../core/RaisinPropsScope';
+import { RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope';
 import { NodeChildrenEditor } from '../NodeChildrenEditor';
 import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope';
 import { SlotScope, SlotScopeMolecule, SlotScopeProvider } from './SlotScope';
@@ -11,7 +11,7 @@ export default {
   title: 'Slot scope',
 };
 
-const StoryMolecule = molecule<Partial<RaisinProps>>(() => {
+const StoryMolecule = molecule<Partial<RaisinConfig>>(() => {
   return {
     HTMLAtom: atom('<div>I am a div</div>'),
     PackagesAtom: atom([] as any),

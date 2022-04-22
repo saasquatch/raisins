@@ -1,8 +1,7 @@
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { AttributeMolecule } from '../attributes';
-import { Clear } from '../attributes/AttributesController.stories';
 
 const colorStyle = {
   height: '25px',
@@ -13,12 +12,10 @@ const colorStyle = {
   marginLeft: '5px',
 };
 export const ColorWidget = () => {
-  const { name, valueAtom, schemaAtom } = useMolecule(AttributeMolecule);
+  const { valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
-  const schema = useAtomValue(schemaAtom);
   return (
     <div>
-      <b>{schema.title ?? name}</b>{' '}
       <input
         type="text"
         value={value}
@@ -52,12 +49,10 @@ export const ColorWidget = () => {
 };
 
 export const DateRangeWidget = () => {
-  const { name, valueAtom, schemaAtom } = useMolecule(AttributeMolecule);
+  const { valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
-  const schema = useAtomValue(schemaAtom);
   return (
     <div>
-      <b>{schema.title ?? name}</b>{' '}
       <input
         type="date"
         value={value}
@@ -67,12 +62,11 @@ export const DateRangeWidget = () => {
   );
 };
 export const ImageUpload = () => {
-  const { name, valueAtom, schemaAtom } = useMolecule(AttributeMolecule);
+  const { valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
-  const schema = useAtomValue(schemaAtom);
+
   return (
     <div>
-      <b>{schema.title ?? name}</b>{' '}
       <input
         type="text"
         value={value}
@@ -82,13 +76,11 @@ export const ImageUpload = () => {
   );
 };
 export const StatTypeSelectWidget = () => {
-  const { name, valueAtom, schemaAtom } = useMolecule(AttributeMolecule);
+  const { valueAtom } = useMolecule(AttributeMolecule);
   const [value, setValue] = useAtom(valueAtom);
-  const schema = useAtomValue(schemaAtom);
 
   return (
     <div>
-      <b>{schema.title ?? name}</b>{' '}
       <input
         value={value}
         list="stats"
@@ -104,6 +96,12 @@ export const StatTypeSelectWidget = () => {
 
 export type Widgets = {
   [key: string]: React.FC;
+};
+
+export const Clear = () => {
+  const { clearAtom } = useMolecule(AttributeMolecule);
+  const clear = useSetAtom(clearAtom);
+  return <button onClick={clear}>x</button>;
 };
 
 export const widgets: Widgets = {

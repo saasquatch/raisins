@@ -5,6 +5,7 @@ export * from './core';
 export * from './hotkeys';
 export * from './node';
 export * from './rich-text';
+
 export { EditorView };
 /**
  * TODO: Remove before final release

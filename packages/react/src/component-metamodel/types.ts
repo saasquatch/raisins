@@ -11,3 +11,17 @@ export type ModuleDetails = {
   'package.json': PackageJson;
   raisins?: schema.Package;
 } & Module;
+
+export type ResolveType<T> = T extends Promise<infer V> ? V : T;
+export type Loadable<Value> =
+  | {
+      state: 'loading';
+    }
+  | {
+      state: 'hasError';
+      error: unknown;
+    }
+  | {
+      state: 'hasData';
+      data: ResolveType<Value>;
+    };

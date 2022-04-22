@@ -9,11 +9,10 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
-import { CanvasStyleMolecule, sizes } from './canvas/CanvasStyleMolecule';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
-import { RaisinProps, RaisinsProvider } from './core/RaisinPropsScope';
-import { HoveredNodeMolecule } from './core/selection/HoveredNode';
+import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
+import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
@@ -24,7 +23,7 @@ import { Module } from './util/NPMRegistry';
 const meta: Meta = {
   title: 'Editor',
   component: Editor,
-  excludeStories: ['EditorView'],
+  excludeStories: ['EditorView', 'StoryConfigMolecule'],
 };
 export default meta;
 
@@ -33,14 +32,16 @@ const StoryScope = createScope({
   startingPackages: [] as Module[],
 });
 
-const StoryMolecule = molecule<Partial<RaisinProps>>((_, getScope) => {
-  const storyScope = getScope(StoryScope);
-  return {
-    HTMLAtom: atom(storyScope.startingHtml),
-    PackagesAtom: atom(storyScope.startingPackages),
-    uiWidgetsAtom: atom({}),
-  };
-});
+export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
+  (_, getScope) => {
+    const storyScope = getScope(StoryScope);
+    return {
+      HTMLAtom: atom(storyScope.startingHtml),
+      PackagesAtom: atom(storyScope.startingPackages),
+      uiWidgetsAtom: atom({}),
+    };
+  }
+);
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
@@ -51,6 +52,7 @@ export function BasicStory({
       {/* <RegisteredAtoms /> */}
     </>
   ),
+  Molecule = StoryConfigMolecule,
 }) {
   return (
     <>
@@ -58,7 +60,7 @@ export function BasicStory({
         scope={StoryScope}
         value={{ startingHtml, startingPackages }}
       >
-        <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
+        <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
       </ScopeProvider>{' '}
     </>
   );
@@ -177,6 +179,34 @@ export function EditorView() {
     </>
   );
 }
+
+export type Size = {
+  name: string;
+  width: string;
+  height: number;
+};
+
+type Mode = 'preview' | 'edit';
+
+const sizes: Size[] = [
+  { name: 'Auto', width: 'auto', height: 1080 },
+  { name: 'Large', width: '992px', height: 1080 },
+  { name: 'Medium', width: '768px', height: 1080 },
+  { name: 'Small', width: '576px', height: 1080 },
+  { name: 'X-Small', width: '400px', height: 1080 },
+];
+
+const CanvasStyleMolecule = molecule((getMol) => {
+  const OutlineAtom = atom(true);
+  const ModeAtom = atom<Mode>('edit');
+  const SizeAtom = atom<Size>(sizes[0]);
+
+  return {
+    OutlineAtom,
+    ModeAtom,
+    SizeAtom,
+  };
+});
 
 const ToolbarMolecule = molecule((getMol) => {
   return {

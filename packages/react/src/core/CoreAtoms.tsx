@@ -1,4 +1,5 @@
 import {
+  generateJsonPointers,
   getPath,
   htmlParser,
   htmlSerializer,
@@ -12,9 +13,8 @@ import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
 import { isFunction } from '../util/isFunction';
-import { generateJsonPointers } from "../validation/validateNode";
 import { generateNextState } from './editting/EditAtoms';
-import { PropsMolecule } from './RaisinPropsScope';
+import { ConfigMolecule } from './RaisinConfigScope';
 
 export type InternalState = {
   current: RaisinNode;
@@ -26,7 +26,7 @@ export type InternalState = {
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 
 export const CoreMolecule = molecule((getMol, getScope) => {
-  const { HTMLAtom } = getMol(PropsMolecule);
+  const { HTMLAtom } = getMol(ConfigMolecule);
   /*
     Scenario: Souls are presered when downstream HTML matches upstream HTML
 

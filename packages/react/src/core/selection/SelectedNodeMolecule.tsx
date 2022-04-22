@@ -15,8 +15,6 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     (get) => get(InternalStateAtom).selected,
     (_, set, next?: RaisinNode | undefined) => {
       set(InternalStateAtom, (prev: InternalState) => {
-        // TODO: Allows for selecting nodes that aren't part of the current tree.
-        // That doesn't make sense and should be prevented
         return {
           ...prev,
           selected: next
@@ -59,11 +57,14 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     }
   );
 
+  const HasSelectionAtom = atom((get) => get(SelectedNodeAtom) !== undefined);
+
   return {
     SelectedAtom,
     SelectedNodeAtom,
     SelectedSoulAtom,
     SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
     SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
+    HasSelectionAtom,
   };
 });

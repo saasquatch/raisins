@@ -6,7 +6,7 @@ import { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';
 import { NPMRegistry } from '../../util/NPMRegistry';
 import {
-  CanvasEvent,
+  RawCanvasEvent,
   ChildRPC,
   GeometryDetail,
   ParentRPC,
@@ -58,7 +58,7 @@ export type SnabbdomIframeProps = {
   head: Atom<string>;
   selector: Atom<string>;
   registry: Atom<NPMRegistry>;
-  onEvent: WritableAtom<null, CanvasEvent>;
+  onEvent: WritableAtom<null, RawCanvasEvent>;
   onResize: WritableAtom<null, GeometryDetail>;
 };
 

@@ -1,10 +1,19 @@
+import { htmlParser, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
+import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
+import { CanvasFull } from '../canvas/CanvasController.stories';
+import { CanvasProvider } from '../canvas/CanvasScope';
+import { PickAndPlopMolecule } from '../core';
+import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  referrerWidget,
+  VanillaComponents,
+} from '../examples/VanillaComponents';
 import { BasicStory } from '../index.stories';
-import { MintComponents } from '../examples/MintComponents';
-import { ComponentModelMolecule } from './ComponentModel';
+import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
 
 const meta: Meta = {
@@ -18,7 +27,121 @@ export function PackageEditor() {
   return <PackageEditorController />;
 }
 
-export function Mint() {
+const fakeBlocks: Block[] = [
+  {
+    title: 'div',
+    content: htmlParser('<div>I am a div</div>')
+      .children[0] as RaisinElementNode,
+  },
+  {
+    title: 'tr',
+    content: htmlParser(
+      '<tr><td style="border: 1px solid black">test</td></tr>'
+    ).children[0] as RaisinElementNode,
+  },
+  {
+    title: 'td',
+    content: htmlParser('<td style="border: 1px solid black">I am a td</td>')
+      .children[0] as RaisinElementNode,
+  },
+  {
+    title: 'table',
+    content: htmlParser(
+      '<table><thead></thead><tbody><tr ><td style="border: 1px solid black">1</td><td style="border: 1px solid black">2</td><td style="border: 1px solid black">3</td><tr /></tbody></table>'
+    ).children[0] as RaisinElementNode,
+  },
+  {
+    title: 'thead',
+    content: htmlParser('<thead></thead>').children[0] as RaisinElementNode,
+  },
+  {
+    title: 'tbody',
+    content: htmlParser('<tbody></tbody>').children[0] as RaisinElementNode,
+  },
+];
+
+const BlocksController = () => {
+  const { BlocksAtom } = useMolecule(ComponentModelMolecule);
+  const { PickedAtom } = useMolecule(PickAndPlopMolecule);
+
+  const blocks = useAtomValue(BlocksAtom);
+  const [picked, pick] = useAtom(PickedAtom);
+
+  const pickedBlock = picked?.type === 'block' ? picked.block : undefined;
+  return (
+    <div
+      style={{
+        width: '25%',
+        position: 'fixed',
+        overflowY: 'scroll',
+        height: '95vh',
+      }}
+    >
+      <h2>Blocks</h2>
+      {(blocks.length ? blocks : fakeBlocks).map((block) => {
+        return (
+          <div
+            style={{
+              border: '1px solid grey',
+              margin: '10px',
+              background: pickedBlock === block ? 'red' : 'inherit',
+            }}
+            onClick={() =>
+              pick({
+                type: 'block',
+                block,
+              })
+            }
+          >
+            {block.title}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const Editor = () => {
+  return (
+    <div style={{ display: 'flex' }}>
+      <BlocksController />
+      <div style={{ width: '74%', position: 'absolute', right: 0 }}>
+        <CanvasProvider>
+          <CanvasFull />
+        </CanvasProvider>
+      </div>
+    </div>
+  );
+};
+
+export function BigBlocks() {
+  return (
+    <BasicStory startingHtml={big + `<table></table>`}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintBlocks() {
+  return (
+    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function VanillaBlocks() {
+  return (
+    <BasicStory
+      startingHtml={referrerWidget}
+      startingPackages={VanillaComponents}
+    >
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintPackageEditor() {
   return (
     <BasicStory startingPackages={MintComponents}>
       <PackageEditorController />
