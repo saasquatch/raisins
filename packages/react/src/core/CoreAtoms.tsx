@@ -1,4 +1,5 @@
 import {
+  generateJsonPointers,
   getPath,
   htmlParser,
   htmlSerializer,
@@ -12,7 +13,6 @@ import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
 import { isFunction } from '../util/isFunction';
-import { generateJsonPointers } from "../validation/validateNode";
 import { generateNextState } from './editting/EditAtoms';
 import { ConfigMolecule } from './RaisinConfigScope';
 

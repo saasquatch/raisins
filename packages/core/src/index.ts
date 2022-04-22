@@ -3,10 +3,22 @@ import cssParser from "./css-om/parser";
 import cssSerializer from "./css-om/serializer";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
 import * as cssUtil from "./css-om/util";
-import { isCommentNode, isDirectiveNode, isElementNode, isNodeWithChilden, isRoot, isStyleNode, isTextNode } from "./html-dom/isNode";
+import {
+  isCommentNode,
+  isDirectiveNode,
+  isElementNode,
+  isNodeWithChilden,
+  isRoot,
+  isStyleNode,
+  isTextNode
+} from "./html-dom/isNode";
 import htmlParser from "./html-dom/parser";
 import type {
-  RaisinCommentNode, RaisinDocumentNode, RaisinElementNode, RaisinNode, RaisinNodeWithChildren,
+  RaisinCommentNode,
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
@@ -22,7 +34,13 @@ import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
 import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
 import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
 import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
-import { validateNode } from "./validation/validateNode/validateNode";
+import {
+  validateNode,
+  validateChildConstraints,
+  generateJsonPointers,
+  validateAttributes
+} from "./validation/validateNode/validateNode";
+import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils";
 
 export {
   htmlSerializer,
@@ -42,15 +60,21 @@ export {
   doesChildAllowParent,
   doesParentAllowChild,
   isNodeAllowed,
-  validateNode,
   HTMLComponents,
+  validateNode,
+  validateChildConstraints,
+  generateJsonPointers,
+  validateAttributes,
+  getSubErrors,
+  hasSubErrors,
+  removeError,
   // Path / selection
   getNode,
   getPath,
-  // CSS 
+  // CSS
   cssSerializer,
   cssParser,
-  cssUtil,
+  cssUtil
 };
 export type {
   RaisinNodeVisitor,
@@ -71,15 +95,5 @@ export type {
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode,
+  RaisinTextNode
 };
-
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-import { getPath, RaisinElementNode } from '@raisins/core';
+import { getPath, getSubErrors, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
@@ -10,7 +10,6 @@ import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { isElementNode } from '../util/isNode';
-import { getSubErrors } from '../validation';
 import { ValidationMolecule } from '../validation/ValidationMolecule';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForChildren } from './atoms/atomForChildren';
