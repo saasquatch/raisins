@@ -173,9 +173,8 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
 
     const allSlots = [...definedSlots, ...childSlots];
-    const dedupedSet = new Set<string>(allSlots);
-
-    return [...dedupedSet.keys()].sort();
+    const dedupedSet = Array.from(new Set<string>(allSlots));
+    return [...dedupedSet].sort();
   });
 
   /**
