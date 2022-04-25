@@ -3,83 +3,95 @@ import { CustomElement } from "@raisins/schema/schema";
 import { calculatePlopTargets } from "./calculatePlopTargets";
 import { RaisinElementNode } from "../html-dom/RaisinNode";
 import expect from "expect";
+import _ from "lodash";
 
 describe("", () => {
-  //   it("Calculate Plop Targets - Single slot", () => {
-  //     const node: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: { slot: "children" },
-  //       tagName: "sqm-timeline-stuff",
-  //       children: []
-  //     };
+  it("Calculate Plop Targets - Single slot", () => {
+    const node: RaisinElementNode = {
+      type: "tag",
+      attribs: { slot: "children" },
+      tagName: "sqm-timeline-stuff",
+      children: []
+    };
 
-  //     const plop: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: { slot: "children" },
-  //       tagName: "sqm-timeline-entry",
-  //       children: []
-  //     };
-  //     const plopMeta: CustomElement = {
-  //       tagName: "sqm-timeline-entry",
-  //       slots: [{ name: "chisldren" }]
-  //     };
+    const plop: RaisinElementNode = {
+      type: "tag",
+      attribs: { slot: "children" },
+      tagName: "sqm-timeline-entry",
+      children: []
+    };
+    const plopMeta: CustomElement = {
+      tagName: "sqm-timeline-entry",
+      slots: [{ name: "chisldren" }]
+    };
 
-  //     const parentEmpty: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: {},
-  //       tagName: "sqm-timeline",
-  //       children: []
-  //     };
+    const parentEmpty: RaisinElementNode = {
+      type: "tag",
+      attribs: {},
+      tagName: "sqm-timeline",
+      children: []
+    };
 
-  //     const parent1Node: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: {},
-  //       tagName: "sqm-timeline",
-  //       children: [node]
-  //     };
+    const parent1Node: RaisinElementNode = {
+      type: "tag",
+      attribs: {},
+      tagName: "sqm-timeline",
+      children: [node]
+    };
 
-  //     const parent2Node: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: {},
-  //       tagName: "sqm-timeline",
-  //       children: [node, node]
-  //     };
+    const parent2Node: RaisinElementNode = {
+      type: "tag",
+      attribs: {},
+      tagName: "sqm-timeline",
+      children: [
+        {
+          type: "tag",
+          attribs: { slot: "children" },
+          tagName: "sqm-timeline-stuff",
+          children: []
+        },
+        plop
+      ]
+    };
 
-  //     const parent3Node: RaisinElementNode = {
-  //       type: "tag",
-  //       attribs: {},
-  //       tagName: "sqm-timeline",
-  //       children: [node, node, node]
-  //     };
+    console.log(parent2Node.children[1] === plop);
 
-  //     const parentMeta: CustomElement = {
-  //       tagName: "sqm-timeline",
-  //       slots: [{ name: "children" }]
-  //     };
-  //     const schema = {
-  //       parentMeta,
-  //       possiblePlopMeta: plopMeta
-  //     };
+    const parent3Node: RaisinElementNode = {
+      type: "tag",
+      attribs: {},
+      tagName: "sqm-timeline",
+      children: [node, node, node]
+    };
 
-  //     //   expect(calculatePlopTargets(parentEmpty, plop, schema).length).toBe(1);
-  //     //   expect(calculatePlopTargets(parent1Node, plop, schema).length).toBe(2);
-  //     //   expect(calculatePlopTargets(parent2Node, plop, schema).length).toBe(3);
-  //     //   expect(calculatePlopTargets(parent3Node, plop, schema).length).toBe(4);
+    const parentMeta: CustomElement = {
+      tagName: "sqm-timeline",
+      slots: [{ name: "children" }]
+    };
+    const schema = {
+      parentMeta,
+      possiblePlopMeta: plopMeta
+    };
 
-  //     //   const res = calculatePlopTargets(parent3Node, plop, schema);
-  //     //   console.log(res);
-  //   });
+    //   expect(calculatePlopTargets(parentEmpty, plop, schema).length).toBe(1);
+    //   expect(calculatePlopTargets(parent1Node, plop, schema).length).toBe(2);
+    //   expect(calculatePlopTargets(parent2Node, plop, schema).length).toBe(3);
+    //   expect(calculatePlopTargets(parent3Node, plop, schema).length).toBe(4);
+
+    //   const res = calculatePlopTargets(parent3Node, plop, schema);
+    //   console.log(res);
+  });
 
   it("Calculate Plop Targets - Double slot", () => {
+    const possiblePlopMeta: CustomElement = {
+      tagName: "sqm-timeline-entry",
+      slots: [{ name: "a" }, { name: "b" }]
+    };
+
     const plop: RaisinElementNode = {
       type: "tag",
       tagName: "sqm-timeline-entry",
-      attribs: {},
+      attribs: { slot: "a" },
       children: []
-    };
-    const possiblePlopMeta: CustomElement = {
-      tagName: "sqm-timeline-entry",
-      slots: [{ name: "slot-a" }, { name: "slot-b" }, { name: "slot-c" }]
     };
 
     const node = (type: string): RaisinElementNode => {
@@ -93,21 +105,30 @@ describe("", () => {
 
     const parentMeta: CustomElement = {
       tagName: "sqm-timeline",
-      slots: [{ name: "slot-a" }, { name: "slot-b" }, { name: "slot-c" }]
+      slots: [{ name: "a" }, { name: "b" }]
     };
 
     const parent1A: RaisinElementNode = {
       type: "tag",
       tagName: "sqm-timeline",
       attribs: {},
-      children: [node('slot-d')]
+      children: [node("b"), node("a"), node("b"), node("a")]
     };
 
     const schema = {
       parentMeta,
       possiblePlopMeta
     };
-    const res = calculatePlopTargets(parent1A, plop, schema);
+    var res = calculatePlopTargets(parent1A, plop, schema);
+    console.log("\n\n", res);
+
+    const parentPA: RaisinElementNode = {
+      type: "tag",
+      tagName: "sqm-timeline",
+      attribs: {},
+      children: [plop, node("a"), node("b"), node("a")]
+    };
+    var res = calculatePlopTargets(parentPA, plop, schema);
     console.log("\n\n", res);
   });
 });
