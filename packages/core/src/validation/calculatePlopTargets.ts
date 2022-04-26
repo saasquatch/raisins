@@ -93,7 +93,7 @@ export function calculatePlopTargets(
     return (
       schema.parentMeta.slots
         ?.filter(value => plopSlot.includes(value.name))
-        .map((s, idx) => {
+        .map(s => {
           return {
             slot: s.name,
             idx: 0,
