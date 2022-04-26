@@ -16,7 +16,7 @@ export function calculatePlopTargets(
     parentMeta: CustomElement;
     possiblePlopMeta: CustomElement;
   }
-): PlopTarget[] | any {
+): PlopTarget[] {
   // deal with root
   // if (!isElementNode(parent)) return [];
 
