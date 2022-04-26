@@ -41,6 +41,7 @@ import {
   validateAttributes
 } from "./validation/validateNode/validateNode";
 import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils";
+import { calculatePlopTargets } from "./validation/calculatePlopTargets";
 
 export {
   htmlSerializer,
@@ -68,6 +69,7 @@ export {
   getSubErrors,
   hasSubErrors,
   removeError,
+  calculatePlopTargets,
   // Path / selection
   getNode,
   getPath,

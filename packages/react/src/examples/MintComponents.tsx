@@ -2,7 +2,7 @@ export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.css',
-    version: '1.5.6-2',
+    version: '1.5.6-3',
   },
   {
     name: '@saasquatch/bedrock-components',
@@ -13,7 +13,7 @@ export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '1.5.6-2',
+    version: '1.5.6-3',
   },
 ];
 

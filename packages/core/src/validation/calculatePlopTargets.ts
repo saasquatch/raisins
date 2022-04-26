@@ -16,7 +16,7 @@ export function calculatePlopTargets(
     parentMeta: CustomElement;
     possiblePlopMeta: CustomElement;
   }
-): PlopTarget[] | any {
+): PlopTarget[] {
   // deal with root
   // if (!isElementNode(parent)) return [];
 
@@ -93,7 +93,7 @@ export function calculatePlopTargets(
     return (
       schema.parentMeta.slots
         ?.filter(value => plopSlot.includes(value.name))
-        .map((s, idx) => {
+        .map(s => {
           return {
             slot: s.name,
             idx: 0,
