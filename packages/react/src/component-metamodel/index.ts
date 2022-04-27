@@ -1,2 +1,2 @@
 export * from './ComponentModel';
-export { Module } from './types';
+export { Module, ModuleDetails } from './types';
