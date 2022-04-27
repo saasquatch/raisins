@@ -70,6 +70,21 @@ export const DefaultNumberWidget: AttributeWidget = () => {
   );
 };
 
+export const DefaultSelectWidget: AttributeWidget = () => {
+  const { valueAtom, schemaAtom } = useMolecule(AttributeMolecule);
+  const [value, setValue] = useAtom(valueAtom);
+
+  const schema = useAtomValue(schemaAtom);
+
+  return (
+    <select value={value} onChange={(e) => setValue(e.target.value)}>
+      {schema.enum?.map((key, idx) => (
+        <option value={key}>{schema.enumNames?.[idx] ?? key}</option>
+      ))}
+    </select>
+  );
+};
+
 export const DefaultAttributeThemeMolecule: AttributeThemeMolecule = molecule(
   () => {
     return {
@@ -77,6 +92,7 @@ export const DefaultAttributeThemeMolecule: AttributeThemeMolecule = molecule(
         text: DefaultTextWidget,
         boolean: DefaultBooleanWidget,
         number: DefaultNumberWidget,
+        select: DefaultSelectWidget,
         [DefaultAttributeComponent]: DefaultTextWidget,
       }),
       templates: atom({

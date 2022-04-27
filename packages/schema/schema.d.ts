@@ -105,6 +105,11 @@ export interface CustomElement {
   examples?: Array<Example>;
 
   /**
+   * Named group for the example content
+   */
+  exampleGroup?: string;
+
+  /**
    * States for previewing the internal state of components
    */
   demoStates?: Array<ComponentState>;

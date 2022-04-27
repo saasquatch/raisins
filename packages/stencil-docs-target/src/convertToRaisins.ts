@@ -59,22 +59,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
-          // comp.slots.map(s => {
-          //   const [title, description] = splitOnFirst(s.docs, ' - ');
-          //   let editor = undefined;
-          //   if (s.name === '' || !s.name) {
-          //     editor = slotEditor(comp);
-          //   }
-          //   const rSlot: schema.Slot = {
-          //     name: s.name,
-          //     title,
-          //     description,
-          //     editor,
-          //     // TODO: validChildren
-          //   };
-          //   return rSlot;
-          // }),
           attributes,
+          exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
           examples: comp.docsTags
             .filter(d => d.name === 'example')
             .map(d => {

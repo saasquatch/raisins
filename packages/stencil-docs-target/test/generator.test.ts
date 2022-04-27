@@ -48,6 +48,8 @@ describe('Stencil docs target', () => {
       throw new Error('No validChildren found');
     if (!dataStr.includes('validParents'))
       throw new Error('No validParents found');
+      if (!dataStr.includes('exampleGroup'))
+      throw new Error('No exampleGroup found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
   });
 });
