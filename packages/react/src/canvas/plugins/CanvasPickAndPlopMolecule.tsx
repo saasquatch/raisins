@@ -1,7 +1,15 @@
-import { isElementNode, RaisinElementNode } from '@raisins/core';
+import {
+  htmlUtil,
+  isElementNode,
+  isNodeAllowed,
+  RaisinElementNode,
+  RaisinNode,
+  calculatePlopTargets,
+} from '@raisins/core';
+import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { h, VNode, VNodeStyle } from 'snabbdom';
+import { h, vnode, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
   CoreMolecule,
@@ -87,30 +95,44 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const isValid = metamodel.isValidChild(pickedNode, parent, slot);
       if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
+      const parentMeta = metamodel.getComponentMeta(parent.tagName);
+      const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
 
-      const raisinChildren = parent.children;
-      const newChildren =
-        vnodeChildren?.reduce((acc, vnodeChild, idx) => {
-          const raisinChild = raisinChildren[idx];
-          if (
-            // No plop around text nodes
-            !isElementNode(raisinChild) ||
-            // No plops around picked node (that's redundant)
-            raisinChild === pickedNode
-          ) {
-            // No plop targets around element nodes
-            return [...acc, vnodeChild];
-          }
+      const plopTargets = calculatePlopTargets(parent, pickedNode, {
+        parentMeta,
+        possiblePlopMeta,
+      });
 
-          const plopBefore = PlopTargetView({
-            idx,
-            slot,
+      const plopsForZeroIndex = plopTargets
+        .filter((plop) => plop.idx === 0)
+        .map((plop) => {
+          return PlopTargetView({
+            idx: plop.idx,
+            slot: plop.slot,
             soulId,
             eventsAttribute,
             parent,
           });
-          return [...acc, plopBefore, vnodeChild];
-        }, [] as Array<string | VNode>) ?? [];
+        });
+
+      const newChildren =
+        vnodeChildren?.reduce((acc, vnodeChild, idx) => {
+          const plopsForNextIndex = plopTargets.filter(
+            (plop) => plop.idx === idx + 1
+          );
+
+          const plopViews = plopsForNextIndex.map((plop) => {
+            return PlopTargetView({
+              idx: plop.idx,
+              slot: plop.slot,
+              soulId,
+              eventsAttribute,
+              parent,
+            });
+          });
+
+          return [...acc, vnodeChild, ...plopViews];
+        }, plopsForZeroIndex as Array<string | VNode>) ?? [];
 
       return newChildren;
     };
@@ -172,6 +194,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     {
       style: {
         // height: '0px',
+        marginBottom: '0!important',
         overflow: 'visible',
       },
     },

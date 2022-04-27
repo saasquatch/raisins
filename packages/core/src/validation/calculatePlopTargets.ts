@@ -1,11 +1,9 @@
 import { CustomElement } from "@raisins/schema/schema";
-import _ from "lodash";
 import { isElementNode } from "../html-dom/isNode";
 import { RaisinNode } from "../html-dom/RaisinNode";
 import { isNodeAllowed } from "./rules/isNodeAllowed";
 
 export type PlopTarget = {
-  parent: RaisinNode;
   idx: number;
   slot: string;
 };
@@ -17,76 +15,12 @@ export function calculatePlopTargets(
     possiblePlopMeta: CustomElement;
   }
 ): PlopTarget[] {
-  // deal with root
-  // if (!isElementNode(parent)) return [];
-
-  // if (schema.parentMeta.slots === undefined) return [];
-
-  // const slots = schema.parentMeta.slots.map(slot => slot.name);
-  // const slotList = slots.reduce((obj, value) => ({ ...obj, [value]: [] }), {});
-
-  // parent.children.forEach(child => {
-  //   if (!isElementNode(child)) return;
-
-  //   if (Object.hasOwn(slotList, child.attribs.slot)) {
-  //     //@ts-ignore
-  //     slotList[child.attribs.slot].push(child);
-  //   }
-  // });
-
-  // const targets: PlopTarget[] = [];
-
-  // let idx = 0;
-  // slots.forEach(slot => {
-  //   //@ts-ignore
-  //   if (slotList[slot].length === 0)
-  //     targets.push({
-  //       slot: slot,
-  //       idx: idx,
-  //       parent
-  //     });
-  //   //@ts-ignore
-  //   slotList[slot].forEach(element => {
-  //     if (element) {
-  //       targets.push({
-  //         slot: slot,
-  //         idx: idx,
-  //         parent
-  //       });
-
-  //       targets.push({
-  //         slot: slot,
-  //         idx: idx + 1,
-  //         parent
-  //       });
-
-  //       idx = idx + 1;
-  //     } else {
-  //       targets.push({
-  //         slot: slot,
-  //         idx: idx,
-  //         parent
-  //       });
-  //     }
-  //   });
-  // });
-
-  // //@ts-ignore
-  // const plopSlots = schema.possiblePlopMeta.slots.map(slot => slot.name) ?? [];
-
-  // return targets
-  //   .filter(
-  //     (v, i, a) =>
-  //       a.findIndex(t => JSON.stringify(t) === JSON.stringify(v)) === i
-  //   )
-  //   .filter(n => plopSlots.includes(n.slot));
-
-  // TODO: Root node should allow any children
   if (!isElementNode(parent)) return [];
   const raisinChildren = parent.children;
   const plopSlot = schema.possiblePlopMeta.slots?.map(e => e.name) ?? [];
   const seenSlots = new Set();
   const remainingSlots = new Set(plopSlot);
+  const removeIDs: number[] = [];
 
   if (parent.children.length <= 0) {
     // Slot plop targets when there are no children
@@ -104,14 +38,11 @@ export function calculatePlopTargets(
   }
 
   var lastIdx = 0;
-
   const newChildren =
     raisinChildren?.reduce((acc, raisinChild, idx) => {
       if (
         // No plop around text nodes
-        !isElementNode(raisinChild) ||
-        // No plops around picked node (that's redundant)
-        raisinChild === possiblePlop
+        !isElementNode(raisinChild)
       ) {
         // No plop targets around element nodes
         return acc;
@@ -126,8 +57,6 @@ export function calculatePlopTargets(
         slot
       );
       if (!isValid) return acc;
-
-      if (!plopSlot.includes(slot)) return acc;
       else remainingSlots.delete(slot);
 
       const plopTargets = [];
@@ -139,16 +68,21 @@ export function calculatePlopTargets(
           parent
         });
       }
-
-      seenSlots.add(slot);
-
       plopTargets.push({
         idx: idx + 1,
         slot,
         parent
       });
-
+      seenSlots.add(slot);
       lastIdx = idx + 1;
+
+      if (
+        // No plops around picked node (that's redundant)
+        raisinChild === possiblePlop
+      ) {
+        // No plop targets around element nodes
+        removeIDs.push(idx, idx + 1);
+      }
 
       return [...acc, ...plopTargets];
     }, [] as PlopTarget[]) ?? [];
@@ -156,12 +90,16 @@ export function calculatePlopTargets(
   remainingSlots.forEach(slot => {
     newChildren.push({
       idx: lastIdx,
-      slot,
-      parent
+      slot
     });
   });
 
-  return newChildren.filter(
-    (v, i, a) => a.findIndex(t => JSON.stringify(t) === JSON.stringify(v)) === i
-  );
+  return newChildren
+    .filter(function(x) {
+      return !removeIDs.includes(x.idx);
+    })
+    .filter(
+      (v, i, a) =>
+        a.findIndex(t => JSON.stringify(t) === JSON.stringify(v)) === i
+    );
 }

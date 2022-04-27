@@ -84,7 +84,7 @@ describe("", () => {
   it("Calculate Plop Targets - Double slot", () => {
     const possiblePlopMeta: CustomElement = {
       tagName: "sqm-timeline-entry",
-      slots: [{ name: "a" }, { name: "b" }]
+      slots: [{ name: "a" },  { name: "b" }]
     };
 
     const plop: RaisinElementNode = {
@@ -114,20 +114,21 @@ describe("", () => {
       attribs: {},
       children: [node("b"), node("a"), node("b"), node("a")]
     };
-
-    const schema = {
-      parentMeta,
-      possiblePlopMeta
-    };
-    var res = calculatePlopTargets(parent1A, plop, schema);
-    console.log("\n\n", res);
+    // var res = calculatePlopTargets(parent1A, plop, schema);
+    // console.log("\n\n", res);
 
     const parentPA: RaisinElementNode = {
       type: "tag",
       tagName: "sqm-timeline",
       attribs: {},
-      children: [plop, node("a"), node("b"), node("a")]
+      children: [node("a"),node("b"), node("a")]
     };
+
+    const schema = {
+      parentMeta,
+      possiblePlopMeta
+    };
+
     var res = calculatePlopTargets(parentPA, plop, schema);
     console.log("\n\n", res);
   });
