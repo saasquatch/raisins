@@ -15,6 +15,8 @@ const TypeToComponent: Record<string, string> = {
   number: 'number',
 };
 
+const DEFAULT_ENUM = 'select';
+
 export function resolveComponent<T>(
   attribute: Attribute,
   components: Record<string, T>
@@ -29,6 +31,10 @@ export function resolveComponent<T>(
       const found = components[widgetName];
       if (found) return found;
     }
+  }
+  if (attribute.enum) {
+    const found = components[DEFAULT_ENUM];
+    if (found) return found;
   }
   if (attribute.type) {
     const widgetName = TypeToComponent[attribute.type];

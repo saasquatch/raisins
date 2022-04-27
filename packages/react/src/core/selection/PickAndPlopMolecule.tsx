@@ -98,7 +98,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
           // Nothing is picked, so do nothing;
           return;
         }
-        const newDocument = moveNode(
+        const newDocument = htmlUtil.moveNode(
           currentDoc,
           pickedNode,
           slot,
@@ -121,29 +121,3 @@ export const PickAndPlopMolecule = molecule((getMol) => {
     PlopNodeInSlotAtom,
   };
 });
-
-// TODO: Move to core html util
-function moveNode(
-  root: RaisinNode,
-  nodeToMove: RaisinNode,
-  slot: string,
-  parentPath: NodePath,
-  idx: number
-): RaisinNode {
-  const docWithNodeRemoved = remove(root, nodeToMove);
-  // TODO: Save soul?
-  const cloneOfPickedNode = clone(nodeToMove);
-  const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
-    ? { ...cloneOfPickedNode }
-    : {
-        ...cloneOfPickedNode,
-        attribs: { ...cloneOfPickedNode.attribs, slot },
-      };
-  const newDocument = insertAtPath(
-    docWithNodeRemoved,
-    nodeWithNewSlot,
-    parentPath,
-    idx
-  );
-  return newDocument;
-}
