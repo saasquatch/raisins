@@ -40,6 +40,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
 
+  const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
   const ListenersSet = new Set<CanvasEventListener>([]);
@@ -63,7 +64,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
         },
       };
     };
-    const renderer = combineRenderers(eventsRenderer, ...renderers);   
+    const renderer = combineRenderers(eventsRenderer, ...renderers);
     const appenders = Array.from(AppendersSet.values()).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
@@ -99,7 +100,10 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const IframeHeadAtom = atom((get) => {
     const script = get(CanvasScriptsAtom);
     const extra = CanvasConfig.IframeHead ? get(CanvasConfig.IframeHead) : '';
-    return script + extra;
+    const bonus = Array.from(HTMLSet.values())
+      .map((a) => get(a))
+      .join('');
+    return script + extra + bonus;
   });
 
   const selector = atom((get) => `[${get(EventSelectorAtom)}]`);
@@ -113,6 +117,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   });
 
   return {
+    HTMLSet,
     ListenersSet,
     GeometryAtom,
     IframeAtom,

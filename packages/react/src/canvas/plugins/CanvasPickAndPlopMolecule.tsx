@@ -1,15 +1,12 @@
 import {
-  htmlUtil,
-  isElementNode,
-  isNodeAllowed,
-  RaisinElementNode,
-  RaisinNode,
   calculatePlopTargets,
+  isElementNode,
+  RaisinElementNode,
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { h, vnode, VNode, VNodeStyle } from 'snabbdom';
+import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
   CoreMolecule,
@@ -47,6 +44,9 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
   CanvasAtoms.ListenersSet.add(DoubleClickAtom);
 
+  const PickAndPlopStyleAtom = atom(`<style>div{background:red}</style>`);
+  CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);
+
   const PickAndPlopListenerAtom = atom(
     null,
     (get, set, { type, target }: RawCanvasEvent) => {
@@ -81,6 +81,8 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
 
+    const addOrMove =
+      picked?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
     const pickedNode =
       picked?.type === 'block' ? picked.block.content : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
@@ -116,6 +118,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
             eventsAttribute,
             parent,
             parentSchema: parentMeta,
+            addOrMove,
           });
         });
 
@@ -136,6 +139,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
               eventsAttribute,
               parent,
               parentSchema: parentMeta,
+              addOrMove,
             });
           });
 
@@ -190,6 +194,7 @@ type PlopTargetViewProps = {
   eventsAttribute: string;
   parent: RaisinElementNode;
   parentSchema: CustomElement;
+  addOrMove: 'add' | 'move';
 };
 const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   soulId,
@@ -198,6 +203,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   eventsAttribute,
   parent,
   parentSchema,
+  addOrMove,
 }) => {
   const defaultAttrs = {
     slot,
@@ -207,45 +213,6 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     'raisin-plop-idx': idx,
     [eventsAttribute]: true,
   };
-
-  // const addIcon = h(
-  //   'svg',
-  //   {
-  //     attrs: {
-  //       xmlns: 'http://www.w3.org/2000/svg',
-  //       viewBox: '0 0 20 20',
-  //       height: '14px',
-  //       width: '14px',
-  //       fill: '#fff',
-  //     },
-  //     style: { display: 'block' },
-  //   },
-  //   h('path', {
-  //     attrs: { d: 'M17 11.5H11.5V17H8.5V11.5H3V8.5H8.5V3H11.5V8.5H17V11.5Z' },
-  //   })
-  // );
-
-  // const addLabel = h(
-  //   'div',
-  //   {
-  //     style: {
-  //       backgroundColor: '#439b76',
-  //       color: '#fff',
-  //       margin: 'auto',
-  //       position: 'relative',
-  //       borderRadius: '100px',
-  //       width: '24px',
-  //       textAlign: 'center',
-  //       height: '24px',
-  //       display: 'flex',
-  //       justifyContent: 'center',
-  //       alignItems: 'center',
-  //     },
-  //   },
-  //   addIcon
-  // );
-
-  const activeType = 'Add';
 
   const PlopLabel = h(
     'div',
@@ -263,7 +230,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         textTransform: 'none',
       },
     },
-    `${activeType} to ${parentSchema.title}`
+    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${parentSchema.title}`
   );
 
   const targetBar = h('div', {
@@ -287,27 +254,6 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         zIndex: '9999',
       },
     },
-    // h(
-    //   'div',
-    //   {
-    //     style: {
-    //       background: 'yellow',
-    //       // height: '8px',
-    //       // top: '-4px',
-    //       zIndex: '999',
-    //       position: 'relative',
-    //     },
-    //     attrs: {
-    //       slot,
-    //       'raisin-plop-target': true,
-    //       'raisin-plop-parent': soulId,
-    //       'raisin-plop-slot': slot,
-    //       'raisin-plop-idx': idx,
-    //       [eventsAttribute]: true,
-    //     },
-    //   },
-    //   `${parent?.tagName} index ${idx}`
-    // )
     h(
       'div',
       {
