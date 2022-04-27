@@ -126,7 +126,10 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
           const plopViews = plopsForNextIndex.map((plop) => {
             return PlopTargetView({
-              idx: idx < plopPosition ? plop.idx : plop.idx - 1,
+              idx:
+                plopPosition !== -1 && idx > plopPosition
+                  ? plop.idx - 1
+                  : plop.idx,
               slot: plop.slot,
               soulId,
               eventsAttribute,
