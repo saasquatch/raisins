@@ -115,6 +115,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
             soulId,
             eventsAttribute,
             parent,
+            parentSchema: parentMeta,
           });
         });
 
@@ -131,6 +132,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
               soulId,
               eventsAttribute,
               parent,
+              parentSchema: parentMeta,
             });
           });
 
@@ -184,6 +186,7 @@ type PlopTargetViewProps = {
   slot: string;
   eventsAttribute: string;
   parent: RaisinElementNode;
+  parentSchema: CustomElement;
 };
 const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   soulId,
@@ -191,36 +194,132 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   idx,
   eventsAttribute,
   parent,
+  parentSchema,
 }) => {
+  const defaultAttrs = {
+    slot,
+    'raisin-plop-target': true,
+    'raisin-plop-parent': soulId,
+    'raisin-plop-slot': slot,
+    'raisin-plop-idx': idx,
+    [eventsAttribute]: true,
+  };
+
+  // const addIcon = h(
+  //   'svg',
+  //   {
+  //     attrs: {
+  //       xmlns: 'http://www.w3.org/2000/svg',
+  //       viewBox: '0 0 20 20',
+  //       height: '14px',
+  //       width: '14px',
+  //       fill: '#fff',
+  //     },
+  //     style: { display: 'block' },
+  //   },
+  //   h('path', {
+  //     attrs: { d: 'M17 11.5H11.5V17H8.5V11.5H3V8.5H8.5V3H11.5V8.5H17V11.5Z' },
+  //   })
+  // );
+
+  // const addLabel = h(
+  //   'div',
+  //   {
+  //     style: {
+  //       backgroundColor: '#439b76',
+  //       color: '#fff',
+  //       margin: 'auto',
+  //       position: 'relative',
+  //       borderRadius: '100px',
+  //       width: '24px',
+  //       textAlign: 'center',
+  //       height: '24px',
+  //       display: 'flex',
+  //       justifyContent: 'center',
+  //       alignItems: 'center',
+  //     },
+  //   },
+  //   addIcon
+  // );
+
+  const activeType = 'Add';
+
+  const PlopLabel = h(
+    'div',
+    {
+      style: {
+        backgroundColor: '#439b76',
+        color: '#fff',
+        fontSize: '12px',
+        lineHeight: '16px',
+        margin: 'auto',
+        zIndex: '999',
+        position: 'relative',
+        borderRadius: '100px',
+        padding: '4px 8px',
+        textTransform: 'none',
+      },
+    },
+    `${activeType} to ${parentSchema.title}`
+  );
+
+  const targetBar = h('div', {
+    style: {
+      backgroundColor: '#439b76',
+      height: '3px',
+      width: '100%',
+      margin: 'auto',
+      zIndex: '999',
+      position: 'relative',
+    },
+  });
+
   return h(
     'div',
     {
       style: {
-        // height: '0px',
-        marginBottom: '0!important',
+        height: '0px',
+        margin: '0',
         overflow: 'visible',
+        zIndex: '9999',
       },
     },
+    // h(
+    //   'div',
+    //   {
+    //     style: {
+    //       background: 'yellow',
+    //       // height: '8px',
+    //       // top: '-4px',
+    //       zIndex: '999',
+    //       position: 'relative',
+    //     },
+    //     attrs: {
+    //       slot,
+    //       'raisin-plop-target': true,
+    //       'raisin-plop-parent': soulId,
+    //       'raisin-plop-slot': slot,
+    //       'raisin-plop-idx': idx,
+    //       [eventsAttribute]: true,
+    //     },
+    //   },
+    //   `${parent?.tagName} index ${idx}`
+    // )
     h(
       'div',
       {
         style: {
-          background: 'yellow',
-          // height: '8px',
-          // top: '-4px',
-          zIndex: '999',
-          position: 'relative',
+          width: '100%',
+          height: 'auto',
+          display: 'grid',
+          gridRow: '1',
+          gridTemplateColumns: '1fr max-content 1fr',
+          cursor: 'pointer',
+          transform: 'translateY(-50%)',
         },
-        attrs: {
-          slot,
-          'raisin-plop-target': true,
-          'raisin-plop-parent': soulId,
-          'raisin-plop-slot': slot,
-          'raisin-plop-idx': idx,
-          [eventsAttribute]: true,
-        },
+        attrs: defaultAttrs,
       },
-      `${parent?.tagName} index ${idx}`
+      [targetBar, PlopLabel, targetBar]
     )
   );
 };
