@@ -96,12 +96,15 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
-      const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
+      const raisinChildren = parent.children;
 
+      const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
       const plopTargets = calculatePlopTargets(parent, pickedNode, {
         parentMeta,
         possiblePlopMeta,
       });
+
+      const plopPosition = raisinChildren.findIndex((n) => n === pickedNode);
 
       const plopsForZeroIndex = plopTargets
         .filter((plop) => plop.idx === 0)
@@ -123,7 +126,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
           const plopViews = plopsForNextIndex.map((plop) => {
             return PlopTargetView({
-              idx: plop.idx,
+              idx: idx < plopPosition ? plop.idx : plop.idx - 1,
               slot: plop.slot,
               soulId,
               eventsAttribute,

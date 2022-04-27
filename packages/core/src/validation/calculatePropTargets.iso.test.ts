@@ -9,7 +9,7 @@ describe("", () => {
   it("Calculate Plop Targets - Single slot", () => {
     const node: RaisinElementNode = {
       type: "tag",
-      attribs: { slot: "children" },
+      attribs: { },
       tagName: "sqm-timeline-stuff",
       children: []
     };
@@ -22,7 +22,7 @@ describe("", () => {
     };
     const plopMeta: CustomElement = {
       tagName: "sqm-timeline-entry",
-      slots: [{ name: "chisldren" }]
+      slots: [{ name: "" }]
     };
 
     const parentEmpty: RaisinElementNode = {
@@ -54,8 +54,6 @@ describe("", () => {
       ]
     };
 
-    console.log(parent2Node.children[1] === plop);
-
     const parent3Node: RaisinElementNode = {
       type: "tag",
       attribs: {},
@@ -65,7 +63,7 @@ describe("", () => {
 
     const parentMeta: CustomElement = {
       tagName: "sqm-timeline",
-      slots: [{ name: "children" }]
+      slots: [{ name: "" }]
     };
     const schema = {
       parentMeta,
@@ -77,59 +75,59 @@ describe("", () => {
     //   expect(calculatePlopTargets(parent2Node, plop, schema).length).toBe(3);
     //   expect(calculatePlopTargets(parent3Node, plop, schema).length).toBe(4);
 
-    //   const res = calculatePlopTargets(parent3Node, plop, schema);
-    //   console.log(res);
+      const res = calculatePlopTargets(parentEmpty, plop, schema);
+      console.log(res);
   });
 
-  it("Calculate Plop Targets - Double slot", () => {
-    const possiblePlopMeta: CustomElement = {
-      tagName: "sqm-timeline-entry",
-      slots: [{ name: "a" },  { name: "b" }]
-    };
+//   it("Calculate Plop Targets - Double slot", () => {
+//     const possiblePlopMeta: CustomElement = {
+//       tagName: "sqm-timeline-entry",
+//       slots: [{ name: "a" },  { name: "b" }]
+//     };
 
-    const plop: RaisinElementNode = {
-      type: "tag",
-      tagName: "sqm-timeline-entry",
-      attribs: { slot: "a" },
-      children: []
-    };
+//     const plop: RaisinElementNode = {
+//       type: "tag",
+//       tagName: "sqm-timeline-entry",
+//       attribs: { slot: "a" },
+//       children: []
+//     };
 
-    const node = (type: string): RaisinElementNode => {
-      return {
-        type: "tag",
-        tagName: "sqm-timeline-entry",
-        attribs: { slot: type },
-        children: []
-      };
-    };
+//     const node = (type: string): RaisinElementNode => {
+//       return {
+//         type: "tag",
+//         tagName: "sqm-timeline-entry",
+//         attribs: { slot: type },
+//         children: []
+//       };
+//     };
 
-    const parentMeta: CustomElement = {
-      tagName: "sqm-timeline",
-      slots: [{ name: "a" }, { name: "b" }]
-    };
+//     const parentMeta: CustomElement = {
+//       tagName: "sqm-timeline",
+//       slots: [{ name: "a" }, { name: "b" }]
+//     };
 
-    const parent1A: RaisinElementNode = {
-      type: "tag",
-      tagName: "sqm-timeline",
-      attribs: {},
-      children: [node("b"), node("a"), node("b"), node("a")]
-    };
-    // var res = calculatePlopTargets(parent1A, plop, schema);
-    // console.log("\n\n", res);
+//     const parent1A: RaisinElementNode = {
+//       type: "tag",
+//       tagName: "sqm-timeline",
+//       attribs: {},
+//       children: [node("b"), node("a"), node("b"), node("a")]
+//     };
+//     // var res = calculatePlopTargets(parent1A, plop, schema);
+//     // console.log("\n\n", res);
 
-    const parentPA: RaisinElementNode = {
-      type: "tag",
-      tagName: "sqm-timeline",
-      attribs: {},
-      children: [node("a"),node("b"), node("a")]
-    };
+//     const parentPA: RaisinElementNode = {
+//       type: "tag",
+//       tagName: "sqm-timeline",
+//       attribs: {},
+//       children: [node("a"),node("b"), node("a")]
+//     };
 
-    const schema = {
-      parentMeta,
-      possiblePlopMeta
-    };
+//     const schema = {
+//       parentMeta,
+//       possiblePlopMeta
+//     };
 
-    var res = calculatePlopTargets(parentPA, plop, schema);
-    console.log("\n\n", res);
-  });
+//     var res = calculatePlopTargets(parentPA, plop, schema);
+//     console.log("\n\n", res);
+//   });
 });
