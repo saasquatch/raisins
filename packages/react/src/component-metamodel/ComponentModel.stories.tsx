@@ -61,10 +61,10 @@ const fakeBlocks: Block[] = [
 ];
 
 const BlocksController = () => {
-  const { BlocksAtom } = useMolecule(ComponentModelMolecule);
+  const { ComponentModelAtom } = useMolecule(ComponentModelMolecule);
   const { PickedAtom } = useMolecule(PickAndPlopMolecule);
 
-  const blocks = useAtomValue(BlocksAtom);
+  const { blocks, groupedBlocks } = useAtomValue(ComponentModelAtom);
   const [picked, pick] = useAtom(PickedAtom);
 
   const pickedBlock = picked?.type === 'block' ? picked.block : undefined;

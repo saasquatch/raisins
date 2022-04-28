@@ -189,6 +189,9 @@ export const ComponentModelMolecule = molecule(
     const ComponentModelAtom = atom<ComponentModel>((get) => {
       const getComponentMeta = get(ComponentMetaAtom);
       const blocks: Block[] = get(BlocksAtom);
+      const groupedBlocks = group(blocks, getComponentMeta);
+
+      console.log('In atom', { blocks, groupedBlocks });
       const getValidChildren = get(ValidChildrenAtom);
 
       function isValidChild(
@@ -216,6 +219,7 @@ export const ComponentModelMolecule = molecule(
         getComponentMeta,
         getSlots: getSlotsInternal,
         blocks,
+        groupedBlocks,
         getValidChildren,
         isValidChild,
       };
@@ -240,6 +244,24 @@ export const ComponentModelMolecule = molecule(
   }
 );
 
+// TODO: figure out where to put examples without a group
+const DEFAULT_BLOCK_GROUP = 'Default';
+
+type BlockGroups = Record<string, Block[]>;
+function group(list: Block[], getComponentMeta: Function): BlockGroups {
+  return list.reduce(function (allGroups: BlockGroups, block: Block) {
+    const exampleGroup =
+      getComponentMeta(block.content?.tagName)?.exampleGroup ??
+      DEFAULT_BLOCK_GROUP;
+    const groupArray = allGroups[exampleGroup] ?? [];
+    const withAttribute = [...groupArray, block];
+    return {
+      ...allGroups,
+      [exampleGroup]: withAttribute,
+    };
+  }, {} as BlockGroups);
+}
+
 /**
  * For managing the types of components that are edited and their properties
  */
@@ -252,6 +274,7 @@ export type ComponentModel = {
   getComponentMeta: ComponentMetaProvider;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
+  groupedBlocks: any;
   getValidChildren: (node: RaisinNode, slot?: string) => Block[];
   isValidChild: (
     from: RaisinElementNode,
