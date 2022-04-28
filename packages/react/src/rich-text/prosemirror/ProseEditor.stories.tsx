@@ -105,15 +105,32 @@ export const WithToolbarSynchronized = () => (
 );
 const Toolbar = () => {
   const ToggleMarks = useMolecule(DefaultProseSchemaMarkMolecule);
-  const toggleBold = useSetAtom(ToggleMarks.toggleBold);
-  const toggleItalic = useSetAtom(ToggleMarks.toggleItalic);
-  const toggleUnderline = useSetAtom(ToggleMarks.toggleUnderline);
+  const [isBold, toggleBold] = useAtom(ToggleMarks.toggleBold);
+  const [isItalic, toggleItalic] = useAtom(ToggleMarks.toggleItalic);
+  const [isUnderline, toggleUnderline] = useAtom(ToggleMarks.toggleUnderline);
+  const toggleLink = useSetAtom(ToggleMarks.toggleLink);
 
   return (
     <>
-      <button onMouseDown={toggleBold}>B</button>
-      <button onMouseDown={toggleItalic}>I</button>
-      <button onMouseDown={toggleUnderline}>U</button>
+      <button
+        onMouseDown={toggleBold}
+        style={{ background: isBold ? 'grey' : undefined }}
+      >
+        B
+      </button>
+      <button
+        onMouseDown={toggleItalic}
+        style={{ background: isItalic ? 'grey' : undefined }}
+      >
+        I
+      </button>
+      <button
+        onMouseDown={toggleUnderline}
+        style={{ background: isUnderline ? 'grey' : undefined }}
+      >
+        U
+      </button>
+      <button onMouseDown={toggleLink}>🔗</button>
     </>
   );
 };

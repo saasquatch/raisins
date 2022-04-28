@@ -1,11 +1,13 @@
 import {
   chainCommands,
+  Command,
   createParagraphNear,
   liftEmptyBlock,
   newlineInCode,
   splitBlock,
   toggleMark,
 } from 'prosemirror-commands';
+import {} from 'prosemirror-transform';
 import { keymap } from 'prosemirror-keymap';
 import { EditorState, Plugin, Transaction } from 'prosemirror-state';
 import { DefaultProseSchema } from './DefaultProseSchema';
@@ -35,6 +37,12 @@ const newLineCmd = chainCommands(
 
 const Enter = 'Enter';
 
+export const PromptForHref: Command = (state, dispatch) => {
+  const href = window.prompt('What url?');
+  const toggleLink = toggleMark(DefaultProseSchema.marks.link, { href });
+  return toggleLink(state, dispatch);
+};
+
 /**
  * A ProseMirror {@link Plugin} for hotkeys that modify the default schema
  *
@@ -44,5 +52,6 @@ export const DefaultProseSchemaHotkeysPlugin: Plugin = keymap({
   'Mod-b': boldCmd,
   'Mod-u': underlineCmd,
   'Mod-i': emCmd,
+  'Mod-k': PromptForHref,
   [Enter]: newLineCmd,
 });
