@@ -44,7 +44,31 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
   CanvasAtoms.ListenersSet.add(DoubleClickAtom);
 
-  const PickAndPlopStyleAtom = atom(`<style>div{background:red}</style>`);
+  const PickAndPlopStyleAtom = atom(
+    `<style>
+    .plop-target-container *{
+      background: #439b76;
+    }
+
+    .plop-target-container:hover *{
+      background-color: #388363;
+    }
+
+    .plop-target-container [targettype="label"]{
+      padding: 4px 8px;
+    }
+    .plop-target-container:hover [targettype="label"]{
+      padding: 8px 12px;
+    }
+    .plop-target-container [targettype="bar"]{
+      height: 3px;
+    }
+    .plop-target-container:hover [targettype="bar"]{
+      height: 4px;
+    }
+
+    </style>`
+  );
   CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);
 
   const PickAndPlopListenerAtom = atom(
@@ -218,7 +242,6 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     'div',
     {
       style: {
-        backgroundColor: '#439b76',
         color: '#fff',
         fontSize: '12px',
         lineHeight: '16px',
@@ -226,22 +249,21 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         zIndex: '999',
         position: 'relative',
         borderRadius: '100px',
-        padding: '4px 8px',
         textTransform: 'none',
       },
+      attrs: { targettype: 'label' },
     },
     `${addOrMove === 'add' ? 'Add' : 'Move'} to ${parentSchema.title}`
   );
 
   const targetBar = h('div', {
     style: {
-      backgroundColor: '#439b76',
-      height: '3px',
       width: '100%',
       margin: 'auto',
       zIndex: '999',
       position: 'relative',
     },
+    attrs: { targettype: 'bar' },
   });
 
   return h(
@@ -266,7 +288,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
           cursor: 'pointer',
           transform: 'translateY(-50%)',
         },
-        attrs: defaultAttrs,
+        attrs: { ...defaultAttrs, class: 'plop-target-container' },
       },
       [targetBar, PlopLabel, targetBar]
     )
