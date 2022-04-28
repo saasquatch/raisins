@@ -1,3 +1,3 @@
 export * from './default-schema';
-export { ProseEditorScope } from './ProseEditorScope';
+export { ProseEditorScope, ProseEditorScopeProvider } from './ProseEditorScope';
 export { ProseEditorStateMolecule } from './ProseEditorStateMolecule';
