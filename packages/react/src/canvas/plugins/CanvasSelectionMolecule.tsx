@@ -34,9 +34,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isSelected
-          ? '2px solid rgba(255,0,0,0.5)'
-          : rest.outline ?? '',
+        outline: isSelected ? '2px solid #439B76' : rest.outline ?? '',
         outlineOffset: isOutlined ? '-2px' : '',
       };
 
@@ -50,7 +48,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
 
   // Registers this renderer
   CanvasAtoms.RendererSet.add(Renderer);
-  
+
   return {
     SelectedRectAtom: defaultRectAtom(
       CanvasAtoms.GeometryAtom,

@@ -184,7 +184,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isPicked ? '2px solid rgba(0,0,255,0.5)' : rest.outline ?? '',
+        outline: isPicked ? '2px dashed #458EDF' : rest.outline ?? '',
         outlineOffset: isPicked ? '-2px' : '',
       };
 
