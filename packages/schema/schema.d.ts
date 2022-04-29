@@ -113,6 +113,11 @@ export interface CustomElement {
    * States for previewing the internal state of components
    */
   demoStates?: Array<ComponentState>;
+
+  /**
+   * Which editor toolbar to show when this element is selected
+   */
+  slotEditor?: string;
 }
 
 export interface Attribute {

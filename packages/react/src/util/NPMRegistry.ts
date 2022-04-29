@@ -1,4 +1,4 @@
-import { atom } from "jotai";
+import { atom } from 'jotai';
 
 export type Module = {
   name: string;
@@ -7,6 +7,8 @@ export type Module = {
 
 export type PackageJson = {
   name: string;
+  title?: string;
+  icon?: string;
   version: string;
   description?: string;
   /**
@@ -45,7 +47,7 @@ export type PackageJson = {
   main?: string;
   /**
    * For serving directly to the web from the CDN.
-   * 
+   *
    * Stencil projects ship with this properly configured in their boilerplate
    */
   unpkg?: string;
@@ -54,8 +56,6 @@ export interface NPMRegistry {
   getPackageJson(module: Module): Promise<PackageJson>;
   resolvePath(module: Module, path: string): string;
 }
-
-
 
 const UNPKG_BASE = 'https://unpkg.com';
 

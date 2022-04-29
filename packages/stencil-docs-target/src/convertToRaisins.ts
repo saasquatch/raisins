@@ -77,6 +77,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             }),
           demoStates: demos.length > 0 ? demos : undefined,
           validParents: jsonTagValue(comp, 'validParents'),
+          slotEditor: slotEditor(comp),
         };
         return elem;
       } catch (e) {
@@ -110,4 +111,4 @@ const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
-// const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
+const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');

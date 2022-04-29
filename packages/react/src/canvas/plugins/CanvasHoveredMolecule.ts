@@ -32,7 +32,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isHovered ? '2px solid green' : rest.outline ?? '',
+        outline: isHovered ? '2px solid #a3caba' : rest.outline ?? '',
         outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
       };
 

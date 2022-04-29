@@ -1,7 +1,7 @@
 {
   "name": "@raisins/core",
   "author": "Logan Volkers",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/raisins.esm.js",
@@ -78,7 +78,7 @@
     "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@raisins/schema": "^0.5.0",
+    "@raisins/schema": "^0.6.0",
     "classnames": "^2.3.1",
     "color2k": "^2.0.0",
     "css": "^3.0.0",
