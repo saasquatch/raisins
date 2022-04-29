@@ -47,7 +47,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       if (ref.current?.html === html) {
         return ref.current.node;
       }
-      return htmlParser(html, {cleanWhitespace: true});
+      return htmlParser(html, {cleanWhitespace: false});
     },
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
