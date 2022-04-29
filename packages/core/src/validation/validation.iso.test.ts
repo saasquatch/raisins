@@ -89,9 +89,9 @@ describe("HTML Components", () => {
     expect(typeof HTMLComponents.H6).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.IMG).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.P).toBe(typeof CustomElement);
-    expect(typeof HTMLComponents.SMALL).toBe(typeof CustomElement);
-    expect(typeof HTMLComponents.SPAN).toBe(typeof CustomElement);
-    expect(typeof HTMLComponents.STRONG).toBe(typeof CustomElement);
+    // expect(typeof HTMLComponents.SMALL).toBe(typeof CustomElement);
+    // expect(typeof HTMLComponents.SPAN).toBe(typeof CustomElement);
+    // expect(typeof HTMLComponents.STRONG).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.TABLE).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.TBODY).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.TD).toBe(typeof CustomElement);

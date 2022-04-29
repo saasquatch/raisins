@@ -7,7 +7,7 @@ import expect from "expect";
 import { StepDefinitions } from "jest-cucumber";
 import parse from "../html-dom/parser";
 import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
-import selector from "../html-dom/selector";
+import selector, { matches } from "../html-dom/selector";
 
 const JEST = process.env.JEST_WORKER_ID !== undefined;
 
@@ -26,6 +26,18 @@ const cucumber = (
 
   when(/^we select "(.*)"$/, (select: string) => {
     found = selector(node, select);
+  });
+
+  then(/^it should match "(.*)"$/, (query: string) => {
+    expect(found.length).toBe(1);
+    const doesMatch = matches(node, found[0], query);
+    expect(doesMatch).toBeTruthy();
+  });
+
+  then(/^it should not match "(.*)"$/, (query: string) => {
+    expect(found.length).toBe(1);
+    const doesMatch = matches(node, found[0], query);
+    expect(doesMatch).toBeFalsy();
   });
 
   then(/^it should return "(.*)"$/, (jsSelector: string) => {

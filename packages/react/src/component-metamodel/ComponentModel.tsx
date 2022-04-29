@@ -18,6 +18,7 @@ import { isElementNode, isRoot } from '../util/isNode';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
+import { DefaultTextMarks } from '@raisins/core/src/html-dom/DefaultTextMarks';
 import { Loadable, Module, ModuleDetails } from './types';
 
 export type ComponentModelMoleculeType = {
@@ -36,6 +37,8 @@ export type ComponentModelMoleculeType = {
     (node: RaisinNode, slot?: string | undefined) => Block[]
   >;
   ComponentModelAtom: Atom<ComponentModel>;
+  IsInteractibleAtom: Atom<InteractibleProvider>;
+  NonInteractibleTags: Set<string>;
 };
 
 export const ComponentModelMolecule = molecule(
@@ -226,6 +229,22 @@ export const ComponentModelMolecule = molecule(
     });
     ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
+    /**
+     * Set of tags that are not interactible. They should only be edited as rich text.
+     */
+    const NonInteractibleTags = new Set(DefaultTextMarks);
+    const IsInteractibleAtom = atom<InteractibleProvider>(() => {
+      return (node) => {
+        if (node.type === 'text') return false;
+        if (node.type === 'comment') return false;
+        if (node.type === 'directive') return false;
+        if (node.type === 'style') return true;
+        if (node.type === 'root') return true;
+        if (NonInteractibleTags.has(node.tagName)) return false;
+        return true;
+      };
+    });
+
     return {
       ModulesAtom: PackagesAtom,
       ModuleDetailsAtom,
@@ -240,6 +259,8 @@ export const ComponentModelMolecule = molecule(
       ComponentMetaAtom,
       ValidChildrenAtom,
       ComponentModelAtom,
+      IsInteractibleAtom,
+      NonInteractibleTags,
     };
   }
 );
@@ -283,4 +304,5 @@ export type ComponentModel = {
   ) => boolean;
 };
 
+export type InteractibleProvider = (node: RaisinNode) => boolean;
 export type ComponentMetaProvider = (tagName: string) => CustomElement;

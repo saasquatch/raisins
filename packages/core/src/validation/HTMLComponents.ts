@@ -195,36 +195,9 @@ export const P: CustomElement = {
 // 'section',
 // 'select',
 // 'small',
-export const SMALL: CustomElement = {
-  title: "Small Text",
-  tagName: "small",
-  attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot }]
-};
 // 'source',
 // 'span',
-export const SPAN: CustomElement = {
-  title: "Text (span)",
-  tagName: "span",
-  slots: [
-    {
-      ...DefaultSlot,
-      validChildren: ["span"],
-      editor: "inline"
-    }
-  ]
-};
 // 'strong',
-export const STRONG: CustomElement = {
-  title: "Text (strong)",
-  tagName: "strong",
-  slots: [
-    {
-      ...DefaultSlot,
-      validChildren: ["span"]
-    }
-  ]
-};
 // 'style',
 // 'sub',
 // 'summary',
@@ -330,7 +303,6 @@ export const TR: CustomElement = {
 // 'foreignObject',
 // 'g',
 // 'image',
-// 'line',
 // 'linearGradient',
 // 'mask',
 // 'path',

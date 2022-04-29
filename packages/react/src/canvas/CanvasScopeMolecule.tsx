@@ -1,8 +1,7 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { atomWithProxy } from 'jotai/valtio';
-import { proxySet } from 'valtio/utils';
+import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
@@ -32,9 +31,9 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const value = getScope(CanvasScope);
   if (!value) throw new Error('Must be rendered in a <CanvasProvider/>');
 
+  const ComponentModelAtoms = getMol(ComponentModelMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const { EventAttributeAtom: EventSelectorAtom } = CanvasConfig;
-  const CanvasOptions = getMol(CanvasConfigMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
@@ -48,13 +47,15 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
-    const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
+    const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
 
+    const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
       (a) => get(a) as SnabbdomRenderer
     );
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
       const soul = souls(n);
+      if (!isInteractible(n)) return d;
       return {
         ...d,
         attrs: {

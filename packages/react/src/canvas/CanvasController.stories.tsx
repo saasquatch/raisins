@@ -2,6 +2,7 @@ import { Meta } from '@storybook/react';
 import { Atom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
+import { DefaultTextMarks } from '../component-metamodel';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
@@ -9,8 +10,8 @@ import { CanvasProvider } from './CanvasScope';
 import { BasicCanvasController, CanvasController } from './index';
 import {
   CanvasHoveredMolecule,
-  CanvasSelectionMolecule,
   CanvasPickAndPlopMolecule,
+  CanvasSelectionMolecule,
 } from './plugins';
 import { Rect } from './types';
 
@@ -24,6 +25,29 @@ export const LoadTest = () => {
   return (
     <BasicStory startingHtml={example}>
       <CanvasController />
+    </BasicStory>
+  );
+};
+
+export const LoadTestFull = () => {
+  return (
+    <BasicStory startingHtml={example}>
+      <CanvasProvider>
+        <CanvasFull />
+      </CanvasProvider>
+    </BasicStory>
+  );
+};
+
+export const UninteractibleTextFull = () => {
+  const inlineHtml = DefaultTextMarks.map(
+    (tagName) => `<${tagName}>${tagName}</${tagName}>`
+  ).join('&nbsp;');
+  return (
+    <BasicStory startingHtml={`<div>${inlineHtml}</div>`}>
+      <CanvasProvider>
+        <CanvasFull />
+      </CanvasProvider>
     </BasicStory>
   );
 };

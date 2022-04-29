@@ -242,6 +242,40 @@ Feature: Selecting by CSS selectors
 
 
 	@motivating
+	Scenario Outline: Pseudo selector :group(inline) works for inline
+		We used the `:group(inline)` special pseudo function for confirming rich text nodes and valid plop targets.
+
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should match "<Selector2>"
+
+		Examples:
+			| HTML        | Selector | Selector2      |
+			| <b>text</b> | b        | :group(inline) |
+			| <u>text</u> | u        | :group(inline) |
+
+	@motivating
+	Scenario Outline: Pseudo selector :group(inline) won't match non-inline
+		This shows that the ":group(inline)" selector won't match for non-inline tags.
+
+		Given an html document
+			"""
+			<HTML>
+			"""
+		When we select "<Selector>"
+		Then it should not match "<Selector2>"
+
+		Examples:
+			| HTML                          | Selector   | Selector2      |
+			| <div>text</div>               | div        | :group(inline) |
+			| <h1>text</h1>                 | h1         | :group(inline) |
+			| <h2>text</h2>                 | h2         | :group(inline) |
+			| <my-element>text</my-element> | my-element | :group(inline) |
+
+	@motivating
 	Scenario Outline: Pseudo input type selectors
 		Given an html document
 			"""
