@@ -15,6 +15,10 @@ import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
+import {
+  NPMRegistry,
+  NPMRegistryAtom as RegistryAtom,
+} from '../util/NPMRegistry';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
@@ -36,6 +40,7 @@ export type ComponentModelMoleculeType = {
     (node: RaisinNode, slot?: string | undefined) => Block[]
   >;
   ComponentModelAtom: Atom<ComponentModel>;
+  NPMRegistryAtom: Atom<NPMRegistry>;
 };
 
 export const ComponentModelMolecule = molecule(
@@ -224,6 +229,9 @@ export const ComponentModelMolecule = molecule(
         isValidChild,
       };
     });
+
+    const NPMRegistryAtom = atom<NPMRegistry>((get) => get(RegistryAtom));
+
     ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
     return {
@@ -240,6 +248,7 @@ export const ComponentModelMolecule = molecule(
       ComponentMetaAtom,
       ValidChildrenAtom,
       ComponentModelAtom,
+      NPMRegistryAtom,
     };
   }
 );
