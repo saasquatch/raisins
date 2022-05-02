@@ -1,5 +1,6 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
 import { molecule } from 'jotai-molecules';
+import { PickAndPlopMolecule } from '../core';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { HistoryMolecule } from '../core/editting/HistoryAtoms';
 import connectedAtom from '../util/atoms/connectedAtom';
@@ -9,6 +10,7 @@ export const HotkeysMolecule = molecule((getMol) => {
   const { DeleteSelectedAtom, ClearSelectionAtom } = getMol(
     EditSelectedMolecule
   );
+  const { PickedNodeAtom } = getMol(PickAndPlopMolecule);
 
   const HotKeysAtom = connectedAtom(
     (_, set) => {
@@ -32,6 +34,7 @@ export const HotkeysMolecule = molecule((getMol) => {
           case 'esc':
             event.preventDefault();
             set(ClearSelectionAtom);
+            set(PickedNodeAtom, undefined);
             break;
           default:
         }
