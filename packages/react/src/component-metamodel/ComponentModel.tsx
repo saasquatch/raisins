@@ -263,10 +263,10 @@ function group(list: Block[], getComponentMeta: Function): BlockGroups {
       getComponentMeta(block.content?.tagName)?.exampleGroup ??
       DEFAULT_BLOCK_GROUP;
     const groupArray = allGroups[exampleGroup] ?? [];
-    const withAttribute = [...groupArray, block];
+    const withBlock = [...groupArray, block];
     return {
       ...allGroups,
-      [exampleGroup]: withAttribute,
+      [exampleGroup]: withBlock,
     };
   }, {} as BlockGroups);
 }
