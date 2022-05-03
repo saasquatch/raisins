@@ -3,6 +3,7 @@ import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { atomWithProxy } from 'jotai/valtio';
 import { proxySet } from 'valtio/utils';
+import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
@@ -22,6 +23,16 @@ import {
 type CanvasEventListener = WritableAtom<null, RichCanvasEvent>;
 
 /**
+ * Used to "burn down" a snabbdom view for full replacement instead of incremental replacement.
+ *
+ * This is useful for web components that don't use shadow dom, (e.g. stencil components with shadow:false)
+ * and therefore need to have their HTML fully reconstructed on every render to ensure consistency.
+ *
+ * An example during development was `sqm-text`, which threw and exception in snabbdom and caused infinite plop targets to show up.
+ */
+let renderTick = 0;
+
+/**
  * A molecule used for tracking events and geometry for an iframe canvas.
  *
  * Has mutable a set of listeners for dealing with events
@@ -33,6 +44,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   if (!value) throw new Error('Must be rendered in a <CanvasProvider/>');
 
   const CanvasConfig = getMol(CanvasConfigMolecule);
+  const ComponentModel = getMol(ComponentModelMolecule);
   const { EventAttributeAtom: EventSelectorAtom } = CanvasConfig;
   const CanvasOptions = getMol(CanvasConfigMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
@@ -48,6 +60,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
+    const meta = get(ComponentModel.ComponentModelAtom);
     const raisinsSoulAttribute = get(CanvasOptions.SoulAttributeAtom);
 
     const renderers = Array.from(RendererSet.values()).map(
@@ -55,8 +68,15 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     );
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
       const soul = souls(n);
+      const componentMeta = meta.getComponentMeta(n.tagName);
+
+      const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
+      const key =
+        canvasRenderer === 'always-replace' ? ++renderTick : soul.toString();
+
       return {
         ...d,
+        key,
         attrs: {
           ...d.attrs,
           [raisinsSoulAttribute]: soul.toString(),

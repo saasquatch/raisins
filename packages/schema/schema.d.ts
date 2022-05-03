@@ -118,6 +118,18 @@ export interface CustomElement {
    * Which editor toolbar to show when this element is selected
    */
   slotEditor?: string;
+
+  /**
+   * Rules for how this element should rendered in the Raisins canvas.
+   *
+   * Possible values:
+   *  - in-place-update - Changes to this element are rendered on the canvas by mutating a cached HTML element via setAttribute, appendNode, etc.
+   *  - always-replace - Changes to this element are rended on a fresh element created via `createElement`.
+   *
+   * Defaults to `in-place-update`.
+   *
+   */
+  canvasRenderer?: "in-place-update" | "always-replace";
 }
 
 export interface Attribute {

@@ -78,6 +78,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           demoStates: demos.length > 0 ? demos : undefined,
           validParents: jsonTagValue(comp, 'validParents'),
           slotEditor: slotEditor(comp),
+          canvasRenderer: canvasRenderer(comp),
         };
         return elem;
       } catch (e) {
@@ -86,11 +87,19 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
     });
 
   return {
-    title: 'a library',
-    description: 'It does stuff',
     tags,
   };
 }
+function canvasRenderer(
+  comp: HasDocsTags
+): 'in-place-update' | 'always-replace' | undefined {
+  const value = tagValue(comp.docsTags, 'canvasRenderer')?.trim();
+  if (value === undefined) return value;
+  if (value === 'in-place-update') return value;
+  if (value === 'always-replace') return value;
+  throw new Error('Invalid value for @canvasRenderer tag value:' + value);
+}
+
 function tagValue(tags: JsonDocsTag[], name: string): string | undefined {
   return tags?.find(t => t.name === name)?.text;
 }

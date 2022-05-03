@@ -135,6 +135,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
       const plopPosition = raisinChildren.findIndex((n) => n === pickedNode);
 
+      console.log(plopTargets.length, 'Plop targets for ', parent.tagName);
       const plopsForZeroIndex = plopTargets
         .filter((plop) => plop.idx === 0)
         .map((plop) => {
@@ -234,6 +235,8 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   parentSchema,
   addOrMove,
 }) => {
+  const key = `${soulId}/${idx}/${slot}`;
+
   const defaultAttrs = {
     slot,
     'raisin-plop-target': true,
@@ -274,6 +277,8 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   return h(
     'div',
     {
+      // Helps snabbdom know how to remove nodes
+      key,
       style: {
         height: '0px',
         margin: '0',

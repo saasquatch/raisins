@@ -139,3 +139,25 @@ export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
 );
 
 export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;
+
+export const SQMText = ({ Component = BasicCanvasController }) => (
+  <BasicStory
+    startingHtml={`<div>First</div><div>Before</div><sqm-text>in sqm-text</sqm-text><div>After</div>`}
+    startingPackages={MintComponents}
+  >
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
+      </div>
+      <div style={{ width: '50%' }}>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
+      </div>
+    </div>
+  </BasicStory>
+);
+
+export const SQMTextFull = () => <SQMText Component={CanvasFull} />;
