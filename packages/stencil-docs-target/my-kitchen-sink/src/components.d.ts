@@ -54,6 +54,12 @@ export namespace Components {
          */
         "reverse": boolean;
     }
+    interface MyShadowlessCard {
+        /**
+          * Should show backwards?
+         */
+        "label": string;
+    }
     interface MySplit {
         /**
           * Should show backwards?
@@ -133,6 +139,12 @@ declare global {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    interface HTMLMyShadowlessCardElement extends Components.MyShadowlessCard, HTMLStencilElement {
+    }
+    var HTMLMyShadowlessCardElement: {
+        prototype: HTMLMyShadowlessCardElement;
+        new (): HTMLMyShadowlessCardElement;
+    };
     interface HTMLMySplitElement extends Components.MySplit, HTMLStencilElement {
     }
     var HTMLMySplitElement: {
@@ -148,6 +160,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "my-card": HTMLMyCardElement;
         "my-component": HTMLMyComponentElement;
+        "my-shadowless-card": HTMLMyShadowlessCardElement;
         "my-split": HTMLMySplitElement;
         "my-ui-component": HTMLMyUiComponentElement;
     }
@@ -200,6 +213,12 @@ declare namespace LocalJSX {
           * Should show backwards?
          */
         "reverse"?: boolean;
+    }
+    interface MyShadowlessCard {
+        /**
+          * Should show backwards?
+         */
+        "label"?: string;
     }
     interface MySplit {
         /**
@@ -269,6 +288,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "my-card": MyCard;
         "my-component": MyComponent;
+        "my-shadowless-card": MyShadowlessCard;
         "my-split": MySplit;
         "my-ui-component": MyUiComponent;
     }
@@ -279,6 +299,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "my-card": LocalJSX.MyCard & JSXBase.HTMLAttributes<HTMLMyCardElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-shadowless-card": LocalJSX.MyShadowlessCard & JSXBase.HTMLAttributes<HTMLMyShadowlessCardElement>;
             "my-split": LocalJSX.MySplit & JSXBase.HTMLAttributes<HTMLMySplitElement>;
             "my-ui-component": LocalJSX.MyUiComponent & JSXBase.HTMLAttributes<HTMLMyUiComponentElement>;
         }

@@ -195,8 +195,6 @@ export const ComponentModelMolecule = molecule(
       const getComponentMeta = get(ComponentMetaAtom);
       const blocks: Block[] = get(BlocksAtom);
       const groupedBlocks = group(blocks, getComponentMeta);
-
-      console.log('In atom', { blocks, groupedBlocks });
       const getValidChildren = get(ValidChildrenAtom);
 
       function isValidChild(

@@ -51,6 +51,7 @@ describe('Stencil docs target', () => {
     if (!dataStr.includes('exampleGroup'))
       throw new Error('No exampleGroup found');
     if (!dataStr.includes('slotEditor')) throw new Error('No slotEditor found');
+    if (!dataStr.includes('canvasRenderer')) throw new Error('No canvasRenderer found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
   });
 });
