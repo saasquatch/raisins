@@ -7,14 +7,17 @@ import {
   useMolecule,
 } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
+import { CoreMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
+import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
@@ -42,6 +45,43 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
     };
   }
 );
+
+const ErrorListMolecule = molecule((getMol) => {
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { errorsAtom } = getMol(NodeMolecule);
+
+  const ErrorDetails = atom((get) => {
+    const errors = get(errorsAtom);
+    const root = get(RootNodeAtom);
+
+    return errors.map((e) => {
+      return {
+        error: e,
+        node: JSONPointer.get(root, e.jsonPointer),
+      };
+    });
+  });
+  return { ErrorDetails };
+});
+
+function ErrorListController() {
+  const { ErrorDetails } = useMolecule(ErrorListMolecule);
+  const errors = useAtomValue(ErrorDetails);
+  return (
+    <div style={{ color: 'red' }}>
+      Errors
+      <hr />
+      <details>
+        <summary>{errors.length} errors</summary>
+        {errors.map((e) => (
+          <li>
+            {e.error.error.rule} at {e.node.tagName} for {e.error.jsonPointer}
+          </li>
+        ))}
+      </details>
+    </div>
+  );
+}
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
@@ -158,6 +198,7 @@ export function EditorView() {
     <>
       <div style={Main}>
         <div style={Header}>
+          <ErrorListController />
           <ToolbarController />
         </div>
 

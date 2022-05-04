@@ -1,4 +1,6 @@
-import { CustomElement } from "@raisins/schema/schema";
+import { Attribute, CustomElement } from "@raisins/schema/schema";
+import { parseToRgba } from "color2k";
+import { Interval } from "luxon";
 import { isElementNode, isRoot } from "../../html-dom/isNode";
 import { RaisinNode } from "../../html-dom/RaisinNode";
 import { doesChildAllowParent } from "../rules/doesChildAllowParent";
@@ -7,15 +9,32 @@ import {
   ErrorEntry as BaseErrorEntry,
   ErrorStack as BaseErrorStack
 } from "./types";
-import { parseToRgba } from "color2k";
-import { Interval } from "luxon";
 
-type ErrorType = {
-  /**
-   * Machine-readable rule name
-   */
-  rule: string;
-};
+export type ErrorType =
+  | {
+      rule: "doesChildAllowParent" | "doesParentAllowChild";
+      parent: RaisinNode;
+      parentMeta?: CustomElement;
+      child: RaisinNode;
+      childMeta?: CustomElement;
+    }
+  | {
+      rule:
+        | "type/number"
+        | "enum/number"
+        | "maximum"
+        | "minimum"
+        | "required"
+        | `enum/string`
+        | `enum/number`
+        | `enum/boolean`
+        | "minLength"
+        | "maxLength"
+        | `format/color`
+        | `format/date-interval`
+        | `format/url`;
+      attribute: Attribute;
+    };
 
 type ErrorEntry = BaseErrorEntry<ErrorType>;
 type ErrorStack = BaseErrorStack<ErrorType>;
@@ -48,7 +67,11 @@ export function validateChildConstraints(
         return {
           jsonPointer: `/children/${idx}`,
           error: {
-            rule: "doesChildAllowParent"
+            rule: "doesChildAllowParent",
+            parent: node,
+            parentMeta,
+            child,
+            childMeta
           }
         };
       }
@@ -59,7 +82,11 @@ export function validateChildConstraints(
         return {
           jsonPointer: `/children/${idx}`,
           error: {
-            rule: "doesParentAllowChild"
+            rule: "doesParentAllowChild",
+            parent: node,
+            parentMeta,
+            child,
+            childMeta
           }
         };
       }
@@ -128,7 +155,8 @@ export function validateAttributes(
         errorStack.push({
           jsonPointer: "/attribs/" + a.name,
           error: {
-            rule: "required"
+            rule: "required",
+            attribute: a
           }
         });
       // skip validation if does not exist and not required
@@ -146,28 +174,32 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `type/number`
+              rule: `type/number`,
+              attribute: a
             }
           });
         if (a.enum !== undefined && !a.enum.includes(Number(value)))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `enum/number`
+              rule: `enum/number`,
+              attribute: a
             }
           });
         if (a.maximum !== undefined && Number(value) > Number(a.maximum))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `maximum`
+              rule: `maximum`,
+              attribute: a
             }
           });
         if (a.minimum !== undefined && Number(value) < Number(a.minimum))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `minimum`
+              rule: `minimum`,
+              attribute: a
             }
           });
         break;
@@ -176,21 +208,24 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `enum/string`
+              rule: `enum/string`,
+              attribute: a
             }
           });
         if (a.maxLength !== undefined && value.length > Number(a.maxLength))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `maxLength`
+              rule: `maxLength`,
+              attribute: a
             }
           });
         if (a.minLength !== undefined && value.length < Number(a.minLength))
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `minLength`
+              rule: `minLength`,
+              attribute: a
             }
           });
         if (a.format !== undefined) {
@@ -200,7 +235,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format/color`
+                    rule: `format/color`,
+                    attribute: a
                   }
                 });
               break;
@@ -209,7 +245,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format/date-interval`
+                    rule: `format/date-interval`,
+                    attribute: a
                   }
                 });
               break;
@@ -218,7 +255,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
-                    rule: `format/url`
+                    rule: `format/url`,
+                    attribute: a
                   }
                 });
               break;
@@ -230,7 +268,8 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
-              rule: `enum/boolean`
+              rule: `enum/boolean`,
+              attribute: a
             }
           });
         break;

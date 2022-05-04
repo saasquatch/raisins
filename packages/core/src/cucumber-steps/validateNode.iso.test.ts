@@ -127,25 +127,17 @@ const cucumber = (
   });
 
   then("doesParentAllowChild error is returned", () => {
-    expect(validateChildConstraints(node, metalist)).toStrictEqual([
-      {
-        error: {
-          rule: "doesParentAllowChild"
-        },
-        jsonPointer: "/children/0"
-      }
-    ]);
+    const errors = validateChildConstraints(node, metalist);
+    expect(errors.length).toBe(1);
+    expect(errors[0].error.rule).toBe("doesParentAllowChild");
+    expect(errors[0].jsonPointer).toBe("/children/0");
   });
 
   then("doesChildAllowParent error is returned", () => {
-    expect(validateChildConstraints(node, metalist)).toStrictEqual([
-      {
-        error: {
-          rule: "doesChildAllowParent"
-        },
-        jsonPointer: "/children/0"
-      }
-    ]);
+    const errors = validateChildConstraints(node, metalist);
+    expect(errors.length).toBe(1);
+    expect(errors[0].error.rule).toBe("doesChildAllowParent");
+    expect(errors[0].jsonPointer).toBe("/children/0");
   });
 
   var input: string;
