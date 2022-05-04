@@ -108,7 +108,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
     const betterEvent: RichCanvasEvent = { ...e, soul, node };
     for (const listener of ListenersSet.values()) {
-      sett(listener, betterEvent);
+      set(listener, betterEvent);
     }
   });
 
