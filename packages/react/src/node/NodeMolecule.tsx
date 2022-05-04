@@ -1,7 +1,8 @@
 import { getPath, getSubErrors, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { atom } from 'jotai';
+import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { SelectionBookmark } from 'prosemirror-state';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
@@ -30,7 +31,9 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom,
   } = getMol(PickAndPlopMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
-  const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
+  const { SelectedAtom, SelectedNodeAtom, SelectedBookmark } = getMol(
+    SelectedNodeMolecule
+  );
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
     ComponentModelMolecule
@@ -217,6 +220,15 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     return meta?.title ?? tagName;
   });
 
+  const bookmarkForNode: PrimitiveAtom<SelectionBookmark | undefined> = atom(
+    (get) => get(SelectedBookmark),
+    (get, set, next) => {
+      console.log('Change bookmark for node', get(n), next);
+      set(SelectedNodeAtom, get(n));
+      set(SelectedBookmark, next);
+    }
+  );
+
   return {
     /*
     Identifiers
@@ -244,6 +256,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     */
     isSelectedForNode,
     setSelectedForNode,
+    bookmarkForNode,
     /*
     Hover
     */

@@ -9,8 +9,6 @@ import { molecule } from 'jotai-molecules';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
-  CoreMolecule,
-  HoveredNodeMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
@@ -135,7 +133,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
       const plopPosition = raisinChildren.findIndex((n) => n === pickedNode);
 
-      console.log(plopTargets.length, 'Plop targets for ', parent.tagName);
       const plopsForZeroIndex = plopTargets
         .filter((plop) => plop.idx === 0)
         .map((plop) => {

@@ -2,7 +2,12 @@ import { RaisinNode } from '@raisins/core';
 import { atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { CoreMolecule } from '../CoreAtoms';
+import { SelectedNodeMolecule, Selection } from '../selection';
 
+type HistoryState = {
+  node: RaisinNode;
+  selection?: Selection;
+};
 /**
  * A set of atoms for dealing with undo/redo history
  *
@@ -11,14 +16,16 @@ export const HistoryMolecule = molecule((getMol) => {
   const { InternalTransactionAtom, StateListeners, RootNodeAtom } = getMol(
     CoreMolecule
   );
+  const { SelectionAtom } = getMol(SelectedNodeMolecule);
 
-  const undoAtoms = branchAtoms<RaisinNode>();
-  const redoAtoms = branchAtoms<RaisinNode>();
+  const undoAtoms = branchAtoms<HistoryState>();
+  const redoAtoms = branchAtoms<HistoryState>();
 
   const onChangeAtom = atom(
     null,
-    (_, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
-      set(undoAtoms.push, prev);
+    (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
+      console.log('Push undo history', get(SelectionAtom));
+      set(undoAtoms.push, { node: prev, selection: get(SelectionAtom) });
       set(redoAtoms.resetStack);
     }
   );
@@ -35,21 +42,33 @@ export const HistoryMolecule = molecule((getMol) => {
   });
   HistorySizeAtom.debugLabel = 'HistorySizeAtom';
 
-  const UndoPop = atom(null, (get, set, next: RaisinNode) => {
-    set(redoAtoms.forcePush, get(RootNodeAtom));
-    set(InternalTransactionAtom, { type: 'raw-set', next });
-  });
   const UndoAtom = atom(null, (_, set) => {
-    set(undoAtoms.pop, UndoPop);
+    set(
+      undoAtoms.pop,
+      atom(null, (get, set, next: HistoryState) => {
+        set(redoAtoms.forcePush, {
+          node: get(RootNodeAtom),
+          selection: get(SelectionAtom),
+        });
+        console.log('Change selection', next.selection);
+        set(SelectionAtom, next.selection);
+        console.log('Change node', next.node);
+        set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
+      })
+    );
   });
   UndoAtom.debugLabel = 'UndoAtom';
 
   const RedoAtom = atom(null, (_, set) => {
     set(
       redoAtoms.pop,
-      atom(null, (get, set, next: RaisinNode) => {
-        set(undoAtoms.forcePush, get(RootNodeAtom));
-        set(InternalTransactionAtom, { type: 'raw-set', next });
+      atom(null, (get, set, next: HistoryState) => {
+        set(undoAtoms.forcePush, {
+          node: get(RootNodeAtom),
+          selection: get(SelectionAtom),
+        });
+        set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
+        set(SelectionAtom, next.selection);
       })
     );
   });
@@ -97,6 +116,10 @@ export function branchAtoms<T>() {
 
   const pop = atom(null, (get, set, target: WritableAtom<unknown, T>) => {
     const items = get(stack);
+    if (items.length <= 0) {
+      // Can't pop an empty stack
+      return;
+    }
     const [item, ...rest] = items;
 
     set(prevTime, undefined);

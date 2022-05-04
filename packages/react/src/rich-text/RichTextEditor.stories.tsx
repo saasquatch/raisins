@@ -8,30 +8,26 @@ const meta: Meta = {
 };
 export default meta;
 
-const span: RaisinNode = htmlParser(
-  `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
-);
-
 export const Span = () => (
   <BasicStory
     startingHtml={`A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`}
   >
-    <AtomEditor />
+    <Editor />
   </BasicStory>
 );
 
 export const TextWithBreaks = () => (
   <BasicStory startingHtml={`Text<br/>with<br/>breaks`}>
-    <AtomEditor />
+    <Editor />
   </BasicStory>
 );
 export const Paragraphs = () => (
   <BasicStory startingHtml={`<p>First paragrpah</p><p>second paragrapj</p>`}>
-    <AtomEditor />
+    <Editor />
   </BasicStory>
 );
 
-function AtomEditor() {
+function Editor() {
   return (
     <div>
       <NodeRichTextController />

@@ -5,6 +5,7 @@ import React from 'react';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
+import { SelectedNodeRichTextEditor } from '../rich-text/SelectedNodeRichTextEditor';
 import { CanvasProvider } from './CanvasScope';
 import { BasicCanvasController, CanvasController } from './index';
 import {
@@ -84,6 +85,7 @@ const Toolbars = () => {
       <PositionedToolbar rectAtom={HoveredRectAtom}>Hovered</PositionedToolbar>
       <PositionedToolbar rectAtom={SelectedRectAtom}>
         Selected
+        <SelectedNodeRichTextEditor />
       </PositionedToolbar>
       <PositionedToolbar rectAtom={PickedRectAtom}>Picked</PositionedToolbar>
     </>

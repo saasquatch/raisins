@@ -30,8 +30,16 @@ export type InternalStateTransaction =
       next: RaisinNode;
     };
 
+type NodeAndHTML = MutableRefObject<
+  { html: string; node: RaisinNode } | undefined
+>;
+
 export const CoreMolecule = molecule((getMol, getScope) => {
   const { HTMLAtom } = getMol(ConfigMolecule);
+
+  const HtmlCacheAtom = atom(new WeakMap<RaisinNode, string>());
+  const NodeWithHtmlRefAtom = atom<NodeAndHTML>({ current: undefined });
+
   /*
     Scenario: Souls are presered when downstream HTML matches upstream HTML
 
@@ -66,12 +74,6 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       set(HTMLAtom, htmlString);
     }
   );
-  type NodeAndHTML = MutableRefObject<
-    { html: string; node: RaisinNode } | undefined
-  >;
-  const NodeWithHtmlRefAtom = atom<NodeAndHTML>({ current: undefined });
-
-  const HtmlCacheAtom = atom(new WeakMap<RaisinNode, string>());
 
   const StateListeners = new Set<
     WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }>
