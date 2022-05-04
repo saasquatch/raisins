@@ -2,16 +2,16 @@ import { htmlUtil, RaisinNode } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
-import { CoreMolecule } from '../CoreAtoms';
 import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';
-import { EditMolecule, generateNextState } from './EditAtoms';
+import { EditMolecule } from './EditAtoms';
 
 const { removePath } = htmlUtil;
 
 export const EditSelectedMolecule = molecule((getMol) => {
-  const { InternalStateAtom } = getMol(CoreMolecule);
-  const { DuplicateNodeAtom, ReplaceNodeAtom } = getMol(EditMolecule);
+  const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } = getMol(
+    EditMolecule
+  );
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
 
   const { PickedAtom } = getMol(PickAndPlopMolecule);
@@ -20,13 +20,9 @@ export const EditSelectedMolecule = molecule((getMol) => {
    * Deletes the selected node, if anything selected, otherwise no-op
    */
   const DeleteSelectedAtom = atom(null, (get, set) => {
-    set(InternalStateAtom, (previous) => {
-      if (previous.selected) {
-        const clone = removePath(previous.current, previous.selected.path);
-        return generateNextState(previous, clone);
-      }
-      return previous;
-    });
+    const selected = get(SelectedNodeAtom);
+    if (!selected) return;
+    set(RemoveNodeAtom, selected);
   });
 
   const DuplicateSelectedAtom = atom(null, (get, set) => {

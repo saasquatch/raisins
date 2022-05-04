@@ -5,25 +5,30 @@ import {
   htmlSerializer,
   htmlUtil,
   NodePath,
-  NodeSelection,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { atom, SetStateAction, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { MutableRefObject } from 'react';
-import { isFunction } from '../util/isFunction';
-import { generateNextState } from './editting/EditAtoms';
 import { ConfigMolecule } from './RaisinConfigScope';
 
 export type InternalState = {
   current: RaisinNode;
-  undoStack: RaisinNode[];
-  redoStack: RaisinNode[];
-  selected?: NodeSelection;
 };
 
 const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
+
+export type InternalStateTransaction =
+  | {
+      // Mostly just used for undo/redo. Will skip state listeners.
+      type: 'raw-set';
+      next: RaisinNode;
+    }
+  | {
+      type: 'set';
+      next: RaisinNode;
+    };
 
 export const CoreMolecule = molecule((getMol, getScope) => {
   const { HTMLAtom } = getMol(ConfigMolecule);
@@ -47,7 +52,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       if (ref.current?.html === html) {
         return ref.current.node;
       }
-      return htmlParser(html, {cleanWhitespace: false});
+      return htmlParser(html, { cleanWhitespace: false });
     },
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
@@ -66,44 +71,29 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   >;
   const NodeWithHtmlRefAtom = atom<NodeAndHTML>({ current: undefined });
 
-  const getDerivedInternal = (get: Getter) => {
-    const current = get(NodeFromHtml);
-    const historyState = get(HistoryAtom);
-    return {
-      current,
-      ...historyState,
-    };
-  };
+  const HtmlCacheAtom = atom(new WeakMap<RaisinNode, string>());
 
-  const HtmlCacheAtom = atom(() => new WeakMap<RaisinNode, string>());
+  const StateListeners = new Set<
+    WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }>
+  >([]);
 
-  // Should be made private
-  const InternalStateAtom: PrimitiveAtom<InternalState> = atom(
-    getDerivedInternal,
-    (get, set, next: SetStateAction<InternalState>) => {
-      const iState = getDerivedInternal(get);
-      const { current, ...rest } = isFunction(next) ? next(iState) : next;
-      set(NodeFromHtml, current);
-      set(HistoryAtom, rest);
+  const InternalTransactionAtom = atom(
+    null,
+    (get, set, next: InternalStateTransaction) => {
+      const prev = get(NodeFromHtml);
+      set(NodeFromHtml, next.next);
+      if (next.type === 'set') {
+        StateListeners.forEach((l) => set(l, { prev: prev, next: next.next }));
+      }
     }
   );
-  InternalStateAtom.debugLabel = 'InternalStateAtom';
-
-  const HistoryAtom = atom<Omit<InternalState, 'current'>>({
-    redoStack: [],
-    undoStack: [],
-    selected: undefined,
-  });
-  HistoryAtom.debugLabel = 'HistoryAtom';
 
   const RootNodeAtom = atom(
-    (get) => get(InternalStateAtom).current,
-    (_, set, next: SetStateAction<RaisinNode>) => {
-      set(InternalStateAtom, (previous) => {
-        const nextNode =
-          typeof next === 'function' ? next(previous.current) : next;
-        return generateNextState(previous, nextNode, false);
-      });
+    (get) => get(NodeFromHtml),
+    (get, set, next: SetStateAction<RaisinNode>) => {
+      const nextNode =
+        typeof next === 'function' ? next(get(NodeFromHtml)) : next;
+      set(InternalTransactionAtom, { type: 'set', next: nextNode });
     }
   );
   RootNodeAtom.debugLabel = 'RootNodeAtom';
@@ -145,12 +135,12 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   return {
     NodeFromHtml,
     NodeWithHtmlRefAtom,
-    InternalStateAtom,
-    HistoryAtom,
     RootNodeAtom,
     IdentifierModelAtom,
     ParentsAtom,
     JsonPointersAtom,
+    StateListeners,
+    InternalTransactionAtom,
   };
 });
 

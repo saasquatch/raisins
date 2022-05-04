@@ -1,32 +1,36 @@
-import { getNode, getPath, isElementNode, RaisinNode } from '@raisins/core';
+import {
+  getNode,
+  getPath,
+  isElementNode,
+  NodeSelection,
+  RaisinNode,
+} from '@raisins/core';
 import { atom, Getter, SetStateAction } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { isFunction } from '../../util/isFunction';
-import { CoreMolecule, InternalState } from '../CoreAtoms';
+import { CoreMolecule } from '../CoreAtoms';
 import { Soul, SoulsMolecule } from '../souls/Soul';
 import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
 
 export const SelectedNodeMolecule = molecule((getMol) => {
-  const { InternalStateAtom } = getMol(CoreMolecule);
+  const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SoulToNodeAtom } = getMol(SoulsInDocMolecule);
 
+  const SelectedPath = atom<NodeSelection | undefined>(undefined);
   const SelectedAtom = atom(
-    (get) => get(InternalStateAtom).selected,
-    (_, set, next?: RaisinNode | undefined) => {
-      set(InternalStateAtom, (prev: InternalState) => {
-        return {
-          ...prev,
-          selected: next
-            ? { type: 'node', path: getPath(prev.current, next)! }
-            : undefined,
-        };
-      });
+    (get) => get(SelectedPath),
+    (get, set, next?: RaisinNode | undefined) => {
+      const nextPath = next
+        ? ({ type: 'node', path: getPath(get(RootNodeAtom), next)! } as const)
+        : undefined;
+
+      set(SelectedPath, nextPath);
     }
   );
 
   function getSelected(get: Getter) {
-    const { current } = get(InternalStateAtom);
+    const current = get(RootNodeAtom);
     const selected = get(SelectedAtom);
     return selected?.path ? getNode(current, selected.path) : undefined;
   }
