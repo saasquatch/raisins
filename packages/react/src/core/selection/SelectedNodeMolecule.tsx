@@ -67,7 +67,6 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     },
     (get, set, next) => {
       const nextValue = isFunction(next) ? next(get(SelectedBookmark)) : next;
-      console.log('Change bookmark', nextValue);
       set(SelectionAtom, (prev) => {
         if (prev?.type === 'node' && nextValue) {
           // When text selection is set

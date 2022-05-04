@@ -24,7 +24,6 @@ export const HistoryMolecule = molecule((getMol) => {
   const onChangeAtom = atom(
     null,
     (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
-      console.log('Push undo history', get(SelectionAtom));
       set(undoAtoms.push, { node: prev, selection: get(SelectionAtom) });
       set(redoAtoms.resetStack);
     }
@@ -50,9 +49,7 @@ export const HistoryMolecule = molecule((getMol) => {
           node: get(RootNodeAtom),
           selection: get(SelectionAtom),
         });
-        console.log('Change selection', next.selection);
         set(SelectionAtom, next.selection);
-        console.log('Change node', next.node);
         set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
       })
     );

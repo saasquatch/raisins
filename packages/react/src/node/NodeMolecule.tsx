@@ -223,7 +223,6 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const bookmarkForNode: PrimitiveAtom<SelectionBookmark | undefined> = atom(
     (get) => get(SelectedBookmark),
     (get, set, next) => {
-      console.log('Change bookmark for node', get(n), next);
       set(SelectedNodeAtom, get(n));
       set(SelectedBookmark, next);
     }

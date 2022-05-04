@@ -27,18 +27,12 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
     const doc = get(proseNodeAtom);
     const bookmark: SelectionBookmark | undefined = get(get(scope).selection);
     if (!bookmark) return undefined;
-    console.log('Resolve bookmark', bookmark);
     return bookmark.resolve(doc);
   });
 
   // Build editor state
   const editorStateAtom = atom<EditorState, Transaction>(
     (get) => {
-      console.log(
-        'Changed prose state',
-        get(proseNodeAtom),
-        get(proseSelectionAtom)
-      );
       let state = EditorState.create({
         doc: get(proseNodeAtom),
         selection: get(proseSelectionAtom),
