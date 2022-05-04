@@ -93,8 +93,22 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   window.addEventListener('DOMContentLoaded', function () {
     const methods: ChildRPC = {
       render(content) {
-        patchAndCache(content);
-        dispatchResizeAll();
+        try {
+          patchAndCache(content);
+        } catch (e) {
+          document.body.innerHTML = `<div style="color:red; width: 300px; margin: 0 auto;"><b>Canvas Render Error</b><details>${e}</details></div><hr/>`;
+          console.error(
+            'Canvas render error',
+            e,
+            'rendering content',
+            content,
+            'into currentNode',
+            currentNode
+          );
+          throw e;
+        } finally {
+          dispatchResizeAll();
+        }
       },
     };
     let myConnection = (window as any).Penpal.connectToParent({
