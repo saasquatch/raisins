@@ -37,7 +37,8 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
         ...rest,
         cursor: 'pointer',
         outline: isSelected ? '2px solid #439B76' : rest.outline ?? '',
-        outlineOffset: isOutlined ? '-2px' : '',
+        // outlineOffset: isOutlined ? '-2px' : '',
+        outlineOffset:''
       };
 
       return {
