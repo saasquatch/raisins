@@ -1,3 +1,4 @@
+import { RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
 import {
@@ -57,7 +58,7 @@ const ErrorListMolecule = molecule((getMol) => {
     return errors.map((e) => {
       return {
         error: e,
-        node: JSONPointer.get(root, e.jsonPointer),
+        node: JSONPointer.get(root, e.jsonPointer) as RaisinNode,
       };
     });
   });
@@ -71,13 +72,42 @@ function ErrorListController() {
     <div style={{ color: 'red' }}>
       Errors
       <hr />
-      <details>
+      <details style={{ maxHeight: '300px', overflow: 'scroll' }}>
         <summary>{errors.length} errors</summary>
-        {errors.map((e) => (
-          <li>
-            {e.error.error.rule} at {e.node.tagName} for {e.error.jsonPointer}
-          </li>
-        ))}
+        {errors.map((e) => {
+          const error = e.error.error;
+
+          if (error.type === 'ancestry') {
+            return (
+              <li>
+                {error.rule === 'doesParentAllowChild' && (
+                  <span>
+                    {error.parentMeta?.title ?? error.parent.type} does not
+                    allow {error.childMeta?.title ?? error.child.type} inside
+                    it. Valid children are:{' '}
+                    {error.parentMeta?.slots
+                      ?.map((s) => s.validChildren)
+                      .join(',')}
+                  </span>
+                )}
+                {error.rule === 'doesChildAllowParent' && (
+                  <span>
+                    {error.childMeta?.title ?? error.child.type} is not allowed
+                    inside of {error.parentMeta?.title ?? error.parent.type}.
+                    Valid parents are:{' '}
+                    {error.childMeta?.validParents?.join(',')}
+                  </span>
+                )}
+              </li>
+            );
+          } else {
+            return (
+              <li>
+                {error.attribute.name} is invalid. {error.rule}
+              </li>
+            );
+          }
+        })}
       </details>
     </div>
   );

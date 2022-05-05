@@ -10,31 +10,34 @@ import {
   ErrorStack as BaseErrorStack
 } from "./types";
 
-export type ErrorType =
-  | {
-      rule: "doesChildAllowParent" | "doesParentAllowChild";
-      parent: RaisinNode;
-      parentMeta?: CustomElement;
-      child: RaisinNode;
-      childMeta?: CustomElement;
-    }
-  | {
-      rule:
-        | "type/number"
-        | "enum/number"
-        | "maximum"
-        | "minimum"
-        | "required"
-        | `enum/string`
-        | `enum/number`
-        | `enum/boolean`
-        | "minLength"
-        | "maxLength"
-        | `format/color`
-        | `format/date-interval`
-        | `format/url`;
-      attribute: Attribute;
-    };
+export type AttributeError = {
+  type: "attribute";
+  rule:
+    | "type/number"
+    | "enum/number"
+    | "maximum"
+    | "minimum"
+    | "required"
+    | `enum/string`
+    | `enum/number`
+    | `enum/boolean`
+    | "minLength"
+    | "maxLength"
+    | `format/color`
+    | `format/date-interval`
+    | `format/url`;
+  attribute: Attribute;
+  node: RaisinNode;
+};
+export type AncestryError = {
+  type: "ancestry";
+  rule: "doesChildAllowParent" | "doesParentAllowChild";
+  parent: RaisinNode;
+  parentMeta?: CustomElement;
+  child: RaisinNode;
+  childMeta?: CustomElement;
+};
+export type ErrorType = AncestryError | AttributeError;
 
 type ErrorEntry = BaseErrorEntry<ErrorType>;
 type ErrorStack = BaseErrorStack<ErrorType>;
@@ -67,6 +70,7 @@ export function validateChildConstraints(
         return {
           jsonPointer: `/children/${idx}`,
           error: {
+            type: "ancestry",
             rule: "doesChildAllowParent",
             parent: node,
             parentMeta,
@@ -82,6 +86,7 @@ export function validateChildConstraints(
         return {
           jsonPointer: `/children/${idx}`,
           error: {
+            type: "ancestry",
             rule: "doesParentAllowChild",
             parent: node,
             parentMeta,
@@ -155,6 +160,8 @@ export function validateAttributes(
         errorStack.push({
           jsonPointer: "/attribs/" + a.name,
           error: {
+            type: "attribute",
+            node,
             rule: "required",
             attribute: a
           }
@@ -174,6 +181,8 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
               rule: `type/number`,
               attribute: a
             }
@@ -182,6 +191,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `enum/number`,
               attribute: a
             }
@@ -190,6 +202,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `maximum`,
               attribute: a
             }
@@ -198,6 +213,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `minimum`,
               attribute: a
             }
@@ -208,6 +226,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `enum/string`,
               attribute: a
             }
@@ -216,6 +237,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `maxLength`,
               attribute: a
             }
@@ -224,6 +248,9 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
+
               rule: `minLength`,
               attribute: a
             }
@@ -235,6 +262,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
+                    type: "attribute",
+                    node,
                     rule: `format/color`,
                     attribute: a
                   }
@@ -245,6 +274,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
+                    type: "attribute",
+                    node,
                     rule: `format/date-interval`,
                     attribute: a
                   }
@@ -255,6 +286,8 @@ export function validateAttributes(
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
+                    type: "attribute",
+                    node,
                     rule: `format/url`,
                     attribute: a
                   }
@@ -268,6 +301,8 @@ export function validateAttributes(
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
+              type: "attribute",
+              node,
               rule: `enum/boolean`,
               attribute: a
             }
