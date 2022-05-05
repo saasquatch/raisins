@@ -136,7 +136,6 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       (geo) => geo
     ) as GeometryEntry[];
 
-    console.log(geometry);
     const newGeometry = { entries: geometry };
     set(GeometryAtom, newGeometry);
   });
