@@ -1,4 +1,4 @@
-import { RaisinNode } from '@raisins/core';
+import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
 import {
@@ -82,9 +82,12 @@ function ErrorListController() {
               <li>
                 {error.rule === 'doesParentAllowChild' && (
                   <span>
-                    {error.parentMeta?.title ?? error.parent.type} does not
-                    allow {error.childMeta?.title ?? error.child.type} inside
-                    it. Valid children are:{' '}
+                    {error.parentMeta?.title ??
+                      (error.parent as RaisinElementNode).type}{' '}
+                    does not allow{' '}
+                    {error.childMeta?.title ??
+                      (error.child as RaisinElementNode).tagName}{' '}
+                    inside it. Valid children are:{' '}
                     {error.parentMeta?.slots
                       ?.map((s) => s.validChildren)
                       .join(',')}
