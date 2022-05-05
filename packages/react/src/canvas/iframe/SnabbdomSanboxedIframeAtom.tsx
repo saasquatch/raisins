@@ -52,7 +52,6 @@ export const SnabbdomIframeMolecule = molecule((getMol, getScope) => {
   return createAtoms(props);
 });
 
-
 export type SnabbdomIframeProps = {
   vnodeAtom: Atom<VNode>;
   head: Atom<string>;
