@@ -1,8 +1,6 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { atomWithProxy } from 'jotai/valtio';
-import { proxySet } from 'valtio/utils';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
