@@ -14,16 +14,16 @@ export function doesParentAllowChild(
   slot: string | undefined
 ): boolean {
   const slots = parentMeta.slots;
-  const slotMeta = slots?.find(s => s.name === slot);
+  const slotMeta = slots?.find(s => s.name === slot ?? "");
   if (!slotMeta && slot !== "") return false;
 
+  // TODO: Add custom pseudo selector, e.g. `:inline` for text-only slots https://github.com/fb55/css-select/blob/493cca99cd075d7bf64451bbd518325f11da084e/test/qwery.ts#L18
   if (!isElementNode(child)) return false;
 
   const { validChildren = ["*"] } = slotMeta ?? {};
   const { tagName } = child;
 
   // TODO: Replace this with CSS selector implementation from core
-  // TODO: Add custom pseudo selector, e.g. `:inline` for text-only slots https://github.com/fb55/css-select/blob/493cca99cd075d7bf64451bbd518325f11da084e/test/qwery.ts#L18
   const parentAllowsChild =
     validChildren?.includes("*") ||
     (tagName && validChildren?.includes(tagName)) ||
