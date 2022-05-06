@@ -10,6 +10,7 @@ import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule';
 import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';
+import { atomWithShallowCheck } from '../util/atoms/atomWithShallowCheck';
 import { isElementNode } from '../util/isNode';
 import { ValidationMolecule } from '../validation/ValidationMolecule';
 import { atomForAttributes } from './atoms/atomForAttributes';
@@ -277,9 +278,10 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     /*
     Validation
     */
-    errorsAtom,
-    childrenErrorsAtom,
-    attributeErrorsAtom,
+    // Shallow equal check avoids empty error case
+    errorsAtom: atomWithShallowCheck(errorsAtom),
+    childrenErrorsAtom: atomWithShallowCheck(childrenErrorsAtom),
+    attributeErrorsAtom: atomWithShallowCheck(attributeErrorsAtom),
     hasErrorsAtom: hasErrors,
   };
 });
