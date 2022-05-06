@@ -1,11 +1,4 @@
-import {
-  And as and,
-  Given as given,
-  When as when,
-  Then as then
-} from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
 import parse from "../html-dom/parser";
 import {
   RaisinCommentNode,
@@ -22,8 +15,7 @@ import {
   validateAttributes,
   validateChildConstraints
 } from "../validation/validateNode/validateNode";
-
-const JEST = process.env.JEST_WORKER_ID !== undefined;
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 
 const cucumber = (
   given: (...args: any[]) => void,
@@ -206,25 +198,4 @@ const cucumber = (
   });
 };
 
-var jestSteps: StepDefinitions = () => {};
-
-if (!JEST) {
-  cucumber(given, and, when, then);
-} else {
-  const jest_cucumber = require("jest-cucumber");
-
-  const feature = jest_cucumber.loadFeature(
-    "../validation/validateNode/validateNode.feature",
-    {
-      loadRelativePath: true
-    }
-  );
-
-  var jestSteps: StepDefinitions = ({ given, and, when, then }) => {
-    cucumber(given, and, when, then);
-  };
-
-  jest_cucumber.autoBindSteps([feature], [jestSteps]);
-}
-
-export const steps = jestSteps;
+bindIsomorphicCucumberSteps(cucumber, "../html-dom/validateNode.feature");

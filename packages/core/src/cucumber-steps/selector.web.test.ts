@@ -1,14 +1,9 @@
 /* istanbul ignore file */
-import {
-  Given as given,
-  Then as then,
-  When as when
-} from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
 import parse from "../html-dom/parser";
 import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
 import selector from "../html-dom/selector";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 
 const JEST = process.env.JEST_WORKER_ID !== undefined;
 
@@ -52,22 +47,4 @@ const cucumber = (
   });
 };
 
-var jestSteps: StepDefinitions = () => {};
-
-if (!JEST) {
-  cucumber(given, when, then);
-} else {
-  const jest_cucumber = require("jest-cucumber");
-
-  const feature = jest_cucumber.loadFeature("../html-dom/selector.feature", {
-    loadRelativePath: true
-  });
-
-  var jestSteps: StepDefinitions = ({ given, when, then }) => {
-    cucumber(given, when, then);
-  };
-
-  jest_cucumber.autoBindSteps([feature], [jestSteps]);
-}
-
-export const steps = jestSteps;
+bindIsomorphicCucumberSteps(cucumber, "../html-dom/selector.feature");
