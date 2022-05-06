@@ -5,7 +5,11 @@ import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { GeometryDetail, RawCanvasEvent } from './api/_CanvasRPCContract';
+import {
+  GeometryDetail,
+  GeometryEntry,
+  RawCanvasEvent,
+} from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScope } from './CanvasScope';
 import { CanvasScriptsMolecule } from './CanvasScriptsMolecule';
@@ -21,6 +25,16 @@ import {
 type CanvasEventListener = WritableAtom<null, RichCanvasEvent>;
 
 /**
+ * Used to "burn down" a snabbdom view for full replacement instead of incremental replacement.
+ *
+ * This is useful for web components that don't use shadow dom, (e.g. stencil components with shadow:false)
+ * and therefore need to have their HTML fully reconstructed on every render to ensure consistency.
+ *
+ * An example during development was `sqm-text`, which threw and exception in snabbdom and caused infinite plop targets to show up.
+ */
+let renderTick = 0;
+
+/**
  * A molecule used for tracking events and geometry for an iframe canvas.
  *
  * Has mutable a set of listeners for dealing with events
@@ -33,6 +47,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
   const ComponentModelAtoms = getMol(ComponentModelMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
+  const ComponentModel = getMol(ComponentModelMolecule);
   const { EventAttributeAtom: EventSelectorAtom } = CanvasConfig;
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
@@ -48,6 +63,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
+    const meta = get(ComponentModel.ComponentModelAtom);
+
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
@@ -56,8 +73,15 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
       const soul = souls(n);
       if (!isInteractible(n)) return d;
+      const componentMeta = meta.getComponentMeta(n.tagName);
+
+      const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
+      const key =
+        canvasRenderer === 'always-replace' ? ++renderTick : soul.toString();
+
       return {
         ...d,
+        key,
         attrs: {
           ...d.attrs,
           [raisinsSoulAttribute]: soul.toString(),
@@ -94,9 +118,28 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   });
 
   const GeometryAtom = atom({ entries: [] } as GeometryDetail);
-  const SetGeometryAtom = atom(null, (_, set, next: GeometryDetail) =>
-    set(GeometryAtom, next)
-  );
+  const SetGeometryAtom = atom(null, (get, set, next: GeometryDetail) => {
+    const existing = get(GeometryAtom);
+    const geometryMap = new Map();
+    const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
+
+    existing.entries?.forEach((geo) => {
+      if (!geo.target?.attributes[raisinsAttribute]) return;
+      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
+    });
+
+    next.entries?.forEach((geo) => {
+      if (!geo.target?.attributes[raisinsAttribute]) return;
+      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
+    });
+
+    const geometry = Array.from(geometryMap.values()).map(
+      (geo) => geo
+    ) as GeometryEntry[];
+
+    const newGeometry = { entries: geometry };
+    set(GeometryAtom, newGeometry);
+  });
 
   const IframeHeadAtom = atom((get) => {
     const script = get(CanvasScriptsAtom);

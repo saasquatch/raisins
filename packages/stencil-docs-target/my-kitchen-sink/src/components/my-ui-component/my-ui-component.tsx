@@ -9,6 +9,7 @@ import { Component, Prop, h } from '@stencil/core';
  * @example Nerd Bird - <my-component first=The middle=Nerd last=Bird max-length=400></my-component>
  * @example Surely Sam - <my-component first=The middle=Surely last=Sam max-length=400></my-component>
  * @exampleGroup Cool Kids
+ * @slotEditor richText
  */
 @Component({
   tag: 'my-ui-component',

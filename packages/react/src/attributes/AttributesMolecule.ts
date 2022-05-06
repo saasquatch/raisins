@@ -30,7 +30,6 @@ export const AttributesMolecule = molecule((getMol) => {
   const groupedSchemaAtom: Atom<AttributeGroups> = atom((get) => {
     const attributes = get(componentMetaForNode)?.attributes;
     const groupedList = attributes ? group(attributes) : {};
-    console.log({ groupedList });
     return groupedList;
   });
 

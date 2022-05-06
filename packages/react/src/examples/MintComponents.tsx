@@ -2,18 +2,18 @@ export const MintComponents = [
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.css',
-    version: '1.5.6-4',
+    version: '1.6.1-2',
   },
   {
     name: '@saasquatch/bedrock-components',
     filePath: '/dist/bedrock-components/bedrock-components.js',
-    version: '1.3.x',
+    version: '1.3.2-1',
   },
 
   {
     name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '1.5.6-4',
+    version: '1.6.1-2',
   },
 ];
 

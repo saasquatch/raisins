@@ -15,6 +15,10 @@ import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { isElementNode, isRoot } from '../util/isNode';
+import {
+  NPMRegistry,
+  NPMRegistryAtom as RegistryAtom,
+} from '../util/NPMRegistry';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
@@ -39,6 +43,7 @@ export type ComponentModelMoleculeType = {
   ComponentModelAtom: Atom<ComponentModel>;
   IsInteractibleAtom: Atom<InteractibleProvider>;
   NonInteractibleTags: Set<string>;
+  NPMRegistryAtom: Atom<NPMRegistry>;
 };
 
 export const ComponentModelMolecule = molecule(
@@ -193,8 +198,6 @@ export const ComponentModelMolecule = molecule(
       const getComponentMeta = get(ComponentMetaAtom);
       const blocks: Block[] = get(BlocksAtom);
       const groupedBlocks = group(blocks, getComponentMeta);
-
-      console.log('In atom', { blocks, groupedBlocks });
       const getValidChildren = get(ValidChildrenAtom);
 
       function isValidChild(
@@ -227,6 +230,9 @@ export const ComponentModelMolecule = molecule(
         isValidChild,
       };
     });
+
+    const NPMRegistryAtom = atom<NPMRegistry>((get) => get(RegistryAtom));
+
     ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
     /**
@@ -261,6 +267,7 @@ export const ComponentModelMolecule = molecule(
       ComponentModelAtom,
       IsInteractibleAtom,
       NonInteractibleTags,
+      NPMRegistryAtom,
     };
   }
 );
@@ -275,10 +282,10 @@ function group(list: Block[], getComponentMeta: Function): BlockGroups {
       getComponentMeta(block.content?.tagName)?.exampleGroup ??
       DEFAULT_BLOCK_GROUP;
     const groupArray = allGroups[exampleGroup] ?? [];
-    const withAttribute = [...groupArray, block];
+    const withBlock = [...groupArray, block];
     return {
       ...allGroups,
-      [exampleGroup]: withAttribute,
+      [exampleGroup]: withBlock,
     };
   }, {} as BlockGroups);
 }

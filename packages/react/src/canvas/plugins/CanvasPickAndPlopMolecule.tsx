@@ -9,7 +9,6 @@ import { molecule } from 'jotai-molecules';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
-  CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
@@ -31,18 +30,20 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   } = getMol(PickAndPlopMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
-  const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
+
   /**
-   * Listens for click events, marks clicked elements as selected
+   * Listens for double click events, marks double clicked elements as selected
    */
-  const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-    if (e.type === 'dblclick') {
-      set(PickedNodeAtom, e.node);
-    }
-  });
-  DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.ListenersSet.add(DoubleClickAtom);
+  if (process.env.NODE_ENV === 'development') {
+    const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
+      if (e.type === 'dblclick') {
+        set(PickedNodeAtom, e.node);
+      }
+    });
+    DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
+    CanvasAtoms.ListenersSet.add(DoubleClickAtom);
+  }
 
   const PickAndPlopStyleAtom = atom(
     `<style>
@@ -97,7 +98,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   CanvasAtoms.ListenersSet.add(PickAndPlopListenerAtom);
 
   const AppenderAtom = atom((get) => {
-    const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const isPloppingActive = get(PloppingIsActive);
     const picked = get(PickedAtom);
@@ -112,6 +112,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
       if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
+
       const parent = n;
 
       // TODO: Root node should allow any children
@@ -180,11 +181,13 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isPicked = picked === n;
+      if (!isPicked) return d;
+
       const { delayed, remove, ...rest } = d.style || {};
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isPicked ? '2px solid rgba(0,0,255,0.5)' : rest.outline ?? '',
+        outline: isPicked ? '2px dashed #458EDF' : rest.outline ?? '',
         outlineOffset: isPicked ? '-2px' : '',
       };
 
@@ -229,6 +232,8 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   parentSchema,
   addOrMove,
 }) => {
+  const key = `${soulId}/${idx}/${slot}`;
+
   const defaultAttrs = {
     slot,
     'raisin-plop-target': true,
@@ -269,6 +274,8 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   return h(
     'div',
     {
+      // Helps snabbdom know how to remove nodes
+      key,
       style: {
         height: '0px',
         margin: '0',

@@ -1,8 +1,8 @@
+import { validateNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule } from '../core';
-import { validateNode } from '@raisins/core';
 
 export const ValidationMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);

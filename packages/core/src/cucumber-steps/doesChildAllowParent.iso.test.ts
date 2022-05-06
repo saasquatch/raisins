@@ -1,11 +1,5 @@
 import { CustomElement } from "@raisins/schema/schema";
-import {
-  And as and,
-  Given as given,
-  Then as then
-} from "cypress-cucumber-preprocessor/steps";
 import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -15,8 +9,7 @@ import {
   RaisinTextNode
 } from "../html-dom/RaisinNode";
 import { doesChildAllowParent } from "../validation/rules/doesChildAllowParent";
-
-const JEST = process.env.JEST_WORKER_ID !== undefined;
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 
 const cucumber = (
   given: (...args: any[]) => void,
@@ -97,25 +90,7 @@ const cucumber = (
   });
 };
 
-var jestSteps: StepDefinitions = () => {};
-
-if (!JEST) {
-  cucumber(given, and, then);
-} else {
-  const jest_cucumber = require("jest-cucumber");
-
-  const feature = jest_cucumber.loadFeature(
-    "../validation/rules/doesChildAllowParent.feature",
-    {
-      loadRelativePath: true
-    }
-  );
-
-  var jestSteps: StepDefinitions = ({ given, and, then }) => {
-    cucumber(given, and, then);
-  };
-
-  jest_cucumber.autoBindSteps([feature], [jestSteps]);
-}
-
-export const steps = jestSteps;
+bindIsomorphicCucumberSteps(
+  cucumber,
+  "../validation/rules/doesChildAllowParent.feature"
+);

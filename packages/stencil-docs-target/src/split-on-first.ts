@@ -40,7 +40,7 @@ export default function splitOnFirst(
   }
 
   return [
-    string.slice(0, separatorIndex),
-    string.slice(separatorIndex + separator.length),
+    string.slice(0, separatorIndex).trim(),
+    string.slice(separatorIndex + separator.length).trim(),
   ];
 }

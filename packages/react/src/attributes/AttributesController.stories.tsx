@@ -17,7 +17,11 @@ import {
   referrerWidget,
   VanillaComponents,
 } from '../examples/VanillaComponents';
-import { BasicStory, StoryConfigMolecule } from '../index.stories';
+import {
+  BasicStory,
+  ErrorListController,
+  StoryConfigMolecule,
+} from '../index.stories';
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { AttributeMolecule } from './AttributeMolecule';
@@ -99,13 +103,15 @@ const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
 };
 
 const AttributesAndChildren = () => {
-    return <div>
+  return (
+    <div>
       <AttributesEditor />
-      <div style={{borderLeft:"10px solid grey"}}>
+      <div style={{ borderLeft: '10px solid grey' }}>
         <NodeChildrenEditor Component={AttributesAndChildren} />
       </div>
     </div>
-}
+  );
+};
 
 export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
   return (
@@ -127,6 +133,21 @@ export const Mint = ({ canvas }: { canvas: boolean }) => {
       Molecule={ConfigMolecule}
     >
       <NodeChildrenEditorStory canvas={canvas} />
+    </BasicStory>
+  );
+};
+
+export const MintErrors = ({ canvas }: { canvas: boolean }) => {
+  return (
+    <BasicStory
+      startingHtml={`<b><div>Ancester error here</div></b> ${mintMono}`}
+      startingPackages={MintComponents}
+      Molecule={ConfigMolecule}
+    >
+      <>
+        <ErrorListController />
+        <NodeChildrenEditorStory canvas={canvas} />
+      </>
     </BasicStory>
   );
 };
@@ -248,9 +269,24 @@ function AttributesEditor() {
       <TagName />
       <AttributesController />
       <Debugging />
+      <Errors />
     </div>
   );
 }
+const Errors = () => {
+  const atoms = useMolecule(NodeMolecule);
+  const errors = useAtomValue(atoms.errorsAtom);
+  return (
+    <div>
+      Errors:
+      <ul>
+        {errors.map((e) => (
+          <li>{e.error.rule}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 const TagName = () => {
   const atoms = useMolecule(NodeMolecule);

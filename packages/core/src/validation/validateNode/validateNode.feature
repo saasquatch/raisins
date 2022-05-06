@@ -217,143 +217,159 @@ Feature: Validate Node
 			| <div center="hello world!"> | true     |
 			| <div center="hello world!"> | false    |
 
-	@motivating
-	Scenario Outline: Format validation for URL for string types
-		Given an input value of <url>
-		When isValidURL is tested
-		Then it returns true
-		Examples:
-			| url                               |
-			| //www.saasquatch.com              |
-			| http://www.saasquatch.com         |
-			| https://www.saasquatch.com        |
-			| https://www.saasquatch.com/about/ |
-
-	@motivating
-	Scenario Outline: URL validation does not accept bad strings
-		Given an input value of <url>
-		When isValidURL is tested
-		Then it returns false
-		Examples:
-			| url                |
-			| saasquatch.com     |
-			| www.saasquatch.com |
-			| localhost:3000     |
-			| example/com        |
-			| example            |
-
-	@landmine
-	Scenario Outline: Format validation for date interval should accept ISO 8601 dates
-		Given an input value of <date>
-		When isValidDateInterval is tested
-		Then it returns true
-		Examples:
-			| date                                                |
-			| 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z           |
-			| 2007-03-01T13:00:00Z/P1Y2M10DT2H30M                 |
-			| P1Y2M10DT2H30M/2008-05-11T15:30:00Z                 |
-			| 2022-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
-			| 2022-04-20/2022-04-20                               |
-
-	@motivating
-	Scenario Outline: Invalid date intervals should be rejected
-		Given an input value of <date>
-		When isValidDateInterval is tested
-		Then it returns false
-		Examples:
-			| date                                                |
-			| 2024-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
-			| 2022-04-20T12:00:00+08:00                           |
-			| 2022-04-20T12:00:00                                 |
-			| 2022-04-20                                          |
-			| 2022-04-20T12:00:00+08:00/                          |
-			| /2022-04-20T12:00:00+08:00                          |
-			| P1Y2M10DT2H30M/P1Y2M10DT2H30M                       |
-			| P1Y2M10DT2H30M                                      |
-
 	@minutiae
-	Scenario Outline: Valid color test should pass css keywords
-		Given an input value of <keyword>
-		When isValidColor is tested
-		Then it returns true
+	Scenario Outline: String required validation for empty strings
+		Given a meta list
+		And it has attribute
+		And name is center
+		And type is string
+		And required is true
+		And a parsed <node>
+		Then <rule> validation error is received
 		Examples:
-			| keyword      |
-			| currentColor |
-			| currentcolor |
+			| node                        | rule     |
+			| <div>                       | required |
+			| <div center>                | no       |
+			| <div center="">             | no       |
+			| <div center="hello world!"> | no       |
 
-	@minutiae
-	Scenario Outline: Valid color test should pass css color names
-		Given an input value of <color>
-		When isValidColor is tested
-		Then it returns true
-		Examples:
-			| color         |
-			| red           |
-			| orange        |
-			| tan           |
-			| rebeccapurple |
+@motivating
+Scenario Outline: Format validation for URL for string types
+	Given an input value of <url>	
+	When isValidURL is tested
+	Then it returns true
+	Examples:
+		| url                               |
+		| //www.saasquatch.com              |
+		| http://www.saasquatch.com         |
+		| https://www.saasquatch.com        |
+		| https://www.saasquatch.com/about/ |
 
-	@motivating
-	Scenario Outline: Valid color test should accept hex color values
-		Given an input value of <hex>
-		When isValidColor is tested
-		Then it returns true
-		Examples:
-			| hex       |
-			| #090      |
-			| #009900   |
-			| #090a     |
-			| #009900aa |
+@motivating
+Scenario Outline: URL validation does not accept bad strings
+	Given an input value of <url>
+	When isValidURL is tested
+	Then it returns false
+	Examples:
+		| url                |
+		| saasquatch.com     |
+		| www.saasquatch.com |
+		| localhost:3000     |
+		| example/com        |
+		| example            |
 
-	@motivating
-	Scenario Outline: Valid color test should accept rgb values
-		Given an input value of <rgb>
-		When isValidColor is tested
-		Then it returns true
-		Examples:
-			| rgb                   |
-			| rgb(34, 12, 64)       |
-			| rgb(34, 12, 64, 0.6)  |
-			| rgba(34, 12, 64)      |
-			| rgba(34, 12, 64, 0.6) |
+@landmine
+Scenario Outline: Format validation for date interval should accept ISO 8601 dates
+	Given an input value of <date>
+	When isValidDateInterval is tested
+	Then it returns true
+	Examples:
+		| date                                                |
+		| 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z           |
+		| 2007-03-01T13:00:00Z/P1Y2M10DT2H30M                 |
+		| P1Y2M10DT2H30M/2008-05-11T15:30:00Z                 |
+		| 2022-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
+		| 2022-04-20/2022-04-20                               |
 
-	@minutiae
-	Scenario Outline: Valid color test should accept hsl values
-		Given an input value of <hsl>
-		When isValidColor is tested
-		Then it returns true
-		Examples:
-			| hsl                      |
-			| hsl(30, 100%, 50%)       |
-			| hsl(30, 100%, 50%, 0.6)  |
-			| hsla(30, 100%, 50%)      |
-			| hsla(30, 100%, 50%, 0.6) |
+@motivating
+Scenario Outline: Invalid date intervals should be rejected
+	Given an input value of <date>
+	When isValidDateInterval is tested
+	Then it returns false
+	Examples:
+		| date                                                |
+		| 2024-04-20T12:00:00+08:00/2022-04-20T12:00:00+08:00 |
+		| 2022-04-20T12:00:00+08:00                           |
+		| 2022-04-20T12:00:00                                 |
+		| 2022-04-20                                          |
+		| 2022-04-20T12:00:00+08:00/                          |
+		| /2022-04-20T12:00:00+08:00                          |
+		| P1Y2M10DT2H30M/P1Y2M10DT2H30M                       |
+		| P1Y2M10DT2H30M                                      |
 
-	@minutiae
-	Scenario Outline: Valid color test should allow shoelace color variables
-		Given an input value of <shoelace>
-		When isValidColor is tested
-		Then it returns true
-		Examples:
-			| shoelace                     |
-			| var(--sl-color-red-400)      |
-			| var(--sl-color-orange-50)    |
-			| var(--sl-color-danger-100)   |
-			| var(--sl-color-success-500)  |
-			| var(--sl-color-warning-950)  |
-			| var(--sl-color-neutral-1000) |
-			| var(--sl-color-neutral-0)    |
+@minutiae
+Scenario Outline: Valid color test should pass css keywords
+	Given an input value of <keyword>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| keyword      |
+		| currentColor |
+		| currentcolor |
 
-	@motivating
-	Scenario Outline: Valid color test should fail on invalid color values
-		Given an input value of <invalid>
-		When isValidColor is tested
-		Then it returns false
-		Examples:
-			| invalid                 |
-			| 2rem                    |
-			| 16px                    |
-			| #ff                     |
-			| #ggg                    |
-			| I like trutles          |
-			| var(--sl-spacing-large) |
+@minutiae
+Scenario Outline: Valid color test should pass css color names
+	Given an input value of <color>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| color         |
+		| red           |
+		| orange        |
+		| tan           |
+		| rebeccapurple |
+
+@motivating
+Scenario Outline: Valid color test should accept hex color values
+	Given an input value of <hex>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| hex       |
+		| #090      |
+		| #009900   |
+		| #090a     |
+		| #009900aa |
+
+@motivating
+Scenario Outline: Valid color test should accept rgb values
+	Given an input value of <rgb>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| rgb                   |
+		| rgb(34, 12, 64)       |
+		| rgb(34, 12, 64, 0.6)  |
+		| rgba(34, 12, 64)      |
+		| rgba(34, 12, 64, 0.6) |
+
+@minutiae
+Scenario Outline: Valid color test should accept hsl values
+	Given an input value of <hsl>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| hsl                      |
+		| hsl(30, 100%, 50%)       |
+		| hsl(30, 100%, 50%, 0.6)  |
+		| hsla(30, 100%, 50%)      |
+		| hsla(30, 100%, 50%, 0.6) |
+
+@minutiae
+Scenario Outline: Valid color test should allow shoelace color variables
+	Given an input value of <shoelace>
+	When isValidColor is tested
+	Then it returns true
+	Examples:
+		| shoelace                     |
+		| var(--sl-color-red-400)      |
+		| var(--sl-color-orange-50)    |
+		| var(--sl-color-danger-100)   |
+		| var(--sl-color-success-500)  |
+		| var(--sl-color-warning-950)  |
+		| var(--sl-color-neutral-1000) |
+		| var(--sl-color-neutral-0)    |
+
+@motivating
+Scenario Outline: Valid color test should fail on invalid color values
+	Given an input value of <invalid>
+	When isValidColor is tested
+	Then it returns false
+	Examples:
+		| invalid                 |
+		| 2rem                    |
+		| 16px                    |
+		| #ff                     |
+		| #ggg                    |
+		| I like trutles          |
+		| var(--sl-spacing-large) |

@@ -17,27 +17,34 @@ export function calculatePlopTargets(
 ): PlopTarget[] {
   if (!isElementNode(parent)) return [];
   const raisinChildren = parent.children;
-  const plopSlot = schema.possiblePlopMeta.slots?.map(e => e.name) ?? [];
   const seenSlots = new Set();
-  const remainingSlots = new Set(plopSlot);
-  const removeIDs: number[] = [];
+  const remainingSlots = new Set(
+    schema.parentMeta.slots?.map(e => e.name) ?? []
+  );
 
   if (parent.children.length <= 0) {
+    const plops: PlopTarget[] = [];
     // Slot plop targets when there are no children
-    return (
-      schema.parentMeta.slots
-        ?.filter(value => plopSlot.includes(value.name))
-        .map(s => {
-          return {
-            slot: s.name,
-            idx: 0,
-            parent
-          };
-        }) ?? []
-    );
+    schema.parentMeta.slots?.forEach(s => {
+      const isValid = isNodeAllowed(
+        possiblePlop,
+        schema.possiblePlopMeta,
+        parent,
+        schema.parentMeta,
+        s.name
+      );
+      if (!isValid) return;
+      plops.push({
+        slot: s.name,
+        idx: 0
+      });
+    });
+    return plops;
   }
 
-  var lastIdx = 0;
+  const removeIDs: any = {};
+
+  let lastIdx = 0;
   const newChildren =
     raisinChildren?.reduce((acc, raisinChild, idx) => {
       if (
@@ -56,22 +63,21 @@ export function calculatePlopTargets(
         schema.parentMeta,
         slot
       );
-      if (!isValid) return acc;
-      else remainingSlots.delete(slot);
 
-      const plopTargets = [];
+      if (!isValid) return acc;
+      remainingSlots.delete(slot);
+
+      let plopTargets = [];
 
       if (!seenSlots.has(slot)) {
         plopTargets.push({
           idx,
-          slot,
-          parent
+          slot
         });
       }
       plopTargets.push({
         idx: idx + 1,
-        slot,
-        parent
+        slot
       });
       seenSlots.add(slot);
       lastIdx = idx + 1;
@@ -81,7 +87,8 @@ export function calculatePlopTargets(
         raisinChild === possiblePlop
       ) {
         // No plop targets around element nodes
-        removeIDs.push(idx, idx + 1);
+        if (removeIDs.slot === undefined) removeIDs[slot] = [];
+        removeIDs[slot].push(idx, idx + 1);
       }
 
       return [...acc, ...plopTargets];
@@ -95,8 +102,9 @@ export function calculatePlopTargets(
   });
 
   return newChildren
-    .filter(function(x) {
-      return !removeIDs.includes(x.idx);
+    .filter(x => {
+      if (removeIDs[x.slot] && removeIDs[x.slot].includes(x.idx)) return false;
+      return true;
     })
     .filter(
       (v, i, a) =>

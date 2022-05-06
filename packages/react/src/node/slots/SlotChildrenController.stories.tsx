@@ -106,7 +106,6 @@ export const LayersController: FC<{}> = () => {
   const atoms = useMolecule(LayersMolecule);
   const hasChildren = useAtomValue(atoms.RootHasChildren);
 
-  console.log({ hasChildren });
   return (
     <div data-layers>
       {' '}
@@ -275,7 +274,6 @@ function SlotWidget() {
   const hasEditor = slotWidget === 'inline';
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
-  console.log({ childNodes, slotWidget, slotDetails });
   return (
     <>
       <div style={SlotContainer}>

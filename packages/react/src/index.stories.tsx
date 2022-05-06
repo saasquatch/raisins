@@ -1,3 +1,4 @@
+import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
 import {
@@ -7,14 +8,17 @@ import {
   useMolecule,
 } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
+import { CoreMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
+import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
@@ -23,7 +27,7 @@ import { Module } from './util/NPMRegistry';
 const meta: Meta = {
   title: 'Editor',
   component: Editor,
-  excludeStories: ['EditorView', 'StoryConfigMolecule'],
+  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
 };
 export default meta;
 
@@ -42,6 +46,75 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
     };
   }
 );
+
+const ErrorListMolecule = molecule((getMol) => {
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { errorsAtom } = getMol(NodeMolecule);
+
+  const ErrorDetails = atom((get) => {
+    const errors = get(errorsAtom);
+    const root = get(RootNodeAtom);
+
+    return errors.map((e) => {
+      return {
+        error: e,
+        node: JSONPointer.get(root, e.jsonPointer) as RaisinNode,
+      };
+    });
+  });
+  return { ErrorDetails };
+});
+
+export function ErrorListController() {
+  const { ErrorDetails } = useMolecule(ErrorListMolecule);
+  const errors = useAtomValue(ErrorDetails);
+  return (
+    <div style={{ color: 'red' }}>
+      Errors
+      <hr />
+      <details style={{ maxHeight: '300px', overflow: 'scroll' }}>
+        <summary>{errors.length} errors</summary>
+        {errors.map((e) => {
+          const error = e.error.error;
+
+          if (error.type === 'ancestry') {
+            return (
+              <li>
+                {error.rule === 'doesParentAllowChild' && (
+                  <span>
+                    {error.parentMeta?.title ??
+                      (error.parent as RaisinElementNode).type}{' '}
+                    does not allow{' '}
+                    {error.childMeta?.title ??
+                      (error.child as RaisinElementNode).tagName}{' '}
+                    inside it. Valid children are:{' '}
+                    {error.parentMeta?.slots
+                      ?.map((s) => s.validChildren)
+                      .join(',')}
+                  </span>
+                )}
+                {error.rule === 'doesChildAllowParent' && (
+                  <span>
+                    {error.childMeta?.title ?? error.child.type} is not allowed
+                    inside of {error.parentMeta?.title ?? error.parent.type}.
+                    Valid parents are:{' '}
+                    {error.childMeta?.validParents?.join(',')}
+                  </span>
+                )}
+              </li>
+            );
+          } else {
+            return (
+              <li>
+                {error.attribute.name} is invalid. {error.rule}
+              </li>
+            );
+          }
+        })}
+      </details>
+    </div>
+  );
+}
 
 export function BasicStory({
   startingHtml = '<span>I am a span</span>',
@@ -158,6 +231,7 @@ export function EditorView() {
     <>
       <div style={Main}>
         <div style={Header}>
+          <ErrorListController />
           <ToolbarController />
         </div>
 

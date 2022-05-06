@@ -1,14 +1,8 @@
-import {
-  Given as given,
-  And as and,
-  When as when,
-  Then as then
-} from "cypress-cucumber-preprocessor/steps";
 import { ElementType } from "domelementtype";
 import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
 import { RaisinNode } from "../html-dom/RaisinNode";
 import { removeWhitespace, visit } from "../html-dom/util";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 
 const JEST = process.env.JEST_WORKER_ID !== undefined;
 
@@ -181,20 +175,4 @@ const cucumber = (
   });
 };
 
-var jestSteps: StepDefinitions = () => {};
-
-if (!JEST) {
-  cucumber(given, and, when, then);
-} else {
-  const jest_cucumber = require("jest-cucumber");
-
-  const feature = jest_cucumber.loadFeature("../html-dom/util.feature", {
-    loadRelativePath: true
-  });
-
-  var jestSteps: StepDefinitions = ({ given, and, when, then }) => {
-    cucumber(given, and, when, then);
-  };
-
-  jest_cucumber.autoBindSteps([feature], [jestSteps]);
-}
+bindIsomorphicCucumberSteps(cucumber, "../html-dom/util.feature");

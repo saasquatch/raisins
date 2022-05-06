@@ -46,22 +46,20 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       if (!currentState) return;
       const nextState = currentState.applyTransaction(trans);
 
-      // FIXME: Re-bundle this state. Since node and selection are independently updated,
-      // their derived state can become inconsistent.
-      // e.g. derived state fo `hydrateState` throw an error such as "Position 51 out of range"
-      // NOTE: This currently works ONLY if selection is updated BEFORE document.
-      // Otherwise deleting from the end of the text will throw an error
-      if (nextState.state.selection !== currentState.selection) {
-        // Only lazily serializes changes
-        const nextSelection = nextState.state.selection.getBookmark();
-        set(get(scope).selection, nextSelection);
-      }
       if (nextState.state.doc !== currentState.doc) {
         // Only lazily serializes changes
         const nextRaisinNode = proseRichDocToRaisin(
           nextState.state.doc.content
         );
         set(get(scope).node, nextRaisinNode);
+      }
+      // IMPORTANT: This currently works ONLY if selection is updated AFTER document.
+      // Otherwise typing at the end of a text area will throw an error.
+      // e.g. "Position 51 out of range"
+      if (nextState.state.selection !== currentState.selection) {
+        // Only lazily serializes changes
+        const nextSelection = nextState.state.selection.getBookmark();
+        set(get(scope).selection, nextSelection);
       }
     }
   );
