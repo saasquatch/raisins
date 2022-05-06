@@ -272,7 +272,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     /*
      Slots
      */
-    allSlotsForNode,
+    allSlotsForNode: atomWithShallowCheck(allSlotsForNode),
     childSlotsAtom,
     slotsForNode,
     /*
