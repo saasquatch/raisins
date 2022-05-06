@@ -7,11 +7,11 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": ""
+				"tagName": "my-example"
 			}
 			"""
 		And a node of <type>
-		Then parent does not allow node as child
+		Then parent does not allow node as child in the "child" slot
 
 		Examples:
 			| type        |
@@ -27,7 +27,7 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": "",
+				"tagName": "my-example",
 				"slots": [
 					{
 						"name": "child"
@@ -36,7 +36,7 @@ Feature: Does Parent Allow Child
 			}
 			"""
 		And a node of <type>
-		Then parent does not allow node as child
+		Then parent does not allow node as child in the "child" slot
 
 		Examples:
 			| node        |
@@ -50,7 +50,7 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": "",
+				"tagName": "my-example",
 				"slots": [
 					{
 						"name": "child",
@@ -62,7 +62,7 @@ Feature: Does Parent Allow Child
 			}
 			"""
 		And a node of element
-		Then parent allows node as child
+		Then parent allows node as child in the "child" slot
 
 
 	@motivating
@@ -70,7 +70,7 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": "",
+				"tagName": "my-example",
 				"slots": [
 					{
 						"name": "child"
@@ -79,7 +79,7 @@ Feature: Does Parent Allow Child
 			}
 			"""
 		And a node of element
-		Then parent allows node as child
+		Then parent allows node as child in the "child" slot
 
 
 	@motivating
@@ -87,7 +87,7 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": "",
+				"tagName": "my-example",
 				"slots": [
 					{
 						"name": "child"
@@ -98,7 +98,7 @@ Feature: Does Parent Allow Child
 		And validChildren has <tagName>
 		And a node of element
 		And node has <tagName>
-		Then parent allows node as child
+		Then parent allows node as child in the "child" slot
 
 		Examples:
 			| tagName |
@@ -113,7 +113,7 @@ Feature: Does Parent Allow Child
 		Given a parent meta
 			"""
 			{
-				"tagName": "",
+				"tagName": "my-example",
 				"slots": [
 					{
 						"name": "child"
@@ -124,7 +124,7 @@ Feature: Does Parent Allow Child
 		And validChildren has <tagName1>
 		And a node of element
 		And node has <tagName2>
-		Then parent does not allow node as child
+		Then parent does not allow node as child in the "child" slot
 
 		Examples:
 			| tagName1 | tagName2 |
@@ -133,3 +133,56 @@ Feature: Does Parent Allow Child
 			| h1       | h3       |
 			| b        | h3       |
 			| p        | h3       |
+
+
+	@motivating
+	Scenario Outline: Parent allows children in it's default slot
+		This is how most built-in html elements should behave.
+
+		Given a parent meta
+			"""
+			{
+				"tagName": "div",
+				"slots": [
+					{
+						"name": ""
+					}
+				]
+			}
+			"""
+		And a node of element
+		And node has <tagName2>
+		Then parent allows node as child in the default slot
+		And parent allows node as child in the "" slot
+
+		Examples:
+			| tagName |
+			| div     |
+			| span    |
+			| h1      |
+			| b       |
+			| p       |
+
+	@motivating
+	Scenario Outline: Parents don't allow children in their it's default slot by default
+		This is how leaf custom components will behave
+
+		Given a parent meta
+			"""
+			{
+				"tagName": "my-example",
+				"slots": []
+			}
+			"""
+		And a node of element
+		And node has <tagName2>
+		Then parent does not allow node as child in the default slot
+		And parent does not allow node as child in the "" slot
+
+		Examples:
+			| tagName |
+			| div     |
+			| span    |
+			| h1      |
+			| b       |
+			| p       |

@@ -11,11 +11,11 @@ import { RaisinNode } from "../../html-dom/RaisinNode";
 export function doesParentAllowChild(
   child: RaisinNode,
   parentMeta: CustomElement,
-  slot: string | undefined
+  slot: string | undefined = ""
 ): boolean {
   const slots = parentMeta.slots;
-  const slotMeta = slots?.find(s => s.name === slot ?? "");
-  if (!slotMeta && slot !== "") return false;
+  const slotMeta = slots?.find(s => s.name === slot);
+  if (!slotMeta) return false;
 
   // TODO: Add custom pseudo selector, e.g. `:inline` for text-only slots https://github.com/fb55/css-select/blob/493cca99cd075d7bf64451bbd518325f11da084e/test/qwery.ts#L18
   if (!isElementNode(child)) return false;

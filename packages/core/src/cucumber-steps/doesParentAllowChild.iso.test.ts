@@ -34,21 +34,21 @@ const cucumber = (
   };
   const text: RaisinTextNode = {
     type: "text",
-    data: ""
+    data: "text-data"
   };
   const comment: RaisinCommentNode = {
     type: "comment",
-    data: ""
+    data: "comment-data"
   };
   const instruction: RaisinProcessingInstructionNode = {
     type: "directive",
-    name: "",
-    data: ""
+    name: "directive-name",
+    data: "directive-data"
   };
   const element: RaisinElementNode = {
     type: "tag",
     attribs: {},
-    tagName: "",
+    tagName: "my-example",
     children: []
   };
 
@@ -90,12 +90,24 @@ const cucumber = (
     parentMeta.slots[0].validChildren = [tagName];
   });
 
-  then("parent allows node as child", () => {
-    expect(doesParentAllowChild(node, parentMeta, "child")).toBe(true);
-  });
+  then(
+    /^parent allows node as child in the "(.*)" slot$/,
+    (slotName: string) => {
+      expect(doesParentAllowChild(node, parentMeta, slotName)).toBe(true);
+    }
+  );
 
-  then("parent does not allow node as child", () => {
-    expect(doesParentAllowChild(node, parentMeta, "child")).toBe(false);
+  then(
+    /^parent does not allow node as child in the "(.*)" slot$/,
+    (slotName: string) => {
+      expect(doesParentAllowChild(node, parentMeta, slotName)).toBe(false);
+    }
+  );
+  then("parent allows node as child in the default slot", () => {
+    expect(doesParentAllowChild(node, parentMeta, undefined)).toBe(true);
+  });
+  then("parent does not allow node as child in the default slot", () => {
+    expect(doesParentAllowChild(node, parentMeta, undefined)).toBe(false);
   });
 };
 
