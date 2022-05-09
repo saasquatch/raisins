@@ -19,6 +19,7 @@ import {
   NPMRegistry,
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
+import shallowEqual from '../util/shallowEqual';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
@@ -108,7 +109,11 @@ export const ComponentModelMolecule = molecule(
      * Remove an NPM package
      */
     const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
-      set(PackagesAtom, (modules) => modules.filter((e) => e !== next))
+      set(PackagesAtom, (modules) =>
+        modules.filter((e) => {
+          return !shallowEqual(e, next);
+        })
+      )
     );
     RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
 

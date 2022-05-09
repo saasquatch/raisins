@@ -218,13 +218,24 @@ function PackageEditorView(props: ModuleManagement) {
       </ul>
       Details:
       <ul>
-        {props.moduleDetails?.map((m) => (
-          <li key={`${m.name}@${m.version}`}>
+        {props.moduleDetails?.map((m, i) => (
+          <li key={`${m.name}@${m.version}-${i}`}>
             <b>{m['package.json'].description}</b>
             <br />
             <div style={{ fontSize: '0.8em', color: 'grey' }}>
               {m['package.json'].name} @ {m['package.json'].version}
             </div>
+            <button
+              onClick={() =>
+                props.removeModule({
+                  filePath: m.filePath,
+                  name: m.name,
+                  version: m.version,
+                })
+              }
+            >
+              Remove
+            </button>
           </li>
         ))}
       </ul>
