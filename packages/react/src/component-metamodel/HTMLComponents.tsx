@@ -157,8 +157,8 @@ export const BR: CustomElement = {
 export const BUTTON: CustomElement = {
   title: 'Button',
   tagName: 'button',
-  slots: [DefaultSlot],
   slotEditor: 'richText',
+  slots: [DefaultSlot],
 };
 // 'canvas',
 export const CANVAS: CustomElement = {
@@ -313,6 +313,7 @@ export const FORM: CustomElement = {
 export const H1: CustomElement = {
   title: 'Heading 1',
   tagName: 'h1',
+  slotEditor: 'richText',
   attributes: COMMON_HTML_ATTRS_SCHEMA,
   slots: [DefaultSlot],
 };
@@ -320,30 +321,35 @@ export const H1: CustomElement = {
 export const H2: CustomElement = {
   title: 'Heading 2',
   tagName: 'h2',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'h3',
 export const H3: CustomElement = {
   title: 'Heading 3',
   tagName: 'h3',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'h4',
 export const H4: CustomElement = {
   title: 'Heading 4',
   tagName: 'h4',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'h5',
 export const H5: CustomElement = {
   title: 'Heading 5',
   tagName: 'h5',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'h6',
 export const H6: CustomElement = {
   title: 'Heading 6',
   tagName: 'h6',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'head',
@@ -448,6 +454,7 @@ export const LEGEND: CustomElement = {
 export const LI: CustomElement = {
   title: 'List Item',
   tagName: 'li',
+  slotEditor: 'richText',
   validParents: ['ul', 'ol', 'menu', 'dir'],
   slots: [DefaultSlot],
 };
@@ -551,6 +558,7 @@ export const OUTPUT: CustomElement = {
 export const P: CustomElement = {
   title: 'Paragraph',
   tagName: 'p',
+  slotEditor: 'richText',
   slots: [DefaultSlot],
 };
 // 'param',
