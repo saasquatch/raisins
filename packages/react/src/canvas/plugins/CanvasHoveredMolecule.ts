@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { VNodeStyle } from 'snabbdom';
+import { PickAndPlopMolecule } from '../../core';
 import { HoveredNodeMolecule } from '../../core/selection/HoveredNodeMolecule';
 import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
@@ -11,6 +12,8 @@ import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
+  const { PickedNodeAtom } = getMol(PickAndPlopMolecule);
+
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
@@ -24,16 +27,18 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
 
   const RendererAtom = atom((get) => {
     const hovered = get(HoveredNodeAtom);
-
+    const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
-      const isHovered = hovered === n;
+      const isHovered = hovered === n && !picked;
 
       const { delayed, remove, ...rest } = d.style || {};
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
         outline: isHovered ? '2px solid #a3caba' : rest.outline ?? '',
-        outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
+        // Disabled outline due to flickering, may just render outside canvas instead
+        // outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
+        outlineOffset: '0',
       };
 
       return {

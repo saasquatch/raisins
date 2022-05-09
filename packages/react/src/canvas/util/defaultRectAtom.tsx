@@ -23,8 +23,6 @@ export function defaultRectAtom(
     const geometry = get(geometryAtom);
     const getSoul = get(soulAtom);
     const soul = getSoul(node);
-
-    console.log({ geometry, soul, soulToString: soulToString(soul) });
     const rect = geometry.entries.find(
       (e) => e.target?.attributes[raisinsSoulAttribute] === soulToString(soul)
     );

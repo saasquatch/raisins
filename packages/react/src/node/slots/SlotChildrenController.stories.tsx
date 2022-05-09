@@ -19,6 +19,9 @@ import { NodeMolecule } from '../NodeMolecule';
 import { NodeScopeProvider, useNodeAtom } from '../NodeScope';
 import { SlotChildrenController } from './SlotChildrenController';
 import { SlotMolecule, SlotScopeProvider } from './SlotScope';
+import { BasicCanvasController, CanvasProvider } from '../../canvas';
+import { AttributesController } from '../../attributes';
+import { SelectedNodeController } from '../../core';
 
 const meta: Meta = {
   title: 'Slot Children Controller',
@@ -81,6 +84,14 @@ const AddBlock: CSSProperties = {
   justifyContent: 'center',
 };
 
+const AttributeEditor = () => {
+  return (
+    <SelectedNodeController
+      HasSelectionComponent={AttributesController}
+    ></SelectedNodeController>
+  );
+};
+
 export const BigLayersOnly = () => (
   <BasicStory startingHtml={big}>
     <div style={{ display: 'flex' }}>
@@ -96,6 +107,25 @@ export const MintLayersOnly = () => (
     <div style={{ display: 'flex' }}>
       <div style={{ width: '50%' }}>
         <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+
+export const MintLayersFull = () => (
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '33%' }}>
+        <LayersController />
+      </div>
+      <div style={{ width: '33%' }}>
+        <CanvasProvider>
+          <BasicCanvasController />
+        </CanvasProvider>
+      </div>
+      <div style={{ width: '33%' }}>
+        <AttributeEditor />
       </div>
       {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>

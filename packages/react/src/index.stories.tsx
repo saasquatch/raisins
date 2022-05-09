@@ -27,7 +27,7 @@ import { Module } from './util/NPMRegistry';
 const meta: Meta = {
   title: 'Editor',
   component: Editor,
-  excludeStories: ['EditorView', 'StoryConfigMolecule'],
+  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
 };
 export default meta;
 
@@ -65,7 +65,7 @@ const ErrorListMolecule = molecule((getMol) => {
   return { ErrorDetails };
 });
 
-function ErrorListController() {
+export function ErrorListController() {
   const { ErrorDetails } = useMolecule(ErrorListMolecule);
   const errors = useAtomValue(ErrorDetails);
   return (

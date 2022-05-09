@@ -1,13 +1,15 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { atomWithProxy } from 'jotai/valtio';
-import { proxySet } from 'valtio/utils';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
-import { GeometryDetail, RawCanvasEvent } from './api/_CanvasRPCContract';
+import {
+  GeometryDetail,
+  GeometryEntry,
+  RawCanvasEvent,
+} from './api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScope } from './CanvasScope';
 import { CanvasScriptsMolecule } from './CanvasScriptsMolecule';
@@ -113,9 +115,28 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   });
 
   const GeometryAtom = atom({ entries: [] } as GeometryDetail);
-  const SetGeometryAtom = atom(null, (_, set, next: GeometryDetail) =>
-    set(GeometryAtom, next)
-  );
+  const SetGeometryAtom = atom(null, (get, set, next: GeometryDetail) => {
+    const existing = get(GeometryAtom);
+    const geometryMap = new Map();
+    const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
+
+    existing.entries?.forEach((geo) => {
+      if (!geo.target?.attributes[raisinsAttribute]) return;
+      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
+    });
+
+    next.entries?.forEach((geo) => {
+      if (!geo.target?.attributes[raisinsAttribute]) return;
+      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
+    });
+
+    const geometry = Array.from(geometryMap.values()).map(
+      (geo) => geo
+    ) as GeometryEntry[];
+
+    const newGeometry = { entries: geometry };
+    set(GeometryAtom, newGeometry);
+  });
 
   const IframeHeadAtom = atom((get) => {
     const script = get(CanvasScriptsAtom);
