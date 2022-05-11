@@ -36,6 +36,7 @@ const COMMON_HTML_ATTRS_SCHEMA = [
 export const A: CustomElement = {
   title: 'Anchor',
   tagName: 'a',
+  slotEditor: 'richText',
   attributes: [
     {
       name: 'href',
