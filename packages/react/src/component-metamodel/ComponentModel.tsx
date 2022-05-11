@@ -286,7 +286,7 @@ export type ComponentModel = {
   getComponentMeta: ComponentMetaProvider;
   getSlots: (node: RaisinElementNode) => NodeWithSlots;
   blocks: Block[];
-  groupedBlocks: any;
+  groupedBlocks: { [key: string]: Block[] };
   getValidChildren: (node: RaisinNode, slot?: string) => Block[];
   isValidChild: (
     from: RaisinElementNode,
