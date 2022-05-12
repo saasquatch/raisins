@@ -29,7 +29,9 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     PloppingIsActive,
   } = getMol(PickAndPlopMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
-  const { ComponentModelAtom } = getMol(ComponentModelMolecule);
+  const { ComponentModelAtom, IsInteractibleAtom } = getMol(
+    ComponentModelMolecule
+  );
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
   /**
@@ -104,6 +106,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const pickedForMove = get(PickedNodeAtom);
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
+    const isInteractible = get(IsInteractibleAtom);
 
     const addOrMove =
       picked?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
@@ -112,19 +115,18 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
       if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
+      if (!isInteractible(n)) return vnodeChildren;
+
+      // FIXME: Root node should allow any children. This only checks for allowed element plops.
+      if (!isElementNode(n)) return vnodeChildren;
 
       const parent = n;
-
-      // TODO: Root node should allow any children
-      if (!isElementNode(parent)) return vnodeChildren;
-
       const slot = n.attribs.slot ?? '';
       const isValid = metamodel.isValidChild(pickedNode, parent, slot);
       if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
       const raisinChildren = parent.children;
-
       const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
       const plopTargets = calculatePlopTargets(parent, pickedNode, {
         parentMeta,
