@@ -9,6 +9,7 @@ import { molecule } from 'jotai-molecules';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
+  CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
@@ -22,6 +23,7 @@ import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
+  const { ParentsAtom } = getMol(CoreMolecule);
   const {
     PlopNodeInSlotAtom,
     PickedAtom,
@@ -104,6 +106,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     const isPloppingActive = get(PloppingIsActive);
     const picked = get(PickedAtom);
     const pickedForMove = get(PickedNodeAtom);
+    const parents = get(ParentsAtom);
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
     const isInteractible = get(IsInteractibleAtom);
@@ -128,10 +131,15 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
       const raisinChildren = parent.children;
       const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
-      const plopTargets = calculatePlopTargets(parent, pickedNode, {
-        parentMeta,
-        possiblePlopMeta,
-      });
+      const plopTargets = calculatePlopTargets(
+        parent,
+        pickedNode,
+        {
+          parentMeta,
+          possiblePlopMeta,
+        },
+        parents
+      );
 
       const plopPosition = raisinChildren.findIndex((n) => n === pickedNode);
 

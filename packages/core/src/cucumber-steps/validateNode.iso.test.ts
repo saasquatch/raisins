@@ -198,4 +198,7 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/validateNode.feature");
+bindIsomorphicCucumberSteps(
+  cucumber,
+  "../validation/validateNode/validateNode.feature"
+);

@@ -1,3 +1,4 @@
+import { autoBindSteps } from "@saasquatch/scoped-autobindsteps";
 import { defineStep } from "cypress-cucumber-preprocessor/steps";
 import { StepDefinitions } from "jest-cucumber";
 
@@ -20,7 +21,7 @@ export function bindIsomorphicCucumberSteps(
       stepDefs(defineStep, defineStep, defineStep, defineStep);
     };
 
-    jest_cucumber.autoBindSteps([feature], [jestSteps]);
+    autoBindSteps([feature], [jestSteps]);
   }
 }
 export type DefineIsoStepDef = (...args: any[]) => void;

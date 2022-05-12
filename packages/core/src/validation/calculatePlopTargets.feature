@@ -12,7 +12,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": ""}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -33,7 +32,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": "", "validChildren": "none"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[]
@@ -49,7 +47,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": "a"}, {"name": "b"}, {"name": "c"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -78,7 +75,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": "a", "validChildren": "none"}, {"name": "b"}, {"name": "c", "validChildren": "none"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -103,7 +99,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": ""}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -126,6 +121,22 @@ Feature: Calculate Plop Targets
 			]
 			"""
 
+
+	@motivating
+	Scenario: Picked parents don't allow plop in their descendents
+
+		We can't allow anyone to become their own grandparent like Phillip J. Fry did that one time.
+
+		Given a parent with following html
+			"""
+			<parent>
+			<node>a<node>b<node>c</node></node></node>
+			</parent>
+			"""
+		And parent meta has slots [{"name": ""}]
+		When the parent is picked
+		Then there are no plop targets anywhere
+
 	@motivating
 	Scenario Outline: Indexes around the plop target are not returned
 
@@ -139,7 +150,6 @@ Feature: Calculate Plop Targets
 			"""
 		And plop is child at position <index> of parent
 		And parent meta has slots [{"name": ""}]
-		And a schema
 		Then calculatePlopTargets will return <result>
 
 		Examples:
@@ -161,7 +171,6 @@ Feature: Calculate Plop Targets
 			"""
 		And plop is child at position 2 of parent
 		And parent meta has slots [{"name": ""}, {"name": "slot-other"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -194,7 +203,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": ""}, {"name": "slot-a"}, {"name": "slot-b"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[
@@ -239,7 +247,6 @@ Feature: Calculate Plop Targets
 			"""
 		And an outside plop target
 		And parent meta has slots [{"name": ""}, {"name": "slot-a"}, {"name": "slot-b"}]
-		And a schema
 		Then calculatePlopTargets will return
 			"""
 			[

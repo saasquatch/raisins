@@ -9,11 +9,6 @@ type Options = {
 /**
  * Parses HTML into a RaisinDocumentNode.
  *
- * Internally uses `htmlparser2` and then converts the `dom-handler`
- * document returned into a frozen immutable RaisinDocumentNode.
- *
- * Also cleans
- *
  * @param html an HTML string
  * @returns a parsed RaisinDocumentNode
  */

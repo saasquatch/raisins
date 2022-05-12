@@ -13,9 +13,20 @@ export function calculatePlopTargets(
   schema: {
     parentMeta: CustomElement;
     possiblePlopMeta: CustomElement;
-  }
+  },
+  parents: WeakMap<RaisinNode, RaisinNode>
 ): PlopTarget[] {
   if (!isElementNode(parent)) return [];
+
+  // Can't drop directly into oneself
+  if (parent === possiblePlop) return [];
+  let ancestor: RaisinNode | undefined = parent;
+  do {
+    // If an ancestor is the plop target, don't allow it.
+    if (ancestor === possiblePlop) return [];
+    ancestor = parents.get(ancestor);
+  } while (ancestor !== undefined);
+
   const raisinChildren = parent.children;
   const seenSlots = new Set();
   const remainingSlots = new Set(
