@@ -79,9 +79,12 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
 
 function markActive(state: EditorState, type: MarkType): boolean {
   let { from, $from, to, empty } = state.selection;
+  if (!type) return false;
   if (empty) return !!type.isInSet(state.storedMarks || $from.marks());
   else return state.doc.rangeHasMark(from, to, type);
 }
 
-const capitalizeFirst = ([first, ...rest]: string): string =>
-  `${first.toUpperCase()}${rest.join('')}`;
+const capitalizeFirst = ([first, ...rest]: string): string => {
+  if (!Array.isArray(rest)) return `${first.toUpperCase()}${rest}`;
+  return `${first.toUpperCase()}${rest.join('')}`;
+};
