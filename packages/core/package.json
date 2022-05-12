@@ -1,7 +1,7 @@
 {
   "name": "@raisins/core",
   "author": "Logan Volkers",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/raisins.esm.js",
