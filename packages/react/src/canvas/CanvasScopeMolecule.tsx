@@ -91,9 +91,6 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       return {
         ...d,
         key,
-        style: {
-          background: canvasRenderer === 'always-replace' ? 'red' : 'inherit',
-        },
         attrs: {
           ...d.attrs,
           [raisinsSoulAttribute]: soul.toString(),
