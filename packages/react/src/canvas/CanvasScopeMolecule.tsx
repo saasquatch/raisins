@@ -57,14 +57,23 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
-  const ListenersSet = new Set<CanvasEventListener>([]);
+  const ListenersMap = new Map<string, Set<CanvasEventListener>>([]);
+  const addEventListener = (type: string, listener: CanvasEventListener) => {
+    let set = ListenersMap.get(type);
+    if (!set) {
+      set = new Set();
+      ListenersMap.set(type, set);
+    }
+    set.add(listener);
+    return () => set?.delete(listener);
+  };
 
   const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
+    const raisinEventAttribute = get(EventSelectorAtom);
     const meta = get(ComponentModel.ComponentModelAtom);
-
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
@@ -82,10 +91,13 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       return {
         ...d,
         key,
+        style: {
+          background: canvasRenderer === 'always-replace' ? 'red' : 'inherit',
+        },
         attrs: {
           ...d.attrs,
           [raisinsSoulAttribute]: soul.toString(),
-          'raisins-events': true,
+          [raisinEventAttribute]: true,
         },
       };
     };
@@ -104,6 +116,9 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   VnodeAtom.debugLabel = 'VnodeAtom';
 
   const CanvasEventAtom = atom(null, (get, set, e: RawCanvasEvent) => {
+    const listenersSet = ListenersMap.get(e.type);
+    if (!listenersSet || listenersSet.size === 0) return;
+
     const idToSoul = get(IdToSoulAtom);
     const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
     const soulId = e.target?.attributes[raisinsAttribute];
@@ -112,9 +127,13 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const node = soul ? soulToNode(soul) : undefined;
 
     const betterEvent: RichCanvasEvent = { ...e, soul, node };
-    for (const listener of ListenersSet.values()) {
+    for (const listener of listenersSet.values()) {
       set(listener, betterEvent);
     }
+  });
+
+  const EventTypesAtom = atom((get) => {
+    return new Set(ListenersMap.keys());
   });
 
   const GeometryAtom = atom({ entries: [] } as GeometryDetail);
@@ -155,6 +174,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     head: IframeHeadAtom,
     registry: NPMRegistryAtom,
     selector,
+    eventTypes: EventTypesAtom,
     vnodeAtom: VnodeAtom,
     onEvent: CanvasEventAtom,
     onResize: SetGeometryAtom,
@@ -162,7 +182,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
   return {
     HTMLSet,
-    ListenersSet,
+    ListenersMap,
+    addEventListener,
     GeometryAtom,
     IframeAtom,
     AppendersSet,

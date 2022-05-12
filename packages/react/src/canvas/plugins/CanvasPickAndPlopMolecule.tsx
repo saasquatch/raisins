@@ -44,7 +44,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       }
     });
     DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-    CanvasAtoms.ListenersSet.add(DoubleClickAtom);
+    CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
   }
 
   const PickAndPlopStyleAtom = atom(
@@ -97,7 +97,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       }
     }
   );
-  CanvasAtoms.ListenersSet.add(PickAndPlopListenerAtom);
+  CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
 
   const AppenderAtom = atom((get) => {
     const souls = get(GetSoulAtom);

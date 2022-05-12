@@ -4,21 +4,27 @@ import { Molecule } from 'jotai-molecules/dist/molecule';
 import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';
+import { throttle } from 'throttle-debounce';
 import { NPMRegistry } from '../../util/NPMRegistry';
 import {
-  RawCanvasEvent,
   ChildRPC,
   GeometryDetail,
   ParentRPC,
+  RawCanvasEvent,
 } from '../api/_CanvasRPCContract';
 import { childApiSrc } from '../injected/childApiSrc';
 
-const iframeSrc = (head: string, registry: NPMRegistry, selector: string) => `
+const iframeSrc = (
+  head: string,
+  registry: NPMRegistry,
+  selector: string,
+  events: Set<string>
+) => `
 <!DOCTYPE html>
 <html>
 <head>
   ${head}
-  ${childApiSrc(registry, selector)}
+  ${childApiSrc(registry, selector, events)}
 </head>
 <body></body>
 </html>`;
@@ -27,6 +33,8 @@ function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
   if (!Comp) return; // no Component yet
   child.render(Comp);
 }
+
+const FPS_60 = 1000 / 60;
 
 export type ConnectionState =
   | { type: 'uninitialized' }
@@ -57,6 +65,10 @@ export type SnabbdomIframeProps = {
   head: Atom<string>;
   selector: Atom<string>;
   registry: Atom<NPMRegistry>;
+  /**
+   * Set of types that will be listened to in the canvas
+   */
+  eventTypes: Atom<Set<string>>;
   onEvent: WritableAtom<null, RawCanvasEvent>;
   onResize: WritableAtom<null, GeometryDetail>;
 };
@@ -74,7 +86,8 @@ export function createAtoms(props: SnabbdomIframeProps) {
     const head = get(props.head);
     const selector = get(props.selector);
     const registry = get(props.registry);
-    return iframeSrc(head, registry, selector);
+    const events = get(props.eventTypes);
+    return iframeSrc(head, registry, selector, events);
   });
 
   const iframeAtom = createIframeAtom(containerAtom, iframeSource);
@@ -145,13 +158,19 @@ export function createAtoms(props: SnabbdomIframeProps) {
     return penpalStateAtom;
   });
 
+  const throttledRender = throttle(
+    FPS_60,
+    renderInChild
+  ) as typeof renderInChild;
+
   const lastRenderedComponent = atom<VNode | undefined>((get) => {
     const whichConnected = get(connectionAtom);
     const connectionStatus = get(whichConnected);
     if (connectionStatus.type !== 'loaded') return undefined;
 
     const component = get(props.vnodeAtom);
-    renderInChild(connectionStatus.childRpc, component);
+
+    throttledRender(connectionStatus.childRpc, component);
     return component;
   });
 

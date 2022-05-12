@@ -166,6 +166,10 @@ export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
 
 export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;
 
+export const MintCanvasWithHover = () => (
+  <MintCanvasOnly Component={CanvasWithHover} />
+);
+
 export const SQMText = ({ Component = BasicCanvasController }) => (
   <BasicStory
     startingHtml={`<div>First</div><div>Before</div><sqm-text>in sqm-text</sqm-text><div>After</div>`}

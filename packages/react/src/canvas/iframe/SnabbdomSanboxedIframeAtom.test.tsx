@@ -26,6 +26,7 @@ describe('Thing', () => {
       onResize: atom(null, () => {}),
       registry: atom(unpkgNpmRegistry),
       selector: atom('[raisin-events]'),
+      eventTypes: atom(new Set<string>()),
       vnodeAtom: atom(h('div')),
     };
   });

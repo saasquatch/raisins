@@ -24,7 +24,10 @@ declare var Penpal: Penpal;
 
 export const ChildAPIModule: string = function RaisinsChildAPI() {
   let currentNode: VNode | HTMLElement = document.body;
-
+  /**
+   * Tracks when a render is active to prevent events mid-render
+   */
+  let rendering: boolean = false;
   const geometryEvent = 'sq:geometry';
 
   function isElement(value: any): value is HTMLElement {
@@ -87,7 +90,14 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   }
 
   function patchAndCache(next: VNode) {
-    patch(currentNode, next);
+    rendering = true;
+    try {
+      patch(currentNode, next);
+    } catch (e) {
+      throw e;
+    } finally {
+      rendering = false;
+    }
     currentNode = next;
   }
   window.addEventListener('DOMContentLoaded', function () {
@@ -131,6 +141,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       dispatchResizeAll();
 
       function sendEventToParent(e: Event) {
+        if (rendering) return;
         const target = e.target;
         if (!isElement(target)) return;
         let elementTarget: HTMLElement | undefined;
@@ -153,11 +164,9 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
           },
         });
       }
-      // Listen for all event types
-      Object.keys(window).forEach((key) => {
-        if (/^on/.test(key)) {
-          window.addEventListener(key.slice(2), sendEventToParent);
-        }
+      // Listen for all event types requested
+      props.events.forEach((key) => {
+        window.addEventListener(key, sendEventToParent);
       });
     });
   });

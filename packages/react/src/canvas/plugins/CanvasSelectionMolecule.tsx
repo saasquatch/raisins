@@ -24,7 +24,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
     }
   });
   SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.ListenersSet.add(SelectedClickedAtom);
+  CanvasAtoms.addEventListener('click', SelectedClickedAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
@@ -38,7 +38,7 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
         cursor: 'pointer',
         outline: isSelected ? '2px solid #439B76' : rest.outline ?? '',
         // outlineOffset: isOutlined ? '-2px' : '',
-        outlineOffset:''
+        outlineOffset: '',
       };
 
       return {

@@ -6,24 +6,32 @@ import { HoveredNodeMolecule } from '../../core/selection/HoveredNodeMolecule';
 import { SoulsMolecule } from '../../core/souls/Soul';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
+import { throttleAtom } from '../iframe/throttledAtom';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
-  const { PickedNodeAtom } = getMol(PickAndPlopMolecule);
+  const { PickedNodeAtom, PloppingIsActive } = getMol(PickAndPlopMolecule);
 
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
-  const CanvasHoveredListenerAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-    if (e.type === 'mouseover') {
-      set(HoveredSoulAtom, e.soul);
+  const ThrottledHoveredSoulAtom = throttleAtom(50, HoveredSoulAtom);
+  const CanvasHoveredListenerAtom = atom(
+    null,
+    (get, set, e: RichCanvasEvent) => {
+      if (e.type === 'mouseover') {
+        const isPlopping = get(PloppingIsActive);
+        // Disable during plop
+        if (isPlopping) return;
+        set(ThrottledHoveredSoulAtom, e.soul);
+      }
     }
-  });
+  );
   CanvasHoveredListenerAtom.debugLabel = 'CanvasHoveredListenerAtom';
-  CanvasAtoms.ListenersSet.add(CanvasHoveredListenerAtom);
+  CanvasAtoms.addEventListener('mouseover', CanvasHoveredListenerAtom);
 
   const RendererAtom = atom((get) => {
     const hovered = get(HoveredNodeAtom);

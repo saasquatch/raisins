@@ -3,9 +3,14 @@ import { ChildAPIModule } from './RaisinsChildAPI';
 
 export type Props = {
   selector: string;
+  events: string[];
 };
-export const childApiSrc = (registry: NPMRegistry, selector: string) => {
-  const props: Props = { selector };
+export const childApiSrc = (
+  registry: NPMRegistry,
+  selector: string,
+  events: Set<string>
+) => {
+  const props: Props = { selector, events: Array.from(events.values()) };
   return `<style>
   body{ margin: 0 }
   </style>
