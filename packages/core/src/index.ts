@@ -3,6 +3,7 @@ import cssParser from "./css-om/parser";
 import cssSerializer from "./css-om/serializer";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
 import * as cssUtil from "./css-om/util";
+import { DefaultTextMarks } from "./html-dom/DefaultTextMarks";
 import {
   isCommentNode,
   isDirectiveNode,
@@ -28,20 +29,18 @@ import htmlSerializer from "./html-dom/serializer";
 import * as htmlUtil from "./html-dom/util";
 import { NodeVisitor as RaisinNodeVisitor } from "./html-dom/util";
 import { getNode, getPath, NodePath, NodeSelection } from "./paths/Paths";
+import { calculatePlopTargets } from "./validation/calculatePlopTargets";
 import { getSlots } from "./validation/getSlots";
 import * as HTMLComponents from "./validation/HTMLComponents";
 import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
 import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
 import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
 import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
-import {
-  validateNode,
-  validateChildConstraints,
-  generateJsonPointers,
-  validateAttributes
-} from "./validation/validateNode/validateNode";
 import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils";
-import { calculatePlopTargets } from "./validation/calculatePlopTargets";
+import {
+  generateJsonPointers,
+  validateAttributes, validateChildConstraints, validateNode
+} from "./validation/validateNode/validateNode";
 
 export {
   htmlSerializer,
@@ -62,6 +61,7 @@ export {
   doesParentAllowChild,
   isNodeAllowed,
   HTMLComponents,
+  DefaultTextMarks,
   validateNode,
   validateChildConstraints,
   generateJsonPointers,
@@ -99,3 +99,4 @@ export type {
   RaisinStyleNode,
   RaisinTextNode
 };
+

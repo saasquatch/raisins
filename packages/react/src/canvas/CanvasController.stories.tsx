@@ -1,8 +1,8 @@
+import { DefaultTextMarks } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { Atom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { DefaultTextMarks } from '../component-metamodel';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';

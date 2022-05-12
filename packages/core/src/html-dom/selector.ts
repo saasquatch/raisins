@@ -151,7 +151,7 @@ export default function select(node: RaisinDocumentNode, query: string) {
   });
 }
 
-const textMarksSet = new Set(DefaultTextMarks);
+const textMarksSet = new Set<string>(DefaultTextMarks);
 export const matches = (
   root: RaisinDocumentNode,
   elem: RaisinElementNode,

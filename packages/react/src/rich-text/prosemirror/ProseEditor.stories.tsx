@@ -105,9 +105,9 @@ export const WithToolbarSynchronized = () => (
 );
 const Toolbar = () => {
   const ToggleMarks = useMolecule(DefaultProseSchemaMarkMolecule);
-  const [isBold, toggleBold] = useAtom(ToggleMarks.toggleBold);
-  const [isItalic, toggleItalic] = useAtom(ToggleMarks.toggleItalic);
-  const [isUnderline, toggleUnderline] = useAtom(ToggleMarks.toggleUnderline);
+  const [isBold, toggleBold] = useAtom(ToggleMarks.toggleStrong);
+  const [isItalic, toggleItalic] = useAtom(ToggleMarks.toggleI);
+  const [isUnderline, toggleUnderline] = useAtom(ToggleMarks.toggleU);
   const toggleLink = useSetAtom(ToggleMarks.toggleLink);
 
   return (

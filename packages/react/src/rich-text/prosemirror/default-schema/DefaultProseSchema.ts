@@ -1,21 +1,63 @@
-import { Schema } from 'prosemirror-model';
-import { marks, nodes } from 'prosemirror-schema-basic';
+import { DefaultTextMarks, HTMLComponents } from '@raisins/core';
+import { CustomElement } from '@raisins/schema/schema';
+import { AttributeSpec, MarkSpec, Schema } from 'prosemirror-model';
+import { nodes } from 'prosemirror-schema-basic';
 
-const { doc, text, hard_break, paragraph } = nodes;
-const { strong, em } = marks;
+const { text, hard_break } = nodes;
 
-const uDOM = ['u', 0] as const;
+type MarkObject = { [name in string]: MarkSpec };
+type AttrObject = {
+  [name: string]: AttributeSpec;
+};
+
+const MarkMap = new Map<string, CustomElement>();
+(Object.keys(HTMLComponents) as (keyof typeof HTMLComponents)[]).forEach(
+  (k) => {
+    MarkMap.set(k, HTMLComponents[k]);
+  }
+);
+
+const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== 'a').reduce(
+  (marks: MarkObject, mark: string): MarkObject => {
+    const component = MarkMap.get(mark);
+
+    const attrs = component?.attributes?.reduce((attrs, attr) => {
+      return {
+        ...attrs,
+        [attr.name]: {
+          default: attr.default,
+        },
+      };
+    }, {} as AttrObject);
+
+    return {
+      ...marks,
+      [mark]: {
+        attrs,
+        parseDOM: [
+          {
+            tag: mark,
+            getAttrs(dom) {
+              const link = dom as HTMLElement;
+              const fromDom = component?.attributes?.reduce((attrs, attr) => {
+                return { ...attrs, [attr.name]: link.getAttribute(attr.name) };
+              }, {} as Record<string, string | null>);
+              return fromDom;
+            },
+          },
+        ],
+        toDOM(node) {
+          return [mark, node.attrs, 0] as const;
+        },
+      },
+    };
+  },
+  {} as MarkObject
+);
 
 export const DefaultProseSchema = new Schema({
   marks: {
-    strong,
-    em,
-    underline: {
-      parseDOM: [{ tag: 'u' }],
-      toDOM() {
-        return uDOM;
-      },
-    },
+    ...defaultMarkSpecs,
     link: {
       attrs: {
         href: {},
@@ -36,7 +78,16 @@ export const DefaultProseSchema = new Schema({
       ],
       toDOM(node) {
         let { href, title } = node.attrs;
-        return ['a', { href, title, target: 'top' }, 0];
+        return [
+          'a',
+          {
+            href,
+            title,
+            // Links will always target top
+            target: 'top',
+          },
+          0,
+        ];
       },
     },
   },
@@ -46,7 +97,5 @@ export const DefaultProseSchema = new Schema({
     },
     text,
     hard_break,
-    // paragraph,
   },
-  // nodes,
 });

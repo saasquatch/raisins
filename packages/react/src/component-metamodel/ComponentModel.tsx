@@ -7,6 +7,7 @@ import {
   NodeWithSlots,
   RaisinElementNode,
   RaisinNode,
+  DefaultTextMarks
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { Atom, atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
@@ -23,7 +24,6 @@ import shallowEqual from '../util/shallowEqual';
 import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
-import { DefaultTextMarks } from '@raisins/core/src/html-dom/DefaultTextMarks';
 import { Loadable, Module, ModuleDetails } from './types';
 
 export type ComponentModelMoleculeType = {
@@ -243,7 +243,7 @@ export const ComponentModelMolecule = molecule(
     /**
      * Set of tags that are not interactible. They should only be edited as rich text.
      */
-    const NonInteractibleTags = new Set(DefaultTextMarks);
+    const NonInteractibleTags = new Set<string>(DefaultTextMarks);
     const IsInteractibleAtom = atom<InteractibleProvider>(() => {
       return (node) => {
         if (node.type === 'text') return false;
