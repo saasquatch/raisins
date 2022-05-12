@@ -57,6 +57,8 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
     }
   );
 
+  type ToggleMethodType = `toggle${Capitalize<MarkKey>}`;
+
   const toggleDefaultMarks = DefaultTextMarks.reduce((atoms, mark) => {
     return {
       ...atoms,
@@ -64,7 +66,7 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
         DefaultProseSchema.marks[mark]
       ),
     };
-  }, {} as Record<`toggle${Capitalize<MarkKey>}`, ToggleMarkAtom>);
+  }, {} as Record<ToggleMethodType, ToggleMarkAtom>);
 
   return {
     ...toggleDefaultMarks,

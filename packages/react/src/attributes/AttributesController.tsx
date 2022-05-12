@@ -22,18 +22,14 @@ export type AttributesControllerProps = {
 export const AttributesController: React.FC<AttributesControllerProps> = (
   props
 ) => {
-  const { keysAtom, schemaAtom, groupedSchemaAtom } = useMolecule(
-    AttributesMolecule
-  );
+  const { keysAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
-  const schema = useAtomValue(schemaAtom);
-  const groupedSchema = useAtomValue(groupedSchemaAtom);
 
   if (!keys) return <></>;
   const Component = props.Component ?? DefaultAttributeComponent;
   return (
     <React.Fragment>
-      {keys.map((key) => {
+      {keys.map((key:string) => {
         return (
           <AttributeProvider attributeName={key} key={key}>
             <Component />

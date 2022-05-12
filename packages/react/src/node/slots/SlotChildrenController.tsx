@@ -28,7 +28,7 @@ export function SlotChildrenController({
   if (!hasSlots) return <></>;
   return (
     <>
-      {slots.map((s) => (
+      {slots.map((s:string) => (
         <SlotScopeProvider slot={s} key={s}>
           <Component />
         </SlotScopeProvider>

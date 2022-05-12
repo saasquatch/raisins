@@ -4,7 +4,8 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "turbo run build",
-    "storybook": "turbo run storybook"
+    "storybook": "turbo run storybook",
+    "test": "turbo run test"
   },
   "workspaces": {
     "packages": [
@@ -24,7 +25,8 @@
         ],
         "outputs": [
           "dist/**"
-        ]
+        ],
+        "cache": false
       },
       "storybook": {
         "dependsOn": [
@@ -45,8 +47,5 @@
         "cache": false
       }
     }
-  },
-  "dependencies": {
-    "validate-color": "^2.2.1"
   }
 }
