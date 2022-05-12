@@ -4,7 +4,7 @@
   "version": "0.16.0",
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/raisins.esm.js",
+  "module": "dist/core.esm.js",
   "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",

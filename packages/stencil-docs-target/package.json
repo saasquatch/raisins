@@ -4,7 +4,7 @@
   "version": "0.2.7",
   "license": "MIT",
   "author": "Logan Volkers",
-  "module": "dist/stencil.esm.js",
+  "module": "dist/stencil-docs-target.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "repository": {

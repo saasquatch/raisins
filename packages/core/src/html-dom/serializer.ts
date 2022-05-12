@@ -1,16 +1,16 @@
+import { CssNodePlain } from "css-tree";
+import { encodeXML, escapeAttribute } from "entities";
+import cssSerializer from "../css-om/serializer";
 import foreignNames from "./foreignNames";
-import { encodeXML } from "entities";
 import type {
   RaisinCommentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
-  RaisinTextNode,
+  RaisinTextNode
 } from "./RaisinNode";
 import { getParents, visit } from "./util";
-import cssSerializer from "../css-om/serializer";
-import { CssNodePlain } from "css-tree";
 
 /**
  *
@@ -38,7 +38,6 @@ import { CssNodePlain } from "css-tree";
 const { attributeNames, elementNames } = foreignNames;
 export interface DomSerializerOptions {
   xmlMode?: boolean | "foreign";
-  decodeEntities?: boolean;
   emptyAttrs?: boolean;
   selfClosingTags?: boolean;
 }
@@ -80,12 +79,14 @@ function formatAttributes(
         // See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
         return key;
       }
-
-      return `${key}="${
-        opts.decodeEntities !== false
-          ? encodeXML(value)
-          : value.replace(/"/g, "&quot;")
-      }"`;
+      
+      /**
+       * Encodes all characters that have to be escaped in HTML attributes,
+       * following {@link https://html.spec.whatwg.org/multipage/parsing.html#escapingString}.
+       *
+       * @param data String to escape.
+       */
+      return `${key}="${escapeAttribute(value)}"`;
     })
     .join(" ");
 }
@@ -250,7 +251,6 @@ function renderText(
   const parent = parents.get(elem);
   // If entities weren't decoded, no need to encode them back
   if (
-    opts.decodeEntities !== false &&
     !(
       !opts.xmlMode &&
       parent &&
