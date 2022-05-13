@@ -12,7 +12,7 @@ import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
 
-const { remove, insertAtPath, clone } = htmlUtil;
+const { moveNode, insertAtPath, clone } = htmlUtil;
 
 export type PlopDestination = {
   parent: RaisinNodeWithChildren;
@@ -95,7 +95,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
           // Nothing is picked, so do nothing;
           return;
         }
-        const newDocument = htmlUtil.moveNode(
+        const newDocument = moveNode(
           currentDoc,
           pickedNode,
           slot,

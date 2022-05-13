@@ -182,43 +182,53 @@ it("Move path", () => {
   });
 });
 
-it("Move node", () => {
-  const node: RaisinElementNode = {
+describe("Move nodes", () => {
+  const node1: RaisinElementNode = {
     tagName: "div",
-    attribs: { slot: "children" },
+    attribs: { slot: "children", id: "node1" },
     children: [],
     type: "tag"
   };
 
-  const slot: RaisinElementNode = {
-    tagName: "slot",
-    attribs: { name: "children" },
+  const node2: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "children", id: "node2" },
     children: [],
     type: "tag"
   };
-
   const root: RaisinDocumentNode = {
     type: "root",
-    children: [node, slot]
+    children: [node1, node2]
   };
 
-  const nodepath: NodePath = [0];
+  it("Move node at the same level", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      root,
+      node2,
+      "children",
+      nodepath,
+      0
+    ) as RaisinDocumentNode;
 
-  const res = moveNode(root, node, "children", nodepath, 0);
+    expect(res.children.length).toBe(2);
+    expect(res.children[0]).toStrictEqual(node2);
+    expect(res.children[1]).toStrictEqual(node1);
+  });
 
-  const slotWithNode: RaisinElementNode = {
-    tagName: "slot",
-    attribs: { name: "children" },
-    children: [node],
-    type: "tag"
-  };
+  it("Move sibling into another sibling, then back again", () => {
+    const res = moveNode(root, node2, "children", [0], 0) as any;
 
-  const rootExpected: RaisinDocumentNode = {
-    type: "root",
-    children: [slotWithNode]
-  };
+    const newNode2 = res.children[0].children[0];
+    expect(res.children.length).toBe(1);
+    expect(newNode2).toStrictEqual(node2);
 
-  expect(res).toStrictEqual(rootExpected);
+    const newOriginal = moveNode(res, newNode2, "children", [], 0) as any;
+
+    expect(newOriginal.children.length).toBe(2);
+    expect(newOriginal.children[0]).toStrictEqual(node2);
+    expect(newOriginal.children[1]).toStrictEqual(node1);
+  });
 });
 
 it("Insert at path", () => {

@@ -259,12 +259,12 @@ export function move(
     ...IdentityVisitor,
     onElement(el, children) {
       const newChildren =
-        el === newParent ? add(children, cloned, newIdx) : children;
+        el === newParent ? addItem(children, cloned, newIdx) : children;
       return onReplace(el, { ...el, children: newChildren });
     },
     onRoot(el, children) {
       const newChildren =
-        el === newParent ? add(children, cloned, newIdx) : children;
+        el === newParent ? addItem(children, cloned, newIdx) : children;
       return onReplace(el, { ...el, children: newChildren });
     }
   });
@@ -294,22 +294,62 @@ export function moveNode(
   parentPath: NodePath,
   idx: number
 ): RaisinNode {
-  const docWithNodeRemoved = remove(root, nodeToMove);
-  // TODO: Save soul?
-  const cloneOfPickedNode = clone(nodeToMove);
-  const nodeWithNewSlot = !isElementNode(cloneOfPickedNode)
-    ? { ...cloneOfPickedNode }
+  const nodeWithNewSlot = !isElementNode(nodeToMove)
+    ? { ...nodeToMove }
     : {
-        ...cloneOfPickedNode,
-        attribs: { ...cloneOfPickedNode.attribs, slot }
+        ...nodeToMove,
+        attribs: { ...nodeToMove.attribs, slot }
       };
-  const newDocument = insertAtPath(
-    docWithNodeRemoved,
-    nodeWithNewSlot,
-    parentPath,
-    idx
-  );
-  return newDocument;
+  const parent = getNode(root, parentPath);
+
+  const onChildren = (
+    el: RaisinNodeWithChildren,
+    newChildren: RaisinNode[]
+  ) => {
+    const found = newChildren.indexOf(nodeToMove);
+    if (el === parent && found >= 0) {
+      // Case 0 -- moved within the same level of the tree
+      return {
+        ...el,
+        children: addItemAndRemove(
+          newChildren,
+          nodeWithNewSlot,
+          idx,
+          nodeToMove
+        )
+      };
+    } else if (el === parent) {
+      // Case 1 -- Just added to this level of tree, but not removed as well
+      return {
+        ...el,
+        children: addItem(newChildren, nodeWithNewSlot, idx)
+      };
+    } else if (found >= 0) {
+      // Case 2 -- Removed from this level of the tree, to be inserted elsewhere
+      return {
+        ...el,
+        children: removeItem(newChildren, found)
+      } as RaisinNodeWithChildren;
+    } else if (shallowEqual(newChildren, el.children)) {
+      // Don't modify
+      return el;
+    } else {
+      // Case 3 -- this part of the tree unaffected
+      return {
+        ...el,
+        children: newChildren
+      };
+    }
+  };
+  const newDocument = visit<RaisinNode>(root, {
+    onComment: c => c,
+    onDirective: d => d,
+    onElement: onChildren,
+    onRoot: onChildren,
+    onStyle: s => s,
+    onText: t => t
+  });
+  return newDocument!;
 }
 
 /**
@@ -332,7 +372,7 @@ export function insertAt(
     children: RaisinNode[]
   ): RaisinNode => {
     const newChildren =
-      el === newParent ? add(children, node, newIdx) : children;
+      el === newParent ? addItem(children, node, newIdx) : children;
     return onReplace(el, { ...el, children: newChildren });
   };
   const moved = visit(root, {
@@ -375,12 +415,6 @@ export function removeWhitespace(
       "Whitespace removal produced no content at all. Try this on a root node instead of an embedded text node"
     );
   return cleaned;
-}
-
-function add<T>(arr: T[], el: T, idx: number): T[] {
-  const before = arr.slice(0, idx);
-  const after = arr.slice(idx, arr.length);
-  return [...before, el, ...after];
 }
 
 function freeze(node: RaisinNode) {
@@ -473,3 +507,38 @@ export function getAncestry(
   }
   return [...ancestry];
 }
+
+function addItemAndRemove<T>(
+  arr: T[],
+  elToAdd: T,
+  idxToAdd: number,
+  remove: T
+): T[] {
+  return arr.reduce((newArr, el, idx) => {
+    if (el === remove) {
+      // No remove item in new array
+      return newArr;
+    }
+    if (idx === idxToAdd) {
+      // Add in front of this index
+      return [...newArr, elToAdd, el];
+    }
+    return [...newArr, el];
+  }, [] as T[]);
+}
+
+function addItem<T>(arr: T[], el: T, idx: number): T[] {
+  const before = arr.slice(0, idx);
+  const after = arr.slice(idx, arr.length);
+  return [...before, el, ...after];
+}
+
+function removeItem<T>(items: T[], index: number): T[] {
+  const firstArr = items.slice(0, index);
+  const secondArr = items.slice(index + 1);
+  return [...firstArr, ...secondArr];
+}
+
+const shallowEqual = <T>(array1: T[], array2: T[]) =>
+  array1.length === array2.length &&
+  array1.every((value, index) => value === array2[index]);
