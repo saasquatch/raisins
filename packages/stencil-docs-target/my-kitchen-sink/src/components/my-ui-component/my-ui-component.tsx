@@ -10,6 +10,7 @@ import { Component, Prop, h } from '@stencil/core';
  * @example Surely Sam - <my-component first=The middle=Surely last=Sam max-length=400></my-component>
  * @exampleGroup Cool Kids
  * @slotEditor richText
+ * @canvasRenderer always-replace
  */
 @Component({
   tag: 'my-ui-component',
@@ -40,6 +41,15 @@ export class MyUiComponent {
    * @uiDefault Friend
    */
   @Prop() last: string;
+
+  /**
+   * The Age
+   *
+   * @uiName Age
+   * @uiDefault 10
+   * @required
+   */
+  @Prop() age: string;
 
   /**
    * Truncates names longer than this

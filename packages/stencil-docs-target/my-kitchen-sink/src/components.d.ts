@@ -68,6 +68,13 @@ export namespace Components {
     }
     interface MyUiComponent {
         /**
+          * The Age
+          * @uiName Age
+          * @uiDefault 10
+          * @required
+         */
+        "age": string;
+        /**
           * What to call people if we don't have their name
           * @uiName Anonymous Label
           * @uiEnum ["Friend", "Buddy", "Pal"]
@@ -227,6 +234,13 @@ declare namespace LocalJSX {
         "reverse"?: boolean;
     }
     interface MyUiComponent {
+        /**
+          * The Age
+          * @uiName Age
+          * @uiDefault 10
+          * @required
+         */
+        "age"?: string;
         /**
           * What to call people if we don't have their name
           * @uiName Anonymous Label

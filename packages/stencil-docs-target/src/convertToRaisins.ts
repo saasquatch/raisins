@@ -49,7 +49,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               uiGroup: tagValue(p.docsTags, 'uiGroup'),
               // uiGroupSwitch: tagValue(p.docsTags, 'uiGroupSwitch'),
               uiOrder: jsonTagValue(p, 'uiOrder'),
-              required: jsonTagValue(p, 'required'),
+              required: required(p),
             };
 
             return attr;
@@ -121,3 +121,5 @@ const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
+const required = (x: HasDocsTags) =>
+  !!x.docsTags.find(tag => tag.name === 'required');
