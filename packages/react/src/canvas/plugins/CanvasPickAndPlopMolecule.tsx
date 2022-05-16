@@ -282,7 +282,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   });
 
   return h(
-    'div',
+    'raisins-plop-target',
     {
       // Helps snabbdom know how to remove nodes
       key,
@@ -291,6 +291,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         margin: '0',
         overflow: 'visible',
         zIndex: '9999',
+        display: 'block',
       },
     },
     h(

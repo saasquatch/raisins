@@ -27,7 +27,13 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
     const doc = get(proseNodeAtom);
     const bookmark: SelectionBookmark | undefined = get(get(scope).selection);
     if (!bookmark) return undefined;
-    return bookmark.resolve(doc);
+
+    try {
+      return bookmark.resolve(doc);
+    } catch {
+      // Root has changed and the bookmark position is no longer valid
+      return undefined;
+    }
   });
 
   // Build editor state

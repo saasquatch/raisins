@@ -45,8 +45,13 @@ export const SelectedNodeMolecule = molecule((getMol) => {
 
   function getSelected(get: Getter) {
     const current = get(RootNodeAtom);
-    const selected = get(SelectedAtom);
-    return selected?.path ? getNode(current, selected.path) : undefined;
+    const selected = get(SelectionAtom);
+    try {
+      return selected?.path ? getNode(current, selected.path) : undefined;
+    } catch {
+      // Selected node no longer exists within the root
+      return undefined;
+    }
   }
 
   const SelectedNodeAtom = atom(
