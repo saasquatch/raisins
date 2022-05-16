@@ -43,6 +43,7 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
       HTMLAtom: atom(storyScope.startingHtml),
       PackagesAtom: atom(storyScope.startingPackages),
       uiWidgetsAtom: atom({}),
+      LocalURLAtom: atom('http://localhost:3000'),
     };
   }
 );
