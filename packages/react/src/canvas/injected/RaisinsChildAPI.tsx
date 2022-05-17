@@ -131,7 +131,9 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       const ro = new window.ResizeObserver(function (
         entries: ResizeObserverEntry[]
       ) {
-        parent.resizeHeight(entries[0].contentRect.height + '');
+        // Adds 5 pixels of padding to support hover/selection states
+        const height = entries[0].contentRect.height + 5 + '';
+        parent.resizeHeight(height);
       });
       ro.observe(document.body);
 
