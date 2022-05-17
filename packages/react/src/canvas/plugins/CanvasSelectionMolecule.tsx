@@ -9,17 +9,17 @@ import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomRenderer } from '../util/raisinToSnabdom';
 
-export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
+export const CanvasSelectionMolecule = molecule((getMol) => {
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SelectedNodeAtom, SelectedSoulAtom } = getMol(SelectedNodeMolecule);
-  const { PickedNodeAtom } = getMol(PickAndPlopMolecule);
+  const { PickedAtom } = getMol(PickAndPlopMolecule);
   /**
    * Listens for click events, marks clicked elements as selected
    */
-  const SelectedClickedAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-    if (e.type === 'click') {
+  const SelectedClickedAtom = atom(null, (get, set, e: RichCanvasEvent) => {
+    if (e.type === 'click' && !get(PickedAtom)) {
       set(SelectedSoulAtom, e.soul);
     }
   });
@@ -28,16 +28,14 @@ export const CanvasSelectionMolecule = molecule((getMol, getScope) => {
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
-    const picked = get(PickedNodeAtom);
+    const picked = get(PickedAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isSelected = selected === n && !picked;
-      const isOutlined = isSelected;
       const { delayed, remove, ...rest } = d.style || {};
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
         outline: isSelected ? '2px solid #439B76' : rest.outline ?? '',
-        // outlineOffset: isOutlined ? '-2px' : '',
         outlineOffset: '',
       };
 
