@@ -366,9 +366,6 @@ function ElementLayer() {
     ...(isSelected ? SelectedLayer : {}),
     ...(isHovered ? { outline: '1px dashed green' } : {}),
   };
-  const node = useAtomValue(useNodeAtom());
-
-  console.log(node, hasSlots);
 
   return (
     <div data-element style={style}>
