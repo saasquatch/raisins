@@ -140,7 +140,7 @@ export const Mint = ({ canvas }: { canvas: boolean }) => {
 export const MintErrors = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory
-      startingHtml={`<b><div>Ancester error here</div></b> ${mintMono}`}
+      startingHtml={`<b><div>Ancestor error here</div></b> ${mintMono}`}
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >

@@ -2,7 +2,12 @@ import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel';
-import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../core';
+import {
+  CoreMolecule,
+  PickAndPlopMolecule,
+  SoulsInDocMolecule,
+  SoulsMolecule,
+} from '../core';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import {
@@ -53,7 +58,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
-
+  const { PloppingIsActive } = getMol(PickAndPlopMolecule);
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
@@ -74,7 +79,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
     const raisinEventAttribute = get(EventSelectorAtom);
     const meta = get(ComponentModel.ComponentModelAtom);
-
+    const picked = get(PloppingIsActive);
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
       (a) => get(a) as SnabbdomRenderer
@@ -85,8 +90,12 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       const componentMeta = meta.getComponentMeta(n.tagName);
 
       const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
+
+      // Only replace if in pick-and-plop mode to prevent misaligned toolbars and flickering
       const key =
-        canvasRenderer === 'always-replace' ? ++renderTick : soul.toString();
+        picked && canvasRenderer === 'always-replace'
+          ? ++renderTick
+          : soul.toString();
 
       return {
         ...d,
