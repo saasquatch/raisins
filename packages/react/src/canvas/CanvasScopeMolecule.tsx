@@ -87,7 +87,6 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
       const key =
         canvasRenderer === 'always-replace' ? ++renderTick : soul.toString();
-
       return {
         ...d,
         key,
@@ -96,6 +95,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
           [raisinsSoulAttribute]: soul.toString(),
           [raisinEventAttribute]: true,
         },
+        resizeObserver: true,
+        canvasRenderer,
       };
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);
