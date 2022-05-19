@@ -105,6 +105,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
           [raisinsSoulAttribute]: soul.toString(),
           [raisinEventAttribute]: true,
         },
+        resizeObserver: true,
       };
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);

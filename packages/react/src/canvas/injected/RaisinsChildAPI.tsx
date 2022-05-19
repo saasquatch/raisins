@@ -52,12 +52,15 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
 
   const resizeModule: Module = {
     create: function (empty, next) {
-      isElement(next.elm) && resizeObserver.observe(next.elm);
+      isElement(next.elm) &&
+        !!next.data?.resizeObserver &&
+        resizeObserver.observe(next.elm);
     },
     destroy: function (old) {
       isElement(old.elm) && resizeObserver.unobserve(old.elm);
     },
   };
+
   const patch = snabbdom.init([
     // Init patch function with chosen modules
     resizeModule,
