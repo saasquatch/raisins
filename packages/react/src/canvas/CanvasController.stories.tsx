@@ -3,7 +3,12 @@ import { Meta } from '@storybook/react';
 import { Atom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  big,
+  MintComponents,
+  mintMono,
+  mintTimeline,
+} from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
 import { SelectedNodeRichTextEditor } from '../rich-text/SelectedNodeRichTextEditor';
@@ -165,6 +170,14 @@ export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
 );
 
 export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;
+
+export const TimelineCanvasFull = () => (
+  <BasicStory startingHtml={mintTimeline} startingPackages={MintComponents}>
+    <CanvasProvider>
+      <CanvasFull />
+    </CanvasProvider>
+  </BasicStory>
+);
 
 export const MintCanvasWithHover = () => (
   <MintCanvasOnly Component={CanvasWithHover} />

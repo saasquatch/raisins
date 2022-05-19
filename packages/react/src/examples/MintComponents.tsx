@@ -64,6 +64,36 @@ export const mintReferralTable = `
 </sqm-referral-table>
 `;
 
+export const mintTimeline = `<sqm-portal-container gap="large" slot="left">
+<sqm-text>Get rewarded when your friend uses Klip </sqm-text>
+<sqm-timeline icon="circle">
+  <sqm-timeline-entry
+    reward="75"
+    unit="points"
+    desc="Your friends signs up for a free trial"
+  >
+  </sqm-timeline-entry>
+  <sqm-timeline-entry
+    reward="$50"
+    unit="visa giftcard"
+    desc="Your friends signs up for Klip Business"
+  >
+  </sqm-timeline-entry>
+  <sqm-timeline-entry
+    reward="$200"
+    unit="visa giftcard"
+    desc="Your friend qualifies as a good fit for Klip Enterprise"
+  >
+  </sqm-timeline-entry>
+  <sqm-timeline-entry
+    reward="$1000"
+    unit="visa giftcard"
+    desc="Your friend purchases Klip Enterprise"
+  >
+  </sqm-timeline-entry>
+</sqm-timeline>
+</sqm-portal-container>`;
+
 export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">

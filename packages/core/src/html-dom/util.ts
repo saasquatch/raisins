@@ -523,6 +523,10 @@ function addItemAndRemove<T>(
       // Add in front of this index
       return [...newArr, elToAdd, el];
     }
+    if (idx === idxToAdd - 1 && idxToAdd === arr.length) {
+      // Add to the end of the array
+      return [...newArr, el, elToAdd];
+    }
     return [...newArr, el];
   }, [] as T[]);
 }
