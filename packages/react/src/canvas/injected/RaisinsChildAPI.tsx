@@ -60,12 +60,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       isElement(old.elm) && resizeObserver.unobserve(old.elm);
     },
   };
-  const rendererModule: Module = {
 
-    pre: function(){
-      
-    }
-  }
   const patch = snabbdom.init([
     // Init patch function with chosen modules
     resizeModule,
