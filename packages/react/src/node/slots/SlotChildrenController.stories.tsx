@@ -28,6 +28,11 @@ import {
 } from '../../canvas';
 import { AttributesController } from '../../attributes';
 import { SelectedNodeController } from '../../core';
+import {
+  referrerWidget,
+  VanillaComponents,
+} from '../../examples/VanillaComponents';
+import { CanvasFull } from '../../canvas/CanvasController.stories';
 
 const meta: Meta = {
   title: 'Slot Children Controller',
@@ -209,7 +214,29 @@ export const ReferralTableFull = () => (
       </div>
       <div style={{ width: '33%' }}>
         <CanvasProvider>
-          <BasicCanvasController />
+          <CanvasFull />
+        </CanvasProvider>
+      </div>
+      <div style={{ width: '33%' }}>
+        <AttributeEditor />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+
+export const VanillaLayersFull = () => (
+  <BasicStory
+    startingHtml={referrerWidget}
+    startingPackages={VanillaComponents}
+  >
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '33%' }}>
+        <LayersController />
+      </div>
+      <div style={{ width: '33%' }}>
+        <CanvasProvider>
+          <CanvasFull />
         </CanvasProvider>
       </div>
       <div style={{ width: '33%' }}>
