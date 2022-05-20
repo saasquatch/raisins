@@ -2,7 +2,7 @@ export const VanillaComponents = [
   {
     name: '@saasquatch/vanilla-components',
     filePath: '/dist/widget-components/entrypoint.js',
-    version: '1.3.0-2',
+    version: '1.2.4-8',
   },
 ];
 

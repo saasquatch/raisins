@@ -19,7 +19,13 @@ import { NodeMolecule } from '../NodeMolecule';
 import { NodeScopeProvider, useNodeAtom } from '../NodeScope';
 import { SlotChildrenController } from './SlotChildrenController';
 import { SlotMolecule, SlotScopeProvider } from './SlotScope';
-import { BasicCanvasController, CanvasProvider } from '../../canvas';
+import {
+  BasicCanvasController,
+  CanvasHoveredMolecule,
+  CanvasPickAndPlopMolecule,
+  CanvasProvider,
+  CanvasSelectionMolecule,
+} from '../../canvas';
 import { AttributesController } from '../../attributes';
 import { SelectedNodeController } from '../../core';
 
@@ -113,8 +119,90 @@ export const MintLayersOnly = () => (
   </BasicStory>
 );
 
-export const MintLayersFull = () => (
-  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+function Canvas() {
+  useMolecule(CanvasSelectionMolecule);
+  useMolecule(CanvasHoveredMolecule);
+  useMolecule(CanvasPickAndPlopMolecule);
+  return <BasicCanvasController />;
+}
+
+export const MintLayersFull = () => {
+  return (
+    <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <div style={{ display: 'flex' }}>
+        <div style={{ width: '33%' }}>
+          <LayersController />
+        </div>
+        <div style={{ width: '33%' }}>
+          <CanvasProvider>
+            <Canvas />
+          </CanvasProvider>
+        </div>
+        <div style={{ width: '33%' }}>
+          <AttributeEditor />
+        </div>
+        {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+      </div>
+    </BasicStory>
+  );
+};
+
+const referralTableExamples = `
+<sqm-referral-table
+per-page="4"
+hidden-columns="2"
+more-label="Next"
+prev-label="Prev"
+show-labels
+sm-breakpoint="599"
+md-breakpoint="799"
+>
+<sqm-referral-table-user-column
+  column-title="User"
+  anonymous-user="Anonymous User"
+  deleted-user="Deleted User"
+></sqm-referral-table-user-column>
+<sqm-referral-table-user-column
+  column-title="User"
+  anonymous-user="Anonymous User"
+  deleted-user="Deleted User"
+>
+</sqm-referral-table-user-column>
+<sqm-referral-table-status-column
+  column-title="Referral status"
+  converted-status-text="Converted"
+  in-progress-status-text="In Progress"
+>
+</sqm-referral-table-status-column>
+<sqm-referral-table-rewards-column
+  column-title="Rewards"
+  expiring-text="Expiring in"
+  fuel-tank-text="Your code is"
+  pending-for-text="{status} for {date}"
+  reward-received-text="Reward received on"
+  status-long-text="{status, select, AVAILABLE {Reward expiring on} CANCELLED {Reward cancelled on} PENDING {Available on} EXPIRED {Reward expired on} other {Not available} }"
+  status-text="{status, select, AVAILABLE {Available} CANCELLED {Cancelled} PENDING {Pending} EXPIRED {Expired} REDEEMED {Redeemed} other {Not available} }"
+>
+</sqm-referral-table-rewards-column>
+<sqm-referral-table-date-column
+  column-title="Date referred"
+  date-shown="dateReferralStarted"
+>
+</sqm-referral-table-date-column>
+<sqm-empty
+  slot="empty"
+  empty-state-image="https://res.cloudinary.com/saasquatch/image/upload/v1644000223/squatch-assets/empty_referral2.png"
+  empty-state-header="View your referral details"
+  empty-state-text="Refer a friend to view the status of your referrals and rewards earned"
+></sqm-empty>
+</sqm-referral-table>
+`;
+
+export const ReferralTableFull = () => (
+  <BasicStory
+    startingHtml={referralTableExamples}
+    startingPackages={MintComponents}
+  >
     <div style={{ display: 'flex' }}>
       <div style={{ width: '33%' }}>
         <LayersController />
@@ -278,6 +366,7 @@ function ElementLayer() {
     ...(isSelected ? SelectedLayer : {}),
     ...(isHovered ? { outline: '1px dashed green' } : {}),
   };
+
   return (
     <div data-element style={style}>
       {!hasSlots && name}
@@ -326,7 +415,7 @@ function SlotWidget() {
                 {childNodes.length} children in this slot ({slotDetails.name})
                 <ChildrenEditorForAtoms
                   childAtoms={childNodes}
-                  Component={SlotChild}
+                  Component={({idx}) => <SlotChild idx={idx} atoms={atoms} />}
                 />
               </div>
             )}
@@ -337,8 +426,7 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number }> = ({ idx }) => {
-  const atoms = useMolecule(SlotMolecule);
+const SlotChild: React.FC<{ idx?: number, atoms:any }> = ({ idx, atoms }) => {
   return (
     <>
       <ElementLayer />

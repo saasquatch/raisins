@@ -141,8 +141,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
         parents
       );
 
-      const plopPosition = raisinChildren.findIndex((n) => n === pickedNode);
-
       const plopsForZeroIndex = plopTargets
         .filter((plop) => plop.idx === 0)
         .map((plop) => {
@@ -165,10 +163,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
           const plopViews = plopsForNextIndex.map((plop) => {
             return PlopTargetView({
-              idx:
-                plopPosition !== -1 && idx > plopPosition
-                  ? plop.idx - 1
-                  : plop.idx,
+              idx: plop.idx,
               slot: plop.slot,
               soulId,
               eventsAttribute,
