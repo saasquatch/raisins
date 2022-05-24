@@ -39,7 +39,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
     ComponentModelMolecule
   );
-  const { RootNodeAtom, JsonPointersAtom } = getMol(CoreMolecule);
+  const { JsonPointersAtom, rerenderNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
   const ValidationAtoms = getMol(ValidationMolecule);
@@ -206,9 +206,13 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   /**
    * Duplicates the node in context from the document
    */
-  const duplicateForNode = atom(null, (get, set) =>
-    set(DuplicateNodeAtom, get(n))
-  );
+  const duplicateForNode = atom(null, async (get, set) => {
+    // Set render mode to prevent errors when duplicating elements with canvasRenderer = "always-replace"
+    set(rerenderNodeAtom, true);
+    set(DuplicateNodeAtom, get(n));
+    await new Promise((resolve) => setTimeout(resolve, 1));
+    set(rerenderNodeAtom, false);
+  });
 
   /**
    * Gets the human readable name for the next in context

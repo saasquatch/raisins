@@ -134,6 +134,11 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   );
   JsonPointersAtom.debugLabel = 'JsonPointersAtom';
 
+  /**
+   * Used to override default behavior of @canvasRenderer "always-replace"
+   */
+  const rerenderNodeAtom = atom(false);
+
   return {
     NodeFromHtml,
     NodeWithHtmlRefAtom,
@@ -143,6 +148,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     JsonPointersAtom,
     StateListeners,
     InternalTransactionAtom,
+    rerenderNodeAtom,
   };
 });
 

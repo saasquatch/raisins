@@ -14,6 +14,7 @@ import {
   SoulsMolecule,
 } from '../core';
 import { Soul } from '../core/souls/Soul';
+import { NodeMolecule } from '../node';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import {
   GeometryDetail,
@@ -63,8 +64,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
+  const { rerenderNodeAtom } = getMol(CoreMolecule);
   const { PloppingIsActive } = getMol(PickAndPlopMolecule);
-  const { HasSelectionAtom } = getMol(SelectedNodeMolecule);
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
@@ -85,8 +86,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
     const raisinEventAttribute = get(EventSelectorAtom);
     const meta = get(ComponentModel.ComponentModelAtom);
+    const rerender = get(rerenderNodeAtom);
     const picked = get(PloppingIsActive);
-    const selected = get(HasSelectionAtom);
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
@@ -99,10 +100,9 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
       const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
 
-      // Only replace if in selected or pick-and-plop mode to
-      // prevent misaligned toolbars and flickering
+      // Only replace if duplicating or pick-and-plopping to prevent misaligned toolbars, flickering, and errors
       const useCanvasRenderer =
-        (selected || picked) && canvasRenderer === 'always-replace';
+        (picked || rerender) && canvasRenderer === 'always-replace';
 
       const key = useCanvasRenderer ? ++renderTick : soul.toString();
 
