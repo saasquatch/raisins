@@ -1,10 +1,15 @@
-import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
+import {
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+} from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
+  SelectedNodeMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../core';
@@ -59,6 +64,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { CanvasScriptsAtom } = getMol(CanvasScriptsMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { PloppingIsActive } = getMol(PickAndPlopMolecule);
+  const { HasSelectionAtom } = getMol(SelectedNodeMolecule);
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
@@ -80,6 +86,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const raisinEventAttribute = get(EventSelectorAtom);
     const meta = get(ComponentModel.ComponentModelAtom);
     const picked = get(PloppingIsActive);
+    const selected = get(HasSelectionAtom);
+
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
       (a) => get(a) as SnabbdomRenderer
@@ -91,11 +99,12 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
       const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
 
-      // Only replace if in pick-and-plop mode to prevent misaligned toolbars and flickering
-      const key =
-        picked && canvasRenderer === 'always-replace'
-          ? ++renderTick
-          : soul.toString();
+      // Only replace if in selected or pick-and-plop mode to
+      // prevent misaligned toolbars and flickering
+      const useCanvasRenderer =
+        (selected || picked) && canvasRenderer === 'always-replace';
+
+      const key = useCanvasRenderer ? ++renderTick : soul.toString();
 
       return {
         ...d,
