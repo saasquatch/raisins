@@ -1,4 +1,4 @@
-import { RaisinNodeWithChildren } from '@raisins/core';
+import { RaisinElementNode, RaisinNodeWithChildren } from '@raisins/core';
 import type { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
 import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
@@ -53,7 +53,7 @@ export const SlotMolecule = molecule((getMol, getScope) => {
     focusAtom(nodeAtoms.nodeAtom, (o) =>
       optic_<RaisinNodeWithChildren>()
         .prop('children')
-        .filter((c) => isInSlot(c, slot))
+        .filter((c) => (c as RaisinElementNode).children && isInSlot(c, slot))
     )
   );
 

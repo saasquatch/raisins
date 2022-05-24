@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 
 export type Module = {
+  package: string;
   name: string;
   version?: string;
 };
@@ -69,7 +70,9 @@ export const unpkgNpmRegistry: NPMRegistry = {
   },
   resolvePath(module, path) {
     const version = module.version ?? 'latest';
-    const resolved = `${UNPKG_BASE}/${module.name}@${version}/${path}`;
+    const resolved = `${UNPKG_BASE}/${
+      module.name ?? module.package
+    }@${version}/${path}`;
     return resolved;
   },
 };

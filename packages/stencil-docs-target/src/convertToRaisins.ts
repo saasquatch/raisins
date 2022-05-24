@@ -27,7 +27,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         }, [] as schema.ComponentState[]);
         const attributes = comp.props
           .filter(p => typeof p.attr !== 'undefined')
-          .filter(isUndocumented)
+          .filter(documented)
           .map(p => {
             const attr: schema.Attribute = {
               name: p.attr ?? p.name,
@@ -116,6 +116,8 @@ function hasTag(tagName: string) {
     d.docsTags?.find(t => t.name === tagName) ? true : false;
 }
 const isUndocumented = () => hasTag('undocumented');
+const documented = (x: HasDocsTags) =>
+  !x.docsTags.find(tag => tag.name === 'undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');

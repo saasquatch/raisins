@@ -54,6 +54,8 @@ describe('Stencil docs target', () => {
     if (!dataStr.includes('canvasRenderer'))
       throw new Error('No canvasRenderer found');
     if (!dataStr.includes('required')) throw new Error('No required found');
+    if (dataStr.includes('undocumentedField'))
+      throw new Error('undocumented prop found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
   });
 });

@@ -89,6 +89,12 @@ export class MyUiComponent {
   @Prop() pickedDate: number;
 
   /**
+   * A hidden field for internal use only
+   * @undocumented
+   */
+  @Prop() undocumentedField: number;
+
+  /**
    * @demo Jeff - {"person": "Jeff"}
    * @demo Jess - {"person": "Jess"}
    * @demo No Name - {}

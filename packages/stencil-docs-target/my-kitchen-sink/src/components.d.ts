@@ -131,6 +131,11 @@ export namespace Components {
           * @uiDefault #F00
          */
         "textColor": string;
+        /**
+          * A hidden field for internal use only
+          * @undocumented
+         */
+        "undocumentedField": number;
     }
 }
 declare global {
@@ -298,6 +303,11 @@ declare namespace LocalJSX {
           * @uiDefault #F00
          */
         "textColor"?: string;
+        /**
+          * A hidden field for internal use only
+          * @undocumented
+         */
+        "undocumentedField"?: number;
     }
     interface IntrinsicElements {
         "my-card": MyCard;
