@@ -22,7 +22,7 @@ export class MyUiComponent {
    * The first name of the user to display to their friends
    *
    * @uiName First Name
-   * @uiDefault Your
+   * @default Your
    */
   @Prop() first: string;
 
@@ -30,7 +30,7 @@ export class MyUiComponent {
    * The middle name
    *
    * @uiName Middle Name
-   * @uiDefault Best
+   * @default Best
    */
   @Prop() middle: string;
 
@@ -38,7 +38,7 @@ export class MyUiComponent {
    * The last name
    *
    * @uiName Last Name
-   * @uiDefault Friend
+   * @default Friend
    */
   @Prop() last: string;
 
@@ -46,7 +46,7 @@ export class MyUiComponent {
    * The Age
    *
    * @uiName Age
-   * @uiDefault 10
+   * @default 10
    * @required
    */
   @Prop() age: string;
@@ -55,7 +55,7 @@ export class MyUiComponent {
    * Truncates names longer than this
    *
    * @uiName Max Length
-   * @uiDefault 6
+   * @default 6
    */
   @Prop() maxLength: number = 6;
 
@@ -68,7 +68,7 @@ export class MyUiComponent {
    * What to call people if we don't have their name
    * @uiName Anonymous Label
    * @uiEnum ["Friend", "Buddy", "Pal"]
-   * @uiDefault Friend
+   * @default Friend
    */
   @Prop() anonymousLabel: string;
 
@@ -76,7 +76,7 @@ export class MyUiComponent {
    * @uiName Text Color
    * @uiEnum ["#F00", "#00F", "#0F0"]
    * @uiEnumNames ["Red", "Blue", "Green"]
-   * @uiDefault #F00
+   * @default #F00
    */
   @Prop() textColor: string;
 

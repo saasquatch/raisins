@@ -34,7 +34,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
               description: p.docs,
-              default: uiDefault(p) ?? (p.default && JSON.parse(p.default)),
+              default: defaultValue(p) ?? (p.default && JSON.parse(p.default)),
               // TODO: Support enums -- need to add to Raisins model
               // Reference: https://coda.io/d/Self-Serve-Widget_dtoEr2girWN/Raisins-Schema_sucK8#_luqov
               enum: jsonTagValue(p, 'uiEnum'),
@@ -120,7 +120,7 @@ const documented = (x: HasDocsTags) =>
   !x.docsTags.find(tag => tag.name === 'undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
-const uiDefault = (x: HasDocsTags) => tagValue(x.docsTags, 'uiDefault');
+const defaultValue = (x: HasDocsTags) => tagValue(x.docsTags, 'default');
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
 const required = (x: HasDocsTags) =>

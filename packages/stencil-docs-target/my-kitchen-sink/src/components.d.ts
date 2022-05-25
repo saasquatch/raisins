@@ -20,25 +20,25 @@ export namespace Components {
         /**
           * The first name of the user to display to their friends
           * @uiName First Name
-          * @uiDefault Your
+          * @default Your
          */
         "first": string;
         /**
           * The last name
           * @uiName Last Name
-          * @uiDefault Friend
+          * @default Friend
          */
         "last": string;
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 6
+          * @default 6
          */
         "maxLength": number;
         /**
           * The middle name
           * @uiName Middle Name
-          * @uiDefault Best
+          * @default Best
          */
         "middle": string;
         /**
@@ -70,7 +70,7 @@ export namespace Components {
         /**
           * The Age
           * @uiName Age
-          * @uiDefault 10
+          * @default 10
           * @required
          */
         "age": string;
@@ -78,31 +78,31 @@ export namespace Components {
           * What to call people if we don't have their name
           * @uiName Anonymous Label
           * @uiEnum ["Friend", "Buddy", "Pal"]
-          * @uiDefault Friend
+          * @default Friend
          */
         "anonymousLabel": string;
         /**
           * The first name of the user to display to their friends
           * @uiName First Name
-          * @uiDefault Your
+          * @default Your
          */
         "first": string;
         /**
           * The last name
           * @uiName Last Name
-          * @uiDefault Friend
+          * @default Friend
          */
         "last": string;
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 6
+          * @default 6
          */
         "maxLength": number;
         /**
           * The middle name
           * @uiName Middle Name
-          * @uiDefault Best
+          * @default Best
          */
         "middle": string;
         /**
@@ -128,7 +128,7 @@ export namespace Components {
           * @uiName Text Color
           * @uiEnum ["#F00", "#00F", "#0F0"]
           * @uiEnumNames ["Red", "Blue", "Green"]
-          * @uiDefault #F00
+          * @default #F00
          */
         "textColor": string;
         /**
@@ -192,25 +192,25 @@ declare namespace LocalJSX {
         /**
           * The first name of the user to display to their friends
           * @uiName First Name
-          * @uiDefault Your
+          * @default Your
          */
         "first"?: string;
         /**
           * The last name
           * @uiName Last Name
-          * @uiDefault Friend
+          * @default Friend
          */
         "last"?: string;
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 6
+          * @default 6
          */
         "maxLength"?: number;
         /**
           * The middle name
           * @uiName Middle Name
-          * @uiDefault Best
+          * @default Best
          */
         "middle"?: string;
         /**
@@ -242,7 +242,7 @@ declare namespace LocalJSX {
         /**
           * The Age
           * @uiName Age
-          * @uiDefault 10
+          * @default 10
           * @required
          */
         "age"?: string;
@@ -250,31 +250,31 @@ declare namespace LocalJSX {
           * What to call people if we don't have their name
           * @uiName Anonymous Label
           * @uiEnum ["Friend", "Buddy", "Pal"]
-          * @uiDefault Friend
+          * @default Friend
          */
         "anonymousLabel"?: string;
         /**
           * The first name of the user to display to their friends
           * @uiName First Name
-          * @uiDefault Your
+          * @default Your
          */
         "first"?: string;
         /**
           * The last name
           * @uiName Last Name
-          * @uiDefault Friend
+          * @default Friend
          */
         "last"?: string;
         /**
           * Truncates names longer than this
           * @uiName Max Length
-          * @uiDefault 6
+          * @default 6
          */
         "maxLength"?: number;
         /**
           * The middle name
           * @uiName Middle Name
-          * @uiDefault Best
+          * @default Best
          */
         "middle"?: string;
         /**
@@ -300,7 +300,7 @@ declare namespace LocalJSX {
           * @uiName Text Color
           * @uiEnum ["#F00", "#00F", "#0F0"]
           * @uiEnumNames ["Red", "Blue", "Green"]
-          * @uiDefault #F00
+          * @default #F00
          */
         "textColor"?: string;
         /**

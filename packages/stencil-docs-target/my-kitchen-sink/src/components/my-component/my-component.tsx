@@ -16,7 +16,7 @@ export class MyComponent {
    * The first name of the user to display to their friends
    *
    * @uiName First Name
-   * @uiDefault Your
+   * @default Your
    */
   @Prop() first: string;
 
@@ -24,7 +24,7 @@ export class MyComponent {
    * The middle name
    *
    * @uiName Middle Name
-   * @uiDefault Best
+   * @default Best
    */
   @Prop() middle: string;
 
@@ -32,7 +32,7 @@ export class MyComponent {
    * The last name
    *
    * @uiName Last Name
-   * @uiDefault Friend
+   * @default Friend
    */
   @Prop() last: string;
 
@@ -40,7 +40,7 @@ export class MyComponent {
    * Truncates names longer than this
    *
    * @uiName Max Length
-   * @uiDefault 6
+   * @default 6
    */
   @Prop() maxLength: number = 6;
 
