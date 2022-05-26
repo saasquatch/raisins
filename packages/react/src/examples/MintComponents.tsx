@@ -5,14 +5,16 @@ export const MintComponents = [
   //   version: '1.6.1-2',
   // },
   {
+    package: '@saasquatch/bedrock-components',
     name: '@saasquatch/bedrock-components',
     filePath: '/dist/bedrock-components/bedrock-components.js',
     version: '1.3.2-1',
   },
   {
-    name: '@local',
+    package: '@saasquatch/mint-components',
+    name: '@saasquatch/mint-components',
     filePath: '/dist/mint-components/mint-components.js',
-    version: '',
+    version: 'next',
   },
 ];
 
@@ -61,6 +63,20 @@ export const mintReferralTable = `
   empty-state-text="Refer a friend to view the status of your referrals and rewards earned"
 ></sqm-empty>
 </sqm-referral-table>
+`;
+
+export const mintTimelineTrimmed = `
+<sqm-timeline icon="circle"><sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle"></sqm-timeline-entry><sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle"></sqm-timeline-entry><sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle"></sqm-timeline-entry></sqm-timeline>`;
+
+export const mintTimelineNewlines = `
+<sqm-timeline icon="circle">
+<sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+</sqm-timeline>
 `;
 
 export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
