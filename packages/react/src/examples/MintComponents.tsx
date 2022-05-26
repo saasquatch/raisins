@@ -85,6 +85,19 @@ export const mintTimelineNewlines = `
 </sqm-timeline>
 `;
 
+export const mintTitledSection = `
+<div>
+<h1>Heading</h1>
+</div>
+<sqm-titled-section text-align="center" label-margin="xxx-small">
+  <h3 slot="label">Share $50 with friends</h3>
+  <p slot="content">
+    They'll get a $50 credit towards a new account and you'll get up
+    to $1200
+  </p>
+</sqm-titled-section>
+`;
+
 export const mintMono = `<sqm-brand brand-color="#4225c4" brand-font="Nunito Sans">
 <sqm-portal-container direction="column" padding="small" gap="xxx-large">
   <sqm-portal-container direction="column" padding="none" gap="xxx-large">

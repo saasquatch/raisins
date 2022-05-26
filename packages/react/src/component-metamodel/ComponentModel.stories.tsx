@@ -12,6 +12,7 @@ import {
   MintComponents,
   mintMono,
   mintTimelineNewlines,
+  mintTitledSection,
 } from '../examples/MintComponents';
 import {
   referrerWidget,
@@ -139,6 +140,17 @@ export function MintTimelineBlocks() {
   return (
     <BasicStory
       startingHtml={mintTimelineNewlines}
+      startingPackages={MintComponents}
+    >
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintTitledSectionBlocks() {
+  return (
+    <BasicStory
+      startingHtml={mintTitledSection}
       startingPackages={MintComponents}
     >
       <Editor />
