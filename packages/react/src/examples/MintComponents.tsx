@@ -10,9 +10,15 @@ export const MintComponents = [
     filePath: '/dist/bedrock-components/bedrock-components.js',
     version: '1.3.2-1',
   },
+  // {
+  //   package: '@saasquatch/mint-components',
+  //   name: '@saasquatch/mint-components',
+  //   filePath: '/dist/mint-components/mint-components.js',
+  //   version: 'next',
+  // },
   {
-    package: '@saasquatch/mint-components',
-    name: '@saasquatch/mint-components',
+    package: '@local',
+    name: '@local',
     filePath: '/dist/mint-components/mint-components.js',
     version: 'next',
   },

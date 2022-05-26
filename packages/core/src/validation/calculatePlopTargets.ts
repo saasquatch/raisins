@@ -27,14 +27,13 @@ export function calculatePlopTargets(
     ancestor = parents.get(ancestor);
   } while (ancestor !== undefined);
 
-  const raisinChildren = parent.children.filter((child, idx) => {
-    // @ts-ignore
-    child["idx"] = idx;
-    return (
-      !(child as RaisinTextNode).data ||
-      (child as RaisinTextNode).data?.trim()?.replace(/\\n/g, "")
+  const raisinChildren = parent.children
+    .map((child, idx) => ({ child, idx }))
+    .filter(
+      ({ child }) =>
+        !(child as RaisinTextNode).data ||
+        (child as RaisinTextNode).data?.trim()?.replace(/\\n/g, "")
     );
-  });
   const seenSlots = new Set();
   const remainingSlots = new Set(
     schema.parentMeta.slots?.map(e => e.name) ?? []
@@ -64,16 +63,16 @@ export function calculatePlopTargets(
 
   let lastIdx = 0;
   const newChildren =
-    raisinChildren?.reduce((acc, raisinChild, idx) => {
+    raisinChildren?.reduce((acc, { child, idx: childIdx }, idx) => {
       if (
         // No plop around text nodes
-        !isElementNode(raisinChild)
+        !isElementNode(child)
       ) {
         // No plop targets around element nodes
         return acc;
       }
 
-      const slot = raisinChild.attribs.slot ?? "";
+      const slot = child.attribs.slot ?? "";
       const isValid = isNodeAllowed(
         possiblePlop,
         schema.possiblePlopMeta,
@@ -90,28 +89,25 @@ export function calculatePlopTargets(
 
       const removeIdx =
         idx + 1 === raisinChildren.length - 1 &&
-        possiblePlop !== raisinChildren[raisinChildren.length - 1];
-
-      // @ts-ignore
-      const raisinIdx = raisinChild.idx;
+        possiblePlop !== raisinChildren[raisinChildren.length - 1]?.child;
 
       if (!seenSlots.has(slot)) {
         plopTargets.push({
-          idx: raisinIdx,
+          idx: childIdx,
           slot
         });
       } else if (
-        raisinChild === possiblePlop ||
-        raisinChildren[idx + 1] === possiblePlop ||
-        raisinChildren[raisinChildren.length - 1] === possiblePlop
+        child === possiblePlop ||
+        raisinChildren[idx + 1]?.child === possiblePlop ||
+        raisinChildren[raisinChildren.length - 1]?.child === possiblePlop
       ) {
         plopTargets.push({
-          idx: raisinIdx,
+          idx: childIdx,
           slot
         });
       } else {
         plopTargets.push({
-          idx: raisinIdx + 1,
+          idx: childIdx + 1,
           slot
         });
       }
@@ -121,12 +117,12 @@ export function calculatePlopTargets(
       lastIdx = idx + 1;
       if (
         // No plops around picked node (that's redundant)
-        raisinChild === possiblePlop
+        child === possiblePlop
       ) {
         // No plop targets around element nodes
         if (removeIDs.slot === undefined) removeIDs[slot] = [];
-        removeIDs[slot].push(raisinIdx);
-        if (removeIdx) removeIDs[slot].push(raisinIdx + 1);
+        removeIDs[slot].push(childIdx);
+        if (removeIdx) removeIDs[slot].push(childIdx + 1);
       }
 
       return [...acc, ...plopTargets];
@@ -146,6 +142,8 @@ export function calculatePlopTargets(
         slot
       });
   });
+
+  console.log(raisinChildren);
 
   return newChildren
     .filter(x => {
