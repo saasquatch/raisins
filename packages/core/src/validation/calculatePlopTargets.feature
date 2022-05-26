@@ -104,10 +104,6 @@ Feature: Calculate Plop Targets
 			[
 				{
 					"slot": "",
-					"idx": 0
-				},
-				{
-					"slot": "",
 					"idx": 1
 				},
 				{
@@ -116,7 +112,11 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
-					"idx": 3
+					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
 				}
 			]
 			"""
@@ -138,27 +138,6 @@ Feature: Calculate Plop Targets
 		Then there are no plop targets anywhere
 
 	@motivating
-	Scenario Outline: Indexes around the plop target are not returned
-
-		Given a parent with following html
-			"""
-			<parent>
-			<node></node>
-			<node></node>
-			<node></node>
-			</parent>
-			"""
-		And plop is child at position <index> of parent
-		And parent meta has slots [{"name": ""}]
-		Then calculatePlopTargets will return <result>
-
-		Examples:
-			| index | result                                        |
-			| 0     | [{"slot": "","idx": 2},{"slot": "","idx": 3}] |
-			| 1     | [{"slot": "","idx": 0},{"slot": "","idx": 3}] |
-			| 2     | [{"slot": "","idx": 0},{"slot": "","idx": 1}] |
-
-	@motivating
 	Scenario: Indexes around the plop target are not returned (last position + additional slot)
 
 		Given a parent with following html
@@ -176,15 +155,19 @@ Feature: Calculate Plop Targets
 			[
 				{
 					"slot": "",
-					"idx": 0
-				},
-				{
-					"slot": "",
 					"idx": 1
 				},
 				{
+					"slot": "",
+					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
+				},
+				{
 					"slot": "slot-other",
-					"idx": 3
+					"idx": 4
 				}
 			]
 			"""
@@ -208,10 +191,6 @@ Feature: Calculate Plop Targets
 			[
 				{
 					"slot": "",
-					"idx": 0
-				},
-				{
-					"slot": "",
 					"idx": 1
 				},
 				{
@@ -220,7 +199,11 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
-					"idx": 3
+					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
 				},
 				{
 					"slot": "slot-a",
@@ -234,7 +217,7 @@ Feature: Calculate Plop Targets
 			"""
 
 	@motivating
-	Scenario: Parent with children in multiple slots returns all indexes
+	Scenario: Parent with children in multiple slots returns all valid indexes
 
 		Given a parent with following html
 			"""
@@ -252,10 +235,6 @@ Feature: Calculate Plop Targets
 			[
 				{
 					"slot": "",
-					"idx": 0
-				},
-				{
-					"slot": "",
 					"idx": 1
 				},
 				{
@@ -264,15 +243,19 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
-					"idx": 3
-				},
-				{
-					"slot": "slot-a",
-					"idx": 3
-				},
-				{
-					"slot": "slot-a",
 					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
+				},
+				{
+					"slot": "slot-a",
+					"idx": 7
+				},
+				{
+					"slot": "slot-a",
+					"idx": 8
 				},
 				{
 					"slot": "slot-b",
@@ -280,3 +263,210 @@ Feature: Calculate Plop Targets
 				}
 			]
 			"""
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for the first element
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 1 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
+				}
+			]
+			"""
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for the first element with 4 nodes
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 1 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 4
+				},
+				{
+					"slot": "",
+					"idx": 6
+				},
+				{
+					"slot": "",
+					"idx": 8
+				}
+			]
+			"""
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for a middle element with 4 nodes
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 3 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 1
+				},
+				{
+					"slot": "",
+					"idx": 6
+				},
+				{
+					"slot": "",
+					"idx": 8
+				}
+			]
+			"""
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for the last element with 4 nodes
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 7 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 1
+				},
+				{
+					"slot": "",
+					"idx": 3
+				},
+				{
+					"slot": "",
+					"idx": 5
+				}
+			]
+			"""
+
+
+
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for the middle element
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 3 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 1
+				},
+				{
+					"slot": "",
+					"idx": 6
+				}
+			]
+			"""
+
+	@motivating
+	Scenario: White space and newline characters do not create additional plop targets for the last element
+
+		Given a parent with following html
+			"""
+			<parent>\n
+			<node></node>\n
+			<node></node>\n
+			<node></node>\n
+			</parent>
+			"""
+		And plop is child at position 5 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 1
+				},
+				{
+					"slot": "",
+					"idx": 3
+				}
+			]
+			"""
+
+	@motivating
+	Scenario: Randomly ordered nodes and newlines do not break plop targets for the first element
+
+		Given a parent with following html
+			"""
+			<parent>
+			<node></node><node></node>
+			<node></node>
+			</parent>
+			"""
+		And plop is child at position 1 of parent
+		And parent meta has slots [{"name": ""}]
+		Then calculatePlopTargets will return
+			"""
+			[
+				{
+					"slot": "",
+					"idx": 3
+				},
+				{
+					"slot": "",
+					"idx": 5
+				}
+			]
+			"""
+

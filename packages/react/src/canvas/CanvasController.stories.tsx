@@ -7,7 +7,8 @@ import {
   big,
   MintComponents,
   mintMono,
-  mintTimeline,
+  mintTimelineNewlines,
+  mintTimelineTrimmed,
 } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
@@ -172,7 +173,21 @@ export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
 export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;
 
 export const TimelineCanvasFull = () => (
-  <BasicStory startingHtml={mintTimeline} startingPackages={MintComponents}>
+  <BasicStory
+    startingHtml={mintTimelineNewlines}
+    startingPackages={MintComponents}
+  >
+    <CanvasProvider>
+      <CanvasFull />
+    </CanvasProvider>
+  </BasicStory>
+);
+
+export const TimelineTrimmedCanvasFull = () => (
+  <BasicStory
+    startingHtml={mintTimelineTrimmed}
+    startingPackages={MintComponents}
+  >
     <CanvasProvider>
       <CanvasFull />
     </CanvasProvider>

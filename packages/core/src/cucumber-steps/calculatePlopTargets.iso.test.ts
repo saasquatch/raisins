@@ -19,7 +19,7 @@ const cucumber = (
   let parentMeta: CustomElement;
 
   given("a parent with following html", (html: string) => {
-    parent = parse(html, { cleanWhitespace: true })
+    parent = parse(html, { cleanWhitespace: false })
       .children[0] as RaisinElementNode;
     parents = getParents(parent);
   });

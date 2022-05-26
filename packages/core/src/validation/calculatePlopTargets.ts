@@ -1,6 +1,6 @@
 import { CustomElement } from "@raisins/schema/schema";
 import { isElementNode } from "../html-dom/isNode";
-import { RaisinNode } from "../html-dom/RaisinNode";
+import { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode";
 import { isNodeAllowed } from "./rules/isNodeAllowed";
 
 export type PlopTarget = {
@@ -27,7 +27,14 @@ export function calculatePlopTargets(
     ancestor = parents.get(ancestor);
   } while (ancestor !== undefined);
 
-  const raisinChildren = parent.children;
+  // Filter out text node children and save the original index
+  const raisinChildren = parent.children
+    .map((child, idx) => ({ child, idx }))
+    .filter(
+      ({ child }) =>
+        !(child as RaisinTextNode).data ||
+        (child as RaisinTextNode).data?.trim()?.replace(/\\n/g, "")
+    );
   const seenSlots = new Set();
   const remainingSlots = new Set(
     schema.parentMeta.slots?.map(e => e.name) ?? []
@@ -57,16 +64,16 @@ export function calculatePlopTargets(
 
   let lastIdx = 0;
   const newChildren =
-    raisinChildren?.reduce((acc, raisinChild, idx) => {
+    raisinChildren?.reduce((acc, { child, idx: childIdx }, idx) => {
       if (
         // No plop around text nodes
-        !isElementNode(raisinChild)
+        !isElementNode(child)
       ) {
         // No plop targets around element nodes
         return acc;
       }
 
-      const slot = raisinChild.attribs.slot ?? "";
+      const slot = child.attribs.slot ?? "";
       const isValid = isNodeAllowed(
         possiblePlop,
         schema.possiblePlopMeta,
@@ -76,40 +83,61 @@ export function calculatePlopTargets(
       );
 
       if (!isValid) return acc;
+
       remainingSlots.delete(slot);
 
       let plopTargets = [];
 
       if (!seenSlots.has(slot)) {
         plopTargets.push({
-          idx,
+          idx: childIdx,
           slot
         });
       }
-      plopTargets.push({
-        idx: idx + 1,
-        slot
-      });
-      seenSlots.add(slot);
-      lastIdx = idx + 1;
+      if (
+        child === possiblePlop ||
+        raisinChildren[idx + 1]?.child === possiblePlop ||
+        raisinChildren[raisinChildren.length - 1]?.child === possiblePlop
+      ) {
+        plopTargets.push({
+          idx: childIdx,
+          slot
+        });
+      } else {
+        plopTargets.push({
+          idx: childIdx + 1,
+          slot
+        });
+      }
 
+      seenSlots.add(slot);
+
+      lastIdx = idx + 1;
       if (
         // No plops around picked node (that's redundant)
-        raisinChild === possiblePlop
+        child === possiblePlop
       ) {
         // No plop targets around element nodes
         if (removeIDs.slot === undefined) removeIDs[slot] = [];
-        removeIDs[slot].push(idx, idx + 1);
+        removeIDs[slot].push(childIdx);
       }
 
       return [...acc, ...plopTargets];
     }, [] as PlopTarget[]) ?? [];
 
   remainingSlots.forEach(slot => {
-    newChildren.push({
-      idx: lastIdx,
+    const isValid = isNodeAllowed(
+      possiblePlop,
+      schema.possiblePlopMeta,
+      parent,
+      schema.parentMeta,
       slot
-    });
+    );
+    if (isValid)
+      newChildren.push({
+        idx: lastIdx,
+        slot
+      });
   });
 
   return newChildren
