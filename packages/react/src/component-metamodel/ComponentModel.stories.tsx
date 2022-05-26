@@ -7,7 +7,12 @@ import React from 'react';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { CanvasProvider } from '../canvas/CanvasScope';
 import { PickAndPlopMolecule } from '../core';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  big,
+  MintComponents,
+  mintMono,
+  mintTimelineNewlines,
+} from '../examples/MintComponents';
 import {
   referrerWidget,
   VanillaComponents,
@@ -125,6 +130,17 @@ export function BigBlocks() {
 export function MintBlocks() {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintTimelineBlocks() {
+  return (
+    <BasicStory
+      startingHtml={mintTimelineNewlines}
+      startingPackages={MintComponents}
+    >
       <Editor />
     </BasicStory>
   );

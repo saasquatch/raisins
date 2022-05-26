@@ -108,6 +108,10 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
+					"idx": 2
+				},
+				{
+					"slot": "",
 					"idx": 4
 				},
 				{
@@ -191,6 +195,10 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
+					"idx": 2
+				},
+				{
+					"slot": "",
 					"idx": 4
 				},
 				{
@@ -231,6 +239,10 @@ Feature: Calculate Plop Targets
 				},
 				{
 					"slot": "",
+					"idx": 2
+				},
+				{
+					"slot": "",
 					"idx": 4
 				},
 				{
@@ -240,6 +252,10 @@ Feature: Calculate Plop Targets
 				{
 					"slot": "slot-a",
 					"idx": 7
+				},
+				{
+					"slot": "slot-a",
+					"idx": 8
 				},
 				{
 					"slot": "slot-b",

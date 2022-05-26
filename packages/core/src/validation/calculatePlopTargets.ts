@@ -27,6 +27,7 @@ export function calculatePlopTargets(
     ancestor = parents.get(ancestor);
   } while (ancestor !== undefined);
 
+  // Filter out text node children and save the original index
   const raisinChildren = parent.children
     .map((child, idx) => ({ child, idx }))
     .filter(
@@ -87,16 +88,13 @@ export function calculatePlopTargets(
 
       let plopTargets = [];
 
-      const removeIdx =
-        idx + 1 === raisinChildren.length - 1 &&
-        possiblePlop !== raisinChildren[raisinChildren.length - 1]?.child;
-
       if (!seenSlots.has(slot)) {
         plopTargets.push({
           idx: childIdx,
           slot
         });
-      } else if (
+      }
+      if (
         child === possiblePlop ||
         raisinChildren[idx + 1]?.child === possiblePlop ||
         raisinChildren[raisinChildren.length - 1]?.child === possiblePlop
@@ -122,7 +120,6 @@ export function calculatePlopTargets(
         // No plop targets around element nodes
         if (removeIDs.slot === undefined) removeIDs[slot] = [];
         removeIDs[slot].push(childIdx);
-        if (removeIdx) removeIDs[slot].push(childIdx + 1);
       }
 
       return [...acc, ...plopTargets];
@@ -142,8 +139,6 @@ export function calculatePlopTargets(
         slot
       });
   });
-
-  console.log(raisinChildren);
 
   return newChildren
     .filter(x => {
