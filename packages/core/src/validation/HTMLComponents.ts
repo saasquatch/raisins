@@ -668,7 +668,6 @@ export const SPAN: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["span"],
       editor: "inline"
     }
   ]
@@ -679,8 +678,7 @@ export const STRONG: CustomElement = {
   tagName: "strong",
   slots: [
     {
-      ...DefaultSlot,
-      validChildren: ["span"]
+      ...DefaultSlot
     }
   ]
 };
