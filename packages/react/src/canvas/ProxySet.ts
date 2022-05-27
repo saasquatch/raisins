@@ -7,7 +7,6 @@ export function createProxy<T extends object>() {
   const store = create<SetStore<T>>((set) => ({
     values: [],
     add: (item: T) => {
-      console.log('Adding', item);
       set((state) => ({ values: [...state.values, item] }));
     },
     remove: (item: T) =>
