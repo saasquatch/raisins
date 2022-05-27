@@ -50,6 +50,29 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     }
   );
 
+  function ensureShadow(el: HTMLElement) {
+    if (el.shadowRoot === null) {
+      el.attachShadow({ mode: 'open' });
+    }
+    return el.shadowRoot!;
+  }
+
+  const shadowDomModule: Module = {
+    create: function (_, vNode: VNode) {
+      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
+        ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+      }
+    },
+    update: function (oldVNode: VNode, vNode: VNode) {
+      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
+        // Will only parse when the string content is different
+        if (oldVNode.data?.shadowContent !== vNode.data?.shadowContent) {
+          ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+        }
+      }
+    },
+  };
+
   const resizeModule: Module = {
     create: function (empty, next) {
       isElement(next.elm) &&
@@ -63,6 +86,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
 
   const patch = snabbdom.init([
     // Init patch function with chosen modules
+    shadowDomModule,
     resizeModule,
     snabbdom.propsModule,
     snabbdom.classModule,
@@ -95,6 +119,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   function patchAndCache(next: VNode) {
     rendering = true;
     try {
+      console.log('CHILD: Rendering new node', next);
       patch(currentNode, next);
     } catch (e) {
       throw e;

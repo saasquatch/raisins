@@ -1,20 +1,14 @@
-import {
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNode,
-} from '@raisins/core';
+import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
-  SelectedNodeMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../core';
 import { Soul } from '../core/souls/Soul';
-import { NodeMolecule } from '../node';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import {
   GeometryDetail,
@@ -25,6 +19,8 @@ import { CanvasConfigMolecule } from './CanvasConfig';
 import { CanvasScope } from './CanvasScope';
 import { CanvasScriptsMolecule } from './CanvasScriptsMolecule';
 import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
+import { createProxy } from './ProxySet';
+import { RootRenderer } from './types';
 import {
   combineAppenders,
   combineRenderers,
@@ -69,6 +65,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
+  const RootRendererProxy = createProxy<Atom<RootRenderer>>();
   const ListenersMap = new Map<string, Set<CanvasEventListener>>([]);
   const addEventListener = (type: string, listener: CanvasEventListener) => {
     let set = ListenersMap.get(type);
@@ -121,10 +118,20 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const appenders = Array.from(AppendersSet.values()).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
+    const rootRenderers = Array.from(
+      get(RootRendererProxy.atom).values
+    ).map((r) => get(r));
+    const rootRenderer = rootRenderers.reduce(
+      (prev, renderer) => {
+        return (c, n) => renderer(prev(c, n), n);
+      },
+      (c, n) => c
+    );
     const vnode = raisinToSnabbdom(
       node as RaisinDocumentNode,
       renderer,
-      appender
+      appender,
+      rootRenderer
     );
 
     return vnode;
@@ -204,6 +211,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     IframeAtom,
     AppendersSet,
     RendererSet,
+    RootRendererSet: RootRendererProxy.set,
   };
 });
 

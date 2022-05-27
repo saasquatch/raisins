@@ -1,3 +1,6 @@
+import type { RaisinNode } from '@raisins/core';
+import type { VNode, VNodeChildren, VNodeData } from 'snabbdom';
+
 /**
  * A rectangle for on-canvas positioning.
  *
@@ -9,3 +12,19 @@ export type Rect = {
   height: number;
   width: number;
 };
+
+export type RaisinVNode = Omit<VNode, 'data'> & {
+  data?: RaisinVNodeData;
+};
+
+export type RaisinVNodeData = VNodeData & {
+  /**
+   * Content of the shadow dom
+   */
+  shadowContent?: string;
+};
+
+export type RootRenderer = (
+  children: VNodeChildren,
+  document: RaisinNode
+) => VNodeChildren;

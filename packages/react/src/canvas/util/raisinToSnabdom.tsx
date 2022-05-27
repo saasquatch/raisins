@@ -7,6 +7,7 @@ import {
 } from '@raisins/core';
 import { h, VNode, VNodeData } from 'snabbdom';
 import styleToObject from 'style-to-object';
+import { RootRenderer } from '../types';
 const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';
@@ -52,7 +53,8 @@ export function combineAppenders(
 export function raisinToSnabbdom(
   node: RaisinDocumentNode,
   modifier: SnabbdomRenderer = (d, n) => d,
-  appender: SnabbdomAppender = (c, n) => c
+  appender: SnabbdomAppender = (c, n) => c,
+  rootRenderer?: RootRenderer
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onComment(c) {
@@ -81,7 +83,12 @@ export function raisinToSnabbdom(
       return text.data;
     },
     onRoot(root, children) {
-      return h(GLOBAL_ENTRY, {}, appender(children, root));
+      const newchildren = appender(children, root);
+      if (rootRenderer) {
+        const rootNode = rootRenderer(newchildren, root);
+        return h(GLOBAL_ENTRY, {}, rootNode);
+      }
+      return h(GLOBAL_ENTRY, {}, newchildren);
     },
   });
 

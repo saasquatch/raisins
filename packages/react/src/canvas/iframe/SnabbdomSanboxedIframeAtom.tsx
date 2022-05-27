@@ -169,8 +169,9 @@ export function createAtoms(props: SnabbdomIframeProps) {
     if (connectionStatus.type !== 'loaded') return undefined;
 
     const component = get(props.vnodeAtom);
+    console.log('Render new item', props.vnodeAtom, component);
 
-    throttledRender(connectionStatus.childRpc, component);
+    renderInChild(connectionStatus.childRpc, component);
     return component;
   });
 
