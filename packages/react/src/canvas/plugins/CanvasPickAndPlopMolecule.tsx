@@ -38,6 +38,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
   /**
    * Listens for double click events, marks double clicked elements as selected
+   * Only triggers with NODE_ENV=development
    */
   if (process.env.NODE_ENV === 'development') {
     const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
