@@ -18,6 +18,7 @@ import {
   referrerWidget,
   VanillaComponents,
 } from '../examples/VanillaComponents';
+import { useHotkeys } from '../hotkeys';
 import { BasicStory } from '../index.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
@@ -108,6 +109,7 @@ const BlocksController = () => {
 };
 
 const Editor = () => {
+  useHotkeys();
   return (
     <div style={{ display: 'flex' }}>
       <BlocksController />
