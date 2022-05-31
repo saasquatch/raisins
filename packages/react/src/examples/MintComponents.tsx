@@ -7,21 +7,18 @@ export const MintComponents = [
   {
     package: '@saasquatch/bedrock-components',
     name: '@saasquatch/bedrock-components',
-    filePath: '/dist/bedrock-components/bedrock-components.js',
-    version: '1.3.2-1',
+    version: '1.3.2-7',
+  },
+  {
+    package: '@saasquatch/mint-components',
+    name: '@saasquatch/mint-components',
+    version: '1.6.1-27',
   },
   // {
-  //   package: '@saasquatch/mint-components',
-  //   name: '@saasquatch/mint-components',
-  //   filePath: '/dist/mint-components/mint-components.js',
+  //   package: '@local',
+  //   name: '@local',
   //   version: 'next',
   // },
-  {
-    package: '@local',
-    name: '@local',
-    filePath: '/dist/mint-components/mint-components.js',
-    version: 'next',
-  },
 ];
 
 export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
