@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react';
-import { atom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { h } from 'snabbdom';
@@ -29,17 +29,22 @@ const CanvasWithSelection = () => {
 const PaintItRedMolecule = molecule((getMol, getScope) => {
   const CanvasScope = getMol(CanvasScopeMolecule);
 
+  const ColorAtom = atom('pink');
+  const TextAtom = atom('I am magic');
   const PaintItRed = atom<RootRenderer>((get) => {
+    const color = get(ColorAtom);
+    const text = get(TextAtom);
     return (n, d) => {
       return h(
-        'my-entry',
+        'div',
         {
           style: {
             display: 'block',
             padding: '20px',
             background: 'green',
+            '--favorite-color': color,
           },
-          shadowContent: `<div>I am magic <hr/><slot></slot><hr/>More magic down here</div>`,
+          shadowContent: `<div>${text}<hr/><slot></slot><hr/>${text}</div>`,
         },
         n
       );
@@ -47,15 +52,41 @@ const PaintItRedMolecule = molecule((getMol, getScope) => {
   });
 
   CanvasScope.RootRendererSet.add(PaintItRed);
+  return { ColorAtom, TextAtom };
 });
+
+const ShadowPicker = () => {
+  const atoms = useMolecule(PaintItRedMolecule);
+  const [, setColor] = useAtom(atoms.ColorAtom);
+  const [text, setText] = useAtom(atoms.TextAtom);
+  return (
+    <>
+      {['pink', 'red', 'green'].map((c) => (
+        <button onClick={() => setColor(c)}>{c}</button>
+      ))}
+
+      <hr />
+      <input
+        type="text"
+        value={text}
+        onInput={(e) => setText((e.target as HTMLInputElement).value)}
+      />
+    </>
+  );
+};
 
 export const CanvasFull = () => {
   useMolecule(PaintItRedMolecule);
+  useMolecule(CanvasHoveredMolecule);
+  useMolecule(CanvasSelectionMolecule);
 
   return (
-    <div style={{ position: 'relative' }}>
-      <BasicCanvasController />
-    </div>
+    <>
+      <ShadowPicker />
+      <div style={{ position: 'relative' }}>
+        <BasicCanvasController />
+      </div>
+    </>
   );
 };
 

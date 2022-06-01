@@ -350,7 +350,7 @@ export const big = `
 This kitten is as cute as he is playful. Bring him home today!
 <small>6 weeks old</small>
 
-<div slot="footer">
+<div slot="footer" style="background:var(--favorite-color)">
   <sl-button type="primary" pill>More Info</sl-button>
   <sl-rating></sl-rating>
 </div>
