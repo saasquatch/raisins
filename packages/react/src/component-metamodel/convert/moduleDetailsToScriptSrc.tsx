@@ -23,7 +23,7 @@ export function moduleDetailsToScriptSrc(
       const isCss = filePath && filePath.endsWith('.css');
       // TODO: Centralize registry better
       let registryToUse = registry;
-      if (m.name === LOCAL_REPO && localUrl) {
+      if (m.package === LOCAL_REPO && localUrl) {
         registryToUse = makeLocalRegistry(localUrl);
       }
       if (isCss)

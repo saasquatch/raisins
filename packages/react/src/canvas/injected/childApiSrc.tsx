@@ -16,7 +16,7 @@ export const childApiSrc = (
   </style>
   <script src="${registry.resolvePath(
     {
-      name: 'penpal',
+      package: 'penpal',
       version: '6.2.1',
     },
     'dist/penpal.min.js'
@@ -24,7 +24,7 @@ export const childApiSrc = (
   <script type="module">
   import * as snabbdom from "${registry.resolvePath(
     {
-      name: 'snabbdom',
+      package: 'snabbdom',
       version: '3.5.0',
     },
     'build/index.js'

@@ -34,8 +34,8 @@ export type ComponentModelMoleculeType = {
   ComponentsAtom: Atom<CustomElement[]>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
-  AddModuleAtom: WritableAtom<null, SetStateAction<Module>>;
-  RemoveModuleAtom: WritableAtom<null, SetStateAction<Module>>;
+  AddModuleAtom: WritableAtom<null, Module>;
+  RemoveModuleAtom: WritableAtom<null, Module>;
   RemoveModuleByNameAtom: WritableAtom<null, string>;
   ComponentMetaAtom: Atom<ComponentMetaProvider>;
   ValidChildrenAtom: Atom<
@@ -124,7 +124,7 @@ export const ComponentModelMolecule = molecule(
      * Remove all packages based on their NPM name
      */
     const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-      set(PackagesAtom, (modules) => modules.filter((e) => e.name !== name))
+      set(PackagesAtom, (modules) => modules.filter((e) => e.package !== name))
     );
     RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
 

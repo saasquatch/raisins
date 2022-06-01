@@ -1,7 +1,6 @@
 export const VanillaComponents = [
   {
     package: '@saasquatch/vanilla-components',
-    name: '@saasquatch/vanilla-components',
     version: '1.2.4-14',
   },
 ];
