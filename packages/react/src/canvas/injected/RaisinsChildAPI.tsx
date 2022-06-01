@@ -94,7 +94,12 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
               elm.setAttributeNS(xmlnsNS, key, cur as any);
             } else {
               const nsUrl = elm.lookupNamespaceURI(ns);
-              elm.setAttributeNS(nsUrl, key, cur as any);
+              if (nsUrl === null) {
+                // No namespace found. Ignore using validation
+                elm.setAttribute(key, cur as any);
+              } else {
+                elm.setAttributeNS(nsUrl, key, cur as any);
+              }
             }
           } else {
             throw new Error(`Invalid attribute "${key}"`);
