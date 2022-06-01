@@ -11,6 +11,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
 import { CanvasController } from './canvas/CanvasController';
+import { Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { CoreMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
@@ -22,7 +23,6 @@ import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
-import { Module } from './util/NPMRegistry';
 
 const meta: Meta = {
   title: 'Editor',

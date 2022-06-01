@@ -1,7 +1,7 @@
 {
   "name": "@raisins/react",
   "author": "Logan Volkers",
-  "version": "0.81.0",
+  "version": "0.82.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
