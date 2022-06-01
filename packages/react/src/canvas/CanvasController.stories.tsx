@@ -219,3 +219,31 @@ export const SQMText = ({ Component = BasicCanvasController }) => (
 );
 
 export const SQMTextFull = () => <SQMText Component={CanvasFull} />;
+
+export const ScalableVectorGraphics = ({
+  Component = BasicCanvasController,
+}) => (
+  <BasicStory
+    startingHtml={`<svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    >
+      <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+
+ </svg>`}
+    startingPackages={[]}
+  >
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
+      </div>
+      <div style={{ width: '50%' }}>
+        <CanvasProvider>
+          <Component />
+        </CanvasProvider>
+      </div>
+    </div>
+  </BasicStory>
+);
