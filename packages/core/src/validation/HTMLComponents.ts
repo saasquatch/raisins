@@ -850,10 +850,10 @@ export const CIRCLE: CustomElement = {
   tagName: "circle",
   slots: [DefaultSlot]
 };
-// 'clipPath',
+// 'clippath',
 export const clipPath: CustomElement = {
   title: "Clipping Path",
-  tagName: "clipPath",
+  tagName: "clippath",
   slots: [DefaultSlot]
 };
 // 'defs',
@@ -868,10 +868,10 @@ export const ELLIPSE: CustomElement = {
   tagName: "video",
   slots: [DefaultSlot]
 };
-// 'foreignObject',
+// 'foreignobject',
 export const FOREIGNOBJECT: CustomElement = {
   title: "Foreign Object",
-  tagName: "foreignObject",
+  tagName: "foreignobject",
   slots: [DefaultSlot]
 };
 // 'g',
@@ -892,10 +892,10 @@ export const LINE: CustomElement = {
   tagName: "line",
   slots: [DefaultSlot]
 };
-// 'linearGradient',
+// 'lineargradient',
 export const LINEARGRADIENT: CustomElement = {
   title: "Linear Gradient",
-  tagName: "linearGradient",
+  tagName: "lineargradient",
   slots: [DefaultSlot]
 };
 // 'mask',
@@ -928,16 +928,16 @@ export const POLYLINE: CustomElement = {
   tagName: "polyline",
   slots: [DefaultSlot]
 };
-// 'radialGradient',
+// 'radialgradient',
 export const RADIALGRADIENT: CustomElement = {
   title: "Radial Gradient",
-  tagName: "radialGradient",
+  tagName: "radialgradient",
   slots: [DefaultSlot]
 };
 // 'rect',
 export const RECT: CustomElement = {
   title: "Rectangle",
-  tagName: "rectangle",
+  tagName: "rect",
   slots: [DefaultSlot]
 };
 // 'stop',

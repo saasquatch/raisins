@@ -19,8 +19,8 @@ export function moduleDetailsToScriptSrc(
       const { module, browser, main, unpkg } = m['package.json'];
       // Use the prescribed file path, if not then module, browser, or main or empty
       const filePath = m.filePath ?? unpkg ?? module ?? browser ?? main ?? '';
-      const useModule = filePath === module || filePath.endsWith('.esm.js');
-      const isCss = m.filePath && m.filePath.endsWith('.css');
+      const useModule = filePath === module || filePath?.endsWith('.esm.js');
+      const isCss = filePath && filePath.endsWith('.css');
       // TODO: Centralize registry better
       let registryToUse = registry;
       if (m.name === LOCAL_REPO && localUrl) {

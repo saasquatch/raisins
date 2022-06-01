@@ -12,7 +12,7 @@ export const MintComponents = [
   {
     package: '@saasquatch/mint-components',
     name: '@saasquatch/mint-components',
-    version: '1.6.1-27',
+    version: '1.6.1-28',
   },
   // {
   //   package: '@local',
