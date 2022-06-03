@@ -66,7 +66,7 @@ export const DefaultProseSchema = new Schema({
       inclusive: false,
       parseDOM: [
         {
-          tag: 'a[href]',
+          tag: 'a',
           getAttrs(dom) {
             const link = dom as HTMLAnchorElement;
             return {

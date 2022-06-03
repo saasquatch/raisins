@@ -7,11 +7,18 @@ import React from 'react';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { CanvasProvider } from '../canvas/CanvasScope';
 import { PickAndPlopMolecule } from '../core';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import {
+  big,
+  MintComponents,
+  mintMono,
+  mintTimelineNewlines,
+  mintTitledSection,
+} from '../examples/MintComponents';
 import {
   referrerWidget,
   VanillaComponents,
 } from '../examples/VanillaComponents';
+import { useHotkeys } from '../hotkeys';
 import { BasicStory } from '../index.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
@@ -102,6 +109,7 @@ const BlocksController = () => {
 };
 
 const Editor = () => {
+  useHotkeys();
   return (
     <div style={{ display: 'flex' }}>
       <BlocksController />
@@ -125,6 +133,28 @@ export function BigBlocks() {
 export function MintBlocks() {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintTimelineBlocks() {
+  return (
+    <BasicStory
+      startingHtml={mintTimelineNewlines}
+      startingPackages={MintComponents}
+    >
+      <Editor />
+    </BasicStory>
+  );
+}
+
+export function MintTitledSectionBlocks() {
+  return (
+    <BasicStory
+      startingHtml={mintTitledSection}
+      startingPackages={MintComponents}
+    >
       <Editor />
     </BasicStory>
   );

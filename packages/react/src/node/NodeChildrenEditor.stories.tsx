@@ -2,7 +2,9 @@ import { isElementNode, isRoot, RaisinNode } from '@raisins/core';
 import { useAtom, useAtomValue } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import React, { useContext } from 'react';
+import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
+import { invalidTBody } from '../examples/HTMLComponents';
 import { BasicStory } from '../index.stories';
 import { example } from './children/LoadTest.example';
 import {
@@ -38,6 +40,30 @@ export const JsonPointersTest = () => {
     <BasicStory startingHtml={example}>
       <JsonPointers />
     </BasicStory>
+  );
+};
+
+export const HTMLValidationTest = () => {
+  return (
+    <BasicStory startingHtml={invalidTBody}>
+      <ValidationTest />
+    </BasicStory>
+  );
+};
+
+const ValidationTest = () => {
+  const [html, setHtml] = useAtom(useMolecule(ConfigMolecule).HTMLAtom);
+
+  return (
+    <>
+      <textarea
+        value={html}
+        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+        rows={6}
+        style={{ width: '300px' }}
+      />
+      <JsonPointers />
+    </>
   );
 };
 

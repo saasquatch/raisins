@@ -19,7 +19,7 @@ const proseAtom: ProseEditorScopeType = atom(() => {
   const props: ProseEditorScopeProps = {
     node: atom(
       htmlParser(
-        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a>`
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a> and without href <a>test</a>`
       )
     ),
     plugins: atom([DefaultProseSchemaHotkeysPlugin]),

@@ -7,7 +7,7 @@ import {
   NodeWithSlots,
   RaisinElementNode,
   RaisinNode,
-  DefaultTextMarks
+  DefaultTextMarks,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { Atom, atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
@@ -218,7 +218,25 @@ export const ComponentModelMolecule = molecule(
         ParentsAtom;
         const parentMeta = getComponentMeta(parent.tagName);
         const childMeta = getComponentMeta(child.tagName);
-        return isNodeAllowed(child, childMeta, parent, parentMeta, slot);
+
+        // allows default HTML components to inherit custom slot names
+        const slots = parentMeta.slots
+          ? [
+              ...parentMeta.slots,
+              { name: parent.attribs.slot, title: parent.attribs.slot },
+            ]
+          : [];
+
+        return isNodeAllowed(
+          child,
+          childMeta,
+          parent,
+          {
+            ...parentMeta,
+            slots,
+          },
+          slot
+        );
       }
 
       function getSlotsInternal(node: RaisinNode): NodeWithSlots {

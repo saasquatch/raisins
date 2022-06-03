@@ -124,6 +124,34 @@ export const MintLayersOnly = () => (
   </BasicStory>
 );
 
+export const SVGLayersOnly = () => (
+  <BasicStory
+    startingHtml={`
+    <style>body { color:red; }</style>
+    <svg  version="1.1"
+    width="300" height="200"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlsn:xlink="http://www.w3.org/2000/svg"
+    xlink="http://www.w3.org/2000/svg">
+    <clipPath></clipPath>
+    <foreignObject></foreignObject>
+    <linearGradient></linearGradient>
+    <pattern></pattern>
+    <radialGradient></radialGradient>
+    <rect></rect>
+    </svg>
+  `}
+    startingPackages={MintComponents}
+  >
+    <div style={{ display: 'flex' }}>
+      <div style={{ width: '50%' }}>
+        <LayersController />
+      </div>
+      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
+    </div>
+  </BasicStory>
+);
+
 function Canvas() {
   useMolecule(CanvasSelectionMolecule);
   useMolecule(CanvasHoveredMolecule);
@@ -442,7 +470,7 @@ function SlotWidget() {
                 {childNodes.length} children in this slot ({slotDetails.name})
                 <ChildrenEditorForAtoms
                   childAtoms={childNodes}
-                  Component={({idx}) => <SlotChild idx={idx} atoms={atoms} />}
+                  Component={({ idx }) => <SlotChild idx={idx} atoms={atoms} />}
                 />
               </div>
             )}
@@ -453,7 +481,7 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number, atoms:any }> = ({ idx, atoms }) => {
+const SlotChild: React.FC<{ idx?: number; atoms: any }> = ({ idx, atoms }) => {
   return (
     <>
       <ElementLayer />

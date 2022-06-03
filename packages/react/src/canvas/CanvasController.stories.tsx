@@ -7,7 +7,8 @@ import {
   big,
   MintComponents,
   mintMono,
-  mintTimeline,
+  mintTimelineNewlines,
+  mintTimelineTrimmed,
 } from '../examples/MintComponents';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
@@ -172,7 +173,21 @@ export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
 export const MintCanvasFull = () => <MintCanvasOnly Component={CanvasFull} />;
 
 export const TimelineCanvasFull = () => (
-  <BasicStory startingHtml={mintTimeline} startingPackages={MintComponents}>
+  <BasicStory
+    startingHtml={mintTimelineNewlines}
+    startingPackages={MintComponents}
+  >
+    <CanvasProvider>
+      <CanvasFull />
+    </CanvasProvider>
+  </BasicStory>
+);
+
+export const TimelineTrimmedCanvasFull = () => (
+  <BasicStory
+    startingHtml={mintTimelineTrimmed}
+    startingPackages={MintComponents}
+  >
     <CanvasProvider>
       <CanvasFull />
     </CanvasProvider>
@@ -204,3 +219,53 @@ export const SQMText = ({ Component = BasicCanvasController }) => (
 );
 
 export const SQMTextFull = () => <SQMText Component={CanvasFull} />;
+
+export const SVGWithoutNamespace = () => (
+  <ScalableVectorGraphics
+    html={`<svg>
+<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+</svg>`}
+  />
+);
+
+export const SVGWithNamespace = () => (
+  <ScalableVectorGraphics
+    html={`<svg xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+</svg>`}
+  />
+);
+
+export const SVGWithXLinkButNoElements = () => (
+  <ScalableVectorGraphics
+    html={`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+</svg>`}
+  />
+);
+
+export const SVGWithXlinkNamespace = () => (
+  <ScalableVectorGraphics
+    html={`<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink">
+<script xlink:href="cool-script.js" type="text/ecmascript"/>
+<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+</svg>`}
+  />
+);
+
+export const SVGWithXlinkButNoNamespace = () => (
+  <ScalableVectorGraphics
+    html={`<svg xmlns="http://www.w3.org/2000/svg">
+<script xlink:href="cool-script.js" type="text/ecmascript"/>
+<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />
+</svg>`}
+  />
+);
+const ScalableVectorGraphics = ({ html = '' }) => (
+  <BasicStory startingHtml={html} startingPackages={[]}>
+    <CanvasProvider>
+      <BasicCanvasController />
+    </CanvasProvider>
+  </BasicStory>
+);

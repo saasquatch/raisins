@@ -7,7 +7,7 @@ Since this file is used to generate serialized code from this function, it can o
 */
 import type PenpalType from 'penpal';
 import type * as SnabbdomType from 'snabbdom';
-import type { Module, VNode } from 'snabbdom';
+import type { Module, VNode, VNodeData } from 'snabbdom';
 import type {
   ChildRPC,
   GeometryEntry,
@@ -84,13 +84,74 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     },
   };
 
+  const xmlnsAttr = 'xmlns';
+  const xmlnsNS = 'http://www.w3.org/2000/xmlns/';
+
+  function updateAttrs(oldVnode: VNode, vnode: VNode): void {
+    let key: string;
+    const elm: Element = vnode.elm as Element;
+    let oldAttrs = (oldVnode.data as VNodeData).attrs;
+    let attrs = (vnode.data as VNodeData).attrs;
+
+    if (!oldAttrs && !attrs) return;
+    if (oldAttrs === attrs) return;
+    oldAttrs = oldAttrs || {};
+    attrs = attrs || {};
+
+    // update modified attributes, add new attributes
+    for (key in attrs) {
+      const cur = attrs[key];
+      const old = oldAttrs[key];
+      if (old !== cur) {
+        if (cur === true) {
+          elm.setAttribute(key, '');
+        } else if (cur === false) {
+          elm.removeAttribute(key);
+        } else {
+          const parts = key.split(':');
+          if (parts.length === 1) {
+            elm.setAttribute(key, cur as any);
+          } else if (parts.length === 2) {
+            const ns = parts[0];
+            if (ns === xmlnsAttr) {
+              elm.setAttributeNS(xmlnsNS, key, cur as any);
+            } else {
+              const nsUrl = elm.lookupNamespaceURI(ns);
+              if (nsUrl === null) {
+                // No namespace found. Ignore using validation
+                elm.setAttribute(key, cur as any);
+              } else {
+                elm.setAttributeNS(nsUrl, key, cur as any);
+              }
+            }
+          } else {
+            throw new Error(`Invalid attribute "${key}"`);
+          }
+        }
+      }
+    }
+    // remove removed attributes
+    // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
+    // the other option is to remove all attributes with value == undefined
+    for (key in oldAttrs) {
+      if (!(key in attrs)) {
+        elm.removeAttribute(key);
+      }
+    }
+  }
+
+  const attributesModule: Module = {
+    create: updateAttrs,
+    update: updateAttrs,
+  };
+
   const patch = snabbdom.init([
     // Init patch function with chosen modules
     shadowDomModule,
     resizeModule,
     snabbdom.propsModule,
     snabbdom.classModule,
-    snabbdom.attributesModule,
+    attributesModule,
     snabbdom.styleModule,
     snabbdom.datasetModule,
   ]);

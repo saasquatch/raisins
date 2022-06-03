@@ -1,8 +1,8 @@
 import { atom } from 'jotai';
 
 export type Module = {
-  package: string;
   name: string;
+  package?: string;
   version?: string;
 };
 
