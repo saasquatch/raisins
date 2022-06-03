@@ -50,7 +50,7 @@ export function raisinsDocsTarget({
       // Post-processing (someone will want this)
       const postProcessed = postProcess(allComponents, docsJson);
       const pkg: schema.Package = {
-        schemaVersion: '0.0.1',
+        schemaVersion: '1.0.0',
         modules: postProcessed,
       };
 
