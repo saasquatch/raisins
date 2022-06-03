@@ -2,6 +2,8 @@
 
 A [custom docs target](https://stenciljs.com/docs/docs-custom) for Stencil that generates a file compatible with `@raisins/schema` library description format.
 
+## Examples
+
 - Component annotations
 
 ```js
