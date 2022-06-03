@@ -21,9 +21,9 @@ export const config: Config = {
  * @uiOrder ["first", "middle", "last", "*"]
  * @validParents ["div"]
  * @slots [{"name":"mySlot", "validChildren":["div"]}]
- * @example Cool Kid - <my-component first=a middle=cool last=kid max-length=400></my-component>
- * @example Nerd Bird - <my-component first=The middle=Nerd last=Bird max-length=400></my-component>
- * @example Surely Sam - <my-component first=The middle=Surely last=Sam max-length=400></my-component>
+ * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+ * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+ * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
  * @exampleGroup Cool Kids
  * @slotEditor richText
  * @canvasRenderer always-replace
@@ -58,8 +58,8 @@ export class MyUiComponent {...}
   /**
    * Date to display
    * @uiName Pick a Date
-   * @uiWidget DatePicker
-   * @uiWidgetOptions {"format":"milliseconds"}
+   * @uiWidget dateRange
+   * @uiWidgetOptions {"allowPastDates":true, "months": 1}
    */
   @Prop() pickedDate: number;
 
