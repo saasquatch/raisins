@@ -84,6 +84,7 @@
     "css-tree": "*",
     "domelementtype": "^2.2.0",
     "entities": "^4.3.0",
+    "husky": "^8.0.1",
     "lodash.clonedeep": "^4.5.0",
     "luxon": "^2.3.2"
   },
