@@ -1,7 +1,7 @@
 {
   "name": "@raisins/core",
   "author": "SaaSquatch",
-  "version": "0.27.0",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/core.esm.js",
@@ -62,12 +62,10 @@
     "@types/mz": "^2.7.4",
     "@types/parse5": "^6.0.3",
     "@types/styled-components": "^5.1.14",
-    "classnames": "^2.3.1",
     "cypress": "^9.5.2",
     "cypress-cucumber-preprocessor": "^4.3.1",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
-    "husky": "^7.0.2",
     "jest": "^25.5.4",
     "jest-cucumber": "^3.0.1",
     "jsonata": "^1.8.5",
@@ -87,10 +85,7 @@
     "domelementtype": "^2.2.0",
     "entities": "^4.3.0",
     "lodash.clonedeep": "^4.5.0",
-    "luxon": "^2.3.2",
-    "penpal": "^6.1.0",
-    "snabbdom": "^3.1.0",
-    "styled-components": "^5.3.1"
+    "luxon": "^2.3.2"
   },
   "jest": {
     "testMatch": [
