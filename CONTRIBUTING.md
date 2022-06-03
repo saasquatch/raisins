@@ -9,3 +9,7 @@
 - Run `npx lerna bootstrap` in the root (Bootstrap the packages in the current Lerna repo. Installing all their dependencies and linking any cross-dependencies.)
 - Build the packages you need `npm run build`
 - Run a subproject, e.g. `cd packages/react-example && npm run start`
+
+## Publishing
+
+- Deploys are done manually for each package with independent versioning.
