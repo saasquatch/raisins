@@ -13,5 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release of schema for `core`, `react`, and `stencil-docs-target`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/schema@v1.0.0...HEAD
-[1.0.0]: https://github.com/saasquatch/raisins/compare/schema@v1.0.0
+[unreleased]: https://github.com/saasquatch/raisins/compare/schema@1.0.0...HEAD
+[1.0.0]: https://github.com/saasquatch/raisins/releases/tag/schema@1.0.0
+
+
