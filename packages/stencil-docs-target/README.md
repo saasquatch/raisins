@@ -50,7 +50,6 @@ export const config: Config = {
 ```js
 /**
  * @uiName My Component
- * @uiOrder ["first", "middle", "last", "*"]
  * @validParents ["div"]
  * @slots [{"name":"mySlot", "title":"My Slotted Content", "validChildren":["div"]}]
  * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
