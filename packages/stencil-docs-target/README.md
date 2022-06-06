@@ -1,6 +1,6 @@
 ## Raisins Stencil Docs Target
 
-A [custom docs target](https://stenciljs.com/docs/docs-custom) for Stencil that generates a file compatible with `@raisins/schema` library description format. The generated file powers the user experience in the `@raisins/react` editor and functionality of `@raisins/core`. Component packages require these custom stencil docs to work with the raisins editor, be sure to annotate your components and attributes.
+A [custom docs target](https://stenciljs.com/docs/docs-custom) for Stencil that generates a file compatible with `@raisins/schema` library description format. The generated file powers the user experience in the `@raisins/react` editor and functionality of `@raisins/core`. Component packages require these custom stencil docs to work with the raisins editor - be sure to annotate your components and attributes.
 
 ## Component Annotations
 | Tag |Description | example |
