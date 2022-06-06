@@ -66,8 +66,8 @@
   "bugs": {
     "url": "https://github.com/saasquatch/raisins/issues"
   },
+  "homepage": "https://github.com/saasquatch/raisins",
   "dependencies": {
     "@raisins/schema": "1.0.0"
-  },
-  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
+  }
 }

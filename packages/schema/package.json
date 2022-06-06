@@ -25,6 +25,7 @@
   "bugs": {
     "url": "https://github.com/saasquatch/raisins/issues"
   },
+  "homepage": "https://github.com/saasquatch/raisins",
   "devDependencies": {
     "typescript": "^4.4.3",
     "typescript-json-schema": "^0.51.0"
