@@ -11,6 +11,7 @@ import { molecule } from 'jotai-molecules';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';
+import { SelectedNodeMolecule } from './SelectedNodeMolecule';
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 
@@ -27,6 +28,7 @@ export type PickedOption =
 
 export const PickAndPlopMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
+  const { SelectedAtom } = getMol(SelectedNodeMolecule);
 
   /**
    * For tracking which atom is picked. Can only have one atom picked at a time.
@@ -89,6 +91,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
         );
 
         set(RootNodeAtom, newDocument);
+        set(SelectedAtom, cloneOfPickedNode);
       } else {
         const pickedNode = get(PickedNodeAtom);
         if (!pickedNode) {
@@ -105,7 +108,6 @@ export const PickAndPlopMolecule = molecule((getMol) => {
 
         set(RootNodeAtom, newDocument);
       }
-
       // Don't allow re-plop
       set(PickedAtom, undefined);
     }

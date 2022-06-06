@@ -3,7 +3,7 @@
   "description": "A custom docs target for Stencil components. Edit in Raisins.",
   "version": "1.0.0",
   "license": "MIT",
-  "author": "SaaSquatch",
+  "author": "SaaSquatch Team",
   "module": "dist/stencil-docs-target.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -63,8 +63,11 @@
     "tslib": "^2.3.1",
     "typescript": "^4.7.2"
   },
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  },
   "dependencies": {
-    "@raisins/schema": "^0.7.0"
+    "@raisins/schema": "1.0.0"
   },
   "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
 }
