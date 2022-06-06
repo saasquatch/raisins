@@ -57,7 +57,6 @@ export const config: Config = {
  * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
  * @exampleGroup Cool Kids
  * @slotEditor richText
- * @canvasRenderer always-replace
  */
 @Component({
   tag: 'my-ui-component',
