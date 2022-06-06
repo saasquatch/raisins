@@ -13,19 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release of schema for `core`, `react`, and `stencil-docs-target`
 - Interfaces:
-    - Package
-    - CustomElement
-    - Attribute
-    - ComponentState
-    - Slot
-    - CssCustomProperty
+  - Package
+  - CustomElement
+  - Attribute
+  - ComponentState
+  - Slot
+  - CssCustomProperty
 - Types:
-    - Example
-    - Module
-- See schema for integrated documentationg on types and interfaces
-
+  - Example
+  - Module
+- See schema for integrated documentating on types and interfaces
 
 [unreleased]: https://github.com/saasquatch/raisins/compare/schema@1.0.0...HEAD
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/schema@1.0.0
-
-
