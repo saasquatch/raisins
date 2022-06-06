@@ -2,6 +2,7 @@ import { getPath, getSubErrors, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { waitForAll } from 'jotai/utils';
 import { SelectionBookmark } from 'prosemirror-state';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
@@ -12,6 +13,7 @@ import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { atomWithShallowCheck } from '../util/atoms/atomWithShallowCheck';
 import { isElementNode } from '../util/isNode';
+import { waitForUpdate } from '../util/waitForUpdate';
 import { ValidationMolecule } from '../validation/ValidationMolecule';
 import { atomForAttributes } from './atoms/atomForAttributes';
 import { atomForChildren } from './atoms/atomForChildren';
@@ -210,7 +212,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     // Set render mode to prevent errors when duplicating elements with canvasRenderer = "always-replace"
     set(rerenderNodeAtom, true);
     set(DuplicateNodeAtom, get(n));
-    await new Promise((resolve) => setTimeout(resolve, 1));
+    await waitForUpdate();
     set(rerenderNodeAtom, false);
   });
 

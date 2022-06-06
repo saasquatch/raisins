@@ -1,7 +1,7 @@
 {
   "name": "@raisins/react",
   "author": "SaaSquatch",
-  "version": "0.84.0",
+  "version": "0.85.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",

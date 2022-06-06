@@ -10,6 +10,7 @@ import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
+import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule } from './SelectedNodeMolecule';
 
@@ -73,7 +74,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
 
   const PlopNodeInSlotAtom = atom(
     null,
-    (get, set, { parent, idx, slot }: PlopDestination) => {
+    async (get, set, { parent, idx, slot }: PlopDestination) => {
       const picked = get(PickedAtom);
       if (!picked) return;
 
@@ -91,6 +92,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
         );
 
         set(RootNodeAtom, newDocument);
+        await waitForUpdate();
         set(SelectedAtom, cloneOfPickedNode);
       } else {
         const pickedNode = get(PickedNodeAtom);
