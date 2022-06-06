@@ -7,14 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2022-06-03
+## [1.0.0] - 2022-06-06
 
 ### Added
 
 - Supports JSDocs tags for customizing the editability of stencil components
-
-  - supported JSDoc tags for attributes:
-
+  - Attribute Tags:
     - `@undocumented`
     - `@uiName`
     - `@uiType`
@@ -31,8 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `@format`
     - `@uiGroup`
     - `@uiOrder`
-
-- supported JSDoc tags for elements:
+- Element Tags:
   - `@undocumented`
   - `@uiName`
   - `@slots`
