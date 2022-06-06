@@ -8,27 +8,7 @@ Congrats! You just saved yourself hours of work by bootstrapping this project wi
 
 ## Commands
 
-TSDX scaffolds your new library inside `/src`.
-
-To run TSDX, use:
-
-```bash
-npm start # or yarn start
-```
-
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
-
 To do a one-off build, use `npm run build` or `yarn build`.
-
-To run tests, use `npm test` or `yarn test`.
-
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`.
 
 ### Bundle Analysis
 
@@ -42,20 +22,6 @@ TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rol
 
 `tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
 
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
-}
-```
-
 You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
 
 ## Module Formats
@@ -68,14 +34,8 @@ The appropriate paths are configured in `package.json` and `dist/index.js` accor
 
 Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
 
-## Development
-
-- Most updates will need to be made in `/src/convertToRaisins.ts`.
-  There are also some helpful utility files to help parse some of the more complex JSDocs.
-
 ## Publishing
 
-- Confirm all tests pass with `npm run test`
 - Build with `npm run build`
 - Update the package version and run `npm run publish`
-- tag with the newly published version: `git tag @raisins/stencil-docs-target@[your-version]` and `git push origin --tags`
+- tag with the newly published version: `git tag @raisins/schema@[your-version]` and `git push origin --tags`
