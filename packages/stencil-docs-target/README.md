@@ -6,8 +6,8 @@ A [custom docs target](https://stenciljs.com/docs/docs-custom) for Stencil that 
 | Tag |Description | example |
 |-|-|-|
 |uiName | Human readable component name.| @uiName My Component |
-|validParents | An array of strings, where each string is the tag of an element that could be this component's parent in the DOM. This can be left empty to show that any parent element is valid. | ["div", "my-component"]|
-|slots| An array of objects, where each object specifies a slot in the component. Always includes a name and a title. Valid children can be included with the tags of elements that could be this component's child in the DOM. This can be left empty to show that any element is a valid child. | [{"name":"mySlot", "title":"My Slotted Content", "validChildren":["div"]}]|
+|validParents | An array of strings, where each string is the tag of an element that could be this component's parent in the DOM. This can be left empty to show that any parent element is valid. | @validParents ["div", "my-component"]|
+|slots| An array of objects, where each object specifies a slot in the component. Always includes a name and a title. Valid children can be included with the tags of elements that could be this component's child in the DOM. This can be left empty to show that any element is a valid child. | @slots [{"name":"mySlot", "title":"My Slotted Content", "validChildren":["div"]}]|
 | example | An example of the component's usage. The format is the human name first and then the HTML, seperated by a dash `-`.| @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component> |
 | exampleGroup | Human readable name to group component examples by. Examples are grouped and displayed within a drop down titles with the `exampleGroup` value in the raisins editor.  | @exampleGroup Cool Kids |
 |slotEditor| Used to dictate if a rich text editor should appear when editing the content of the component's slots. | @slotEditor richText|
