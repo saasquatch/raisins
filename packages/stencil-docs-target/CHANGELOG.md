@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `@format`
     - `@uiGroup`
     - `@uiOrder`
+      - Note: uiOrder is picked up by the stencildocs target but not utilized in the raisins editor at the moment.
 - Element Tags:
   - `@undocumented`
   - `@uiName`
