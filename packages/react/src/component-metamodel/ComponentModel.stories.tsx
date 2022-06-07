@@ -6,7 +6,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { CanvasProvider } from '../canvas/CanvasScope';
-import { PickAndPlopMolecule } from '../core';
+import { ConfigMolecule, PickAndPlopMolecule } from '../core';
 import {
   big,
   MintComponents,
@@ -19,7 +19,8 @@ import {
   VanillaComponents,
 } from '../examples/VanillaComponents';
 import { useHotkeys } from '../hotkeys';
-import { BasicStory } from '../index.stories';
+import { BasicStory, StoryConfigMolecule } from '../index.stories';
+import { JsonPointers } from '../node/NodeChildrenEditor.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
 
@@ -178,6 +179,41 @@ export function MintPackageEditor() {
     </BasicStory>
   );
 }
+
+export const LocalBlocks = () => {
+  return (
+    <BasicStory
+      startingHtml={''}
+      startingPackages={[
+        {
+          package: '@local',
+          version: 'next',
+        },
+      ]}
+    >
+      <CustomThemeTest />
+    </BasicStory>
+  );
+};
+
+const CustomThemeTest = () => {
+  // @ts-ignore
+  const [html, setHtml] = useAtom(useMolecule(ConfigMolecule).HTMLAtom);
+
+  return (
+    <>
+      <textarea
+        value={html}
+        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+        rows={6}
+        style={{ width: '300px' }}
+      />
+      <JsonPointers />
+
+      <Editor />
+    </>
+  );
+};
 
 const PACKAGES = [
   '@local',

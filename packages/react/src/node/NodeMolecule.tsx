@@ -1,8 +1,7 @@
-import { getPath, getSubErrors, RaisinElementNode } from '@raisins/core';
+import { getSubErrors, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
-import { waitForAll } from 'jotai/utils';
 import { SelectionBookmark } from 'prosemirror-state';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
