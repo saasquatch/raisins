@@ -6,10 +6,11 @@ Raisins in a WYSIWYG visual editor for HTML and web components. This is the reac
 
 Raisins React comes with many controllers and molecules to help build a visual editor for your HTML. By using each of them together, you are able to control each different piece of functionality to include or exclude from the editing experience.
 
-- Basic Canvas
+## Base Example
+
+- The base example contains a canvas with some basic text editability. It can be combined with the examples below to provide a more complete editability experience.
 
 ```js
-export function BasicExample() {
   const WidgetScope = createScope<{
     startingHtml: string;
     startingPackages: Module[];
@@ -57,6 +58,7 @@ export function BasicExample() {
     );
   };
 
+export function BaseExample() {
   return (
     <ScopeProvider
       scope={WidgetScope}
@@ -75,7 +77,37 @@ export function BasicExample() {
 }
 ```
 
-- Canvas Toolbars
+## External HTML Control
+
+```js
+  const Editor = () => {
+    useHotkeys();
+    const { HTMLAtom } = useMolecule(ConfigMolecule);
+    const [html, setHtml] = useAtom(HTMLAtom!);
+
+    return (
+      <>
+        <textarea
+          value={html}
+          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+          rows={10}
+          style={{ width: '500px' }}
+        />
+        <div style={{ display: 'flex' }}>
+          <div style={{ flex: 0.7 }}>
+            <BasicCanvasController />
+          </div>
+          <div style={{ flex: 0.3 }}>
+            <AttributeEditor />
+          </div>
+        </div>
+      </>
+    );
+  };
+
+```
+
+## Canvas Toolbars
 
 ```js
 const ToolbarMolecule = molecule((getMol) => {
@@ -139,7 +171,7 @@ const Toolbars = () => {
   };
 ```
 
-- Layers
+## Layers
 
 ```js
 const Label: CSSProperties = {
@@ -184,6 +216,17 @@ const TitleBar: CSSProperties = {
 ```
 
 ```js
+type Atoms = {
+  slot: string,
+  slotDetails: Atom<Slot>,
+  slotName: string,
+  childrenInSlot: WritableAtom<
+    PrimitiveAtom<RaisinNode>[],
+    PrimitiveAtom<RaisinNode>,
+    void
+  >,
+};
+
 const LayersController = () => {
   const atoms = useMolecule(LayersMolecule);
   const hasChildren = useAtomValue(atoms.RootHasChildren);
@@ -284,7 +327,10 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
+const SlotChild: React.FC<{ idx?: number, atoms: Atoms }> = ({
+  idx,
+  atoms,
+}) => {
   return (
     <>
       <ElementLayerName />
@@ -310,9 +356,20 @@ const Editor = () => {
 };
 ```
 
-- Layers With Buttons
+## Layers With Buttons
 
 ```js
+type Atoms = {
+  slot: string,
+  slotDetails: Atom<Slot>,
+  slotName: string,
+  childrenInSlot: WritableAtom<
+    PrimitiveAtom<RaisinNode>[],
+    PrimitiveAtom<RaisinNode>,
+    void
+  >,
+};
+
 function ElementLayer() {
   const {
     duplicateForNode,
@@ -422,7 +479,10 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
+const SlotChild: React.FC<{ idx?: number, atoms: Atoms }> = ({
+  idx,
+  atoms,
+}) => {
   return (
     <>
       <ElementLayer />
@@ -436,8 +496,8 @@ function PlopTarget({ idx, slot }: { idx: number, slot: string }) {
   const plopNode = useSetAtom(plopNodeHere);
   const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
 
-  const isPloppablable = canPlop({ slot, idx });
-  if (!isPloppablable) {
+  const isPloppable = canPlop({ slot, idx });
+  if (!isPloppable) {
     return <></>;
   }
   return (
@@ -464,4 +524,144 @@ const Editor = () => {
     </div>
   );
 };
+```
+
+## Custom Components
+
+```js
+const Editor = () => {
+  useHotkeys();
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flex: 0.3 }}>
+        <LayersController />
+      </div>
+      <div style={{ flex: 0.4 }}>
+        <BasicCanvasController />
+      </div>
+      <div style={{ flex: 0.3 }}>
+        <AttributeEditor />
+      </div>
+    </div>
+  );
+};
+
+const html =
+  startingHtml +
+  `<sqm-timeline icon="circle">
+<sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle">
+</sqm-timeline-entry></sqm-timeline>`;
+
+export function CustomComponents() {
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml: html,
+        startingPackages: [
+          {
+            package: '@saasquatch/mint-components',
+            version: '1.6.x',
+          },
+        ],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+```
+
+## Full Example
+
+```js
+// Config
+// ...WidgetScope, ConfigMolecule
+
+// Layers
+// ...ElementLayer, SlotWidget, SlotChild, PlopTarget
+
+  const Editor = () => {
+    useHotkeys();
+    const { EditSelectedNodeAtom } = useMolecule(EditSelectedMolecule);
+    const { HTMLAtom } = useMolecule(ConfigMolecule);
+    const [html, setHtml] = useAtom(HTMLAtom!);
+
+    return (
+      <>
+        <textarea
+          value={html}
+          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+          rows={10}
+          style={{ width: '500px' }}
+        />
+        <div style={{ display: 'flex' }}>
+          <div style={{ flex: 0.3 }}>
+            <LayersController />
+          </div>
+          <div style={{ flex: 0.4 }}>
+            <NodeScopeProvider nodeAtom={EditSelectedNodeAtom}>
+              <Toolbars />
+            </NodeScopeProvider>
+            <BasicCanvasController />
+          </div>
+          <div style={{ flex: 0.3 }}>
+            <AttributeEditor />
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    useMolecule(CanvasPickAndPlopMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
+
+  const html =
+    startingHtml +
+    `<sqm-timeline icon="circle">
+<sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle">
+</sqm-timeline-entry></sqm-timeline>`;
+
+export function FullExample() {
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml: html,
+        startingPackages: [
+          {
+            package: '@saasquatch/mint-components',
+            version: '1.6.x',
+          },
+        ],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
 ```
