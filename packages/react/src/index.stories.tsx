@@ -1,6 +1,6 @@
 import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
+import { Atom, atom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
@@ -10,10 +10,24 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
-import { CanvasController } from './canvas/CanvasController';
-import { Module } from './component-metamodel';
+import { AttributesController } from './attributes';
+import {
+  CanvasHoveredMolecule,
+  CanvasProvider,
+  CanvasSelectionMolecule,
+  Rect,
+} from './canvas';
+import {
+  BasicCanvasController,
+  CanvasController,
+} from './canvas/CanvasController';
+import { ComponentModelMolecule, Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
-import { CoreMolecule } from './core';
+import {
+  CoreMolecule,
+  SelectedNodeController,
+  SelectedNodeMolecule,
+} from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
@@ -185,6 +199,18 @@ export const Vanilla = () => (
 );
 export const Big = () => <BasicStory startingHtml={big} />;
 
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(SelectedNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasStyleMolecule),
+    ...getMol(CanvasSelectionMolecule),
+    ...getMol(CanvasHoveredMolecule),
+    ...getMol(ComponentModelMolecule),
+  };
+});
+
 function Editor() {
   useHotkeys();
 
@@ -290,14 +316,6 @@ const CanvasStyleMolecule = molecule((getMol) => {
     OutlineAtom,
     ModeAtom,
     SizeAtom,
-  };
-});
-
-const ToolbarMolecule = molecule((getMol) => {
-  return {
-    ...getMol(HoveredNodeMolecule),
-    ...getMol(HistoryMolecule),
-    ...getMol(CanvasStyleMolecule),
   };
 });
 

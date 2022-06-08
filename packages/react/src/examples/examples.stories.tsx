@@ -1,38 +1,84 @@
-# Raisins React
+import { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
+import { Module } from '@raisins/schema';
+import { Meta } from '@storybook/react';
+import { useAtomValue, atom, Atom, useSetAtom, useAtom } from 'jotai';
+import {
+  createScope,
+  molecule,
+  ScopeProvider,
+  useMolecule,
+} from 'jotai-molecules';
+import React, { CSSProperties, FC, useCallback, useMemo } from 'react';
+import { AttributesController } from '../attributes';
+import {
+  CanvasSelectionMolecule,
+  CanvasHoveredMolecule,
+  BasicCanvasController,
+  CanvasProvider,
+  Rect,
+} from '../canvas';
+import { ComponentModelMolecule } from '../component-metamodel';
+import {
+  HoveredNodeMolecule,
+  SelectedNodeMolecule,
+  HistoryMolecule,
+  RaisinConfig,
+  SelectedNodeController,
+  RaisinsProvider,
+  EditSelectedMolecule,
+  EditMolecule,
+  CoreMolecule,
+  PickAndPlopMolecule,
+} from '../core';
+import { useHotkeys } from '../hotkeys';
+import {
+  ChildrenEditorForAtoms,
+  NodeChildrenEditor,
+  NodeMolecule,
+  NodeScopeProvider,
+  SlotChildrenController,
+  SlotMolecule,
+  SlotScopeProvider,
+} from '../node';
+import {
+  ProseEditor,
+  ProseEditorScopeProvider,
+  RichTextMolecule,
+} from '../rich-text';
+import { NodeRichTextController } from '../rich-text/RichTextEditor';
 
-Raisins in a WYSIWYG visual editor for HTML and web components. This is the react package, which handles the state behind the visual rendering experience.
+const meta: Meta = {
+  title: 'Examples',
+  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
+};
+export default meta;
 
-# Examples
+const WidgetScope = createScope<{
+  startingHtml: string;
+  startingPackages: Module[];
+}>({
+  startingHtml: '',
+  startingPackages: [] as Module[],
+});
 
-Raisins React comes with many controllers and molecules to help build a visual editor for your HTML. By using each of them together, you are able to control each different piece of functionality to include or exclude from the editing experience.
+const ConfigMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
+  const widgetScope = getScope(WidgetScope);
+  return {
+    HTMLAtom: atom(widgetScope.startingHtml),
+    PackagesAtom: atom(widgetScope.startingPackages),
+    uiWidgetsAtom: atom({}),
+  };
+});
 
-- Basic Canvas
-
-```js
-export function BasicExample() {
-  const WidgetScope = createScope<{
-    startingHtml: string;
-    startingPackages: Module[];
-  }>({
-    startingHtml: '',
-    startingPackages: [] as Module[],
-  });
-
-  const ConfigMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
-    const widgetScope = getScope(WidgetScope);
-    return {
-      HTMLAtom: atom(widgetScope.startingHtml),
-      PackagesAtom: atom(widgetScope.startingPackages),
-      uiWidgetsAtom: atom({}),
-    };
-  });
-
-  const startingHtml = `
-    <h1>My Heading</h1>
-    <p style="width:200px;height:100px;">My first paragraph</p>
-    <p style="width:200px;height:100px;">My second paragraph</p>
+const startingHtml = `
+<div>
+  <h1>My Heading</h1>
+  <p style="width:200px;height:100px;">My first paragraph</p>
+  <p style="width:200px;height:100px;">My second paragraph</p>
+</div>
 `;
 
+export function BasicExample() {
   const Editor = () => {
     useHotkeys();
     return (
@@ -73,51 +119,8 @@ export function BasicExample() {
     </ScopeProvider>
   );
 }
-```
 
-- Canvas Toolbars
-
-```js
-const ToolbarMolecule = molecule((getMol) => {
-  return {
-    ...getMol(HoveredNodeMolecule),
-    ...getMol(SelectedNodeMolecule),
-    ...getMol(HistoryMolecule),
-    ...getMol(CanvasStyleMolecule),
-    ...getMol(CanvasSelectionMolecule),
-    ...getMol(CanvasHoveredMolecule),
-    ...getMol(ComponentModelMolecule),
-  };
-});
-
-const Toolbars = () => {
-  const {
-    HoveredNodeAtom,
-    SelectedNodeAtom,
-    SelectedRectAtom,
-    HoveredRectAtom,
-    ComponentModelAtom,
-  } = useMolecule(ToolbarMolecule);
-
-  const hoveredNode = useAtomValue(HoveredNodeAtom) as RaisinElementNode;
-  const selectedNode = useAtomValue(SelectedNodeAtom) as RaisinElementNode;
-
-  const { getComponentMeta } = useAtomValue(ComponentModelAtom);
-  const hoveredTitle = getComponentMeta(hoveredNode?.tagName).title;
-  const selectedTitle = getComponentMeta(selectedNode?.tagName).title;
-  return (
-    <>
-      <PositionedToolbar rectAtom={HoveredRectAtom}>
-        Hovered - {hoveredTitle}
-      </PositionedToolbar>
-      <PositionedToolbar rectAtom={SelectedRectAtom}>
-        Selected - {selectedTitle}
-        <SelectedNodeRichTextEditor />
-      </PositionedToolbar>
-    </>
-  );
-};
-
+export function WithToolbars() {
   const Editor = () => {
     useHotkeys();
     const { EditSelectedNodeAtom } = useMolecule(EditSelectedMolecule);
@@ -137,11 +140,252 @@ const Toolbars = () => {
       </>
     );
   };
-```
 
-- Layers
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
 
-```js
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml,
+        startingPackages: [],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+
+export function WithLayers() {
+  const Editor = () => {
+    useHotkeys();
+    return (
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 0.3 }}>
+          <LayersControllerSimple />
+        </div>
+        <div style={{ flex: 0.4 }}>
+          <BasicCanvasController />
+        </div>
+        <div style={{ flex: 0.3 }}>
+          <AttributeEditor />
+        </div>
+      </div>
+    );
+  };
+
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
+
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml,
+        startingPackages: [],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+
+export function WithLayersAndButtons() {
+  const Editor = () => {
+    useHotkeys();
+    return (
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 0.3 }}>
+          <LayersController />
+        </div>
+        <div style={{ flex: 0.4 }}>
+          <BasicCanvasController />
+        </div>
+        <div style={{ flex: 0.3 }}>
+          <AttributeEditor />
+        </div>
+      </div>
+    );
+  };
+
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
+
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml,
+        startingPackages: [],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(SelectedNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasSelectionMolecule),
+    ...getMol(CanvasHoveredMolecule),
+    ...getMol(ComponentModelMolecule),
+    ...getMol(RichTextMolecule),
+  };
+});
+
+const Toolbars = () => {
+  const {
+    HoveredNodeAtom,
+    SelectedNodeAtom,
+    SelectedRectAtom,
+    HoveredRectAtom,
+    ComponentModelAtom,
+
+    proseAtom,
+  } = useMolecule(ToolbarMolecule);
+
+  const hoveredNode = useAtomValue(HoveredNodeAtom) as RaisinElementNode;
+  const selectedNode = useAtomValue(SelectedNodeAtom) as RaisinElementNode;
+
+  const { getComponentMeta } = useAtomValue(ComponentModelAtom);
+  const hoveredMeta = getComponentMeta(hoveredNode?.tagName);
+  const selectedMeta = getComponentMeta(selectedNode?.tagName);
+  const textEditor = selectedMeta.slotEditor === 'richText';
+  return (
+    <>
+      <PositionedToolbar rectAtom={HoveredRectAtom}>
+        Hovered - {hoveredMeta?.title}
+      </PositionedToolbar>
+      <PositionedToolbar rectAtom={SelectedRectAtom}>
+        Selected - {selectedMeta?.title}
+        {textEditor && (
+          <ProseEditorScopeProvider value={proseAtom}>
+            <ProseEditor />
+          </ProseEditorScopeProvider>
+        )}
+      </PositionedToolbar>
+    </>
+  );
+};
+
+const PositionedToolbar = ({
+  rectAtom,
+  children,
+}: {
+  rectAtom: Atom<Rect | undefined>;
+  children: React.ReactNode;
+}) => {
+  const rect = useAtomValue(rectAtom);
+  if (!rect)
+    return (
+      <div style={{ position: 'absolute', top: 0, left: 0, display: 'none' }} />
+    );
+
+  const { x, y, width, height } = rect;
+
+  console.log(x, y, width, height);
+  const toolbarWidth = width + 4;
+  return (
+    <div
+      style={{
+        background: 'green',
+        color: 'white',
+        position: 'absolute',
+        transform: `translate(${x - 2}px, ${y + height}px)`,
+        transition: 'transform .2s',
+        width: toolbarWidth + 'px',
+        minWidth: '200px',
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const LayersMolecule = molecule((getMol) => {
+  const { InsertNodeAtom } = getMol(EditMolecule);
+  const { ComponentModelAtom } = getMol(ComponentModelMolecule);
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const RootHasChildren = atom(
+    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+  );
+
+  return {
+    ...getMol(PickAndPlopMolecule),
+    InsertNodeAtom,
+    ComponentModelAtom,
+    RootHasChildren,
+    RootNodeAtom,
+  };
+});
+
+const LayersControllerSimple = () => {
+  const atoms = useMolecule(LayersMolecule);
+  const hasChildren = useAtomValue(atoms.RootHasChildren);
+
+  return (
+    <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
+      {hasChildren && (
+        <SlotScopeProvider slot="">
+          <NodeChildrenEditor Component={ElementLayerName} />
+        </SlotScopeProvider>
+      )}
+    </NodeScopeProvider>
+  );
+};
+
+const LayersController = () => {
+  const atoms = useMolecule(LayersMolecule);
+  const hasChildren = useAtomValue(atoms.RootHasChildren);
+
+  return (
+    <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
+      {hasChildren && (
+        <SlotScopeProvider slot="">
+          <NodeChildrenEditor Component={ElementLayer} />
+        </SlotScopeProvider>
+      )}
+    </NodeScopeProvider>
+  );
+};
+
 const Label: CSSProperties = {
   cursor: 'pointer',
   lineHeight: '28px',
@@ -181,24 +425,8 @@ const TitleBar: CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
 };
-```
 
-```js
-const LayersController = () => {
-  const atoms = useMolecule(LayersMolecule);
-  const hasChildren = useAtomValue(atoms.RootHasChildren);
-
-  return (
-    <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
-      {hasChildren && (
-        <SlotScopeProvider slot="">
-          <NodeChildrenEditor Component={ElementLayer} />
-        </SlotScopeProvider>
-      )}
-    </NodeScopeProvider>
-  );
-};
-function ElementLayer() {
+function ElementLayerName() {
   const {
     isNodeAnElement,
     isSelectedForNode,
@@ -238,7 +466,7 @@ function ElementLayer() {
           {name}
           {hasSlots && (
             <div>
-              <SlotChildrenController Component={SlotWidget} />
+              <SlotChildrenController Component={SlotWidgetSimple} />
             </div>
           )}
         </div>
@@ -247,7 +475,7 @@ function ElementLayer() {
   );
 }
 
-function SlotWidget() {
+function SlotWidgetSimple() {
   const atoms = useMolecule(SlotMolecule);
   const childNodes = useAtomValue(atoms.childrenInSlot);
 
@@ -284,7 +512,10 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
+const SlotChildSimple: React.FC<{ idx?: number; atoms: any }> = ({
+  idx,
+  atoms,
+}) => {
   return (
     <>
       <ElementLayerName />
@@ -292,27 +523,7 @@ const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
     </>
   );
 };
-const Editor = () => {
-  useHotkeys();
-  return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 0.3 }}>
-        <LayersController />
-      </div>
-      <div style={{ flex: 0.4 }}>
-        <BasicCanvasController />
-      </div>
-      <div style={{ flex: 0.3 }}>
-        <AttributeEditor />
-      </div>
-    </div>
-  );
-};
-```
 
-- Layers With Buttons
-
-```js
 function ElementLayer() {
   const {
     duplicateForNode,
@@ -422,7 +633,7 @@ function SlotWidget() {
   );
 }
 
-const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
+const SlotChild: React.FC<{ idx?: number; atoms: any }> = ({ idx, atoms }) => {
   return (
     <>
       <ElementLayer />
@@ -430,7 +641,7 @@ const SlotChild: React.FC<{ idx?: number, atoms: any }> = ({ idx, atoms }) => {
     </>
   );
 };
-function PlopTarget({ idx, slot }: { idx: number, slot: string }) {
+function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
   const canPlop = useAtomValue(canPlopHereAtom);
   const plopNode = useSetAtom(plopNodeHere);
@@ -447,21 +658,3 @@ function PlopTarget({ idx, slot }: { idx: number, slot: string }) {
     </div>
   );
 }
-
-const Editor = () => {
-  useHotkeys();
-  return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 0.3 }}>
-        <LayersController />
-      </div>
-      <div style={{ flex: 0.4 }}>
-        <BasicCanvasController />
-      </div>
-      <div style={{ flex: 0.3 }}>
-        <AttributeEditor />
-      </div>
-    </div>
-  );
-};
-```
