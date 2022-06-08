@@ -18,7 +18,10 @@ import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
-import { referrerWidget, VanillaComponents } from './examples/VanillaComponents';
+import {
+  referrerWidget,
+  VanillaComponents,
+} from './examples/VanillaComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';

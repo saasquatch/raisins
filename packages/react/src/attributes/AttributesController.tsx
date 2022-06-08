@@ -29,7 +29,7 @@ export const AttributesController: React.FC<AttributesControllerProps> = (
   const Component = props.Component ?? DefaultAttributeComponent;
   return (
     <React.Fragment>
-      {keys.map((key:string) => {
+      {keys.map((key: string) => {
         return (
           <AttributeProvider attributeName={key} key={key}>
             <Component />

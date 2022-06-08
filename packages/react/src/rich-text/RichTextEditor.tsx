@@ -4,7 +4,6 @@ import { ProseEditor } from './prosemirror/ProseEditor';
 import { ProseEditorScopeProvider } from './prosemirror/ProseEditorScope';
 import { RichTextMolecule } from './RichTextMolecule';
 
-
 /**
  * A controller for editing the {@link NodeScopeMolecule} as rich text via a Prose Editor
  *

@@ -2,7 +2,7 @@ import * as schema from '@raisins/schema/schema';
 import type { PackageJson } from '../util/NPMRegistry';
 
 export type Module = {
-  package:string;
+  package: string;
   version?: string;
   filePath?: string;
 };

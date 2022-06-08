@@ -24,9 +24,4 @@ export type Style = typeof STYLE;
 export const TAG = "tag" as const;
 export type Tag = typeof TAG;
 
-export type DomElementType =
-  | Root
-  | Text
-  | Directive
-  | Comment
-  | Tag;
+export type DomElementType = Root | Text | Directive | Comment | Tag;

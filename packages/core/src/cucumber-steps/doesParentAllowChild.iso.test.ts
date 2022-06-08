@@ -14,7 +14,6 @@ import {
   IsoStepDefs
 } from "./bindIsomorphicCucumberSteps";
 
-
 const cucumber: IsoStepDefs = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,

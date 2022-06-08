@@ -10,7 +10,7 @@ import {
   DefaultTextMarks,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { Atom, atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';

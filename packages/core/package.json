@@ -1,6 +1,7 @@
 {
   "name": "@raisins/core",
   "author": "SaaSquatch Team",
+  "description": "Core functions for manipulating and validating HTML and raisin nodes",
   "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",

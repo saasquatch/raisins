@@ -9,10 +9,10 @@ Feature: Util Functions
 		Given a raisin node with html
 			"""
 			<div>
-							<div>
-							I am a div
-						</div>		
-				</div>
+			<div>
+			I am a div
+			</div>
+			</div>
 			"""
 		When we run removeWhitespace on raisin node
 		Then it should return html "<div><div>I am a div</div></div>"

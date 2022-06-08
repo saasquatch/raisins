@@ -6,8 +6,6 @@ import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';
 import { EditMolecule } from './EditAtoms';
 
-const { removePath } = htmlUtil;
-
 export const EditSelectedMolecule = molecule((getMol) => {
   const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } = getMol(
     EditMolecule

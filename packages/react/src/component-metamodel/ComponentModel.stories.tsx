@@ -19,7 +19,7 @@ import {
   VanillaComponents,
 } from '../examples/VanillaComponents';
 import { useHotkeys } from '../hotkeys';
-import { BasicStory, StoryConfigMolecule } from '../index.stories';
+import { BasicStory } from '../index.stories';
 import { JsonPointers } from '../node/NodeChildrenEditor.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';

@@ -13,7 +13,7 @@ export type AttributeThemeMoleculeValue = {
  */
 export type AttributeThemeMolecule = Molecule<AttributeThemeMoleculeValue>;
 
-export const DefaultAttributeComponent = "default";
+export const DefaultAttributeComponent = 'default';
 
 export type AttributeTemplateProps = { children: React.ReactNode };
 export type AttributeTemplate = React.ComponentType<AttributeTemplateProps>;

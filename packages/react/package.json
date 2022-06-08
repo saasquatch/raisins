@@ -1,6 +1,7 @@
 {
   "name": "@raisins/react",
   "author": "SaaSquatch Team",
+  "description": "React package with tools for building a Raisins editor",
   "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",

@@ -25,7 +25,7 @@ export function getPath(
         }
         return undefined;
       })
-      .find((c) => c !== undefined);
+      .find(c => c !== undefined);
   }
   return undefined;
 }
