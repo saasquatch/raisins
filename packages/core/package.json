@@ -1,6 +1,6 @@
 {
   "name": "@raisins/core",
-  "author": "SaaSquatch",
+  "author": "SaaSquatch Team",
   "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
@@ -97,5 +97,7 @@
     "nonGlobalStepDefinitions": false,
     "stepDefinitions": "src/cucumber-steps"
   },
-  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  }
 }

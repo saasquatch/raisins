@@ -1,20 +1,14 @@
-import {
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNode,
-} from '@raisins/core';
+import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
-  SelectedNodeMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../core';
 import { Soul } from '../core/souls/Soul';
-import { NodeMolecule } from '../node';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import {
   GeometryDetail,

@@ -1,7 +1,7 @@
 {
   "name": "@raisins/react",
-  "author": "SaaSquatch",
-  "version": "0.86.0",
+  "author": "SaaSquatch Team",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
@@ -109,5 +109,7 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
   },
-  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  }
 }
