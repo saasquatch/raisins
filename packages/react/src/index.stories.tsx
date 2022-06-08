@@ -18,6 +18,7 @@ import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
+import { referrerWidget, VanillaComponents } from './examples/VanillaComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
@@ -172,6 +173,12 @@ export function ExternalHTMLControl() {
 
 export const Mint = () => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents} />
+);
+export const Vanilla = () => (
+  <BasicStory
+    startingHtml={referrerWidget}
+    startingPackages={VanillaComponents}
+  />
 );
 export const Big = () => <BasicStory startingHtml={big} />;
 

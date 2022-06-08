@@ -1,6 +1,7 @@
 import { RaisinNode } from '@raisins/core';
 import { atom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
+import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule, Selection } from '../selection';
 
@@ -13,9 +14,12 @@ type HistoryState = {
  *
  */
 export const HistoryMolecule = molecule((getMol) => {
-  const { InternalTransactionAtom, StateListeners, RootNodeAtom } = getMol(
-    CoreMolecule
-  );
+  const {
+    InternalTransactionAtom,
+    StateListeners,
+    RootNodeAtom,
+    rerenderNodeAtom,
+  } = getMol(CoreMolecule);
   const { SelectionAtom } = getMol(SelectedNodeMolecule);
 
   const undoAtoms = branchAtoms<HistoryState>();
@@ -41,7 +45,8 @@ export const HistoryMolecule = molecule((getMol) => {
   });
   HistorySizeAtom.debugLabel = 'HistorySizeAtom';
 
-  const UndoAtom = atom(null, (_, set) => {
+  const UndoAtom = atom(null, async (_, set) => {
+    set(rerenderNodeAtom, true);
     set(
       undoAtoms.pop,
       atom(null, (get, set, next: HistoryState) => {
@@ -53,10 +58,13 @@ export const HistoryMolecule = molecule((getMol) => {
         set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
       })
     );
+    await waitForUpdate();
+    set(rerenderNodeAtom, false);
   });
   UndoAtom.debugLabel = 'UndoAtom';
 
-  const RedoAtom = atom(null, (_, set) => {
+  const RedoAtom = atom(null, async (_, set) => {
+    set(rerenderNodeAtom, true);
     set(
       redoAtoms.pop,
       atom(null, (get, set, next: HistoryState) => {
@@ -68,6 +76,8 @@ export const HistoryMolecule = molecule((getMol) => {
         set(SelectionAtom, next.selection);
       })
     );
+    await waitForUpdate();
+    set(rerenderNodeAtom, false);
   });
   RedoAtom.debugLabel = 'RedoAtom';
 
