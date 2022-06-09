@@ -10,7 +10,7 @@ export const MintComponents = [
   },
   {
     package: '@saasquatch/mint-components',
-    version: '1.6.1-34',
+    version: '1.6.1-39',
   },
   // {
   //   package: '@local',

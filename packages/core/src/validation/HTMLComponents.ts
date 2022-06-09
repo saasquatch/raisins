@@ -316,28 +316,60 @@ export const H1: CustomElement = {
   tagName: "h1",
   slotEditor: "richText",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [DefaultSlot]
+  slots: [{ name: "", title: "Text" }],
+  exampleGroup: "Typography",
+  examples: [
+    {
+      title: "H1",
+      content: "<h1>H1 Header Text</h1>"
+    }
+  ],
+  canvasRenderer: "always-replace"
 };
 // 'h2',
 export const H2: CustomElement = {
   title: "Heading 2",
   tagName: "h2",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [{ name: "", title: "Text" }],
+  exampleGroup: "Typography",
+  examples: [
+    {
+      title: "H2",
+      content: "<h2>H2 Header Text</h2>"
+    }
+  ],
+  canvasRenderer: "always-replace"
 };
 // 'h3',
 export const H3: CustomElement = {
   title: "Heading 3",
   tagName: "h3",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [{ name: "", title: "Text" }],
+  exampleGroup: "Typography",
+  examples: [
+    {
+      title: "H3",
+      content: "<h3>H3 Header Text</h3>"
+    }
+  ],
+  canvasRenderer: "always-replace"
 };
 // 'h4',
 export const H4: CustomElement = {
   title: "Heading 4",
   tagName: "h4",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [{ name: "", title: "Text" }],
+  exampleGroup: "Typography",
+  examples: [
+    {
+      title: "H4",
+      content: "<h4>H4 Header Text</h4>"
+    }
+  ],
+  canvasRenderer: "always-replace"
 };
 // 'h5',
 export const H5: CustomElement = {
@@ -560,7 +592,15 @@ export const P: CustomElement = {
   title: "Paragraph",
   tagName: "p",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [{ name: "", title: "Text" }],
+  exampleGroup: "Typography",
+  examples: [
+    {
+      title: "Paragraph",
+      content: "<p>Paragraph Text</p>"
+    }
+  ],
+  canvasRenderer: "always-replace"
 };
 // 'param',
 export const PARAM: CustomElement = {

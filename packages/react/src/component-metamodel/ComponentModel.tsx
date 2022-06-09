@@ -219,7 +219,7 @@ export const ComponentModelMolecule = molecule(
         const parentMeta = getComponentMeta(parent.tagName);
         const childMeta = getComponentMeta(child.tagName);
 
-        // allows default HTML components to inherit custom slot names
+        // allows default HTML components to inherit its parent's custom slot names
         const slots = parentMeta.slots
           ? [
               ...parentMeta.slots,
