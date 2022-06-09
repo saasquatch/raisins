@@ -21,7 +21,10 @@ import {
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
 import shallowEqual from '../util/shallowEqual';
-import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
+import {
+  blockFromHtml,
+  moduleDetailsToBlocks,
+} from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
 import { Loadable, Module, ModuleDetails } from './types';
@@ -96,11 +99,12 @@ export const ComponentModelMolecule = molecule(
      */
     const BlocksAtom = atom((get) => {
       const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-      const defaultBlocks = DEFAULT_BLOCKS.map((block) => ({
-        title: block.title,
-        content: { ...block },
-      })) as Block[];
-
+      const defaultBlocks = DEFAULT_BLOCKS.map((block) => {
+        return {
+          title: block.title,
+          content: blockFromHtml(block.examples?.[0]?.content as string),
+        };
+      }) as Block[];
       return [...blocksFromModules, ...defaultBlocks];
     });
     BlocksAtom.debugLabel = 'BlocksAtom';
