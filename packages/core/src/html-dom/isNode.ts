@@ -12,7 +12,7 @@ import {
   RaisinTextNode
 } from "./RaisinNode";
 
-export function isNodeWithChilden(
+export function isNodeWithChildren(
   node?: RaisinNode
 ): node is RaisinNodeWithChildren {
   return isElementNode(node) || isRoot(node);

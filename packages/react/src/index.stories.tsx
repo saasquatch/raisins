@@ -1,6 +1,6 @@
 import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { Atom, atom, useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
@@ -10,24 +10,11 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
-import { AttributesController } from './attributes';
-import {
-  CanvasHoveredMolecule,
-  CanvasProvider,
-  CanvasSelectionMolecule,
-  Rect,
-} from './canvas';
-import {
-  BasicCanvasController,
-  CanvasController,
-} from './canvas/CanvasController';
+import { CanvasHoveredMolecule, CanvasSelectionMolecule } from './canvas';
+import { CanvasController } from './canvas/CanvasController';
 import { ComponentModelMolecule, Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
-import {
-  CoreMolecule,
-  SelectedNodeController,
-  SelectedNodeMolecule,
-} from './core';
+import { CoreMolecule, SelectedNodeMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';

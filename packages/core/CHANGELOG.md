@@ -18,8 +18,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `htmlSerializer`
     - `htmlParser`
     - `htmlUtil`
+      - included utility functions:
+      - `getParents`
+      - `visit`
+      - `remove`
+      - `removePath`
+      - `duplicate`
+      - `replace`
+      - `replacePath`
+      - `move`
+      - `moveToPath`
+      - `moveNode`
+      - `insertAt`
+      - `insertAtPath`
+      - `removeWhitespace`
+      - `visitAll`
+      - `clone`
+      - `getAncestry`
   - Node types
-    - `isNodeWithChilden`
+    - `isNodeWithChildren`
     - `isElementNode`
     - `isRoot`
     - `isStyleNode`

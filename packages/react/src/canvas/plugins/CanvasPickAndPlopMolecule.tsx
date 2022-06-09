@@ -130,7 +130,6 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
-      const raisinChildren = parent.children;
       const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
       const plopTargets = calculatePlopTargets(
         parent,

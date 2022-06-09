@@ -3,7 +3,7 @@ import {
   isCommentNode,
   isDirectiveNode,
   isElementNode,
-  isNodeWithChilden,
+  isNodeWithChildren,
   isRoot,
   isStyleNode,
   isTextNode
@@ -31,7 +31,7 @@ describe("isNode utility", () => {
     expect(isRoot()).toBe(false);
   });
 
-  isNode(`<div></div>`, isElementNode, isNodeWithChilden);
+  isNode(`<div></div>`, isElementNode, isNodeWithChildren);
   isNode(`<!--This is a comment -->`, isCommentNode);
   isNode(`<style></style>`, isStyleNode);
   isNode(`hello world`, isTextNode);

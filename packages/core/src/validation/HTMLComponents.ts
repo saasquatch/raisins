@@ -601,6 +601,7 @@ export const P: CustomElement = {
     }
   ],
   canvasRenderer: "always-replace"
+  // TODO: shouldn't be able to add a <p> tag inside of another <p> - need invalidChildren: ["p"]
 };
 // 'param',
 export const PARAM: CustomElement = {
