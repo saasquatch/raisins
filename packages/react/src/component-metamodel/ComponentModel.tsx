@@ -96,7 +96,12 @@ export const ComponentModelMolecule = molecule(
      */
     const BlocksAtom = atom((get) => {
       const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-      return [...blocksFromModules];
+      const defaultBlocks = DEFAULT_BLOCKS.map((block) => ({
+        title: block.title,
+        content: { ...block },
+      })) as Block[];
+
+      return [...blocksFromModules, ...defaultBlocks];
     });
     BlocksAtom.debugLabel = 'BlocksAtom';
 
@@ -297,6 +302,14 @@ export const ComponentModelMolecule = molecule(
 
 // TODO: figure out where to put examples without a group
 const DEFAULT_BLOCK_GROUP = 'Default';
+
+const DEFAULT_BLOCKS = [
+  HTMLComponents.P,
+  HTMLComponents.H1,
+  HTMLComponents.H2,
+  HTMLComponents.H3,
+  HTMLComponents.H4,
+];
 
 type BlockGroups = Record<string, Block[]>;
 function group(list: Block[], getComponentMeta: Function): BlockGroups {
