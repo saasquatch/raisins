@@ -2,6 +2,12 @@
 
 Raisins in a WYSIWYG visual editor for HTML and web components. This is the react package, which handles the state behind the visual rendering experience.
 
+# Installation
+
+```
+npm i @raisins/react
+```
+
 # Examples
 
 Raisins React comes with many controllers and molecules to help build a visual editor for your HTML. By using each of them together, you are able to control each different piece of functionality to include or exclude from the editing experience.
