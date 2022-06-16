@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2022-06-16
+
+- New version of `@raisins/core` dependency to fix safari regex bug
+
 ## [1.0.0] - 2022-06-09
 
 ### Added
@@ -65,4 +69,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `ProseEditorScopeProvider`
 
 [unreleased]: https://github.com/saasquatch/raisins/compare/react@1.0.0...HEAD
+[1.0.1]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.0.1
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/react@1.0.0

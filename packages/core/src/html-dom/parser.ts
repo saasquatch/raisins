@@ -36,7 +36,7 @@ function parseDomParser(html: string) {
   const isBody = /<\/?body.*?>/is.test(html);
 
   // removes any excess new line characters after a closing <html> tag
-  html = html.replace(/(?<=<\/html>)\n*/g, "");
+  html = html.replace(/<\/html>\n*/g, `</html>`);
 
   if (isDoctype || isHtml || isHead || isBody) {
     const parser = new DOMParser();
