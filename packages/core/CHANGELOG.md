@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2022-06-16
+
+- Fixed regex bug in Safari
+
 ## [1.0.0] - 2022-06-09
 
 ### Added
@@ -68,4 +72,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `cssSelector`
 
 [unreleased]: https://github.com/saasquatch/raisins/compare/core@1.0.0...HEAD
+[1.0.1]: https://github.com/saasquatch/raisins/releases/tag/core@1.0.1...core@1.0.0
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/core@1.0.0
