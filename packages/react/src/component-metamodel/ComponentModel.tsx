@@ -58,14 +58,14 @@ export const ComponentModelMolecule = molecule(
     /**
      * Module details from NPM (loaded async)
      */
-    const ModuleDetailsAync = atom(
+    const ModuleDetailsAsync = atom(
       async (get) =>
         await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
     );
     /**
      * Module details from NPM (or loading or error)
      */
-    const ModuleDetailsStateAtom = loadable(ModuleDetailsAync);
+    const ModuleDetailsStateAtom = loadable(ModuleDetailsAsync);
 
     /**
      * List of modules from NPM
