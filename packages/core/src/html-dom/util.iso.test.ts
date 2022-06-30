@@ -196,6 +196,7 @@ describe("Move nodes", () => {
     children: [],
     type: "tag"
   };
+
   const root: RaisinDocumentNode = {
     type: "root",
     children: [node1, node2]
@@ -214,6 +215,134 @@ describe("Move nodes", () => {
     expect(res.children.length).toBe(2);
     expect(res.children[0]).toStrictEqual(node2);
     expect(res.children[1]).toStrictEqual(node1);
+  });
+
+  const slotRoot: RaisinDocumentNode = {
+    type: "root",
+    children: [node2]
+  };
+
+  const node2Moved: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "node2" },
+    children: [],
+    type: "tag"
+  };
+
+  it("Move node at the same level with new slot", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      slotRoot,
+      node2,
+      "otherChildren",
+      nodepath,
+      0
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(1);
+    expect(res.children[0]).toStrictEqual(node2Moved);
+  });
+
+  const movingNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "children", id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const movedNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const existingNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "existingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const movedExistingNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "children", id: "existingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const multiSlotRoot: RaisinDocumentNode = {
+    type: "root",
+    children: [existingNode]
+  };
+
+  it("Move node at the same level with new slot to a specific index of an empty slot", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      multiSlotRoot,
+      existingNode,
+      "children",
+      nodepath,
+      1
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(1);
+    expect(res.children[0]).toStrictEqual(movedExistingNode);
+  });
+
+  it("Move node at the same level with new slot to a specific index", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      multiSlotRoot,
+      movingNode,
+      "otherChildren",
+      nodepath,
+      1
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(2);
+    expect(res.children[1]).toStrictEqual(movedNode);
+    expect(res.children[0]).toStrictEqual(existingNode);
+  });
+
+  const node1NoSlot: RaisinElementNode = {
+    tagName: "div",
+    attribs: { id: "node1" },
+    children: [],
+    type: "tag"
+  };
+  const node2NoSlot: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "node2" },
+    children: [],
+    type: "tag"
+  };
+  const node3NoSlot: RaisinElementNode = {
+    tagName: "div",
+    attribs: { id: "node2" },
+    children: [],
+    type: "tag"
+  };
+
+  const slotlessRoot: RaisinDocumentNode = {
+    type: "root",
+    children: [node1NoSlot, node2NoSlot, node3NoSlot]
+  };
+
+  it("Move node with no slot", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      slotlessRoot,
+      node1NoSlot,
+      "",
+      nodepath,
+      2
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(3);
+    expect(res.children[0]).toStrictEqual(node2NoSlot);
+    expect(res.children[1]).toStrictEqual(node1NoSlot);
+    expect(res.children[2]).toStrictEqual(node3NoSlot);
   });
 
   it("Move sibling into another sibling, then back again", () => {

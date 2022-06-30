@@ -472,7 +472,6 @@ const PositionedToolbar = ({
 
   const { x, y, width, height } = rect;
 
-  console.log(x, y, width, height);
   const toolbarWidth = width + 4;
   return (
     <div

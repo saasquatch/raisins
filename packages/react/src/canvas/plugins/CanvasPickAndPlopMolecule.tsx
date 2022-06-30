@@ -90,7 +90,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
           if (!parentSoul) return;
           const soulToNode = get(SoulToNodeAtom);
           const parentNode = soulToNode(parentSoul);
-          if (!parentNode || !isElementNode(parentNode)) return;
+          if (!parentNode) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
           const slot = target?.attributes['raisin-plop-slot'] ?? '';
           set(PlopNodeInSlotAtom, { parent: parentNode, idx, slot });
@@ -118,14 +118,14 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       picked?.type === 'block' ? picked.block.content : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
-      if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
+      if (!isPloppingActive) return vnodeChildren;
       if (!isInteractible(n)) return vnodeChildren;
 
       // FIXME: Root node should allow any children. This only checks for allowed element plops.
-      if (!isElementNode(n)) return vnodeChildren;
+      // if (!isElementNode(n)) return vnodeChildren;
 
       const parent = n;
-      const slot = n.attribs.slot ?? '';
+      const slot = n.attribs?.slot ?? pickedNode.attribs?.slot ?? '';
       const isValid = metamodel.isValidChild(pickedNode, parent, slot);
       if (!isValid) return vnodeChildren;
       const soulId = souls(parent).toString();
@@ -237,6 +237,19 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   parentSchema,
   addOrMove,
 }) => {
+  const slotTitle =
+    parentSchema?.slots?.find((foundSlot) => slot === foundSlot.name)?.title ||
+    parentSchema.title ||
+    'Content';
+
+  const rootSlotStyle =
+    parent.type === 'root'
+      ? {
+          height: '15px',
+          margin: '15px 0',
+        }
+      : {};
+
   const key = `${soulId}/${idx}/${slot}`;
 
   const defaultAttrs = {
@@ -263,7 +276,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
       },
       attrs: { targettype: 'label' },
     },
-    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${parentSchema.title}`
+    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`
   );
 
   const targetBar = h('div', {
@@ -281,12 +294,14 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     {
       // Helps snabbdom know how to remove nodes
       key,
+      attrs: { slot },
       style: {
         height: '0px',
         margin: '0',
         overflow: 'visible',
         zIndex: '9999',
         display: 'block',
+        ...rootSlotStyle,
       },
     },
     h(

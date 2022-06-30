@@ -219,6 +219,7 @@ export const ComponentModelMolecule = molecule(
         parent: RaisinElementNode,
         slot: string
       ): boolean {
+        if (parent.type === 'root') return true;
         if (child === parent) {
           // Can't drop into yourself
           // FIXME: Check for all ancestors
@@ -229,12 +230,13 @@ export const ComponentModelMolecule = molecule(
         const childMeta = getComponentMeta(child.tagName);
 
         // allows default HTML components to inherit its parent's custom slot names
-        const slots = parentMeta.slots
-          ? [
-              ...parentMeta.slots,
-              { name: parent.attribs.slot, title: parent.attribs.slot },
-            ]
-          : [];
+        const slots =
+          parent.attribs.slot && parentMeta.slots
+            ? [
+                ...parentMeta.slots,
+                { name: parent.attribs.slot, title: parent.attribs.slot },
+              ]
+            : parentMeta.slots;
 
         return isNodeAllowed(
           child,

@@ -296,6 +296,11 @@ export function moveNode(
 ): RaisinNode {
   const nodeWithNewSlot = !isElementNode(nodeToMove)
     ? { ...nodeToMove }
+    : nodeToMove.attribs.slot === undefined
+    ? {
+        ...nodeToMove,
+        attribs: { ...nodeToMove.attribs }
+      }
     : {
         ...nodeToMove,
         attribs: { ...nodeToMove.attribs, slot }
@@ -307,7 +312,14 @@ export function moveNode(
     newChildren: RaisinNode[]
   ) => {
     const found = newChildren.indexOf(nodeToMove);
+
     if (el === parent && found >= 0) {
+      const isMovingSlot =
+        (nodeToMove as RaisinElementNode).attribs.slot !== undefined &&
+        isElementNode(nodeToMove) &&
+        isElementNode(nodeWithNewSlot) &&
+        ((nodeToMove as unknown) as RaisinElementNode)?.attribs?.slot !==
+          ((nodeWithNewSlot as unknown) as RaisinElementNode)?.attribs?.slot;
       // Case 0 -- moved within the same level of the tree
       return {
         ...el,
@@ -315,7 +327,8 @@ export function moveNode(
           newChildren,
           nodeWithNewSlot,
           idx,
-          nodeToMove
+          nodeToMove,
+          isMovingSlot
         )
       };
     } else if (el === parent) {
@@ -512,9 +525,19 @@ function addItemAndRemove<T>(
   arr: T[],
   elToAdd: T,
   idxToAdd: number,
-  remove: T
+  remove: T,
+  moveSlot: boolean
 ): T[] {
   return arr.reduce((newArr, el, idx) => {
+    // Move to new slot at same index or at the end of array
+    if (
+      el === remove &&
+      moveSlot &&
+      (idx === idxToAdd || (idx === idxToAdd - 1 && idxToAdd === arr.length))
+    ) {
+      return [...newArr, elToAdd];
+    }
+
     if (el === remove) {
       // No remove item in new array
       return newArr;

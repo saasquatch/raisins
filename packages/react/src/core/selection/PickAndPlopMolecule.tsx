@@ -1,3 +1,4 @@
+import { RaisinElementNode } from '@raisins/core';
 import {
   getNode,
   getPath,
@@ -82,7 +83,10 @@ export const PickAndPlopMolecule = molecule((getMol) => {
       const parentPath = getPath(currentDoc, parent)!;
 
       if (picked.type === 'block') {
-        const cloneOfPickedNode = clone(picked.block.content);
+        picked.block.content.attribs.slot = slot;
+        const cloneOfPickedNode = clone(
+          picked.block.content
+        ) as RaisinElementNode;
 
         const newDocument = insertAtPath(
           currentDoc,
@@ -90,12 +94,12 @@ export const PickAndPlopMolecule = molecule((getMol) => {
           parentPath,
           idx
         );
-
         set(RootNodeAtom, newDocument);
         await waitForUpdate();
         set(SelectedAtom, cloneOfPickedNode);
       } else {
-        const pickedNode = get(PickedNodeAtom);
+        const pickedNode = get(PickedNodeAtom) as RaisinElementNode;
+
         if (!pickedNode) {
           // Nothing is picked, so do nothing;
           return;

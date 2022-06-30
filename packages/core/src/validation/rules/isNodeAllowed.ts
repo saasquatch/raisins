@@ -19,5 +19,7 @@ export function isNodeAllowed(
 ) {
   const parentAllowsChild = doesParentAllowChild(child, parentMeta, slot);
   const childAllowsParents = doesChildAllowParent(childMeta, parent);
+
+  // console.log({parentAllowsChild, childAllowsParents})
   return parentAllowsChild && childAllowsParents;
 }

@@ -43,7 +43,7 @@ describe("isNodeAllowed", () => {
 
     const childMeta: CustomElement = {
       tagName: "",
-      validParents: ["*"]
+      validParents: ["h3"]
     };
 
     const parent: RaisinElementNode = {
