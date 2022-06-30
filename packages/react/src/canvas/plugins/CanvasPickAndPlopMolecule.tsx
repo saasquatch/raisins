@@ -1,7 +1,10 @@
 import {
   calculatePlopTargets,
   isElementNode,
+  isRoot,
+  RaisinDocumentNode,
   RaisinElementNode,
+  RaisinNodeWithChildren,
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
@@ -89,7 +92,9 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
             : undefined;
           if (!parentSoul) return;
           const soulToNode = get(SoulToNodeAtom);
-          const parentNode = soulToNode(parentSoul);
+          const parentNode = soulToNode(parentSoul) as
+            | RaisinElementNode
+            | RaisinDocumentNode;
           if (!parentNode) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
           const slot = target?.attributes['raisin-plop-slot'] ?? '';
@@ -124,10 +129,13 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       // FIXME: Root node should allow any children. This only checks for allowed element plops.
       // if (!isElementNode(n)) return vnodeChildren;
 
-      const parent = n;
-      const slot = n.attribs?.slot ?? pickedNode.attribs?.slot ?? '';
-      const isValid = metamodel.isValidChild(pickedNode, parent, slot);
+      const slot =
+        (n as RaisinElementNode).attribs?.slot ??
+        pickedNode.attribs?.slot ??
+        '';
+      const isValid = metamodel.isValidChild(pickedNode, n, slot);
       if (!isValid) return vnodeChildren;
+      const parent = n as RaisinElementNode & RaisinNodeWithChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
       const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
@@ -224,7 +232,7 @@ type PlopTargetViewProps = {
   soulId: string;
   slot: string;
   eventsAttribute: string;
-  parent: RaisinElementNode;
+  parent: RaisinElementNode | RaisinDocumentNode;
   parentSchema: CustomElement;
   addOrMove: 'add' | 'move';
 };
@@ -242,8 +250,9 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     parentSchema.title ||
     'Content';
 
-  const rootSlotStyle =
-    parent.type === 'root'
+  // Prevent plop target from being cut off at the top/bottom of the canvas
+  const paddedPlopStyle =
+    isRoot(parent) && (idx === 1 || idx === parent.children.length - 1)
       ? {
           height: '15px',
           margin: '15px 0',
@@ -301,7 +310,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         overflow: 'visible',
         zIndex: '9999',
         display: 'block',
-        ...rootSlotStyle,
+        ...paddedPlopStyle,
       },
     },
     h(

@@ -81,7 +81,7 @@ export function validateChildConstraints(
       }
       if (
         parentMeta &&
-        !doesParentAllowChild(child, parentMeta, child.attribs.slot)
+        !doesParentAllowChild(child, parentMeta, child.attribs.slot, node)
       ) {
         return {
           jsonPointer: `/children/${idx}`,

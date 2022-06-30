@@ -8,6 +8,8 @@ import {
   RaisinElementNode,
   RaisinNode,
   DefaultTextMarks,
+  RaisinNodeWithChildren,
+  RaisinDocumentNode,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
@@ -190,7 +192,7 @@ export const ComponentModelMolecule = molecule(
         }
 
         const filter = (block: Block) =>
-          doesParentAllowChild(block.content, nodeMeta, slot);
+          doesParentAllowChild(block.content, nodeMeta, slot, node);
         const validChildren = blocks.filter(filter);
         if (!validChildren.length) {
           return [];
@@ -216,10 +218,10 @@ export const ComponentModelMolecule = molecule(
 
       function isValidChild(
         child: RaisinElementNode,
-        parent: RaisinElementNode,
+        parent: RaisinElementNode | RaisinNodeWithChildren,
         slot: string
       ): boolean {
-        if (parent.type === 'root') return true;
+        if (isRoot(parent)) return true;
         if (child === parent) {
           // Can't drop into yourself
           // FIXME: Check for all ancestors
@@ -348,7 +350,7 @@ export type ComponentModel = {
   getValidChildren: (node: RaisinNode, slot?: string) => Block[];
   isValidChild: (
     from: RaisinElementNode,
-    to: RaisinElementNode,
+    to: RaisinElementNode | RaisinDocumentNode,
     slot: string
   ) => boolean;
 };
