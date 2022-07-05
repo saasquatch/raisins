@@ -1,4 +1,8 @@
-import { RaisinCommentNode, RaisinProcessingInstructionNode, RaisinStyleNode } from "..";
+import {
+  RaisinCommentNode,
+  RaisinProcessingInstructionNode,
+  RaisinStyleNode
+} from "..";
 import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
 import {
   RaisinDocumentNode,
@@ -8,7 +12,7 @@ import {
   RaisinTextNode
 } from "./RaisinNode";
 
-export function isNodeWithChilden(
+export function isNodeWithChildren(
   node?: RaisinNode
 ): node is RaisinNodeWithChildren {
   return isElementNode(node) || isRoot(node);
@@ -34,7 +38,9 @@ export function isCommentNode(node?: RaisinNode): node is RaisinCommentNode {
   return nodeIsType(COMMENT, node);
 }
 
-export function isDirectiveNode(node?: RaisinNode): node is RaisinProcessingInstructionNode {
+export function isDirectiveNode(
+  node?: RaisinNode
+): node is RaisinProcessingInstructionNode {
   return nodeIsType(DIRECTIVE, node);
 }
 

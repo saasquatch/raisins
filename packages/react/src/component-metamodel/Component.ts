@@ -1,4 +1,4 @@
-import * as schema from "@raisins/schema/schema";
+import * as schema from '@raisins/schema/schema';
 
-export type CustomElement = schema.CustomElement
-export type Slot = schema.Slot
+export type CustomElement = schema.CustomElement;
+export type Slot = schema.Slot;

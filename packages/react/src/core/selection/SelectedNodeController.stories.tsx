@@ -9,11 +9,8 @@ import {
   AttributesControllerProps,
   AttributesMolecule,
 } from '../../attributes';
-import { CanvasController } from '../../canvas';
 import { BasicCanvasController } from '../../canvas/CanvasController';
 import { CanvasProvider } from '../../canvas/CanvasScope';
-import { CanvasHoveredMolecule } from '../../canvas/plugins/CanvasHoveredMolecule';
-import { CanvasPickAndPlopMolecule } from '../../canvas/plugins/CanvasPickAndPlopMolecule';
 import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
 import {
   mintMono,

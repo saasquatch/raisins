@@ -1,7 +1,10 @@
 import {
   calculatePlopTargets,
   isElementNode,
+  isRoot,
+  RaisinDocumentNode,
   RaisinElementNode,
+  RaisinNodeWithChildren,
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
@@ -89,8 +92,10 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
             : undefined;
           if (!parentSoul) return;
           const soulToNode = get(SoulToNodeAtom);
-          const parentNode = soulToNode(parentSoul);
-          if (!parentNode || !isElementNode(parentNode)) return;
+          const parentNode = soulToNode(parentSoul) as
+            | RaisinElementNode
+            | RaisinDocumentNode;
+          if (!parentNode) return;
           const idx = Number(target?.attributes['raisin-plop-idx']);
           const slot = target?.attributes['raisin-plop-slot'] ?? '';
           set(PlopNodeInSlotAtom, { parent: parentNode, idx, slot });
@@ -118,19 +123,21 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       picked?.type === 'block' ? picked.block.content : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
-      if (!isPloppingActive || !isElementNode(n)) return vnodeChildren;
+      if (!isPloppingActive) return vnodeChildren;
       if (!isInteractible(n)) return vnodeChildren;
 
       // FIXME: Root node should allow any children. This only checks for allowed element plops.
-      if (!isElementNode(n)) return vnodeChildren;
+      // if (!isElementNode(n)) return vnodeChildren;
 
-      const parent = n;
-      const slot = n.attribs.slot ?? '';
-      const isValid = metamodel.isValidChild(pickedNode, parent, slot);
+      const slot =
+        (n as RaisinElementNode).attribs?.slot ??
+        pickedNode.attribs?.slot ??
+        '';
+      const isValid = metamodel.isValidChild(pickedNode, n, slot);
       if (!isValid) return vnodeChildren;
+      const parent = n as RaisinElementNode & RaisinNodeWithChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
-      const raisinChildren = parent.children;
       const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
       const plopTargets = calculatePlopTargets(
         parent,
@@ -225,7 +232,7 @@ type PlopTargetViewProps = {
   soulId: string;
   slot: string;
   eventsAttribute: string;
-  parent: RaisinElementNode;
+  parent: RaisinElementNode | RaisinDocumentNode;
   parentSchema: CustomElement;
   addOrMove: 'add' | 'move';
 };
@@ -238,6 +245,21 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   parentSchema,
   addOrMove,
 }) => {
+  const slotTitle =
+    parentSchema?.slots?.find((foundSlot) => slot === foundSlot.name)?.title ||
+    parentSchema.title ||
+    'Content';
+
+  console.log({ parent, idx });
+  // Prevent plop target from being cut off at the top/bottom of the canvas
+  const paddedPlopStyle =
+    isRoot(parent) && (idx <= 1 || idx === parent.children.length - 1)
+      ? {
+          height: '14px',
+          marginTop: '26px',
+        }
+      : {};
+
   const key = `${soulId}/${idx}/${slot}`;
 
   const defaultAttrs = {
@@ -264,7 +286,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
       },
       attrs: { targettype: 'label' },
     },
-    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${parentSchema.title}`
+    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`
   );
 
   const targetBar = h('div', {
@@ -282,12 +304,15 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     {
       // Helps snabbdom know how to remove nodes
       key,
+      attrs: { slot },
       style: {
         height: '0px',
         margin: '0',
         overflow: 'visible',
         zIndex: '9999',
         display: 'block',
+        marginTop: '0',
+        ...paddedPlopStyle,
       },
     },
     h(

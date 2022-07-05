@@ -1,3 +1,4 @@
+import { RaisinElementNode } from '@raisins/core';
 import {
   getNode,
   getPath,
@@ -10,7 +11,9 @@ import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
+import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
+import { SelectedNodeMolecule } from './SelectedNodeMolecule';
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 
@@ -27,6 +30,7 @@ export type PickedOption =
 
 export const PickAndPlopMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
+  const { SelectedAtom } = getMol(SelectedNodeMolecule);
 
   /**
    * For tracking which atom is picked. Can only have one atom picked at a time.
@@ -71,7 +75,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
 
   const PlopNodeInSlotAtom = atom(
     null,
-    (get, set, { parent, idx, slot }: PlopDestination) => {
+    async (get, set, { parent, idx, slot }: PlopDestination) => {
       const picked = get(PickedAtom);
       if (!picked) return;
 
@@ -79,7 +83,10 @@ export const PickAndPlopMolecule = molecule((getMol) => {
       const parentPath = getPath(currentDoc, parent)!;
 
       if (picked.type === 'block') {
-        const cloneOfPickedNode = clone(picked.block.content);
+        picked.block.content.attribs.slot = slot;
+        const cloneOfPickedNode = clone(
+          picked.block.content
+        ) as RaisinElementNode;
 
         const newDocument = insertAtPath(
           currentDoc,
@@ -87,10 +94,12 @@ export const PickAndPlopMolecule = molecule((getMol) => {
           parentPath,
           idx
         );
-
         set(RootNodeAtom, newDocument);
+        await waitForUpdate();
+        set(SelectedAtom, cloneOfPickedNode);
       } else {
-        const pickedNode = get(PickedNodeAtom);
+        const pickedNode = get(PickedNodeAtom) as RaisinElementNode;
+
         if (!pickedNode) {
           // Nothing is picked, so do nothing;
           return;
@@ -105,7 +114,6 @@ export const PickAndPlopMolecule = molecule((getMol) => {
 
         set(RootNodeAtom, newDocument);
       }
-
       // Don't allow re-plop
       set(PickedAtom, undefined);
     }

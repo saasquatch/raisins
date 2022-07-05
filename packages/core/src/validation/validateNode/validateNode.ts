@@ -81,7 +81,7 @@ export function validateChildConstraints(
       }
       if (
         parentMeta &&
-        !doesParentAllowChild(child, parentMeta, child.attribs.slot)
+        !doesParentAllowChild(child, parentMeta, child.attribs.slot, node)
       ) {
         return {
           jsonPointer: `/children/${idx}`,
@@ -121,7 +121,7 @@ function validateChildNodes(
 }
 
 /**
- * Generate a set of JSON Paths for all descendents of a {@link RaisinNode}
+ * Generate a set of JSON Pointers for all descendents of a {@link RaisinNode}
  */
 export function generateJsonPointers(
   node: RaisinNode,

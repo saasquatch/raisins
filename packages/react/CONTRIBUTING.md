@@ -34,21 +34,6 @@ Jest tests are set up to run with `npm test` or `yarn test`.
 
 [`size-limit`](https://github.com/ai/size-limit) is set up to calculate the real cost of your library with `npm run size` and visualize the bundle with `npm run analyze`.
 
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
-```
-
 ### Rollup
 
 TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
@@ -82,3 +67,9 @@ The appropriate paths are configured in `package.json` and `dist/index.js` accor
 ## Named Exports
 
 Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+
+## Publishing
+
+- Build with `npm run build`
+- Update the package version and run `npm run publish`
+- tag with the newly published version: `git tag @raisins/react@[your-version]` and `git push origin --tags`

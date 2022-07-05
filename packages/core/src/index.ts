@@ -8,7 +8,7 @@ import {
   isCommentNode,
   isDirectiveNode,
   isElementNode,
-  isNodeWithChilden,
+  isNodeWithChildren,
   isRoot,
   isStyleNode,
   isTextNode
@@ -46,9 +46,8 @@ export {
   htmlSerializer,
   htmlParser,
   htmlUtil,
-  cssSelector,
   // Node types
-  isNodeWithChilden,
+  isNodeWithChildren,
   isElementNode,
   isRoot,
   isStyleNode,
@@ -76,6 +75,7 @@ export {
   // CSS
   cssSerializer,
   cssParser,
+  cssSelector,
   cssUtil
 };
 export type {

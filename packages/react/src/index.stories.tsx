@@ -10,19 +10,24 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
+import { CanvasHoveredMolecule, CanvasSelectionMolecule } from './canvas';
 import { CanvasController } from './canvas/CanvasController';
+import { ComponentModelMolecule, Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
-import { CoreMolecule } from './core';
+import { CoreMolecule, SelectedNodeMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import { big, MintComponents, mintMono } from './examples/MintComponents';
+import {
+  referrerWidget,
+  VanillaComponents,
+} from './examples/VanillaComponents';
 import { useHotkeys } from './hotkeys/useHotkeys';
 import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
-import { Module } from './util/NPMRegistry';
 
 const meta: Meta = {
   title: 'Editor',
@@ -173,7 +178,25 @@ export function ExternalHTMLControl() {
 export const Mint = () => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents} />
 );
+export const Vanilla = () => (
+  <BasicStory
+    startingHtml={referrerWidget}
+    startingPackages={VanillaComponents}
+  />
+);
 export const Big = () => <BasicStory startingHtml={big} />;
+
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(SelectedNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasStyleMolecule),
+    ...getMol(CanvasSelectionMolecule),
+    ...getMol(CanvasHoveredMolecule),
+    ...getMol(ComponentModelMolecule),
+  };
+});
 
 function Editor() {
   useHotkeys();
@@ -280,14 +303,6 @@ const CanvasStyleMolecule = molecule((getMol) => {
     OutlineAtom,
     ModeAtom,
     SizeAtom,
-  };
-});
-
-const ToolbarMolecule = molecule((getMol) => {
-  return {
-    ...getMol(HoveredNodeMolecule),
-    ...getMol(HistoryMolecule),
-    ...getMol(CanvasStyleMolecule),
   };
 });
 

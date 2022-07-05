@@ -8,9 +8,11 @@ import {
   RaisinElementNode,
   RaisinNode,
   DefaultTextMarks,
+  RaisinNodeWithChildren,
+  RaisinDocumentNode,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { Atom, atom, PrimitiveAtom, SetStateAction, WritableAtom } from 'jotai';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { molecule } from 'jotai-molecules';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
@@ -21,7 +23,10 @@ import {
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
 import shallowEqual from '../util/shallowEqual';
-import { moduleDetailsToBlocks } from './convert/moduleDetailsToBlocks';
+import {
+  blockFromHtml,
+  moduleDetailsToBlocks,
+} from './convert/moduleDetailsToBlocks';
 import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
 import { modulesToDetails } from './convert/modulesToDetails';
 import { Loadable, Module, ModuleDetails } from './types';
@@ -34,8 +39,8 @@ export type ComponentModelMoleculeType = {
   ComponentsAtom: Atom<CustomElement[]>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
-  AddModuleAtom: WritableAtom<null, SetStateAction<Module>>;
-  RemoveModuleAtom: WritableAtom<null, SetStateAction<Module>>;
+  AddModuleAtom: WritableAtom<null, Module>;
+  RemoveModuleAtom: WritableAtom<null, Module>;
   RemoveModuleByNameAtom: WritableAtom<null, string>;
   ComponentMetaAtom: Atom<ComponentMetaProvider>;
   ValidChildrenAtom: Atom<
@@ -55,14 +60,14 @@ export const ComponentModelMolecule = molecule(
     /**
      * Module details from NPM (loaded async)
      */
-    const ModuleDetailsAync = atom(
+    const ModuleDetailsAsync = atom(
       async (get) =>
         await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
     );
     /**
      * Module details from NPM (or loading or error)
      */
-    const ModuleDetailsStateAtom = loadable(ModuleDetailsAync);
+    const ModuleDetailsStateAtom = loadable(ModuleDetailsAsync);
 
     /**
      * List of modules from NPM
@@ -96,7 +101,13 @@ export const ComponentModelMolecule = molecule(
      */
     const BlocksAtom = atom((get) => {
       const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-      return [...blocksFromModules];
+      const defaultBlocks = DEFAULT_BLOCKS.map((block) => {
+        return {
+          title: block.title,
+          content: blockFromHtml(block.examples?.[0]?.content as string),
+        };
+      }) as Block[];
+      return [...blocksFromModules, ...defaultBlocks];
     });
     BlocksAtom.debugLabel = 'BlocksAtom';
 
@@ -124,7 +135,7 @@ export const ComponentModelMolecule = molecule(
      * Remove all packages based on their NPM name
      */
     const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-      set(PackagesAtom, (modules) => modules.filter((e) => e.name !== name))
+      set(PackagesAtom, (modules) => modules.filter((e) => e.package !== name))
     );
     RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
 
@@ -181,7 +192,7 @@ export const ComponentModelMolecule = molecule(
         }
 
         const filter = (block: Block) =>
-          doesParentAllowChild(block.content, nodeMeta, slot);
+          doesParentAllowChild(block.content, nodeMeta, slot, node);
         const validChildren = blocks.filter(filter);
         if (!validChildren.length) {
           return [];
@@ -207,9 +218,10 @@ export const ComponentModelMolecule = molecule(
 
       function isValidChild(
         child: RaisinElementNode,
-        parent: RaisinElementNode,
+        parent: RaisinElementNode | RaisinNodeWithChildren,
         slot: string
       ): boolean {
+        if (isRoot(parent)) return true;
         if (child === parent) {
           // Can't drop into yourself
           // FIXME: Check for all ancestors
@@ -219,13 +231,14 @@ export const ComponentModelMolecule = molecule(
         const parentMeta = getComponentMeta(parent.tagName);
         const childMeta = getComponentMeta(child.tagName);
 
-        // allows default HTML components to inherit custom slot names
-        const slots = parentMeta.slots
-          ? [
-              ...parentMeta.slots,
-              { name: parent.attribs.slot, title: parent.attribs.slot },
-            ]
-          : [];
+        // allows default HTML components to inherit its parent's custom slot names
+        const slots =
+          parent.attribs.slot && parentMeta.slots
+            ? [
+                ...parentMeta.slots,
+                { name: parent.attribs.slot, title: parent.attribs.slot },
+              ]
+            : parentMeta.slots;
 
         return isNodeAllowed(
           child,
@@ -298,6 +311,14 @@ export const ComponentModelMolecule = molecule(
 // TODO: figure out where to put examples without a group
 const DEFAULT_BLOCK_GROUP = 'Default';
 
+const DEFAULT_BLOCKS = [
+  HTMLComponents.P,
+  HTMLComponents.H1,
+  HTMLComponents.H2,
+  HTMLComponents.H3,
+  HTMLComponents.H4,
+];
+
 type BlockGroups = Record<string, Block[]>;
 function group(list: Block[], getComponentMeta: Function): BlockGroups {
   return list.reduce(function (allGroups: BlockGroups, block: Block) {
@@ -329,7 +350,7 @@ export type ComponentModel = {
   getValidChildren: (node: RaisinNode, slot?: string) => Block[];
   isValidChild: (
     from: RaisinElementNode,
-    to: RaisinElementNode,
+    to: RaisinElementNode | RaisinDocumentNode,
     slot: string
   ) => boolean;
 };

@@ -6,7 +6,7 @@ import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { CanvasProvider } from '../canvas/CanvasScope';
-import { PickAndPlopMolecule } from '../core';
+import { ConfigMolecule, PickAndPlopMolecule } from '../core';
 import {
   big,
   MintComponents,
@@ -20,6 +20,7 @@ import {
 } from '../examples/VanillaComponents';
 import { useHotkeys } from '../hotkeys';
 import { BasicStory } from '../index.stories';
+import { JsonPointers } from '../node/NodeChildrenEditor.stories';
 import { Block, ComponentModelMolecule } from './ComponentModel';
 import { Module, ModuleDetails } from './types';
 
@@ -179,6 +180,41 @@ export function MintPackageEditor() {
   );
 }
 
+export const LocalBlocks = () => {
+  return (
+    <BasicStory
+      startingHtml={''}
+      startingPackages={[
+        {
+          package: '@local',
+          version: 'next',
+        },
+      ]}
+    >
+      <CustomThemeTest />
+    </BasicStory>
+  );
+};
+
+const CustomThemeTest = () => {
+  // @ts-ignore
+  const [html, setHtml] = useAtom(useMolecule(ConfigMolecule).HTMLAtom);
+
+  return (
+    <>
+      <textarea
+        value={html}
+        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+        rows={6}
+        style={{ width: '300px' }}
+      />
+      <JsonPointers />
+
+      <Editor />
+    </>
+  );
+};
+
 const PACKAGES = [
   '@local',
   '@saasquatch/component-boilerplate',
@@ -190,14 +226,14 @@ const PACKAGES = [
 
 const setOfThings: Module[] = [
   {
-    name: '@shoelace-style/shoelace',
+    package: '@shoelace-style/shoelace',
   },
   //   {
-  //     name: '@shoelace-style/shoelace',
+  //     package: '@shoelace-style/shoelace',
   //     filePath: 'dist/shoelace/shoelace.css',
   //   },
   {
-    name: '@shoelace-style/shoelace',
+    package: '@shoelace-style/shoelace',
     filePath: 'dist/themes/light.css',
   },
 ];
@@ -241,15 +277,15 @@ function PackageEditorView(props: ModuleManagement) {
       Modules:
       <ul>
         {props.modules.map((m) => (
-          <li key={m.name + '@' + m.version + '/' + m.filePath}>
-            {m.name} @ {m.version} for {m.filePath}
+          <li key={m.package + '@' + m.version + '/' + m.filePath}>
+            {m.package} @ {m.version} for {m.filePath}
           </li>
         ))}
       </ul>
       Details:
       <ul>
         {props.moduleDetails?.map((m, i) => (
-          <li key={`${m.name}@${m.version}-${i}`}>
+          <li key={`${m.package}@${m.version}-${i}`}>
             <b>{m['package.json'].description}</b>
             <br />
             <div style={{ fontSize: '0.8em', color: 'grey' }}>
@@ -259,7 +295,7 @@ function PackageEditorView(props: ModuleManagement) {
               onClick={() =>
                 props.removeModule({
                   filePath: m.filePath,
-                  name: m.name,
+                  package: m.package,
                   version: m.version,
                 })
               }
@@ -281,18 +317,18 @@ function PackageEditorView(props: ModuleManagement) {
         onClick={() => {
           [
             {
-              name: '@saasquatch/mint-components',
+              package: '@saasquatch/mint-components',
               filePath: '/dist/mint-components/mint-components.css',
               version: '1.5.0-116',
             },
             {
-              name: '@saasquatch/bedrock-components',
+              package: '@saasquatch/bedrock-components',
               filePath: '/dist/bedrock-components/bedrock-components.js',
               version: '1.3.1-7',
             },
 
             {
-              name: '@saasquatch/mint-components',
+              package: '@saasquatch/mint-components',
               filePath: '/dist/mint-components/mint-components.js',
               version: '1.5.0-116',
             },
@@ -308,7 +344,7 @@ function PackageEditorView(props: ModuleManagement) {
               <button
                 onClick={(e) => {
                   props.addModule({
-                    name: m,
+                    package: m,
                   });
                 }}
               >

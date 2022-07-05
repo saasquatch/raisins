@@ -44,7 +44,7 @@ function reduceExamples(
   return [...previousValue, blockExample];
 }
 
-function blockFromHtml(html: string): RaisinElementNode | undefined {
+export function blockFromHtml(html: string): RaisinElementNode | undefined {
   try {
     return parse(html).children[0] as RaisinElementNode;
   } catch (e) {

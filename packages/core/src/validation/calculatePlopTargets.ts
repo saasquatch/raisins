@@ -1,5 +1,5 @@
 import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode } from "../html-dom/isNode";
+import { isElementNode, isRoot } from "../html-dom/isNode";
 import { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode";
 import { isNodeAllowed } from "./rules/isNodeAllowed";
 
@@ -16,16 +16,23 @@ export function calculatePlopTargets(
   },
   parents: WeakMap<RaisinNode, RaisinNode>
 ): PlopTarget[] {
-  if (!isElementNode(parent)) return [];
+  if (isRoot(parent) && !parent.children.length) {
+    return [{ idx: 0, slot: "" }];
+  }
+
+  if (!isElementNode(parent) && !isRoot(parent)) return [];
 
   // Can't drop directly into oneself
   if (parent === possiblePlop) return [];
   let ancestor: RaisinNode | undefined = parent;
-  do {
-    // If an ancestor is the plop target, don't allow it.
-    if (ancestor === possiblePlop) return [];
-    ancestor = parents.get(ancestor);
-  } while (ancestor !== undefined);
+
+  if (!isRoot(ancestor)) {
+    do {
+      // If an ancestor is the plop target, don't allow it.
+      if (ancestor === possiblePlop) return [];
+      ancestor = parents.get(ancestor);
+    } while (ancestor !== undefined);
+  }
 
   // Filter out text node children and save the original index
   const raisinChildren = parent.children

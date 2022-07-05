@@ -1,4 +1,4 @@
-import { isNodeWithChilden } from "../html-dom/isNode";
+import { isNodeWithChildren } from "../html-dom/isNode";
 import { RaisinNode } from "../html-dom/RaisinNode";
 
 export type NodePath = number[];
@@ -16,7 +16,7 @@ export function getPath(
     // Empty array means this node
     return [];
   }
-  if (isNodeWithChilden(root)) {
+  if (isNodeWithChildren(root)) {
     return root.children
       .map((c, idx) => {
         const childPath = getPath(c, node);
@@ -25,14 +25,14 @@ export function getPath(
         }
         return undefined;
       })
-      .find((c) => c !== undefined);
+      .find(c => c !== undefined);
   }
   return undefined;
 }
 
 export function getNode(root: RaisinNode, path: NodePath): RaisinNode {
   return path.reduce((node: RaisinNode, path) => {
-    if (isNodeWithChilden(node)) {
+    if (isNodeWithChildren(node)) {
       return node.children[path];
     }
     throw new Error("Node type" + node.type + "doesn't have children");

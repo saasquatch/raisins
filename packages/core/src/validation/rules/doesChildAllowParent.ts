@@ -1,6 +1,6 @@
 import { CustomElement } from "@raisins/schema/schema";
 import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinNode } from "../../html-dom/RaisinNode";
+import { RaisinElementNode, RaisinNode } from "../../html-dom/RaisinNode";
 
 /**
  * Given a tag's metadata, checks if it allows children.
@@ -14,18 +14,15 @@ export function doesChildAllowParent(
 ): boolean {
   let tagName: string | undefined = undefined;
 
-  if (isRoot(parent)) {
-    // Root element is always allowed.
-    // This allows editing for fragments, since Root !== body
-    return true;
-  }
-  if (!isElementNode(parent)) {
+  if (!isElementNode(parent) && !isRoot(parent)) {
     // Non-element nodes aren't picky. Text doesn't say where it can be, it's the other side of
     // the relationship that enforces this
     return true;
   }
 
-  tagName = parent.tagName;
+  let elementParent = parent as RaisinElementNode;
+
+  tagName = elementParent.tagName;
 
   if (childMeta.validParents === undefined) {
     // No constraints, so all parents are allowed.

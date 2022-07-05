@@ -92,15 +92,16 @@ const ForkedTestEditor = () => {
   );
 };
 
-const JsonPointers = () => {
+export const JsonPointers = () => {
   const nodeAtoms = useMolecule(NodeMolecule);
   const hasErrors = useAtomValue(nodeAtoms.hasErrorsAtom);
   const allErrors = useAtomValue(nodeAtoms.errorsAtom);
   const errors = useAtomValue(nodeAtoms.attributeErrorsAtom);
   const tagName = useAtomValue(nodeAtoms.tagNameAtom);
+  const name = useAtomValue(nodeAtoms.nameForNode);
   return (
     <div>
-      {tagName ?? 'Root'}
+      {name ?? tagName ?? 'Root'}
       {errors.length > 0 && (
         <>
           <p>Errors for this node</p>

@@ -1,8 +1,8 @@
 {
   "name": "@raisins/schema",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "Types (a.k.a. schema) for the Raisins ecosystem",
-  "author": "Logan Volkers <logan@saasquat.ch>",
+  "author": "SaaSquatch Team",
   "license": "MIT",
   "main": "schema.json",
   "files": [
@@ -25,11 +25,9 @@
   "bugs": {
     "url": "https://github.com/saasquatch/raisins/issues"
   },
+  "homepage": "https://github.com/saasquatch/raisins",
   "devDependencies": {
     "typescript": "^4.4.3",
     "typescript-json-schema": "^0.51.0"
-  },
-  "dependencies": {
-    "split-on-first": "^3.0.0"
   }
 }

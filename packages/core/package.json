@@ -1,7 +1,8 @@
 {
   "name": "@raisins/core",
-  "author": "Logan Volkers",
-  "version": "0.27.0",
+  "author": "SaaSquatch Team",
+  "description": "Core functions for manipulating and validating HTML and raisin nodes",
+  "version": "1.0.2-2",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/core.esm.js",
@@ -62,12 +63,10 @@
     "@types/mz": "^2.7.4",
     "@types/parse5": "^6.0.3",
     "@types/styled-components": "^5.1.14",
-    "classnames": "^2.3.1",
     "cypress": "^9.5.2",
     "cypress-cucumber-preprocessor": "^4.3.1",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
-    "husky": "^7.0.2",
     "jest": "^25.5.4",
     "jest-cucumber": "^3.0.1",
     "jsonata": "^1.8.5",
@@ -79,18 +78,16 @@
     "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@raisins/schema": "^0.7.0",
+    "@raisins/schema": "^1.0.0",
     "color2k": "^2.0.0",
     "css": "^3.0.0",
     "css-select": "^5.1.0",
     "css-tree": "*",
     "domelementtype": "^2.2.0",
     "entities": "^4.3.0",
+    "husky": "^8.0.1",
     "lodash.clonedeep": "^4.5.0",
-    "luxon": "^2.3.2",
-    "penpal": "^6.1.0",
-    "snabbdom": "^3.1.0",
-    "styled-components": "^5.3.1"
+    "luxon": "^2.3.2"
   },
   "jest": {
     "testMatch": [
@@ -101,5 +98,7 @@
     "nonGlobalStepDefinitions": false,
     "stepDefinitions": "src/cucumber-steps"
   },
-  "gitHead": "8629058a0437bbea5bfb184c13855f4b58a8480f"
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  }
 }
