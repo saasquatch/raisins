@@ -105,7 +105,7 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
   </BasicStory>
 );
 
-const Toolbars = () => {
+export const Toolbars = () => {
   const { PickedRectAtom } = useMolecule(CanvasPickAndPlopMolecule);
   const { SelectedRectAtom } = useMolecule(CanvasSelectionMolecule);
   const { HoveredRectAtom } = useMolecule(CanvasHoveredMolecule);

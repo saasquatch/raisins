@@ -4,11 +4,17 @@ import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { h } from 'snabbdom';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
+import { useHotkeys } from '../hotkeys';
 import { BasicStory } from '../index.stories';
+import { Toolbars } from './CanvasController.stories';
 import { CanvasProvider } from './CanvasScope';
 import { CanvasScopeMolecule } from './CanvasScopeMolecule';
 import { BasicCanvasController } from './index';
-import { CanvasHoveredMolecule, CanvasSelectionMolecule } from './plugins';
+import {
+  CanvasHoveredMolecule,
+  CanvasPickAndPlopMolecule,
+  CanvasSelectionMolecule,
+} from './plugins';
 import { RootRenderer } from './types';
 
 const meta: Meta = {
@@ -79,11 +85,13 @@ export const CanvasFull = () => {
   useMolecule(PaintItRedMolecule);
   useMolecule(CanvasHoveredMolecule);
   useMolecule(CanvasSelectionMolecule);
-
+  useMolecule(CanvasPickAndPlopMolecule);
+  useHotkeys();
   return (
     <>
       <ShadowPicker />
       <div style={{ position: 'relative' }}>
+        <Toolbars />
         <BasicCanvasController />
       </div>
     </>
