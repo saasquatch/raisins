@@ -4,9 +4,22 @@ import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
+import {
+  AttributeProvider,
+  AttributesControllerProps,
+  AttributesMolecule,
+} from '../attributes';
 import { CanvasFull } from '../canvas/CanvasController.stories';
 import { CanvasProvider } from '../canvas/CanvasScope';
-import { ConfigMolecule, PickAndPlopMolecule } from '../core';
+import {
+  ConfigMolecule,
+  PickAndPlopMolecule,
+  SelectedNodeController,
+} from '../core';
+import {
+  AttributeEditor,
+  DefaultAttributeComponent,
+} from '../core/selection/SelectedNodeController.stories';
 import {
   big,
   MintComponents,
@@ -109,6 +122,64 @@ const BlocksController = () => {
   );
 };
 
+export const CustomAttributesController: React.FC<AttributesControllerProps> = (
+  props
+) => {
+  const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
+  const keys = useAtomValue(keysAtom);
+  const groupedSchema = useAtomValue(groupedSchemaAtom);
+
+  if (!keys) return <></>;
+  const Component = props.Component ?? DefaultAttributeComponent;
+  return (
+    <>
+      {Object.keys(groupedSchema).map((key, idx) => {
+        return (
+          <>
+            {groupedSchema[key].map((attribute) => {
+              return (
+                <AttributeProvider
+                  attributeName={attribute.name}
+                  key={attribute.name}
+                >
+                  <Component />
+                </AttributeProvider>
+              );
+            })}
+            <hr />
+          </>
+        );
+      })}
+    </>
+  );
+};
+
+const EditorWithProps = () => {
+  return (
+    <CanvasProvider>
+      <div style={{ display: 'flex' }}>
+        <div>
+          <details>
+            <summary>Blocks</summary>
+            <BlocksController />
+          </details>
+
+          <AttributeEditor
+            Controller={() => (
+              <SelectedNodeController
+                HasSelectionComponent={CustomAttributesController}
+              ></SelectedNodeController>
+            )}
+          />
+        </div>
+        <div style={{ width: '74%', position: 'absolute', right: 0 }}>
+          <CanvasFull />
+        </div>
+      </div>
+    </CanvasProvider>
+  );
+};
+
 const Editor = () => {
   useHotkeys();
   return (
@@ -193,6 +264,38 @@ export const LocalBlocks = () => {
     >
       <CustomThemeTest />
     </BasicStory>
+  );
+};
+
+export const LocalBlocksAndProps = () => {
+  return (
+    <BasicStory
+      startingHtml={`
+      <sqm-portal-container direction="column" gap="xxx-large">
+  <sqm-portal-profile></sqm-portal-profile> </sqm-portal-container
+><sqm-portal-container direction="column" gap="xxx-large">
+  <sqm-portal-change-password></sqm-portal-change-password>
+</sqm-portal-container>
+
+      `}
+      startingPackages={[
+        {
+          package: '@local',
+          version: 'next',
+        },
+      ]}
+    >
+      <CustomThemeTestWithProps />
+    </BasicStory>
+  );
+};
+
+const CustomThemeTestWithProps = () => {
+  return (
+    <>
+      <JsonPointers />
+      <EditorWithProps />
+    </>
   );
 };
 

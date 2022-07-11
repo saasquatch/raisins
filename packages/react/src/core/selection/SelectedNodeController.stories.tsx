@@ -39,7 +39,7 @@ const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
   };
 });
 
-const AttributeEditor = ({
+export const AttributeEditor = ({
   Controller = () => (
     <SelectedNodeController
       HasSelectionComponent={AttributesController}
@@ -191,7 +191,7 @@ export const CustomSelectedComponentVanilla = () => {
   );
 };
 
-const CustomAttributesController: React.FC<AttributesControllerProps> = (
+export const CustomAttributesController: React.FC<AttributesControllerProps> = (
   props
 ) => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
@@ -224,7 +224,7 @@ const CustomAttributesController: React.FC<AttributesControllerProps> = (
   );
 };
 
-const DefaultAttributeComponent = () => {
+export const DefaultAttributeComponent = () => {
   const { FieldAtom } = useMolecule(AttributeMolecule);
   const Field = useAtomValue(FieldAtom);
   return <Field />;

@@ -53,7 +53,7 @@ export interface NPMRegistry {
   resolvePath(module: Module, path: string): string;
 }
 
-const UNPKG_BASE = 'https://unpkg.com';
+const UNPKG_BASE = 'https://fast.ssqt.io/npm';
 
 export const unpkgNpmRegistry: NPMRegistry = {
   async getPackageJson(m) {

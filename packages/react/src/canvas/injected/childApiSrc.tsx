@@ -27,7 +27,7 @@ export const childApiSrc = (
       package: 'snabbdom',
       version: '3.5.0',
     },
-    'build/index.js'
+    '+esm'
   )}"
   const props = ${JSON.stringify(props)};
   (${ChildAPIModule})();
