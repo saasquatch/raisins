@@ -1,5 +1,6 @@
 import expect from "expect";
 import { NodePath } from "../paths/Paths";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -217,6 +218,56 @@ describe("Move nodes", () => {
     expect(res.children[1]).toStrictEqual(node1);
   });
 
+  const emptyRoot: RaisinDocumentNode = {
+    type: "root",
+    children: []
+  };
+
+  const possiblePlopMeta = {
+    title: "Div",
+    tagName: "div",
+    attributes: [],
+    slots: []
+  };
+
+  const newNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { id: "newNode" },
+    children: [],
+    type: "tag"
+  };
+
+  it("Adding a slot to root", () => {
+    const nodepath: NodePath = [];
+    const plopTargets = calculatePlopTargets(
+      emptyRoot,
+      {
+        // @ts-ignore
+        tagName: undefined,
+        title: undefined,
+        slots: []
+      },
+      {
+        pickedNode: newNode,
+        possiblePlopMeta
+      },
+      {}
+    );
+
+    expect(plopTargets.length).toBe(1);
+
+    const res = moveNode(
+      emptyRoot,
+      newNode,
+      "",
+      nodepath,
+      1
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(1);
+    expect(res.children[0]).toStrictEqual(newNode);
+  });
+
   const slotRoot: RaisinDocumentNode = {
     type: "root",
     children: [node2]
@@ -313,7 +364,7 @@ describe("Move nodes", () => {
     type: "tag"
   };
 
-  // Moving a new component with out a slot name into the same slot as an existing component
+  // Moving a new component without a slot name into the same slot as an existing component
   /**
    * Component Added: <my-other-field></my-other-field>
    *
