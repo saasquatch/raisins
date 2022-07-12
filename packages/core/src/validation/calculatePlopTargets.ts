@@ -16,11 +16,11 @@ export function calculatePlopTargets(
   },
   parents: WeakMap<RaisinNode, RaisinNode>
 ): PlopTarget[] {
+  if (!isElementNode(parent) && !isRoot(parent)) return [];
+
   if (isRoot(parent) && !parent.children.length) {
     return [{ idx: 0, slot: "" }];
   }
-
-  if (!isElementNode(parent) && !isRoot(parent)) return [];
 
   // Can't drop directly into oneself
   if (parent === possiblePlop) return [];
