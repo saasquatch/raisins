@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2022-07-12
+
+### Updated
+
+- Plop targets are now generated within the root
+  - Allows for plopping components into empty HTML
+- `moveNode` now supports plopping components without slot names into named slots
+  - For example, the component \<my-component> can now be plopped into the "child" slot of \<my-container>, resulting in the following HTML:
+  ```
+  <my-container>
+    <my-component slot="child" />
+  </my-container>
+  ```
+
 ## [1.0.1] - 2022-06-16
 
 - Fixed regex bug in Safari
@@ -71,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `cssUtil`
     - `cssSelector`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/core@1.0.0...HEAD
+[unreleased]: https://github.com/saasquatch/raisins/compare/core@1.1.0...HEAD
+[1.1.0]: https://github.com/saasquatch/raisins/releases/tag/core@1.1.0...core@1.0.1
 [1.0.1]: https://github.com/saasquatch/raisins/releases/tag/core@1.0.1...core@1.0.0
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/core@1.0.0
