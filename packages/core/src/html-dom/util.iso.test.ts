@@ -224,17 +224,28 @@ describe("Move nodes", () => {
 
   const node2Moved: RaisinElementNode = {
     tagName: "div",
-    attribs: { slot: "otherChildren", id: "node2" },
+    attribs: { slot: "formData", id: "node2" },
     children: [],
     type: "tag"
   };
 
-  it("Move node at the same level with new slot", () => {
+  // Moving a component with no slot name attached into a named slot
+  /**
+   * Before:
+   *  <my-field></my-field>
+   *  <my-form></my-form>
+   *
+   * After:
+   *   <my-form>
+   *     <my-field slot="formData"></my-field>
+   *   </my-form>
+   */
+  it("Move an existing node into a slot", () => {
     const nodepath: NodePath = [];
     const res = moveNode(
       slotRoot,
       node2,
-      "otherChildren",
+      "formData",
       nodepath,
       0
     ) as RaisinDocumentNode;
@@ -242,20 +253,6 @@ describe("Move nodes", () => {
     expect(res.children.length).toBe(1);
     expect(res.children[0]).toStrictEqual(node2Moved);
   });
-
-  const movingNode: RaisinElementNode = {
-    tagName: "div",
-    attribs: { slot: "children", id: "movingNode" },
-    children: [],
-    type: "tag"
-  };
-
-  const movedNode: RaisinElementNode = {
-    tagName: "div",
-    attribs: { slot: "otherChildren", id: "movingNode" },
-    children: [],
-    type: "tag"
-  };
 
   const existingNode: RaisinElementNode = {
     tagName: "div",
@@ -276,6 +273,18 @@ describe("Move nodes", () => {
     children: [existingNode]
   };
 
+  // Moving a component with a slot name into a new slot within the same component
+  /**
+   * Before:
+   *  <my-form>
+   *    <my-field slot="formData"></my-field>
+   *  </my-form>
+   *
+   * After:
+   *   <my-form>
+   *     <my-field slot="terms"></my-field>
+   *   </my-form>
+   */
   it("Move node at the same level with new slot to a specific index of an empty slot", () => {
     const nodepath: NodePath = [];
     const res = moveNode(
@@ -290,7 +299,79 @@ describe("Move nodes", () => {
     expect(res.children[0]).toStrictEqual(movedExistingNode);
   });
 
-  it("Move node at the same level with new slot to a specific index", () => {
+  const addingNoSlotNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const addedNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  // Moving a new component with out a slot name into the same slot as an existing component
+  /**
+   * Component Added: <my-other-field></my-other-field>
+   *
+   * Before:
+   *  <my-form>
+   *    <my-field slot="formData"></my-field>
+   *  </my-form>
+   *
+   * After:
+   *   <my-form>
+   *     <my-field slot="formData"></my-field>
+   *     <my-other-field slot="formData"></my-other-field>
+   *   </my-form>
+   */
+  it("Move a new node as a sibling with a different slot to a specific index", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      multiSlotRoot,
+      addingNoSlotNode,
+      "otherChildren",
+      nodepath,
+      1
+    ) as RaisinDocumentNode;
+    expect(res.children.length).toBe(2);
+    expect(res.children[0]).toStrictEqual(existingNode);
+    expect(res.children[1]).toStrictEqual(addedNode);
+  });
+
+  const movingNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "children", id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  const movedNode: RaisinElementNode = {
+    tagName: "div",
+    attribs: { slot: "otherChildren", id: "movingNode" },
+    children: [],
+    type: "tag"
+  };
+
+  // Moving a new component with a slot name into a slot within the same component as an existing component
+  /**
+   * Component Added: <my-other-field slot="terms"></my-other-field>
+   *
+   * Before:
+   *  <my-form>
+   *    <my-field slot="formData"></my-field>
+   *  </my-form>
+   *
+   * After:
+   *   <my-form>
+   *     <my-field slot="formData"></my-field>
+   *     <my-other-field slot="formData"></my-other-field>
+   *   </my-form>
+   */
+  it("Move a new node as a sibling with a different slot to a specific index", () => {
     const nodepath: NodePath = [];
     const res = moveNode(
       multiSlotRoot,
@@ -313,7 +394,7 @@ describe("Move nodes", () => {
   };
   const node2NoSlot: RaisinElementNode = {
     tagName: "div",
-    attribs: { slot: "otherChildren", id: "node2" },
+    attribs: { id: "node2" },
     children: [],
     type: "tag"
   };
@@ -329,7 +410,25 @@ describe("Move nodes", () => {
     children: [node1NoSlot, node2NoSlot, node3NoSlot]
   };
 
-  it("Move node with no slot", () => {
+  // Moving a child component to a new index within a parent component
+  /**
+   * Component Added: <my-field></my-field>
+   *
+   * Before:
+   *  <parent>
+   *    <child id="1" />
+   *    <child id="2" />
+   *    <child id="3" />
+   *  </parent>
+   *
+   * After:
+   *  <parent>
+   *    <child id="2" />
+   *    <child id="1" />
+   *    <child id="3" />
+   *  </parent>
+   */
+  it("Move node with no slot to a new index", () => {
     const nodepath: NodePath = [];
     const res = moveNode(
       slotlessRoot,

@@ -290,13 +290,13 @@ export function moveToPath(
 export function moveNode(
   root: RaisinNode,
   nodeToMove: RaisinNode,
-  slot: string,
+  slot: string | undefined,
   parentPath: NodePath,
   idx: number
 ): RaisinNode {
   const nodeWithNewSlot = !isElementNode(nodeToMove)
     ? { ...nodeToMove }
-    : nodeToMove.attribs.slot === undefined
+    : !slot
     ? {
         ...nodeToMove,
         attribs: { ...nodeToMove.attribs }
