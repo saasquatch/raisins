@@ -12,7 +12,7 @@ export function doesParentAllowChild(
   child: RaisinNode,
   parentMeta: CustomElement,
   slot: string | undefined = "",
-  parent: RaisinNode
+  parent?: RaisinNode
 ): boolean {
   // Root element is always allowed.
   // This allows editing for fragments, since Root !== body
