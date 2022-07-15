@@ -65,6 +65,7 @@ export const unpkgNpmRegistry: NPMRegistry = {
   },
   resolvePath(module, path) {
     const version = module.version ?? 'latest';
+    if (path.charAt(0) == '/') path = path.substring(1);
     const resolved = `${UNPKG_BASE}/${module.package}@${version}/${path}`;
     return resolved;
   },
