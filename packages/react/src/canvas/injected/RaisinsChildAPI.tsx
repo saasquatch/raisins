@@ -180,7 +180,6 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   function patchAndCache(next: VNode) {
     rendering = true;
     try {
-      console.log('CHILD: Rendering new node', next);
       patch(currentNode, next);
     } catch (e) {
       throw e;
