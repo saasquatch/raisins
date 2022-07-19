@@ -250,7 +250,6 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     parentSchema.title ||
     'Content';
 
-  console.log({ parent, idx });
   // Prevent plop target from being cut off at the top/bottom of the canvas
   const paddedPlopStyle =
     isRoot(parent) && (idx <= 1 || idx === parent.children.length - 1)

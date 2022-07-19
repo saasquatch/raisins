@@ -16,11 +16,14 @@ export function calculatePlopTargets(
   },
   parents: WeakMap<RaisinNode, RaisinNode>
 ): PlopTarget[] {
-  if (!isElementNode(parent) && !isRoot(parent)) return [];
-
-  if (isRoot(parent) && !parent.children.length) {
-    return [{ idx: 0, slot: "" }];
+  if (isRoot(parent)) {
+    // Allow root plop target if there is only text, spaces, or newlines inside root
+    if (!parent.children?.length || parent.children?.[0]?.type === "text") {
+      return [{ idx: 0, slot: "" }];
+    }
   }
+
+  if (!isElementNode(parent) && !isRoot(parent)) return [];
 
   // Can't drop directly into oneself
   if (parent === possiblePlop) return [];
