@@ -299,7 +299,8 @@ export function moveNode(
     : !slot
     ? {
         ...nodeToMove,
-        attribs: { ...nodeToMove.attribs }
+        // Remove slot from node being moved
+        attribs: (({ slot, ...o }) => o)(nodeToMove.attribs)
       }
     : {
         ...nodeToMove,

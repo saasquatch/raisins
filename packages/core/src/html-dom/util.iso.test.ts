@@ -305,6 +305,76 @@ describe("Move nodes", () => {
     expect(res.children[0]).toStrictEqual(node2Moved);
   });
 
+  // Moving a component with no slot name attached into a named slot
+  /**
+   * Before:
+   *  <my-field></my-field>
+   *  <my-form></my-form>
+   *
+   * After:
+   *   <my-form>
+   *     <my-field slot="formData"></my-field>
+   *   </my-form>
+   */
+  it("Move an existing node into a slot", () => {
+    const nodepath: NodePath = [];
+    const res = moveNode(
+      slotRoot,
+      node2,
+      "formData",
+      nodepath,
+      0
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(1);
+    expect(res.children[0]).toStrictEqual(node2Moved);
+  });
+
+  const container: RaisinElementNode = {
+    tagName: "div",
+    attribs: {},
+    children: [node2Moved],
+    type: "tag"
+  };
+
+  const node2Removed: RaisinElementNode = {
+    tagName: "div",
+    attribs: { id: "node2" },
+    children: [],
+    type: "tag"
+  };
+
+  const slottedRoot: RaisinDocumentNode = {
+    type: "root",
+    children: [container]
+  };
+
+  // Moving a component with a slot name into a section with no slots
+  /**
+   * Before:
+   *  <my-form>
+   *    <my-field slot="formData"></my-field>
+   *  </my-form>
+   *
+   * After:
+   *  <my-field></my-field>
+   *  <my-form></my-form>
+   */
+  it("Move a node with a slot name into a node without named slots", () => {
+    const nodepath: NodePath = [];
+    expect(slottedRoot.children.length).toBe(1);
+    const res = moveNode(
+      slottedRoot,
+      node2Moved,
+      "",
+      nodepath,
+      0
+    ) as RaisinDocumentNode;
+
+    expect(res.children.length).toBe(2);
+    expect(res.children[0]).toStrictEqual(node2Removed);
+  });
+
   const existingNode: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "otherChildren", id: "existingNode" },
