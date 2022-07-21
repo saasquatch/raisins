@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2022-07-21
+
+### Updated
+
+- Plop targets are now generated within the root
+  - Extra margin was added to root plop targets to prevent them from getting cut off in the canvas
+
+### Fixed
+
+- Blocks that are moved into a named slot inherit the slot name so they are properly rendered
+- all packages are loaded with `fast.ssqt.io/npm` instead of `unpkg.com` to prevent occasional loading issues
+
 ## [1.0.1] - 2022-06-16
 
 - New version of `@raisins/core` dependency to fix safari regex bug
@@ -68,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SlotScopeProvider`
   - `ProseEditorScopeProvider`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.0.0...HEAD
+[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.1.0...HEAD
+[1.1.0]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.0
 [1.0.1]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.0.1
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/react@1.0.0
