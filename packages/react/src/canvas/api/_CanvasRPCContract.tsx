@@ -4,7 +4,7 @@ export type GeometryDetail = {
   entries: GeometryEntry[];
 };
 export type GeometryEntry = {
-  contentRect: Omit<DOMRectReadOnly,"toJSON">
+  contentRect: Omit<DOMRectReadOnly, 'toJSON'>;
   target?: {
     attributes: Record<string, string>;
   };
@@ -13,7 +13,7 @@ export type GeometryEntry = {
 /**
  * DOM event from inside the canvas.
  */
-export type CanvasEvent = {
+export type RawCanvasEvent = {
   /**
    * A DOM event type.
    *
@@ -33,11 +33,10 @@ export type CanvasEvent = {
 
 export type ParentRPC = {
   resizeHeight(pixels: string): void;
-  event(event: CanvasEvent): void;
+  event(event: RawCanvasEvent): void;
   geometry(detail: GeometryDetail): void;
 };
 
 export type ChildRPC = {
   render(html: VNode): void;
-  geometry(): GeometryDetail;
 };

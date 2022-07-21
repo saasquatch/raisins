@@ -1,0 +1,12 @@
+{
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "development",
+  "forwardPorts": [8080],
+  "extensions": [
+    "esbenp.prettier-vscode",
+    // LiveShare : https://marketplace.visualstudio.com/items?itemName=ms-vsliveshare.vsliveshare
+    "ms-vsliveshare.vsliveshare",
+    // Cucumber: https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete
+    "alexkrechik.cucumberautocomplete"
+  ]
+}

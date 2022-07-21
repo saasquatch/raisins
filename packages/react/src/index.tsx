@@ -1,2 +1,7 @@
-export { CanvasController } from './canvas/CanvasController';
-export { RaisinsProvider } from './core/RaisinScope';
+export * from './attributes';
+export * from './canvas';
+export * from './component-metamodel';
+export * from './core';
+export * from './hotkeys';
+export * from './node';
+export * from './rich-text';

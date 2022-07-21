@@ -18,3 +18,10 @@ Import the typescript types
 import * as schema from "@raisins/schema/schema";
 type Foo = schema.Package;
 ```
+
+Import specific types from the schema
+
+```js
+import { Attribute } from "@raisins/schema/schema";
+type AttributeAtom = Atom<Attribute>;
+```

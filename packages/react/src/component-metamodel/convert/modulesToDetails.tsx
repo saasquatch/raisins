@@ -1,7 +1,7 @@
 import * as schema from '@raisins/schema/schema';
 import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry';
 
-import { Module, ModuleDetails } from '../ModuleManagement';
+import { Module, ModuleDetails } from '../types';
 import { LOCAL_REPO } from './LOCAL_REPO';
 
 /**
@@ -16,7 +16,7 @@ export async function modulesToDetails(
   const details: ModuleDetails[] = [];
   for (const module of next) {
     let registry = unpkgNpmRegistry;
-    if (module.name === LOCAL_REPO && localUrl) {
+    if (module.package === LOCAL_REPO && localUrl) {
       registry = makeLocalRegistry(localUrl);
     }
     const detail = await registry.getPackageJson(module);

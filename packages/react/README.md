@@ -1,181 +1,673 @@
-# TSDX React w/ Storybook User Guide
+# Raisins React
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+Raisins in a WYSIWYG visual editor for HTML and web components. This is the react package, which handles the state behind the visual rendering experience.
 
-> This TSDX setup is meant for developing React component libraries (not apps!) that can be published to NPM. If you’re looking to build a React-based app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
+# Installation
 
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
-
-## Commands
-
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
-
-The recommended workflow is to run TSDX in one terminal:
-
-```bash
-npm start # or yarn start
+```
+npm i @raisins/react
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
+# Examples
 
-Then run either Storybook or the example playground:
+Raisins React comes with many controllers and molecules to help build a visual editor for your HTML. By using each of them together, you are able to control each different piece of functionality to include or exclude from the editing experience.
 
-### Storybook
+## Base Example
 
-Run inside another terminal:
-
-```bash
-yarn storybook
-```
-
-This loads the stories from `./stories`.
-
-> NOTE: Stories should reference the components as if using the library, similar to the example playground. This means importing from the root project directory. This has been aliased in the tsconfig and the storybook webpack config as a helper.
-
-### Example
-
-Then run the example inside another:
-
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
-```
-
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**, we use [Parcel's aliasing](https://parceljs.org/module_resolution.html#aliases).
-
-To do a one-off build, use `npm run build` or `yarn build`.
-
-To run tests, use `npm test` or `yarn test`.
-
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`.
-
-### Bundle analysis
-
-Calculates the real cost of your library using [size-limit](https://github.com/ai/size-limit) with `npm run size` and visulize it with `npm run analyze`.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```txt
-/example
-  index.html
-  index.tsx       # test your component here in a demo app
-  package.json
-  tsconfig.json
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-/stories
-  Thing.stories.tsx # EDIT THIS
-/.storybook
-  main.js
-  preview.js
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
-```
-
-#### React Testing Library
-
-We do not set up `react-testing-library` for you yet, we welcome contributions and documentation on this.
-
-### Rollup
-
-TSDX uses [Rollup](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
-
-### TypeScript
-
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
-
-## Continuous Integration
-
-### GitHub Actions
-
-Two actions are added by default:
-
-- `main` which installs deps w/ cache, lints, tests, and builds on all pushes against a Node and OS matrix
-- `size` which comments cost comparison of your library on every pull request using [size-limit](https://github.com/ai/size-limit)
-
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
+- The base example contains a canvas with some basic text editability. It can be combined with the examples below to provide a more complete editability experience.
 
 ```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
+  const WidgetScope = createScope<{
+    startingHtml: string;
+    startingPackages: Module[];
+  }>({
+    startingHtml: '',
+    startingPackages: [] as Module[],
+  });
 
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
+    const widgetScope = getScope(WidgetScope);
+    return {
+      HTMLAtom: atom(widgetScope.startingHtml),
+      PackagesAtom: atom(widgetScope.startingPackages),
+      uiWidgetsAtom: atom({}),
+    };
+  });
+
+  const startingHtml = `
+    <h1>My Heading</h1>
+    <p style="width:200px;height:100px;">My first paragraph</p>
+    <p style="width:200px;height:100px;">My second paragraph</p>
+`;
+
+  const Editor = () => {
+    useHotkeys();
+    return (
+      <div style={{ display: 'flex' }}>
+        <div style={{ flex: 0.7 }}>
+          <BasicCanvasController />
+        </div>
+        <div style={{ flex: 0.3 }}>
+          <AttributeEditor />
+        </div>
+      </div>
+    );
+  };
+
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
+
+export function BaseExample() {
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml,
+        startingPackages: [],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
 }
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+## External HTML Control
 
-## Module Formats
+```js
+  const Editor = () => {
+    useHotkeys();
+    const { HTMLAtom } = useMolecule(ConfigMolecule);
+    const [html, setHtml] = useAtom(HTMLAtom!);
 
-CJS, ESModules, and UMD module formats are supported.
+    return (
+      <>
+        <textarea
+          value={html}
+          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+          rows={10}
+          style={{ width: '500px' }}
+        />
+        <div style={{ display: 'flex' }}>
+          <div style={{ flex: 0.7 }}>
+            <BasicCanvasController />
+          </div>
+          <div style={{ flex: 0.3 }}>
+            <AttributeEditor />
+          </div>
+        </div>
+      </>
+    );
+  };
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
-
-## Deploying the Example Playground
-
-The Playground is just a simple [Parcel](https://parceljs.org) app, you can deploy it anywhere you would normally deploy that. Here are some guidelines for **manually** deploying with the Netlify CLI (`npm i -g netlify-cli`):
-
-```bash
-cd example # if not already in the example folder
-npm run build # builds to dist
-netlify deploy # deploy the dist folder
 ```
 
-Alternatively, if you already have a git repo connected, you can set up continuous deployment with Netlify:
+## Canvas Toolbars
 
-```bash
-netlify init
-# build command: yarn build && cd example && yarn && yarn build
-# directory to deploy: example/dist
-# pick yes for netlify.toml
+```js
+const ToolbarMolecule = molecule((getMol) => {
+  return {
+    ...getMol(HoveredNodeMolecule),
+    ...getMol(SelectedNodeMolecule),
+    ...getMol(HistoryMolecule),
+    ...getMol(CanvasStyleMolecule),
+    ...getMol(CanvasSelectionMolecule),
+    ...getMol(CanvasHoveredMolecule),
+    ...getMol(ComponentModelMolecule),
+  };
+});
+
+const Toolbars = () => {
+  const {
+    HoveredNodeAtom,
+    SelectedNodeAtom,
+    SelectedRectAtom,
+    HoveredRectAtom,
+    ComponentModelAtom,
+  } = useMolecule(ToolbarMolecule);
+
+  const hoveredNode = useAtomValue(HoveredNodeAtom) as RaisinElementNode;
+  const selectedNode = useAtomValue(SelectedNodeAtom) as RaisinElementNode;
+
+  const { getComponentMeta } = useAtomValue(ComponentModelAtom);
+  const hoveredTitle = getComponentMeta(hoveredNode?.tagName).title;
+  const selectedTitle = getComponentMeta(selectedNode?.tagName).title;
+  return (
+    <>
+      <PositionedToolbar rectAtom={HoveredRectAtom}>
+        Hovered - {hoveredTitle}
+      </PositionedToolbar>
+      <PositionedToolbar rectAtom={SelectedRectAtom}>
+        Selected - {selectedTitle}
+        <SelectedNodeRichTextEditor />
+      </PositionedToolbar>
+    </>
+  );
+};
+
+  const Editor = () => {
+    useHotkeys();
+    const { EditSelectedNodeAtom } = useMolecule(EditSelectedMolecule);
+    return (
+      <>
+        <NodeScopeProvider nodeAtom={EditSelectedNodeAtom}>
+          <Toolbars />
+        </NodeScopeProvider>
+        <div style={{ display: 'flex' }}>
+          <div style={{ flex: 0.7 }}>
+            <BasicCanvasController />
+          </div>
+          <div style={{ flex: 0.3 }}>
+            <AttributeEditor />
+          </div>
+        </div>
+      </>
+    );
+  };
 ```
 
-## Named Exports
+## Layers
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+```js
+const Label: CSSProperties = {
+  cursor: 'pointer',
+  lineHeight: '28px',
+};
 
-## Including Styles
+const Layer: CSSProperties = {
+  position: 'relative',
+  userSelect: 'none',
+  cursor: 'pointer',
+  padding: '10px 0',
+  outlineOffset: '-2px',
+};
 
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
+const SelectedLayer: CSSProperties = {
+  background: 'green',
+};
 
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
+const SlotContainer: CSSProperties = {
+  marginLeft: '3px',
+  display: 'flex',
+  padding: '0 0 3px 0',
+};
 
-## Publishing to NPM
+const SlotName: CSSProperties = {
+  writingMode: 'vertical-lr',
+  textOrientation: 'sideways',
+  fontSize: '0.7em',
+  padding: '5px 0 5px 2px',
+  color: 'grey',
+  background: 'rgba(0, 0, 0, 0.1)',
+};
 
-We recommend using [np](https://github.com/sindresorhus/np).
-
-## Usage with Lerna
-
-When creating a new package with TSDX within a project set up with Lerna, you might encounter a `Cannot resolve dependency` error when trying to run the `example` project. To fix that you will need to make changes to the `package.json` file _inside the `example` directory_.
-
-The problem is that due to the nature of how dependencies are installed in Lerna projects, the aliases in the example project's `package.json` might not point to the right place, as those dependencies might have been installed in the root of your Lerna project.
-
-Change the `alias` to point to where those packages are actually installed. This depends on the directory structure of your Lerna project, so the actual path might be different from the diff below.
-
-```diff
-   "alias": {
--    "react": "../node_modules/react",
--    "react-dom": "../node_modules/react-dom"
-+    "react": "../../../node_modules/react",
-+    "react-dom": "../../../node_modules/react-dom"
-   },
+const SlotChildren: CSSProperties = {
+  width: '100%',
+};
+const TitleBar: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+};
 ```
 
-An alternative to fixing this problem would be to remove aliases altogether and define the dependencies referenced as aliases as dev dependencies instead. [However, that might cause other problems.](https://github.com/palmerhq/tsdx/issues/64)
+```js
+type Atoms = {
+  slot: string,
+  slotDetails: Atom<Slot>,
+  slotName: string,
+  childrenInSlot: WritableAtom<
+    PrimitiveAtom<RaisinNode>[],
+    PrimitiveAtom<RaisinNode>,
+    void
+  >,
+};
+
+const LayersController = () => {
+  const atoms = useMolecule(LayersMolecule);
+  const hasChildren = useAtomValue(atoms.RootHasChildren);
+
+  return (
+    <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
+      {hasChildren && (
+        <SlotScopeProvider slot="">
+          <NodeChildrenEditor Component={ElementLayer} />
+        </SlotScopeProvider>
+      )}
+    </NodeScopeProvider>
+  );
+};
+function ElementLayer() {
+  const {
+    isNodeAnElement,
+    isSelectedForNode,
+    nameForNode,
+    nodeHovered,
+    setSelectedForNode,
+    allSlotsForNode,
+  } = useMolecule(NodeMolecule);
+
+  const setSelected = useSetAtom(setSelectedForNode);
+  const isAnElement = useAtomValue(isNodeAnElement);
+  const isSelected = useAtomValue(isSelectedForNode);
+  const [isHovered, setHovered] = useAtom(nodeHovered);
+  const slots = useAtomValue(allSlotsForNode);
+  const title = useAtomValue(nameForNode);
+  // Don't render non-element layers
+  if (!isAnElement) return <></>;
+
+  const name = (
+    <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
+      <div style={Label}>{title}</div>
+    </div>
+  );
+
+  const hasSlots = slots?.length > 0;
+  const style = {
+    ...Layer,
+    ...(isSelected ? SelectedLayer : {}),
+    ...(isHovered ? { outline: '1px dashed green' } : {}),
+  };
+
+  return (
+    <div data-element style={style}>
+      {!hasSlots && name}
+      {hasSlots && (
+        <div>
+          {name}
+          {hasSlots && (
+            <div>
+              <SlotChildrenController Component={SlotWidget} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SlotWidget() {
+  const atoms = useMolecule(SlotMolecule);
+  const childNodes = useAtomValue(atoms.childrenInSlot);
+
+  const slotDetails = useAtomValue(atoms.slotDetails);
+  const slotWidget = slotDetails.editor;
+  const hasEditor = slotWidget === 'inline';
+  const isEmpty = (childNodes?.length ?? 0) <= 0;
+
+  return (
+    <>
+      <div style={SlotContainer}>
+        <div style={SlotName}>
+          {slotDetails.title ?? slotDetails.name} ({childNodes.length})
+        </div>
+        {hasEditor && <NodeRichTextController />}
+        {!hasEditor && (
+          // Block Editor
+          <>
+            {!isEmpty && (
+              <div style={SlotChildren}>
+                <PlopTarget idx={0} slot={slotDetails.name} />
+                <ChildrenEditorForAtoms
+                  childAtoms={childNodes}
+                  Component={({ idx }) => (
+                    <SlotChildSimple idx={idx} atoms={atoms} />
+                  )}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+const SlotChild: React.FC<{ idx?: number, atoms: Atoms }> = ({
+  idx,
+  atoms,
+}) => {
+  return (
+    <>
+      <ElementLayerName />
+      <PlopTarget idx={idx ?? 0} slot={atoms.slotName} />
+    </>
+  );
+};
+const Editor = () => {
+  useHotkeys();
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flex: 0.3 }}>
+        <LayersController />
+      </div>
+      <div style={{ flex: 0.4 }}>
+        <BasicCanvasController />
+      </div>
+      <div style={{ flex: 0.3 }}>
+        <AttributeEditor />
+      </div>
+    </div>
+  );
+};
+```
+
+## Layers With Buttons
+
+```js
+type Atoms = {
+  slot: string,
+  slotDetails: Atom<Slot>,
+  slotName: string,
+  childrenInSlot: WritableAtom<
+    PrimitiveAtom<RaisinNode>[],
+    PrimitiveAtom<RaisinNode>,
+    void
+  >,
+};
+
+function ElementLayer() {
+  const {
+    duplicateForNode,
+    isNodeAnElement,
+    isNodePicked,
+    isSelectedForNode,
+    nameForNode,
+    nodeHovered,
+    removeForNode,
+    setSelectedForNode,
+    allSlotsForNode,
+    togglePickNode,
+  } = useMolecule(NodeMolecule);
+
+  const atoms = useMolecule(LayersMolecule);
+  const setSelected = useSetAtom(setSelectedForNode);
+  const isAnElement = useAtomValue(isNodeAnElement);
+  const isSelected = useAtomValue(isSelectedForNode);
+  const isPicked = useAtomValue(isNodePicked);
+  const [isHovered, setHovered] = useAtom(nodeHovered);
+  const slots = useAtomValue(allSlotsForNode);
+
+  const removeNode = useSetAtom(removeForNode);
+  const duplicate = useSetAtom(duplicateForNode);
+  const title = useAtomValue(nameForNode);
+  const moveNode = useSetAtom(togglePickNode);
+  const isPlopping = useAtomValue(atoms.PloppingIsActive);
+  const canMove = isPicked || !isPlopping;
+  // Don't render non-element layers
+  if (!isAnElement) return <></>;
+
+  const name = (
+    <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
+      <div style={Label}>
+        {title} {isPicked && ' Moving...'}
+      </div>
+      <div>
+        <button onClick={moveNode} disabled={!canMove}>
+          {isPicked ? 'Cancel move' : 'Move'}
+        </button>
+        <button onClick={duplicate} disabled={isPlopping}>
+          Dupe
+        </button>
+        <button onClick={removeNode} disabled={isPlopping}>
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+
+  const hasSlots = slots?.length > 0;
+  const style = {
+    ...Layer,
+    ...(isSelected ? SelectedLayer : {}),
+    ...(isHovered ? { outline: '1px dashed green' } : {}),
+  };
+
+  return (
+    <div data-element style={style}>
+      {!hasSlots && name}
+      {hasSlots && (
+        <div>
+          {name}
+          {hasSlots && (
+            <div>
+              <SlotChildrenController Component={SlotWidget} />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SlotWidget() {
+  const atoms = useMolecule(SlotMolecule);
+  const childNodes = useAtomValue(atoms.childrenInSlot);
+
+  const slotDetails = useAtomValue(atoms.slotDetails);
+  const slotWidget = slotDetails.editor;
+  const hasEditor = slotWidget === 'inline';
+  const isEmpty = (childNodes?.length ?? 0) <= 0;
+
+  return (
+    <>
+      <div style={SlotContainer}>
+        <div style={SlotName}>
+          {slotDetails.title ?? slotDetails.name} ({childNodes.length})
+        </div>
+        {hasEditor && <NodeRichTextController />}
+        {!hasEditor && (
+          // Block Editor
+          <>
+            {!isEmpty && (
+              <div style={SlotChildren}>
+                <PlopTarget idx={0} slot={slotDetails.name} />
+                <ChildrenEditorForAtoms
+                  childAtoms={childNodes}
+                  Component={({ idx }) => <SlotChild idx={idx} atoms={atoms} />}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+const SlotChild: React.FC<{ idx?: number, atoms: Atoms }> = ({
+  idx,
+  atoms,
+}) => {
+  return (
+    <>
+      <ElementLayer />
+      <PlopTarget idx={idx ?? 0} slot={atoms.slotName} />
+    </>
+  );
+};
+function PlopTarget({ idx, slot }: { idx: number, slot: string }) {
+  const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
+  const canPlop = useAtomValue(canPlopHereAtom);
+  const plopNode = useSetAtom(plopNodeHere);
+  const plop = useCallback(() => plopNode({ idx, slot }), [idx, slot]);
+
+  const isPloppable = canPlop({ slot, idx });
+  if (!isPloppable) {
+    return <></>;
+  }
+  return (
+    <div style={{ border: '1px dashed red' }}>
+      Position {idx} in {slot || 'content'}
+      <button onClick={plop}>Plop</button>
+    </div>
+  );
+}
+
+const Editor = () => {
+  useHotkeys();
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flex: 0.3 }}>
+        <LayersController />
+      </div>
+      <div style={{ flex: 0.4 }}>
+        <BasicCanvasController />
+      </div>
+      <div style={{ flex: 0.3 }}>
+        <AttributeEditor />
+      </div>
+    </div>
+  );
+};
+```
+
+## Custom Components
+
+```js
+const Editor = () => {
+  useHotkeys();
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flex: 0.3 }}>
+        <LayersController />
+      </div>
+      <div style={{ flex: 0.4 }}>
+        <BasicCanvasController />
+      </div>
+      <div style={{ flex: 0.3 }}>
+        <AttributeEditor />
+      </div>
+    </div>
+  );
+};
+
+const html =
+  startingHtml +
+  `<sqm-timeline icon="circle">
+<sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle">
+</sqm-timeline-entry></sqm-timeline>`;
+
+export function CustomComponents() {
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml: html,
+        startingPackages: [
+          {
+            package: '@saasquatch/mint-components',
+            version: '1.6.x',
+          },
+        ],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+```
+
+## Full Example
+
+```js
+// Config
+// ...WidgetScope, ConfigMolecule
+
+// Layers
+// ...ElementLayer, SlotWidget, SlotChild, PlopTarget
+
+  const Editor = () => {
+    useHotkeys();
+    const { EditSelectedNodeAtom } = useMolecule(EditSelectedMolecule);
+    const { HTMLAtom } = useMolecule(ConfigMolecule);
+    const [html, setHtml] = useAtom(HTMLAtom!);
+
+    return (
+      <>
+        <textarea
+          value={html}
+          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+          rows={10}
+          style={{ width: '500px' }}
+        />
+        <div style={{ display: 'flex' }}>
+          <div style={{ flex: 0.3 }}>
+            <LayersController />
+          </div>
+          <div style={{ flex: 0.4 }}>
+            <NodeScopeProvider nodeAtom={EditSelectedNodeAtom}>
+              <Toolbars />
+            </NodeScopeProvider>
+            <BasicCanvasController />
+          </div>
+          <div style={{ flex: 0.3 }}>
+            <AttributeEditor />
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const AttributeEditor = () => {
+    useMolecule(CanvasSelectionMolecule);
+    useMolecule(CanvasHoveredMolecule);
+    useMolecule(CanvasPickAndPlopMolecule);
+    return (
+      <SelectedNodeController
+        HasSelectionComponent={AttributesController}
+      ></SelectedNodeController>
+    );
+  };
+
+  const html =
+    startingHtml +
+    `<sqm-timeline icon="circle">
+<sqm-timeline-entry reward="$50" unit="visa giftcard" desc="Your friend purchases a Business plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$200" unit="visa giftcard" desc="Our sales team qualifies your friend as a good fit for our Enterprise plan" icon="circle">
+</sqm-timeline-entry>
+<sqm-timeline-entry reward="$1000" unit="visa giftcard" desc="Your friend purchases an Enterprise plan" icon="circle">
+</sqm-timeline-entry></sqm-timeline>`;
+
+export function FullExample() {
+  return (
+    <ScopeProvider
+      scope={WidgetScope}
+      value={{
+        startingHtml: html,
+        startingPackages: [
+          {
+            package: '@saasquatch/mint-components',
+            version: '1.6.x',
+          },
+        ],
+      }}
+    >
+      <RaisinsProvider molecule={ConfigMolecule}>
+        <CanvasProvider>
+          <Editor />
+        </CanvasProvider>
+      </RaisinsProvider>
+    </ScopeProvider>
+  );
+}
+```

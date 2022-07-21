@@ -1,33 +1,31 @@
 import { useAtom } from 'jotai';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { useMolecule } from 'jotai-molecules';
 import React from 'react';
-import { RaisinScope } from '../core/RaisinScope';
-import { SelectedAtom } from '../core/selection/SelectedNode';
-import { WYSWIGCanvas, WYSWIGCanvasProps } from '../views/CanvasView';
-import { CanvasProvider, SizeAtom, useCanvasAtoms } from './useCanvas';
+import { CanvasScopeMolecule } from './CanvasScopeMolecule';
+import { CanvasProvider } from './CanvasScope';
 
-export function useWYSIWYGCanvas(): WYSWIGCanvasProps {
-  const atoms = useCanvasAtoms();
-  const [_, setContainer] = useAtom(atoms.IframeAtom, RaisinScope);
-  const size = useAtomValue(SizeAtom, RaisinScope);
-  const setSelected = useUpdateAtom(SelectedAtom, RaisinScope);
+function useCanvas() {
+  const atoms = useMolecule(CanvasScopeMolecule);
 
-  return {
-    setHtmlRef: setContainer,
-    clearSelected: () => setSelected(undefined as any),
-    size,
-  };
+  const [
+    // Doesn't use the subscribed value, but triggers the subscribe to start
+    _,
+    setRef,
+  ] = useAtom(atoms.IframeAtom);
+  return setRef;
 }
 
 // No props allowed -- should all come from context, or atoms
 export function CanvasController() {
   return (
     <CanvasProvider>
-      <ExampleController />
+      <BasicCanvasController />
     </CanvasProvider>
   );
 }
 
-export function ExampleController() {
-  return <WYSWIGCanvas {...useWYSIWYGCanvas()} />;
+// No props allowed -- should all come from context, or atoms
+export function BasicCanvasController() {
+  // TODO: Forward ref?
+  return <div ref={useCanvas()}></div>;
 }

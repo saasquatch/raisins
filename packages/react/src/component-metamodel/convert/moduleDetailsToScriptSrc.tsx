@@ -1,4 +1,4 @@
-import { ModuleDetails } from '../ModuleManagement';
+import { ModuleDetails } from '../types';
 import { makeLocalRegistry, NPMRegistry } from '../../util/NPMRegistry';
 import { LOCAL_REPO } from './LOCAL_REPO';
 
@@ -18,12 +18,12 @@ export function moduleDetailsToScriptSrc(
     moduleDetails?.map((m) => {
       const { module, browser, main, unpkg } = m['package.json'];
       // Use the prescribed file path, if not then module, browser, or main or empty
-      const filePath = m.filePath ?? unpkg ?? module ?? browser ?? main ?? '';
-      const useModule = filePath === module || filePath.endsWith('.esm.js');
-      const isCss = m.filePath && m.filePath.endsWith('.css');
+      const filePath = m.filePath || unpkg || module || browser || main || '';
+      const useModule = filePath === module || filePath?.endsWith('.esm.js');
+      const isCss = filePath && filePath.endsWith('.css');
       // TODO: Centralize registry better
       let registryToUse = registry;
-      if (m.name === LOCAL_REPO && localUrl) {
+      if (m.package === LOCAL_REPO && localUrl) {
         registryToUse = makeLocalRegistry(localUrl);
       }
       if (isCss)

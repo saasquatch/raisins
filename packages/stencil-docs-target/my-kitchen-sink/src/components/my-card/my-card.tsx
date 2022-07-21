@@ -2,9 +2,8 @@ import { Component, Prop, h, Host } from '@stencil/core';
 
 /**
  * @uiName Card
- * @slot - Body - Body of the card
+ * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
  * @slotEditor inline
- * @slot title - Label - The card label
  * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
  */
 @Component({

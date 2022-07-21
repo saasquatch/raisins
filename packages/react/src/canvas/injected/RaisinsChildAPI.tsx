@@ -7,7 +7,7 @@ Since this file is used to generate serialized code from this function, it can o
 */
 import type PenpalType from 'penpal';
 import type * as SnabbdomType from 'snabbdom';
-import type { Module, VNode } from 'snabbdom';
+import type { Module, VNode, VNodeData } from 'snabbdom';
 import type {
   ChildRPC,
   GeometryEntry,
@@ -24,7 +24,10 @@ declare var Penpal: Penpal;
 
 export const ChildAPIModule: string = function RaisinsChildAPI() {
   let currentNode: VNode | HTMLElement = document.body;
-
+  /**
+   * Tracks when a render is active to prevent events mid-render
+   */
+  let rendering: boolean = false;
   const geometryEvent = 'sq:geometry';
 
   function isElement(value: any): value is HTMLElement {
@@ -39,18 +42,131 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     }, {});
   }
 
-  const resizeObserver = new ResizeObserver((entries) => {
+  // @ts-ignore - fails only for build, not local dev
+  const resizeObserver = new window.ResizeObserver(
+    (entries: ResizeObserverEntry[]) => {
+      const elements = entries.map((e) => e.target);
+      dispatchResize(elements);
+    }
+  );
+
+  function ensureShadow(el: HTMLElement) {
+    if (el.shadowRoot === null) {
+      el.attachShadow({ mode: 'open' });
+    }
+    return el.shadowRoot!;
+  }
+
+  const shadowDomModule: Module = {
+    create: function (_, vNode: VNode) {
+      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
+        ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+      }
+    },
+    update: function (oldVNode: VNode, vNode: VNode) {
+      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
+        // Will only parse when the string content is different
+        if (oldVNode.data?.shadowContent !== vNode.data?.shadowContent) {
+          ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+        }
+      }
+    },
+  };
+
+  const resizeModule: Module = {
+    create: function (empty, next) {
+      isElement(next.elm) &&
+        !!next.data?.resizeObserver &&
+        resizeObserver.observe(next.elm);
+    },
+    destroy: function (old) {
+      isElement(old.elm) && resizeObserver.unobserve(old.elm);
+    },
+  };
+
+  const xmlnsAttr = 'xmlns';
+  const xmlnsNS = 'http://www.w3.org/2000/xmlns/';
+
+  function updateAttrs(oldVnode: VNode, vnode: VNode): void {
+    let key: string;
+    const elm: Element = vnode.elm as Element;
+    let oldAttrs = (oldVnode.data as VNodeData).attrs;
+    let attrs = (vnode.data as VNodeData).attrs;
+
+    if (!oldAttrs && !attrs) return;
+    if (oldAttrs === attrs) return;
+    oldAttrs = oldAttrs || {};
+    attrs = attrs || {};
+
+    // update modified attributes, add new attributes
+    for (key in attrs) {
+      const cur = attrs[key];
+      const old = oldAttrs[key];
+      if (old !== cur) {
+        if (cur === true) {
+          elm.setAttribute(key, '');
+        } else if (cur === false) {
+          elm.removeAttribute(key);
+        } else {
+          const parts = key.split(':');
+          if (parts.length === 1) {
+            elm.setAttribute(key, cur as any);
+          } else if (parts.length === 2) {
+            const ns = parts[0];
+            if (ns === xmlnsAttr) {
+              elm.setAttributeNS(xmlnsNS, key, cur as any);
+            } else {
+              const nsUrl = elm.lookupNamespaceURI(ns);
+              if (nsUrl === null) {
+                // No namespace found. Ignore using validation
+                elm.setAttribute(key, cur as any);
+              } else {
+                elm.setAttributeNS(nsUrl, key, cur as any);
+              }
+            }
+          } else {
+            throw new Error(`Invalid attribute "${key}"`);
+          }
+        }
+      }
+    }
+    // remove removed attributes
+    // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
+    // the other option is to remove all attributes with value == undefined
+    for (key in oldAttrs) {
+      if (!(key in attrs)) {
+        elm.removeAttribute(key);
+      }
+    }
+  }
+
+  const attributesModule: Module = {
+    create: updateAttrs,
+    update: updateAttrs,
+  };
+
+  const patch = snabbdom.init([
+    // Init patch function with chosen modules
+    shadowDomModule,
+    resizeModule,
+    snabbdom.propsModule,
+    snabbdom.classModule,
+    attributesModule,
+    snabbdom.styleModule,
+    snabbdom.datasetModule,
+  ]);
+
+  function dispatchResize(elements: Element[]) {
     document.body.dispatchEvent(
       new CustomEvent(geometryEvent, {
         bubbles: true,
         detail: {
-          entries: entries.map((e) => {
-            const { target } = e;
+          entries: elements.map((e) => {
             const mappedEntry: GeometryEntry = {
-              contentRect: e.target.getBoundingClientRect(),
-              target: isElement(target)
+              contentRect: e.getBoundingClientRect(),
+              target: isElement(e)
                 ? {
-                    attributes: getAttributes(target),
+                    attributes: getAttributes(e),
                   }
                 : undefined,
             };
@@ -59,66 +175,38 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
         },
       })
     );
-  });
-
-  const resizeModule: Module = {
-    create: function (empty, next) {
-      isElement(next.elm) && resizeObserver.observe(next.elm);
-    },
-    destroy: function (old) {
-      isElement(old.elm) && resizeObserver.unobserve(old.elm);
-    },
-  };
-  const patch = snabbdom.init([
-    // Init patch function with chosen modules
-    resizeModule,
-    snabbdom.propsModule,
-    snabbdom.classModule,
-    snabbdom.attributesModule,
-    snabbdom.styleModule,
-    snabbdom.datasetModule,
-  ]);
+  }
 
   function patchAndCache(next: VNode) {
-    patch(currentNode, next);
+    rendering = true;
+    try {
+      patch(currentNode, next);
+    } catch (e) {
+      throw e;
+    } finally {
+      rendering = false;
+    }
     currentNode = next;
   }
   window.addEventListener('DOMContentLoaded', function () {
     const methods: ChildRPC = {
       render(content) {
-        patchAndCache(content);
-      },
-      geometry() {
-        if (isElement(currentNode)) {
-          // No VNode rendered yet
-          return {
-            entries: [],
-          };
+        try {
+          patchAndCache(content);
+        } catch (e) {
+          document.body.innerHTML = `<div style="color:red; width: 300px; margin: 0 auto;"><b>Canvas Render Error</b><details>${e}</details></div><hr/>`;
+          console.error(
+            'Canvas render error',
+            e,
+            'rendering content',
+            content,
+            'into currentNode',
+            currentNode
+          );
+          throw e;
+        } finally {
+          dispatchResizeAll();
         }
-
-        function children(
-          start: HTMLElement[],
-          n: VNode | string
-        ): HTMLElement[] {
-          if (typeof n === 'string') return [];
-          if (n.children) {
-            const childArray = n.children.reduce(children, start);
-            if (isElement(n.elm)) childArray.push(n.elm);
-            return childArray;
-          }
-          if (isElement(n.elm)) start.push(n.elm);
-          return start;
-        }
-        return {
-          entries: children([], currentNode).map((e) => {
-            return {
-              contentRect: e.getBoundingClientRect(),
-              target: {
-                attributes: getAttributes(e),
-              },
-            };
-          }),
-        };
       },
     };
     let myConnection = (window as any).Penpal.connectToParent({
@@ -127,16 +215,23 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     });
 
     myConnection.promise.then(function (parent: ParentRPC) {
-      const ro = new ResizeObserver(function (entries) {
-        parent.resizeHeight(entries[0].contentRect.height + '');
+      // @ts-ignore - fails only for build, not local dev
+      const ro = new window.ResizeObserver(function (
+        entries: ResizeObserverEntry[]
+      ) {
+        // Adds 5 pixels of padding to support hover/selection states
+        const height = entries[0].contentRect.height + 5 + '';
+        parent.resizeHeight(height);
       });
       ro.observe(document.body);
 
       document.addEventListener(geometryEvent, (e: Event) =>
         parent.geometry((e as CustomEvent).detail)
       );
+      dispatchResizeAll();
 
       function sendEventToParent(e: Event) {
+        if (rendering) return;
         const target = e.target;
         if (!isElement(target)) return;
         let elementTarget: HTMLElement | undefined;
@@ -159,12 +254,14 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
           },
         });
       }
-      // Listen for all event types
-      Object.keys(window).forEach((key) => {
-        if (/^on/.test(key)) {
-          window.addEventListener(key.slice(2), sendEventToParent);
-        }
+      // Listen for all event types requested
+      props.events.forEach((key) => {
+        window.addEventListener(key, sendEventToParent);
       });
     });
   });
+
+  function dispatchResizeAll() {
+    dispatchResize(Array.from(document.querySelectorAll('*')));
+  }
 }.toString();

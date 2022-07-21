@@ -1,11 +1,20 @@
 {
   "name": "@raisins/core",
-  "author": "Logan Volkers",
-  "version": "0.0.1",
+  "author": "SaaSquatch Team",
+  "description": "Core functions for manipulating and validating HTML and raisin nodes",
+  "version": "1.1.0",
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/raisins.esm.js",
+  "module": "dist/core.esm.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/raisins",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -21,7 +30,8 @@
     "test:coverage": "tsdx test --coverage",
     "lint": "tsdx lint",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "cypress:open": "cypress open"
   },
   "husky": {
     "hooks": {
@@ -39,39 +49,56 @@
     }
   ],
   "devDependencies": {
+    "@saasquatch/scoped-autobindsteps": "^1.0.0",
     "@shoelace-style/react": "^2.0.0-beta.52",
     "@size-limit/preset-small-lib": "^5.0.4",
     "@testing-library/react-hooks": "^7.0.2",
+    "@types/css": "0.0.33",
     "@types/css-tree": "^1.0.5",
+    "@types/cypress-cucumber-preprocessor": "^4.0.1",
     "@types/domelementtype": "^2.0.1",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^27.4.1",
     "@types/lodash.clonedeep": "^4.5.6",
+    "@types/luxon": "^2.3.1",
     "@types/mz": "^2.7.4",
+    "@types/parse5": "^6.0.3",
     "@types/styled-components": "^5.1.14",
-    "classnames": "^2.3.1",
+    "cypress": "^9.5.2",
+    "cypress-cucumber-preprocessor": "^4.3.1",
     "glob": "^7.2.0",
     "glob-promise": "^4.2.0",
-    "husky": "^7.0.2",
     "jest": "^25.5.4",
     "jest-cucumber": "^3.0.1",
     "jsonata": "^1.8.5",
     "mz": "^2.7.0",
+    "parse5": "^6.0.1",
     "size-limit": "^5.0.4",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
     "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@raisins/schema": "^0.0.1",
-    "classnames": "^2.3.1",
-    "css-select": "^4.1.3",
+    "@raisins/schema": "^1.0.0",
+    "color2k": "^2.0.0",
+    "css": "^3.0.0",
+    "css-select": "^5.1.0",
     "css-tree": "*",
     "domelementtype": "^2.2.0",
-    "hotkeys-js": "^3.8.7",
-    "htmlparser2": "^6.1.0",
+    "entities": "^4.3.0",
+    "husky": "^8.0.1",
     "lodash.clonedeep": "^4.5.0",
-    "penpal": "^6.1.0",
-    "snabbdom": "^3.1.0",
-    "styled-components": "^5.3.1"
+    "luxon": "^2.3.2"
+  },
+  "jest": {
+    "testMatch": [
+      "**/*.@(iso|node).test.@(ts|tsx|js|jsx)"
+    ]
+  },
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": false,
+    "stepDefinitions": "src/cucumber-steps"
+  },
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
   }
 }

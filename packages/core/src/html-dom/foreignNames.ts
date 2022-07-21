@@ -3,7 +3,7 @@
  *
  * Forked from dom-serializer/foreignNames
  *
- * 
+ *
  * See notes on why we forked in serializer.ts
  *
  */
@@ -45,7 +45,7 @@ export default {
     glyphref: "glyphRef",
     lineargradient: "linearGradient",
     radialgradient: "radialGradient",
-    textpath: "textPath",
+    textpath: "textPath"
   },
   attributeNames: {
     definitionurl: "definitionURL",
@@ -106,6 +106,6 @@ export default {
     viewtarget: "viewTarget",
     xchannelselector: "xChannelSelector",
     ychannelselector: "yChannelSelector",
-    zoomandpan: "zoomAndPan",
-  },
+    zoomandpan: "zoomAndPan"
+  }
 };

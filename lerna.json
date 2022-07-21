@@ -1,5 +1,10 @@
 {
   "npmClient": "npm",
-  "packages": ["packages/*"],
-  "version": "0.0.1"
+  "packages": [
+    "packages/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "independent"
 }

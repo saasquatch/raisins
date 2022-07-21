@@ -1,12 +1,5 @@
 import { CssNodePlain } from "css-tree";
-import {
-  Comment,
-  Directive,
-  Root,
-  Style,
-  Tag,
-  Text
-} from "./domElementType";
+import { Comment, Directive, Root, Style, Tag, Text } from "./domElementType";
 
 /**
  * The base used as the prototype for Nodes

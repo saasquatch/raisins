@@ -1,6 +1,7 @@
 import cloneDeep from "lodash.clonedeep";
 import { getNode, NodePath } from "../paths/Paths";
 import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
+import { isElementNode } from "./isNode";
 import {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -258,12 +259,12 @@ export function move(
     ...IdentityVisitor,
     onElement(el, children) {
       const newChildren =
-        el === newParent ? add(children, cloned, newIdx) : children;
+        el === newParent ? addItem(children, cloned, newIdx) : children;
       return onReplace(el, { ...el, children: newChildren });
     },
     onRoot(el, children) {
       const newChildren =
-        el === newParent ? add(children, cloned, newIdx) : children;
+        el === newParent ? addItem(children, cloned, newIdx) : children;
       return onReplace(el, { ...el, children: newChildren });
     }
   });
@@ -286,6 +287,83 @@ export function moveToPath(
   );
 }
 
+export function moveNode(
+  root: RaisinNode,
+  nodeToMove: RaisinNode,
+  slot: string | undefined,
+  parentPath: NodePath,
+  idx: number
+): RaisinNode {
+  const nodeWithNewSlot = !isElementNode(nodeToMove)
+    ? { ...nodeToMove }
+    : !slot
+    ? {
+        ...nodeToMove,
+        // Remove slot from node being moved
+        attribs: (({ slot, ...o }) => o)(nodeToMove.attribs)
+      }
+    : {
+        ...nodeToMove,
+        attribs: { ...nodeToMove.attribs, slot }
+      };
+  const parent = getNode(root, parentPath);
+
+  const onChildren = (
+    el: RaisinNodeWithChildren,
+    newChildren: RaisinNode[]
+  ) => {
+    const found = newChildren.indexOf(nodeToMove);
+
+    if (el === parent && found >= 0) {
+      const isMovingFromSlot = isMovingNodeFromSlot(
+        nodeToMove as RaisinElementNode,
+        nodeWithNewSlot as RaisinElementNode
+      );
+      // Case 0 -- moved within the same level of the tree
+      return {
+        ...el,
+        children: addItemAndRemove(
+          newChildren,
+          nodeWithNewSlot,
+          idx,
+          nodeToMove,
+          isMovingFromSlot
+        )
+      };
+    } else if (el === parent) {
+      // Case 1 -- Just added to this level of tree, but not removed as well
+      return {
+        ...el,
+        children: addItem(newChildren, nodeWithNewSlot, idx)
+      };
+    } else if (found >= 0) {
+      // Case 2 -- Removed from this level of the tree, to be inserted elsewhere
+      return {
+        ...el,
+        children: removeItem(newChildren, found)
+      } as RaisinNodeWithChildren;
+    } else if (shallowEqual(newChildren, el.children)) {
+      // Don't modify
+      return el;
+    } else {
+      // Case 3 -- this part of the tree unaffected
+      return {
+        ...el,
+        children: newChildren
+      };
+    }
+  };
+  const newDocument = visit<RaisinNode>(root, {
+    onComment: c => c,
+    onDirective: d => d,
+    onElement: onChildren,
+    onRoot: onChildren,
+    onStyle: s => s,
+    onText: t => t
+  });
+  return newDocument!;
+}
+
 /**
  * Inserts a new node as a child of the parent at the specified index.
  *
@@ -306,7 +384,7 @@ export function insertAt(
     children: RaisinNode[]
   ): RaisinNode => {
     const newChildren =
-      el === newParent ? add(children, node, newIdx) : children;
+      el === newParent ? addItem(children, node, newIdx) : children;
     return onReplace(el, { ...el, children: newChildren });
   };
   const moved = visit(root, {
@@ -349,12 +427,6 @@ export function removeWhitespace(
       "Whitespace removal produced no content at all. Try this on a root node instead of an embedded text node"
     );
   return cleaned;
-}
-
-function add<T>(arr: T[], el: T, idx: number): T[] {
-  const before = arr.slice(0, idx);
-  const after = arr.slice(idx, arr.length);
-  return [...before, el, ...after];
 }
 
 function freeze(node: RaisinNode) {
@@ -447,3 +519,64 @@ export function getAncestry(
   }
   return [...ancestry];
 }
+
+function addItemAndRemove<T>(
+  arr: T[],
+  elToAdd: T,
+  idxToAdd: number,
+  remove: T,
+  isMovingFromSlot: boolean
+): T[] {
+  return arr.reduce((newArr, el, idx) => {
+    // Move to new slot at same index or at the end of array
+    if (
+      el === remove &&
+      isMovingFromSlot &&
+      (idx === idxToAdd || (idx === idxToAdd - 1 && idxToAdd === arr.length))
+    ) {
+      return [...newArr, elToAdd];
+    }
+
+    if (el === remove) {
+      // No remove item in new array
+      return newArr;
+    }
+    if (idx === idxToAdd) {
+      // Add in front of this index
+      return [...newArr, elToAdd, el];
+    }
+    if (idx === idxToAdd - 1 && idxToAdd === arr.length) {
+      // Add to the end of the array
+      return [...newArr, el, elToAdd];
+    }
+    return [...newArr, el];
+  }, [] as T[]);
+}
+
+function isMovingNodeFromSlot(
+  nodeToMove: RaisinElementNode,
+  nodeWithNewSlot: RaisinElementNode
+) {
+  return (
+    nodeToMove.attribs.slot !== undefined &&
+    isElementNode(nodeToMove) &&
+    isElementNode(nodeWithNewSlot) &&
+    nodeToMove?.attribs?.slot !== nodeWithNewSlot?.attribs?.slot
+  );
+}
+
+function addItem<T>(arr: T[], el: T, idx: number): T[] {
+  const before = arr.slice(0, idx);
+  const after = arr.slice(idx, arr.length);
+  return [...before, el, ...after];
+}
+
+function removeItem<T>(items: T[], index: number): T[] {
+  const firstArr = items.slice(0, index);
+  const secondArr = items.slice(index + 1);
+  return [...firstArr, ...secondArr];
+}
+
+const shallowEqual = <T>(array1: T[], array2: T[]) =>
+  array1.length === array2.length &&
+  array1.every((value, index) => value === array2[index]);

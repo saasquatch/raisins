@@ -19,7 +19,7 @@ export function atomForAttributes(baseAtom: PrimitiveAtom<RaisinNode>) {
           const el = get(baseAtom);
           return isElementNode(el) ? el.attribs : undefined ?? {};
         },
-        (_, set, next:SetStateAction<Attributes>) => {
+        (_, set, next: SetStateAction<Attributes>) => {
           set(baseAtom, (prev) => {
             if (!isElementNode(prev))
               throw new Error("Can't set attributes on non-element");

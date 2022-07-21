@@ -1,11 +1,20 @@
 {
   "name": "@raisins/react",
-  "author": "Logan Volkers",
-  "version": "0.0.1",
+  "author": "SaaSquatch Team",
+  "description": "React package with tools for building a Raisins editor",
+  "version": "1.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/saasquatch/raisins",
+    "directory": "packages/react"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "files": [
     "dist",
     "src"
@@ -14,21 +23,22 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
+    "start": "dts watch",
+    "build": "dts build",
+    "test": "dts test --passWithNoTests",
+    "test:watch": "dts test --passWithNoTests --watch",
+    "lint": "dts lint",
     "size": "size-limit",
     "analyze": "size-limit --why",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "peerDependencies": {
-    "react": "^16.14.0"
+    "react": "^16.13.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "dts lint"
     }
   },
   "prettier": {
@@ -48,11 +58,13 @@
     }
   ],
   "dependencies": {
-    "@raisins/core": "^0.0.1",
-    "@raisins/schema": "^0.0.1",
+    "@raisins/core": "^1.1.0",
+    "@raisins/schema": "^1.0.0",
     "css-tree": "^1.1.3",
     "hotkeys-js": "^3.8.7",
     "jotai": "^1.6.0",
+    "jotai-molecules": "^1.0.3",
+    "jsonpointer": "^5.0.0",
     "optics-ts": "^2.2.0",
     "penpal": "^6.1.0",
     "prosemirror-commands": "^1.1.11",
@@ -60,18 +72,22 @@
     "prosemirror-schema-basic": "^1.1.2",
     "prosemirror-state": "^1.3.4",
     "prosemirror-view": "^1.20.2",
-    "snabbdom": "^3.1.0"
+    "snabbdom": "^3.1.0",
+    "style-to-object": "^0.3.0",
+    "throttle-debounce": "^5.0.0",
+    "valtio": "^1.5.2",
+    "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",
+    "@mdx-js/react": "^2.1.1",
     "@size-limit/preset-small-lib": "^5.0.4",
-    "@storybook/addon-essentials": "^6.3.8",
-    "@storybook/addon-info": "^5.3.21",
-    "@storybook/addon-links": "^6.3.8",
-    "@storybook/addons": "^6.3.8",
-    "@storybook/react": "^6.3.8",
+    "@storybook/addons": "^6.4.22",
+    "@storybook/builder-vite": "^0.1.33",
+    "@storybook/react": "^6.4.22",
     "@testing-library/react-hooks": "^7.0.2",
     "@types/css-tree": "^1.0.6",
+    "@types/jest": "^27.0.2",
     "@types/prosemirror-commands": "^1.0.4",
     "@types/prosemirror-keymap": "^1.0.4",
     "@types/prosemirror-schema-basic": "^1.0.2",
@@ -79,16 +95,24 @@
     "@types/prosemirror-view": "^1.19.1",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
+    "@types/resize-observer-browser": "^0.1.7",
     "@types/styled-components": "^5.1.14",
+    "@types/throttle-debounce": "^5.0.0",
     "babel-loader": "^8.2.2",
     "custom-elements-manifest": "^1.0.0",
+    "cypress": "^9.5.3",
+    "dts-cli": "^1.5.1",
     "husky": "^7.0.2",
+    "local-cypress": "^1.2.5",
     "react": "*",
     "react-dom": "^16.14.0",
+    "react-hooks-testing-library": "^0.6.0",
     "react-is": "^17.0.2",
     "size-limit": "^5.0.4",
-    "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
+  },
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
   }
 }

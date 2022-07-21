@@ -1,7 +1,7 @@
 import { htmlParser as parse, RaisinElementNode } from '@raisins/core';
 import * as schema from '@raisins/schema/schema';
 import { Block } from '../ComponentModel';
-import { ModuleDetails } from '../ModuleManagement';
+import { ModuleDetails } from '../types';
 
 /**
  * Converts module details into a set of `Block`
@@ -44,7 +44,7 @@ function reduceExamples(
   return [...previousValue, blockExample];
 }
 
-function blockFromHtml(html: string): RaisinElementNode | undefined {
+export function blockFromHtml(html: string): RaisinElementNode | undefined {
   try {
     return parse(html).children[0] as RaisinElementNode;
   } catch (e) {

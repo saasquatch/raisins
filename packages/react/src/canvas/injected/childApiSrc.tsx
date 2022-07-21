@@ -3,15 +3,20 @@ import { ChildAPIModule } from './RaisinsChildAPI';
 
 export type Props = {
   selector: string;
+  events: string[];
 };
-export const childApiSrc = (registry: NPMRegistry, selector: string) => {
-  const props: Props = { selector };
+export const childApiSrc = (
+  registry: NPMRegistry,
+  selector: string,
+  events: Set<string>
+) => {
+  const props: Props = { selector, events: Array.from(events.values()) };
   return `<style>
   body{ margin: 0 }
   </style>
   <script src="${registry.resolvePath(
     {
-      name: 'penpal',
+      package: 'penpal',
       version: '6.2.1',
     },
     'dist/penpal.min.js'
@@ -19,10 +24,10 @@ export const childApiSrc = (registry: NPMRegistry, selector: string) => {
   <script type="module">
   import * as snabbdom from "${registry.resolvePath(
     {
-      name: 'snabbdom',
-      version: '3.1.0',
+      package: 'snabbdom',
+      version: '3.5.0',
     },
-    'build/index.js'
+    '+esm'
   )}"
   const props = ${JSON.stringify(props)};
   (${ChildAPIModule})();

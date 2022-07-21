@@ -1,0 +1,40 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - production
+    paths:
+      - packages/**
+  pull_request:
+    paths:
+      - packages/**
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-test:
+    name: Deploy to static site bucket
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Node Setup 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Install dependencies (globally)
+        run: npm i
+
+      - name: Lerna bootrap dependencies for packages/**
+        run: npx lerna bootstrap
+
+      - name: Build (via Turbo)
+        run: npm run build
+
+      - name: Test (via Turbo)
+        run: npm test

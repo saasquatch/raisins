@@ -1,51 +1,95 @@
+/* istanbul ignore file */
+import cssParser from "./css-om/parser";
+import cssSerializer from "./css-om/serializer";
+import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
+import * as cssUtil from "./css-om/util";
+import { DefaultTextMarks } from "./html-dom/DefaultTextMarks";
+import {
+  isCommentNode,
+  isDirectiveNode,
+  isElementNode,
+  isNodeWithChildren,
+  isRoot,
+  isStyleNode,
+  isTextNode
+} from "./html-dom/isNode";
+import htmlParser from "./html-dom/parser";
 import type {
-  RaisinNode,
-  RaisinDocumentNode,
   RaisinCommentNode,
+  RaisinDocumentNode,
   RaisinElementNode,
+  RaisinNode,
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode,
+  RaisinTextNode
 } from "./html-dom/RaisinNode";
-
-import htmlSerializer from "./html-dom/serializer";
-import htmlParser from "./html-dom/parser";
 import cssSelector from "./html-dom/selector";
+import htmlSerializer from "./html-dom/serializer";
 import * as htmlUtil from "./html-dom/util";
 import { NodeVisitor as RaisinNodeVisitor } from "./html-dom/util";
-
-export { htmlSerializer, htmlParser, htmlUtil, RaisinNodeVisitor, cssSelector };
-
-import { isNodeWithChilden, isElementNode, isRoot, isStyleNode, isTextNode, isCommentNode, isDirectiveNode } from "./html-dom/isNode";
-export { isNodeWithChilden, isElementNode, isRoot, isStyleNode, isTextNode, isCommentNode, isDirectiveNode };
-
-import cssSerializer from "./css-om/serializer";
-import cssParser from "./css-om/parser";
-import * as cssUtil from "./css-om/util";
-import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
-
-import { NodePath, NodeSelection, getNode, getPath } from "./paths/Paths";
-
-export type {
-  NodePath,
-  NodeSelection,
-}
+import { getNode, getPath, NodePath, NodeSelection } from "./paths/Paths";
+import { calculatePlopTargets } from "./validation/calculatePlopTargets";
+import { getSlots } from "./validation/getSlots";
+import * as HTMLComponents from "./validation/HTMLComponents";
+import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
+import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
+import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
+import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
+import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils";
+import {
+  generateJsonPointers,
+  validateAttributes, validateChildConstraints, validateNode
+} from "./validation/validateNode/validateNode";
 
 export {
+  htmlSerializer,
+  htmlParser,
+  htmlUtil,
+  // Node types
+  isNodeWithChildren,
+  isElementNode,
+  isRoot,
+  isStyleNode,
+  isTextNode,
+  isCommentNode,
+  isDirectiveNode,
+  // Validation
+  getSlots,
+  doesChildAllowParent,
+  doesParentAllowChild,
+  isNodeAllowed,
+  HTMLComponents,
+  DefaultTextMarks,
+  validateNode,
+  validateChildConstraints,
+  generateJsonPointers,
+  validateAttributes,
+  getSubErrors,
+  hasSubErrors,
+  removeError,
+  calculatePlopTargets,
+  // Path / selection
   getNode,
-  getPath
-}
-
-export {
+  getPath,
+  // CSS
   cssSerializer,
   cssParser,
-  cssUtil,
+  cssSelector,
+  cssUtil
+};
+export type {
+  RaisinNodeVisitor,
+  // Validation
+  NodeWithSlots,
+  NamedSlot,
+  // Path / selection
+  NodePath,
+  NodeSelection,
+  // CSS
   StyleNodeProps,
   StyleNodeWithChildren,
-};
-
-export type {
+  // Node
   RaisinNode,
   RaisinDocumentNode,
   RaisinCommentNode,
@@ -53,5 +97,6 @@ export type {
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode,
+  RaisinTextNode
 };
+

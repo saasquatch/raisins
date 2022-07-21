@@ -1,12 +1,10 @@
-import { atom } from "jotai";
-
-export type Module = {
-  name: string;
-  version?: string;
-};
+import { atom } from 'jotai';
+import { Module } from '../component-metamodel';
 
 export type PackageJson = {
   name: string;
+  title?: string;
+  icon?: string;
   version: string;
   description?: string;
   /**
@@ -45,7 +43,7 @@ export type PackageJson = {
   main?: string;
   /**
    * For serving directly to the web from the CDN.
-   * 
+   *
    * Stencil projects ship with this properly configured in their boilerplate
    */
   unpkg?: string;
@@ -55,9 +53,7 @@ export interface NPMRegistry {
   resolvePath(module: Module, path: string): string;
 }
 
-
-
-const UNPKG_BASE = 'https://unpkg.com';
+const UNPKG_BASE = 'https://fast.ssqt.io/npm';
 
 export const unpkgNpmRegistry: NPMRegistry = {
   async getPackageJson(m) {
@@ -69,7 +65,8 @@ export const unpkgNpmRegistry: NPMRegistry = {
   },
   resolvePath(module, path) {
     const version = module.version ?? 'latest';
-    const resolved = `${UNPKG_BASE}/${module.name}@${version}/${path}`;
+    if (path.charAt(0) == '/') path = path.substring(1);
+    const resolved = `${UNPKG_BASE}/${module.package}@${version}/${path}`;
     return resolved;
   },
 };

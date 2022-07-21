@@ -4,9 +4,10 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "turbo run build",
-    "storybook": "turbo run storybook"
+    "storybook": "turbo run storybook",
+    "test": "turbo run test"
   },
-  "workspaces":{
+  "workspaces": {
     "packages": [
       "packages/*"
     ]
@@ -24,7 +25,8 @@
         ],
         "outputs": [
           "dist/**"
-        ]
+        ],
+        "cache": false
       },
       "storybook": {
         "dependsOn": [
