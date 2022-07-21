@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Plop targets are now generated within the root
   - Extra margin was added to root plop targets to prevent them from getting cut off in the canvas
+- New hook exported: `modulesToDetails`
+  - Retrieves data from an npm package's `package.json` when given a `Module`
 
 ### Fixed
 
