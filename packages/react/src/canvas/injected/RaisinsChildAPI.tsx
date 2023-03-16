@@ -140,6 +140,54 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     }
   }
 
+
+  type Patch = (
+    oldVnode: Element | VNode | DocumentFragment,
+    vnode: VNode
+  ) => VNode;
+
+  /**
+   * Patches template tags correctly. Uses the special `templateContent` data
+   * property on VNodes to track state and patch.
+   * 
+   * See MDN
+   *
+   * @param patch - the patch function. Useful to support recursive patching of templates within templates without creating new snabbdom downstream config
+   */
+  function templateModule(patch: ()=>Patch): Module {
+    return {
+      create: function (_, vNode: VNode) {
+        if (isElement(vNode.elm)) {
+          const { tagName } = vNode.elm;
+          if (
+            tagName.toLocaleLowerCase() === "template" &&
+            vNode.data?.templateContent !== undefined
+          ) {
+            // Do fragment patch
+            patch()(
+              (vNode.elm as HTMLTemplateElement).content,
+              vNode.data.templateContent
+            );
+          }
+        }
+      },
+      update: function (oldVNode: VNode, vNode: VNode) {
+        if (isElement(vNode.elm)) {
+          const { tagName } = vNode.elm;
+          if (
+            tagName.toLocaleLowerCase() === "template" &&
+            vNode.data?.templateContent !== undefined
+          ) {
+            if (oldVNode.data?.templateContent !== vNode.data?.templateContent) {
+              // Do fragment patch
+              patch()(oldVNode.data!.templateContent, vNode.data.templateContent);
+            }
+          }
+        }
+      }
+    };
+  }
+
   const attributesModule: Module = {
     create: updateAttrs,
     update: updateAttrs,
@@ -154,6 +202,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     attributesModule,
     snabbdom.styleModule,
     snabbdom.datasetModule,
+    templateModule(()=>patch)
   ]);
 
   function dispatchResize(elements: Element[]) {

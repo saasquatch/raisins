@@ -47,6 +47,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
       return getNode(currentDoc, picked.path);
     },
     (get, set, next) => {
+      // @ts-expect-error Not all constituents of type are callable
       const node = isFunction(next) ? next(get(PickedNodeAtom)) : next;
 
       if (!node) {

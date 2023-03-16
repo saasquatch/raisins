@@ -5,7 +5,7 @@ import {
   RaisinElementNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { h, VNode, VNodeData } from 'snabbdom';
+import { h, VNode, VNodeData, fragment } from 'snabbdom';
 import styleToObject from 'style-to-object';
 import { RootRenderer } from '../types';
 const { visit } = htmlUtil;
@@ -73,6 +73,25 @@ export function raisinToSnabbdom(
         styleObj = styleObj || {};
       }
 
+      if (el.tagName === 'template') {
+        return h(
+          el.tagName,
+          modifier(
+            {
+              attrs: el.attribs,
+              style: styleObj,
+              // Special handling here that works with the template module
+              // inside of the iframe API. This fixes an issue where template
+              // children are rendered as `template.childNodes` instead of
+              // `template.content.childNodes`. To learn more, read the MDN
+              // article on Document Fragments 
+              // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
+              templateContent: fragment(appender(children, el)),
+            },
+            el
+          )
+        );
+      }
       return h(
         el.tagName,
         modifier({ attrs: el.attribs, style: styleObj }, el),

@@ -50,11 +50,12 @@ export const NodeScopeMolecule = molecule((getMol, getScope) => {
   ): PrimitiveAtom<RaisinNode> {
     return memoized(() => {
       return atom(
-        (get) => get(nodeAtom),
+        get => get(nodeAtom),
         (get, set, next) => {
-          set(nodeAtom, (prev) => {
+          set(nodeAtom, prev => {
             const souls = get(SoulsAtom);
             const soul = souls.get(prev);
+            // @ts-expect-error Not all constituents of type are callable
             const nextNode = isFunction(next) ? next(prev) : next;
             soul && souls.set(nextNode, soul);
             return nextNode;

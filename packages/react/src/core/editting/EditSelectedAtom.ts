@@ -42,6 +42,7 @@ export const EditSelectedMolecule = molecule((getMol) => {
     (get, set, next: SetStateAction<RaisinNode>) => {
       const selected = get(SelectedNodeAtom);
       if (!selected) return; // Don't allow editing if nothing selected
+      // @ts-expect-error Not all constituents of type are callable
       const nextValue = isFunction(next) ? next(selected) : next;
       set(ReplaceNodeAtom, {
         prev: selected,

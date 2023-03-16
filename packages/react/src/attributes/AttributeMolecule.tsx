@@ -35,6 +35,7 @@ export const AttributeMolecule = molecule((getMol) => {
     },
     (_, set, next: SetStateAction<string | undefined>) => {
       set(attributesAtoms.valuesAtom, (prev) => {
+        // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(prev[name]) : next;
         const attrbsClone = { ...prev };
         if (value === undefined) {
@@ -67,6 +68,7 @@ export const AttributeMolecule = molecule((getMol) => {
     (get) => toBoolean(get(valueAtom)),
     (_, set, next) => {
       set(valueAtom, (prev) => {
+        // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(toBoolean(prev)) : next;
         // Empty string for true, undefined for false
         return value ? '' : undefined;
@@ -78,6 +80,7 @@ export const AttributeMolecule = molecule((getMol) => {
     (get) => toNumber(get(valueAtom)),
     (_, set, next) => {
       set(valueAtom, (prev) => {
+        // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(toNumber(prev)) : next;
         // Empty string for true, undefined for false
         return value?.toString();

@@ -23,6 +23,7 @@ export function atomForAttributes(baseAtom: PrimitiveAtom<RaisinNode>) {
           set(baseAtom, (prev) => {
             if (!isElementNode(prev))
               throw new Error("Can't set attributes on non-element");
+            // @ts-expect-error Not all constituents of type are callable
             const nextValue = isFunction(next) ? next(prev.attribs) : next;
             return { ...prev, attribs: nextValue };
           });

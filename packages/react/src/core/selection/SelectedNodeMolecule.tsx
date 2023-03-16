@@ -59,6 +59,7 @@ export const SelectedNodeMolecule = molecule((getMol) => {
       return getSelected(get);
     },
     (get, set, next: SetStateAction<RaisinNode | undefined>) =>
+      // @ts-expect-error Not all constituents of type are callable
       set(SelectedAtom, isFunction(next) ? next(getSelected(get)) : next)
   );
 
@@ -71,6 +72,7 @@ export const SelectedNodeMolecule = molecule((getMol) => {
       return undefined;
     },
     (get, set, next) => {
+      // @ts-expect-error Not all constituents of type are callable
       const nextValue = isFunction(next) ? next(get(SelectedBookmark)) : next;
       set(SelectionAtom, (prev) => {
         if (prev?.type === 'node' && nextValue) {
