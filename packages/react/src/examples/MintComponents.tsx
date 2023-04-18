@@ -18,6 +18,26 @@ export const MintComponents = [
   // },
 ];
 
+export const NextComponents = [
+  // {
+  //   package: '@saasquatch/mint-components',
+  //   filePath: '/dist/mint-components/mint-components.css',
+  //   version: '1.6.1-2',
+  // },
+  {
+    package: '@saasquatch/bedrock-components',
+    version: 'next',
+  },
+  {
+    package: '@saasquatch/mint-components',
+    version: 'next',
+  },
+  // {
+  //   package: '@local',
+  //   version: 'next',
+  // },
+];
+
 export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
 
 export const mintHeroImage = `<sqm-hero-image
@@ -420,4 +440,58 @@ I am a template
   align-items: center;
 }
 </style>
+`;
+
+export const mintTemplates = `
+<sqb-auth-template-switch>
+<template slot="logged-in">
+<sqm-brand>
+  <sqm-portal-container direction="column" padding="none" gap="xx-large" max-width="770px" center display="grid">
+    <sqm-referral-card vertical-alignment="start">
+      <sqm-portal-container gap="large" direction="column" display="flex" justify-content="center" max-width="100%" padding="none" slot="header">
+        <sqm-titled-section text-align="center" label-margin="xxx-small" padding="none">
+          <h3 slot="label">You got &#x24;50 off thanks to a friend!</h3>
+
+          <p slot="content">
+            Description about sharing the products wiht friends will make your
+            life 100 times better!
+          </p>
+        </sqm-titled-section>
+
+        <sqm-portal-container>
+          <p>
+            The coupon code has some conditions that are described concisely in
+            this paragraph so that you don&#x2019;t get upset if the code doesn&#x2019;t work
+          </p></sqm-portal-container>
+
+        <sqm-coupon-code></sqm-coupon-code>
+      </sqm-portal-container>
+
+      <sqm-portal-footer slot="footer" padding-top="none" padding-bottom="none" padding-left="none" padding-right="none"></sqm-portal-footer>
+    </sqm-referral-card>
+  </sqm-portal-container>
+</sqm-brand>
+</template>
+<template slot="logged-out">
+<sqm-brand>
+  <sqm-referred-registration register-label="Get $50 off">
+    <sqm-titled-section text-align="center" label-margin="xxx-small" padding="none" slot="top-slot">
+      <h3 slot="label">You got &#x24;50 off thanks to a friend!</h3>
+      <p slot="content">
+        Description about sharing the products with friends will make your life
+        100 times better!
+      </p>
+    </sqm-titled-section>
+
+    <div slot="bottom-slot">
+      <p style="text-align:center;margin-top:0;margin-bottom:1.5rem">
+        *Valid on purchases of &#x24;75 or more
+      </p>
+      <sqm-portal-footer hide-support-text="true" terms-link="https://example.com" terms-text="Terms And Conditions" faq-text="FAQ" show-powered-by="true" padding-bottom="none" padding-left="none" padding-right="none" padding-top="none"></sqm-portal-footer>
+    </div>
+  </sqm-referred-registration>
+</sqm-brand>
+
+</template>
+</sqb-auth-template-switch>
 `;
