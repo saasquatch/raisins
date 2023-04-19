@@ -1,8 +1,8 @@
 {
   "name": "@raisins/schema",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Types (a.k.a. schema) for the Raisins ecosystem",
-  "author": "SaaSquatch Team",
+  "author": "Referral SaaSquatch Inc.",
   "license": "MIT",
   "main": "schema.json",
   "files": [
