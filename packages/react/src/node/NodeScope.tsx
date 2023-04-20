@@ -50,12 +50,12 @@ export const NodeScopeMolecule = molecule((getMol, getScope) => {
   ): PrimitiveAtom<RaisinNode> {
     return memoized(() => {
       return atom(
-        (get) => get(nodeAtom),
+        get => get(nodeAtom),
         (get, set, next) => {
-          set(nodeAtom, (prev) => {
+          set(nodeAtom, prev => {
             const souls = get(SoulsAtom);
             const soul = souls.get(prev);
-            const nextNode = isFunction(next) ? next(prev) : next;
+            const nextNode = isFunction(next) ? (next as Function)(prev) : next;
             soul && souls.set(nextNode, soul);
             return nextNode;
           });

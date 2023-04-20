@@ -24,18 +24,18 @@ export const AttributeScopeMolecule = molecule((_, getScope) => {
  * Atoms for a single attribute for a node
  *
  */
-export const AttributeMolecule = molecule((getMol) => {
+export const AttributeMolecule = molecule(getMol => {
   const attributesAtoms = getMol(AttributesMolecule);
   const name = getMol(AttributeScopeMolecule);
   const config = getMol(AttributeConfigMolecule);
 
   const valueAtom = atom(
-    (get) => {
+    get => {
       return get(attributesAtoms.valuesAtom)[name];
     },
     (_, set, next: SetStateAction<string | undefined>) => {
-      set(attributesAtoms.valuesAtom, (prev) => {
-        const value = isFunction(next) ? next(prev[name]) : next;
+      set(attributesAtoms.valuesAtom, prev => {
+        const value = isFunction(next) ? (next as Function)(prev[name]) : next;
         const attrbsClone = { ...prev };
         if (value === undefined) {
           delete attrbsClone[name];
@@ -47,27 +47,29 @@ export const AttributeMolecule = molecule((getMol) => {
     }
   );
   const schemaAtom: Atom<Attribute> = atom(
-    (get) =>
-      get(attributesAtoms.schemaAtom)?.find((s) => s.name === name) ?? { name }
+    get =>
+      get(attributesAtoms.schemaAtom)?.find(s => s.name === name) ?? { name }
   );
 
   const clearAtom = atom(null, (_, set) => set(valueAtom, undefined));
 
-  const WidgetAtom = atom((get) =>
+  const WidgetAtom = atom(get =>
     resolveComponent(get(schemaAtom), get(config.AttributeTheme.widgets))
   );
-  const FieldAtom = atom((get) =>
+  const FieldAtom = atom(get =>
     resolveComponent(get(schemaAtom), get(config.AttributeTheme.fields))
   );
-  const TemplateAtom = atom((get) =>
+  const TemplateAtom = atom(get =>
     resolveComponent(get(schemaAtom), get(config.AttributeTheme.templates))
   );
 
   const booleanValueAtom: PrimitiveAtom<boolean | undefined> = atom(
-    (get) => toBoolean(get(valueAtom)),
+    get => toBoolean(get(valueAtom)),
     (_, set, next) => {
-      set(valueAtom, (prev) => {
-        const value = isFunction(next) ? next(toBoolean(prev)) : next;
+      set(valueAtom, prev => {
+        const value = isFunction(next)
+          ? (next as Function)(toBoolean(prev))
+          : next;
         // Empty string for true, undefined for false
         return value ? '' : undefined;
       });
@@ -75,10 +77,12 @@ export const AttributeMolecule = molecule((getMol) => {
   );
 
   const numberValueAtom: PrimitiveAtom<number | undefined> = atom(
-    (get) => toNumber(get(valueAtom)),
+    get => toNumber(get(valueAtom)),
     (_, set, next) => {
-      set(valueAtom, (prev) => {
-        const value = isFunction(next) ? next(toNumber(prev)) : next;
+      set(valueAtom, prev => {
+        const value = isFunction(next)
+          ? (next as Function)(toNumber(prev))
+          : next;
         // Empty string for true, undefined for false
         return value?.toString();
       });
@@ -113,9 +117,7 @@ function toNumber(value: string | undefined): number | undefined {
 /**
  * Provides scope for a {@link AttributeScopeMolecule} and {@link AttributeMolecule}
  */
-export const AttributeProvider: React.FC<{ attributeName: string }> = (
-  props
-) => (
+export const AttributeProvider: React.FC<{ attributeName: string }> = props => (
   <ScopeProvider scope={AttributeScope} value={props.attributeName}>
     {props.children}
   </ScopeProvider>
