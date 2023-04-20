@@ -1,6 +1,6 @@
 {
   "name": "@raisins/core",
-  "author": "Referral SaaSquatch Inc.",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "description": "Core functions for manipulating and validating HTML and raisin nodes",
   "version": "1.1.1",
   "license": "MIT",

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2023-04-20
+
+### Changed
+- Updated license information
+
 ## [1.0.0] - 2022-06-06
 
 ### Added
@@ -40,5 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `@slotEditor`
   - `@canvasRenderer`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/stencil-docs-target@1.0.0...HEAD
+[unreleased]: https://github.com/saasquatch/raisins/compare/stencil-docs-target@1.0.1...HEAD
+[1.0.1]: https://github.com/saasquatch/raisins/releases/tag/stencil-docs-target@1.0.1
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/stencil-docs-target@1.0.0

@@ -3,7 +3,7 @@
   "description": "A custom docs target for Stencil components. Edit in Raisins.",
   "version": "1.0.1",
   "license": "MIT",
-  "author": "Referral SaaSquatch Inc.",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "module": "dist/stencil-docs-target.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

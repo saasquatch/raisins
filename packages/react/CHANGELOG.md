@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2023-04-20
+
+### Changed
+- Updated license information
+
 ## [1.1.0] - 2022-07-21
 
 ### Updated
@@ -82,7 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SlotScopeProvider`
   - `ProseEditorScopeProvider`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.1.0...HEAD
+[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.1.1...HEAD
+[1.1.0]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.1
 [1.1.0]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.0
 [1.0.1]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.0.1
 [1.0.0]: https://github.com/saasquatch/raisins/releases/tag/react@1.0.0
