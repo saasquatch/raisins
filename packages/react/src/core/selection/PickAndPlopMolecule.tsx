@@ -28,7 +28,7 @@ export type PickedOption =
   | { type: 'block'; block: Block }
   | undefined;
 
-export const PickAndPlopMolecule = molecule((getMol) => {
+export const PickAndPlopMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SelectedAtom } = getMol(SelectedNodeMolecule);
 
@@ -38,7 +38,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
   const PickedAtom = atom<PickedOption>(undefined);
 
   const PickedNodeAtom: PrimitiveAtom<RaisinNode | undefined> = atom(
-    (get) => {
+    get => {
       const currentDoc = get(RootNodeAtom);
       const picked = get(PickedAtom);
       if (!picked) return undefined;
@@ -47,7 +47,9 @@ export const PickAndPlopMolecule = molecule((getMol) => {
       return getNode(currentDoc, picked.path);
     },
     (get, set, next) => {
-      const node = isFunction(next) ? next(get(PickedNodeAtom)) : next;
+      const node = isFunction(next)
+        ? (next as Function)(get(PickedNodeAtom))
+        : next;
 
       if (!node) {
         set(PickedAtom, undefined);
@@ -70,7 +72,7 @@ export const PickAndPlopMolecule = molecule((getMol) => {
    * For tracking if a node can be plopped
    */
   const PloppingIsActive = atom(
-    (get) => (get(PickedAtom) !== undefined) as boolean
+    get => (get(PickedAtom) !== undefined) as boolean
   );
 
   const PlopNodeInSlotAtom = atom(

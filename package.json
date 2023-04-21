@@ -12,6 +12,8 @@
       "packages/*"
     ]
   },
+  "license": "MIT",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "devDependencies": {
     "lerna": "^4.0.0",
     "turbo": "^1.0.28"
