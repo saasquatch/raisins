@@ -49,7 +49,6 @@
     }
   },
   "dependencies": {
-    "css-tree": "^1.1.3",
-    "snabbdom": "^3.5.1"
+    "css-tree": "^1.1.3"
   }
 }

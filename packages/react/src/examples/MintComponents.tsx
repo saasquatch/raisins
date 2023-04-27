@@ -26,17 +26,35 @@ export const NextComponents = [
   // },
   {
     package: '@saasquatch/bedrock-components',
-    version: 'next',
+    version: '1.3.7-9',
   },
   {
     package: '@saasquatch/mint-components',
-    version: 'next',
+    version: '1.6.8-22',
   },
   // {
   //   package: '@local',
   //   version: 'next',
   // },
 ];
+
+export const LocalBedrockComponents = [
+  // {
+  //   package: '@saasquatch/mint-components',
+  //   filePath: '/dist/mint-components/mint-components.css',
+  //   version: '1.6.1-2',
+  // },
+ 
+  {
+    package: '@saasquatch/mint-components',
+    version: '1.6.8-22',
+  },
+  {
+    package: '@local',
+    version: 'next',
+  },
+];
+
 
 export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
 
@@ -494,4 +512,88 @@ export const mintTemplates = `
 
 </template>
 </sqb-auth-template-switch>
+`;
+
+export const templateExample = `
+<template-switcher>
+  <template slot="one">Template in slot 1</template>
+  <template slot="two">
+    <template-switcher>
+      <template slot="one">
+      <sqm-brand>
+      <div>
+      2nd order template in nested slot 1
+      </div>
+      </sqm-brand>
+      </template>
+      <template slot="two">2nd order template in nested slot 2</template>
+    </template-switcher>
+  </template>
+</template-switcher>
+
+
+<script>
+  class TemplateSwitcher extends HTMLElement {
+    constructor() {
+      // Always call super first in constructor
+      super();
+      this._state = 1;
+
+      const shadow = this.attachShadow({
+        mode: 'open'
+      });
+      this.render();
+
+
+      this.shadowRoot.innerHTML = '<div style="padding: 20px;">Shadow root. <button>switch</button> <slot name="one">Default one</slot><slot name="two">default two</slot><slot name="shown">Shown slot</div></div>'
+
+      this.shadowRoot.querySelector("button").addEventListener("click", () => {
+        this._state = this._state + 1;
+        this.render();
+      })
+
+    }
+
+    /**
+     * Removes the previously slotted content
+     */
+    cleanup() {
+      const previous = Array.from(this.querySelectorAll("*")).filter(e => e.slot === "shown");
+      previous.forEach(p => this.removeChild(p))
+    }
+    render() {
+      const oneOrTwo = this._state % 2 === 0 ? "one" : "two";
+      const templates = Array.from(this.querySelectorAll("template")).filter(e => e.slot === oneOrTwo);
+      this.cleanup();
+      templates.map(t => {
+        const clone = t.content.cloneNode(true);
+        const wrapper = document.createElement("div");
+        wrapper.slot = "shown";
+        wrapper.appendChild(clone);
+        this.appendChild(wrapper);
+      })
+
+    }
+
+    connectedCallback() {
+      console.log('Custom square element added to page.');
+    }
+
+    disconnectedCallback() {
+      console.log('Custom square element removed from page.');
+    }
+
+    adoptedCallback() {
+      console.log('Custom square element moved to new page.');
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      console.log('Custom square element attributes changed.');
+    }
+  }
+
+  customElements.define('template-switcher', TemplateSwitcher);
+
+</script>
+
 `;

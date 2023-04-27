@@ -25,10 +25,12 @@ import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
 import {
   big,
+  LocalBedrockComponents,
   MintComponents,
   mintMono,
   mintTemplates,
   NextComponents,
+  templateExample,
 } from './examples/MintComponents';
 import {
   referrerWidget,
@@ -41,6 +43,7 @@ import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEdit
 import { StyleEditorController } from './stylesheets/StyleEditor';
 import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
 import { BasicCanvasController } from './canvas';
+import { waitForUpdate } from './util/waitForUpdate';
 
 const meta: Meta = {
   title: 'Editor',
@@ -65,6 +68,54 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
     };
   }
 );
+
+const CanvasStyleMolecule = molecule((getMol, getScope) => {
+  const { rerenderNodeAtom } = getMol(CoreMolecule);
+
+  const outlineBaseAtom = atom(true);
+
+  const OutlineAtom = atom(
+    get => get(outlineBaseAtom),
+    async (get, set, next: boolean) => {
+      set(outlineBaseAtom, next);
+      set(rerenderNodeAtom, true);
+    }
+  );
+  const ModeAtom = atom<Mode>('edit');
+  const SizeAtom = atom<Size>(sizes[0]);
+
+  const CanvasAtoms = getMol(CanvasScopeMolecule);
+  const { IsInteractibleAtom } = getMol(ComponentModelMolecule);
+
+  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
+    const isInteractible = get(IsInteractibleAtom);
+    const outlined = get(OutlineAtom);
+
+    const renderer: SnabbdomRenderer = (d, n) => {
+      if (!isInteractible(n)) return { ...d, outline: '', outlineOffset: '' };
+
+      const { delayed, remove, ...rest } = d.style || {};
+
+      const style = {
+        ...rest,
+        outline: outlined ? '1px dashed #999' : '',
+        outlineOffset: outlined ? '-2px' : '',
+      };
+      return {
+        ...d,
+        style,
+      };
+    };
+    return renderer;
+  });
+  CanvasAtoms.RendererSet.add(Renderer);
+
+  return {
+    OutlineAtom,
+    ModeAtom,
+    SizeAtom,
+  };
+});
 
 const ErrorListMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
@@ -204,8 +255,29 @@ export const Vanilla = () => (
 );
 export const Big = () => <BasicStory startingHtml={big} />;
 
-export const Templates = () => (
-  <BasicStory startingHtml={mintTemplates} startingPackages={NextComponents} />
+export const Templates = () => {
+  return (
+    <BasicStory
+      startingHtml={mintTemplates}
+      startingPackages={NextComponents}
+    />
+  );
+};
+
+export const TemplatesLocal = () => {
+  return (
+    <BasicStory
+      startingHtml={mintTemplates}
+      startingPackages={LocalBedrockComponents}
+    />
+  );
+};
+
+export const TemplatesExample = () => (
+  <BasicStory
+    startingHtml={templateExample}
+    startingPackages={NextComponents}
+  />
 );
 
 const ToolbarMolecule = molecule(getMol => {
@@ -314,44 +386,6 @@ const sizes: Size[] = [
   { name: 'Small', width: '576px', height: 1080 },
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
-
-const CanvasStyleMolecule = molecule((getMol, getScope) => {
-  const OutlineAtom = atom(true);
-  const ModeAtom = atom<Mode>('edit');
-  const SizeAtom = atom<Size>(sizes[0]);
-
-  const CanvasAtoms = getMol(CanvasScopeMolecule);
-  const { IsInteractibleAtom } = getMol(ComponentModelMolecule);
-
-  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
-    const isInteractible = get(IsInteractibleAtom);
-    const outlined = get(OutlineAtom);
-
-    const renderer: SnabbdomRenderer = (d, n) => {
-      if (!isInteractible(n)) return { ...d, outline: '', outlineOffset: '' };
-
-      const { delayed, remove, ...rest } = d.style || {};
-
-      const style = {
-        ...rest,
-        outline: outlined ? '1px dashed #999' : '',
-        outlineOffset: outlined ? '-2px' : '',
-      };
-      return {
-        ...d,
-        style,
-      };
-    };
-    return renderer;
-  });
-  CanvasAtoms.RendererSet.add(Renderer);
-
-  return {
-    OutlineAtom,
-    ModeAtom,
-    SizeAtom,
-  };
-});
 
 function ToolbarController() {
   const atoms = useMolecule(ToolbarMolecule);
