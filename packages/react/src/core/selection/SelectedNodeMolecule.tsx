@@ -22,7 +22,7 @@ export type RichTextSelection = {
   bookmark: SelectionBookmark;
 };
 
-export const SelectedNodeMolecule = molecule((getMol) => {
+export const SelectedNodeMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SoulToNodeAtom } = getMol(SoulsInDocMolecule);
@@ -33,7 +33,7 @@ export const SelectedNodeMolecule = molecule((getMol) => {
    * @deprecated use {@link SelectionAtom} or {@link SelectedNodeAtom} instead
    */
   const SelectedAtom = atom(
-    (get) => get(SelectionAtom),
+    get => get(SelectionAtom),
     (get, set, next?: RaisinNode | undefined) => {
       const nextPath = next
         ? ({ type: 'node', path: getPath(get(RootNodeAtom), next)! } as const)
@@ -55,16 +55,18 @@ export const SelectedNodeMolecule = molecule((getMol) => {
   }
 
   const SelectedNodeAtom = atom(
-    (get) => {
+    get => {
       return getSelected(get);
     },
     (get, set, next: SetStateAction<RaisinNode | undefined>) =>
-      // @ts-expect-error Not all constituents of type are callable
-      set(SelectedAtom, isFunction(next) ? next(getSelected(get)) : next)
+      set(
+        SelectedAtom,
+        isFunction(next) ? (next as Function)(getSelected(get)) : next
+      )
   );
 
   const SelectedBookmark: PrimitiveAtom<SelectionBookmark | undefined> = atom(
-    (get) => {
+    get => {
       const selection = get(SelectionAtom);
       if (selection?.type === 'text') {
         return selection.bookmark;
@@ -72,9 +74,10 @@ export const SelectedNodeMolecule = molecule((getMol) => {
       return undefined;
     },
     (get, set, next) => {
-      // @ts-expect-error Not all constituents of type are callable
-      const nextValue = isFunction(next) ? next(get(SelectedBookmark)) : next;
-      set(SelectionAtom, (prev) => {
+      const nextValue = isFunction(next)
+        ? (next as Function)(get(SelectedBookmark))
+        : next;
+      set(SelectionAtom, prev => {
         if (prev?.type === 'node' && nextValue) {
           // When text selection is set
           // And a node is selected
@@ -112,7 +115,7 @@ export const SelectedNodeMolecule = molecule((getMol) => {
   );
 
   const SelectedSoulAtom = atom(
-    (get) => {
+    get => {
       const getSoul = get(GetSoulAtom);
       const node = get(SelectedNodeAtom);
       if (!node) return undefined;
@@ -129,15 +132,15 @@ export const SelectedNodeMolecule = molecule((getMol) => {
     }
   );
 
-  const HasSelectionAtom = atom((get) => get(SelectionAtom) !== undefined);
+  const HasSelectionAtom = atom(get => get(SelectionAtom) !== undefined);
 
   return {
     SelectionAtom,
     SelectedAtom,
     SelectedNodeAtom,
     SelectedSoulAtom,
-    SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
-    SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
+    SelectedPathString: atom(get => get(SelectedAtom)?.path.toString),
+    SelectedIsElement: atom(get => isElementNode(get(SelectedNodeAtom))),
     HasSelectionAtom,
     SelectedBookmark,
   };

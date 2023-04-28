@@ -55,8 +55,7 @@ export const NodeScopeMolecule = molecule((getMol, getScope) => {
           set(nodeAtom, prev => {
             const souls = get(SoulsAtom);
             const soul = souls.get(prev);
-            // @ts-expect-error Not all constituents of type are callable
-            const nextNode = isFunction(next) ? next(prev) : next;
+            const nextNode = isFunction(next) ? (next as Function)(prev) : next;
             soul && souls.set(nextNode, soul);
             return nextNode;
           });

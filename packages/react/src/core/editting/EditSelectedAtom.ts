@@ -6,7 +6,7 @@ import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';
 import { EditMolecule } from './EditAtoms';
 
-export const EditSelectedMolecule = molecule((getMol) => {
+export const EditSelectedMolecule = molecule(getMol => {
   const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } = getMol(
     EditMolecule
   );
@@ -38,12 +38,11 @@ export const EditSelectedMolecule = molecule((getMol) => {
   });
 
   const EditSelectedNodeAtom = atom(
-    (get) => get(SelectedNodeAtom)!,
+    get => get(SelectedNodeAtom)!,
     (get, set, next: SetStateAction<RaisinNode>) => {
       const selected = get(SelectedNodeAtom);
       if (!selected) return; // Don't allow editing if nothing selected
-      // @ts-expect-error Not all constituents of type are callable
-      const nextValue = isFunction(next) ? next(selected) : next;
+      const nextValue = isFunction(next) ? (next as Function)(selected) : next;
       set(ReplaceNodeAtom, {
         prev: selected,
         next: nextValue,

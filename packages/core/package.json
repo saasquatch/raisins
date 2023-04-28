@@ -1,8 +1,8 @@
 {
   "name": "@raisins/core",
-  "author": "SaaSquatch Team",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "description": "Core functions for manipulating and validating HTML and raisin nodes",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/core.esm.js",
