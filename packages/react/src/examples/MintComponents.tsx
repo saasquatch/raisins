@@ -44,7 +44,7 @@ export const LocalBedrockComponents = [
   //   filePath: '/dist/mint-components/mint-components.css',
   //   version: '1.6.1-2',
   // },
- 
+
   {
     package: '@saasquatch/mint-components',
     version: '1.6.8-22',
@@ -54,7 +54,6 @@ export const LocalBedrockComponents = [
     version: 'next',
   },
 ];
-
 
 export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
 
@@ -466,8 +465,8 @@ export const mintTemplates = `
 <sqm-brand>
   <sqm-portal-container direction="column" padding="none" gap="xx-large" max-width="770px" center display="grid">
     <sqm-referral-card vertical-alignment="start">
-      <sqm-portal-container gap="large" direction="column" display="flex" justify-content="center" max-width="100%" padding="none" slot="header">
-        <sqm-titled-section text-align="center" label-margin="xxx-small" padding="none">
+      <sqm-portal-container gap="xxxx-large" direction="column" display="flex" justify-content="center" max-width="100%" padding="xxxx-large" slot="header">
+        <sqm-titled-section text-align="center" label-margin="none" padding="none">
           <h3 slot="label">You got &#x24;50 off thanks to a friend!</h3>
 
           <p slot="content">
@@ -489,6 +488,7 @@ export const mintTemplates = `
     </sqm-referral-card>
   </sqm-portal-container>
 </sqm-brand>
+
 </template>
 <template slot="logged-out">
 <sqm-brand>

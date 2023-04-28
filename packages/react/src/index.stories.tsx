@@ -12,6 +12,7 @@ import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
 import {
   CanvasHoveredMolecule,
+  CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasScopeMolecule,
   CanvasSelectionMolecule,
@@ -289,6 +290,7 @@ const ToolbarMolecule = molecule(getMol => {
     ...getMol(CanvasSelectionMolecule),
     ...getMol(CanvasHoveredMolecule),
     ...getMol(ComponentModelMolecule),
+    ...getMol(CanvasPickAndPlopMolecule),
   };
 });
 
