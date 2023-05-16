@@ -1,6 +1,6 @@
 import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
+import { Atom, atom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
@@ -10,7 +10,13 @@ import {
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
-import { CanvasHoveredMolecule, CanvasSelectionMolecule } from './canvas';
+import {
+  CanvasHoveredMolecule,
+  CanvasPickAndPlopMolecule,
+  CanvasProvider,
+  CanvasScopeMolecule,
+  CanvasSelectionMolecule,
+} from './canvas';
 import { CanvasController } from './canvas/CanvasController';
 import { ComponentModelMolecule, Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
@@ -18,7 +24,15 @@ import { CoreMolecule, SelectedNodeMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
-import { big, MintComponents, mintMono } from './examples/MintComponents';
+import {
+  big,
+  LocalBedrockComponents,
+  MintComponents,
+  mintMono,
+  mintTemplates,
+  NextComponents,
+  templateExample,
+} from './examples/MintComponents';
 import {
   referrerWidget,
   VanillaComponents,
@@ -28,6 +42,9 @@ import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
+import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
+import { BasicCanvasController } from './canvas';
+import { waitForUpdate } from './util/waitForUpdate';
 
 const meta: Meta = {
   title: 'Editor',
@@ -53,15 +70,63 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
   }
 );
 
-const ErrorListMolecule = molecule((getMol) => {
+const CanvasStyleMolecule = molecule((getMol, getScope) => {
+  const { rerenderNodeAtom } = getMol(CoreMolecule);
+
+  const outlineBaseAtom = atom(true);
+
+  const OutlineAtom = atom(
+    get => get(outlineBaseAtom),
+    async (get, set, next: boolean) => {
+      set(outlineBaseAtom, next);
+      set(rerenderNodeAtom, true);
+    }
+  );
+  const ModeAtom = atom<Mode>('edit');
+  const SizeAtom = atom<Size>(sizes[0]);
+
+  const CanvasAtoms = getMol(CanvasScopeMolecule);
+  const { IsInteractibleAtom } = getMol(ComponentModelMolecule);
+
+  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
+    const isInteractible = get(IsInteractibleAtom);
+    const outlined = get(OutlineAtom);
+
+    const renderer: SnabbdomRenderer = (d, n) => {
+      if (!isInteractible(n)) return { ...d, outline: '', outlineOffset: '' };
+
+      const { delayed, remove, ...rest } = d.style || {};
+
+      const style = {
+        ...rest,
+        outline: outlined ? '1px dashed #999' : '',
+        outlineOffset: outlined ? '-2px' : '',
+      };
+      return {
+        ...d,
+        style,
+      };
+    };
+    return renderer;
+  });
+  CanvasAtoms.RendererSet.add(Renderer);
+
+  return {
+    OutlineAtom,
+    ModeAtom,
+    SizeAtom,
+  };
+});
+
+const ErrorListMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { errorsAtom } = getMol(NodeMolecule);
 
-  const ErrorDetails = atom((get) => {
+  const ErrorDetails = atom(get => {
     const errors = get(errorsAtom);
     const root = get(RootNodeAtom);
 
-    return errors.map((e) => {
+    return errors.map(e => {
       return {
         error: e,
         node: JSONPointer.get(root, e.jsonPointer) as RaisinNode,
@@ -80,7 +145,7 @@ export function ErrorListController() {
       <hr />
       <details style={{ maxHeight: '300px', overflow: 'scroll' }}>
         <summary>{errors.length} errors</summary>
-        {errors.map((e) => {
+        {errors.map(e => {
           const error = e.error.error;
 
           if (error.type === 'ancestry') {
@@ -95,7 +160,7 @@ export function ErrorListController() {
                       (error.child as RaisinElementNode).tagName}{' '}
                     inside it. Valid children are:{' '}
                     {error.parentMeta?.slots
-                      ?.map((s) => s.validChildren)
+                      ?.map(s => s.validChildren)
                       .join(',')}
                   </span>
                 )}
@@ -135,12 +200,14 @@ export function BasicStory({
 }) {
   return (
     <>
-      <ScopeProvider
-        scope={StoryScope}
-        value={{ startingHtml, startingPackages }}
-      >
-        <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
-      </ScopeProvider>{' '}
+      <CanvasProvider>
+        <ScopeProvider
+          scope={StoryScope}
+          value={{ startingHtml, startingPackages }}
+        >
+          <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
+        </ScopeProvider>{' '}
+      </CanvasProvider>
     </>
   );
 }
@@ -163,14 +230,17 @@ export function ExternalHTMLControl() {
   const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom);
   return (
     <>
-      <textarea
-        value={html}
-        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-      />
-      <RaisinsProvider molecule={state}>
-        <Editor />
-        {/* <RegisteredAtoms /> */}
-      </RaisinsProvider>
+      <CanvasProvider>
+        <textarea
+          value={html}
+          onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
+        />
+        <RaisinsProvider molecule={state}>
+          <Editor />
+
+          {/* <RegisteredAtoms /> */}
+        </RaisinsProvider>
+      </CanvasProvider>
     </>
   );
 }
@@ -186,7 +256,32 @@ export const Vanilla = () => (
 );
 export const Big = () => <BasicStory startingHtml={big} />;
 
-const ToolbarMolecule = molecule((getMol) => {
+export const Templates = () => {
+  return (
+    <BasicStory
+      startingHtml={mintTemplates}
+      startingPackages={NextComponents}
+    />
+  );
+};
+
+export const TemplatesLocal = () => {
+  return (
+    <BasicStory
+      startingHtml={mintTemplates}
+      startingPackages={LocalBedrockComponents}
+    />
+  );
+};
+
+export const TemplatesExample = () => (
+  <BasicStory
+    startingHtml={templateExample}
+    startingPackages={NextComponents}
+  />
+);
+
+const ToolbarMolecule = molecule(getMol => {
   return {
     ...getMol(HoveredNodeMolecule),
     ...getMol(SelectedNodeMolecule),
@@ -195,12 +290,13 @@ const ToolbarMolecule = molecule((getMol) => {
     ...getMol(CanvasSelectionMolecule),
     ...getMol(CanvasHoveredMolecule),
     ...getMol(ComponentModelMolecule),
+    ...getMol(CanvasPickAndPlopMolecule),
   };
 });
 
 function Editor() {
   useHotkeys();
-
+  useMolecule(CanvasStyleMolecule);
   return <EditorView />;
 }
 
@@ -264,8 +360,7 @@ export function EditorView() {
         </div>
 
         <div style={CanvasCss}>
-          <CanvasController />
-          <CanvasController />
+          <BasicCanvasController />
           <SelectedNodeRichTextEditor />
         </div>
 
@@ -293,18 +388,6 @@ const sizes: Size[] = [
   { name: 'Small', width: '576px', height: 1080 },
   { name: 'X-Small', width: '400px', height: 1080 },
 ];
-
-const CanvasStyleMolecule = molecule((getMol) => {
-  const OutlineAtom = atom(true);
-  const ModeAtom = atom<Mode>('edit');
-  const SizeAtom = atom<Size>(sizes[0]);
-
-  return {
-    OutlineAtom,
-    ModeAtom,
-    SizeAtom,
-  };
-});
 
 function ToolbarController() {
   const atoms = useMolecule(ToolbarMolecule);
@@ -339,13 +422,13 @@ function ToolbarController() {
       >
         Screen
       </button>
-      {sizes.map((s) => (
+      {sizes.map(s => (
         <button onClick={() => setSize(s)} disabled={size === s} key={s.name}>
           {s.name}
         </button>
       ))}
       <button
-        onClick={() => setOutlined((o) => !o)}
+        onClick={() => setOutlined(o => !o)}
         style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}
       >
         {outlined ? 'Outlined' : 'No Outline'}

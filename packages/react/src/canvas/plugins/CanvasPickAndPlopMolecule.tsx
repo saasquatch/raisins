@@ -23,7 +23,7 @@ import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 
-export const CanvasPickAndPlopMolecule = molecule((getMol) => {
+export const CanvasPickAndPlopMolecule = molecule(getMol => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { ParentsAtom } = getMol(CoreMolecule);
@@ -55,8 +55,18 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
 
   const PickAndPlopStyleAtom = atom(
     `<style>
+
+    raisins-plop-target{
+      z-index: 999;
+    }
+
+    raisins-plop-target:hover{
+      z-index: 9999;
+    }
+
     .plop-target-container *{
       background: #439b76;
+      transition: 0.1s all ease-in-out;
     }
 
     .plop-target-container:hover *{
@@ -107,7 +117,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   );
   CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
 
-  const AppenderAtom = atom((get) => {
+  const AppenderAtom = atom(get => {
     const souls = get(GetSoulAtom);
     const isPloppingActive = get(PloppingIsActive);
     const picked = get(PickedAtom);
@@ -150,8 +160,8 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       );
 
       const plopsForZeroIndex = plopTargets
-        .filter((plop) => plop.idx === 0)
-        .map((plop) => {
+        .filter(plop => plop.idx === 0)
+        .map(plop => {
           return PlopTargetView({
             idx: plop.idx,
             slot: plop.slot,
@@ -166,10 +176,10 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const newChildren =
         vnodeChildren?.reduce((acc, vnodeChild, idx) => {
           const plopsForNextIndex = plopTargets.filter(
-            (plop) => plop.idx === idx + 1
+            plop => plop.idx === idx + 1
           );
 
-          const plopViews = plopsForNextIndex.map((plop) => {
+          const plopViews = plopsForNextIndex.map(plop => {
             return PlopTargetView({
               idx: plop.idx,
               slot: plop.slot,
@@ -190,7 +200,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   });
   CanvasAtoms.AppendersSet.add(AppenderAtom);
 
-  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
+  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
     const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isPicked = picked === n;
@@ -246,7 +256,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   addOrMove,
 }) => {
   const slotTitle =
-    parentSchema?.slots?.find((foundSlot) => slot === foundSlot.name)?.title ||
+    parentSchema?.slots?.find(foundSlot => slot === foundSlot.name)?.title ||
     parentSchema.title ||
     'Content';
 
@@ -308,7 +318,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
         height: '0px',
         margin: '0',
         overflow: 'visible',
-        zIndex: '9999',
+        position: 'relative',
         display: 'block',
         marginTop: '0',
         ...paddedPlopStyle,

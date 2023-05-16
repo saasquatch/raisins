@@ -26,6 +26,12 @@ export const Paragraphs = () => (
   </BasicStory>
 );
 
+export const HeadingWithText = () => (
+  <BasicStory startingHtml={`<h1>I am already bolded</h1>`}>
+    <Editor />
+  </BasicStory>
+);
+
 function Editor() {
   return (
     <div>

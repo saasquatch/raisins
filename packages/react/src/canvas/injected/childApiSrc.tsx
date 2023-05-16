@@ -25,7 +25,7 @@ export const childApiSrc = (
   import * as snabbdom from "${registry.resolvePath(
     {
       package: 'snabbdom',
-      version: '3.5.0',
+      version: '3.5.1',
     },
     '+esm'
   )}"

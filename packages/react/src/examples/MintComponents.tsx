@@ -18,6 +18,34 @@ export const MintComponents = [
   // },
 ];
 
+export const NextComponents = [
+  {
+    package: '@saasquatch/bedrock-components',
+    version: 'next',
+  },
+  {
+    package: '@saasquatch/mint-components',
+    version: 'next',
+  },
+];
+
+export const LocalBedrockComponents = [
+  // {
+  //   package: '@saasquatch/mint-components',
+  //   filePath: '/dist/mint-components/mint-components.css',
+  //   version: '1.6.1-2',
+  // },
+
+  {
+    package: '@saasquatch/mint-components',
+    version: '1.6.8-22',
+  },
+  {
+    package: '@local',
+    version: 'next',
+  },
+];
+
 export const mintBigStat = `<sqm-big-stat flex-reverse="true" alignment="left" stat-type="/referralsCount">`;
 
 export const mintHeroImage = `<sqm-hero-image
@@ -420,4 +448,143 @@ I am a template
   align-items: center;
 }
 </style>
+`;
+
+export const mintTemplates = `
+<sqb-auth-template-switch>
+<template slot="logged-in">
+<sqm-brand>
+  <sqm-portal-container direction="column" padding="none" gap="xx-large" max-width="770px" center display="grid">
+    <sqm-referral-card vertical-alignment="start">
+      <sqm-portal-container gap="xxxx-large" direction="column" display="flex" justify-content="center" max-width="100%" padding="xxxx-large" slot="header">
+        <sqm-titled-section text-align="center" label-margin="none" padding="none">
+          <h3 slot="label">You got &#x24;50 off thanks to a friend!</h3>
+
+          <p slot="content">
+            Description about sharing the products wiht friends will make your
+            life 100 times better!
+          </p>
+        </sqm-titled-section>
+
+        <sqm-portal-container>
+          <p>
+            The coupon code has some conditions that are described concisely in
+            this paragraph so that you don&#x2019;t get upset if the code doesn&#x2019;t work
+          </p></sqm-portal-container>
+
+        <sqm-coupon-code></sqm-coupon-code>
+      </sqm-portal-container>
+
+      <sqm-portal-footer slot="footer" padding-top="none" padding-bottom="none" padding-left="none" padding-right="none"></sqm-portal-footer>
+    </sqm-referral-card>
+  </sqm-portal-container>
+</sqm-brand>
+
+</template>
+<template slot="logged-out">
+<sqm-brand>
+  <sqm-referred-registration register-label="Get $50 off">
+    <sqm-titled-section text-align="center" label-margin="xxx-small" padding="none" slot="top-slot">
+      <h3 slot="label">You got &#x24;50 off thanks to a friend!</h3>
+      <p slot="content">
+        Description about sharing the products with friends will make your life
+        100 times better!
+      </p>
+    </sqm-titled-section>
+
+    <div slot="bottom-slot">
+      <p style="text-align:center;margin-top:0;margin-bottom:1.5rem">
+        *Valid on purchases of &#x24;75 or more
+      </p>
+      <sqm-portal-footer hide-support-text="true" terms-link="https://example.com" terms-text="Terms And Conditions" faq-text="FAQ" show-powered-by="true" padding-bottom="none" padding-left="none" padding-right="none" padding-top="none"></sqm-portal-footer>
+    </div>
+  </sqm-referred-registration>
+</sqm-brand>
+
+</template>
+</sqb-auth-template-switch>
+`;
+
+export const templateExample = `
+<template-switcher>
+  <template slot="one">Template in slot 1</template>
+  <template slot="two">
+    <template-switcher>
+      <template slot="one">
+      <sqm-brand>
+      <div>
+      2nd order template in nested slot 1
+      </div>
+      </sqm-brand>
+      </template>
+      <template slot="two">2nd order template in nested slot 2</template>
+    </template-switcher>
+  </template>
+</template-switcher>
+
+
+<script>
+  class TemplateSwitcher extends HTMLElement {
+    constructor() {
+      // Always call super first in constructor
+      super();
+      this._state = 1;
+
+      const shadow = this.attachShadow({
+        mode: 'open'
+      });
+      this.render();
+
+
+      this.shadowRoot.innerHTML = '<div style="padding: 20px;">Shadow root. <button>switch</button> <slot name="one">Default one</slot><slot name="two">default two</slot><slot name="shown">Shown slot</div></div>'
+
+      this.shadowRoot.querySelector("button").addEventListener("click", () => {
+        this._state = this._state + 1;
+        this.render();
+      })
+
+    }
+
+    /**
+     * Removes the previously slotted content
+     */
+    cleanup() {
+      const previous = Array.from(this.querySelectorAll("*")).filter(e => e.slot === "shown");
+      previous.forEach(p => this.removeChild(p))
+    }
+    render() {
+      const oneOrTwo = this._state % 2 === 0 ? "one" : "two";
+      const templates = Array.from(this.querySelectorAll("template")).filter(e => e.slot === oneOrTwo);
+      this.cleanup();
+      templates.map(t => {
+        const clone = t.content.cloneNode(true);
+        const wrapper = document.createElement("div");
+        wrapper.slot = "shown";
+        wrapper.appendChild(clone);
+        this.appendChild(wrapper);
+      })
+
+    }
+
+    connectedCallback() {
+      console.log('Custom square element added to page.');
+    }
+
+    disconnectedCallback() {
+      console.log('Custom square element removed from page.');
+    }
+
+    adoptedCallback() {
+      console.log('Custom square element moved to new page.');
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      console.log('Custom square element attributes changed.');
+    }
+  }
+
+  customElements.define('template-switcher', TemplateSwitcher);
+
+</script>
+
 `;

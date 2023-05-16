@@ -23,7 +23,7 @@ export const RichTextMolecule = molecule((getMol) => {
     (get) => {
       return {
         type: 'root',
-        children: get(nodeAtom).children,
+        children: get(nodeAtom)?.children,
       };
     },
     (get, set, next) => {

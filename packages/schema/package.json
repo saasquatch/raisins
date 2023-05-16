@@ -15,7 +15,7 @@
   "scripts": {
     "build": "typescript-json-schema --required --ignoreErrors schema.d.ts -o schema.json Package",
     "prepublishOnly": "npm run build",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": ""
   },
   "repository": {
     "type": "git",
