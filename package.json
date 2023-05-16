@@ -49,8 +49,5 @@
         "cache": false
       }
     }
-  },
-  "dependencies": {
-    "css-tree": "^1.1.3"
   }
 }
