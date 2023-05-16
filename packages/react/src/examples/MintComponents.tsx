@@ -19,23 +19,14 @@ export const MintComponents = [
 ];
 
 export const NextComponents = [
-  // {
-  //   package: '@saasquatch/mint-components',
-  //   filePath: '/dist/mint-components/mint-components.css',
-  //   version: '1.6.1-2',
-  // },
   {
     package: '@saasquatch/bedrock-components',
-    version: '1.3.7-9',
+    version: 'next',
   },
   {
     package: '@saasquatch/mint-components',
-    version: '1.6.8-22',
+    version: 'next',
   },
-  // {
-  //   package: '@local',
-  //   version: 'next',
-  // },
 ];
 
 export const LocalBedrockComponents = [
