@@ -43,7 +43,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isHovered ? '2px solid #a3caba' : rest.outline ?? '',
+        outline: isHovered ? '2px solid #A4E0FB' : rest.outline ?? '',
         // Disabled outline due to flickering, may just render outside canvas instead
         // outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
         outlineOffset: '0',
