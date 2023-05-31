@@ -61,12 +61,12 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     }
 
     .plop-target-container *{
-      background: #A4E0FB;
+      background: #6C7784;
       transition: 0.1s all ease-in-out;
     }
 
     .plop-target-container:hover *{
-      background: #14B1F7;
+      background: #2D3E50;
     }
 
     .plop-target-container [targettype="label"]{
