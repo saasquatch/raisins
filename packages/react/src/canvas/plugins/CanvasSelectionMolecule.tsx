@@ -35,7 +35,7 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isSelected ? '2px solid #14B1F7' : rest.outline ?? '',
+        outline: isSelected ? '2px solid #2D3E50' : rest.outline ?? '',
         outlineOffset: '',
       };
 
