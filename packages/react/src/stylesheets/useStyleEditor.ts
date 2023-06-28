@@ -4,12 +4,12 @@ import {
   RaisinNode,
   RaisinStyleNode,
 } from '@raisins/core';
-import * as css from 'css-tree';
 import { useAtom } from 'jotai';
 import { useMolecule } from 'jotai-molecules';
 import { useMemo, useState } from 'react';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { StateUpdater } from '../util/NewState';
+import { CssNodePlain } from 'css-tree';
 
 const { IdentityVisitor, replace, visit } = htmlUtil;
 
@@ -28,7 +28,7 @@ export function useStyleEditor() {
     const nodes: RaisinStyleNode[] = [];
     visit(node, {
       ...IdentityVisitor,
-      onStyle: (n) => {
+      onStyle: n => {
         nodes.push(n);
         return n;
       },
@@ -41,7 +41,7 @@ export function useStyleEditor() {
     RaisinStyleNode | undefined
   >(undefined);
 
-  const updateSelectedSheet: StateUpdater<css.CssNodePlain> = (next) => {
+  const updateSelectedSheet: StateUpdater<CssNodePlain> = next => {
     setNode(
       // @ts-ignore
       (prev: RaisinDocumentNode) => {

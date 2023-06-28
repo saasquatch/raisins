@@ -1,4 +1,4 @@
-import * as Css from "css-tree";
+import { CssNodePlain } from "css-tree";
 import { StateUpdater } from "../util/NewState";
 import { StyleNodeProps, StyleNodeWithChildren } from "./Types";
 
@@ -10,8 +10,8 @@ import { StyleNodeProps, StyleNodeWithChildren } from "./Types";
  * @returns
  */
 export function createUpdater<
-  Node extends Css.CssNodePlain,
-  Child extends Css.CssNodePlain
+  Node extends CssNodePlain,
+  Child extends CssNodePlain
 >(
   props: StyleNodeProps<Node>,
   selector: (prev: Node) => Child,
@@ -38,7 +38,7 @@ export function createUpdater<
 export function createChildUpdater(
   setNode: StateUpdater<StyleNodeWithChildren>,
   idx: number
-): StateUpdater<Css.CssNodePlain> {
+): StateUpdater<CssNodePlain> {
   return next => {
     const reducer = (current: StyleNodeWithChildren): StyleNodeWithChildren => {
       const currentAtIdx = current.children[idx];
