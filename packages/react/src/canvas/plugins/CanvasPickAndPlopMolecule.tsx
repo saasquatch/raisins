@@ -61,12 +61,12 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     }
 
     .plop-target-container *{
-      background: #6C7784;
+      background: #59A7E8;
       transition: 0.1s all ease-in-out;
     }
 
     .plop-target-container:hover *{
-      background: #2D3E50;
+      background: #0077DB;
     }
 
     .plop-target-container [targettype="label"]{
@@ -206,7 +206,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isPicked ? '2px dashed #2D3E50' : rest.outline ?? '',
+        outline: isPicked ? '2px dashed #0077DB' : rest.outline ?? '',
         outlineOffset: isPicked ? '-2px' : '',
       };
 
