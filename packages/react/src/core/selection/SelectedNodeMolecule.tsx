@@ -7,7 +7,7 @@ import {
   RaisinNode,
 } from '@raisins/core';
 import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { SelectionBookmark } from 'prosemirror-state';
 import { isFunction } from '../../util/isFunction';
 import { CoreMolecule } from '../CoreAtoms';

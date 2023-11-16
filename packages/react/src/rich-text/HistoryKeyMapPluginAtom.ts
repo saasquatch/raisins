@@ -1,4 +1,4 @@
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { keymap } from 'prosemirror-keymap';
 import { Plugin } from 'prosemirror-state';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';

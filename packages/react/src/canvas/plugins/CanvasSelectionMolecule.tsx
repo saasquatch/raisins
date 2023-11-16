@@ -1,5 +1,5 @@
 import { Atom, atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { VNodeStyle } from 'snabbdom';
 import { PickAndPlopMolecule } from '../../core';
 import { SelectedNodeMolecule } from '../../core/selection/SelectedNodeMolecule';

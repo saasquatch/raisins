@@ -1,4 +1,4 @@
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ProseEditorStateMolecule } from './ProseEditorStateMolecule';
 import { ProseEditorViewMolecule } from './ProseEditorViewMolecule';
 

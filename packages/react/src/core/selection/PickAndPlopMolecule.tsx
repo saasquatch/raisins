@@ -8,7 +8,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, PrimitiveAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
 import { waitForUpdate } from '../../util/waitForUpdate';

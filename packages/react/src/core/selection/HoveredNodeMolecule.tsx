@@ -1,6 +1,6 @@
 import { isElementNode, RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../CoreAtoms';
 import { Soul } from '../souls/Soul';

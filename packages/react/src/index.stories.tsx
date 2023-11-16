@@ -6,7 +6,7 @@ import {
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'jotai-molecules';
+} from 'bunshi/react';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';

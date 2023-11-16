@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { h } from 'snabbdom';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';

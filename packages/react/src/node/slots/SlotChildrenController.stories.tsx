@@ -1,7 +1,7 @@
 import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai/utils';
 import React, { CSSProperties, FC, useCallback, useState } from 'react';
 import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';

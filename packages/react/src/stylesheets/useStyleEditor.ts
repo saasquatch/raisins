@@ -6,7 +6,7 @@ import {
 } from '@raisins/core';
 import * as css from 'css-tree';
 import { useAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import { useMemo, useState } from 'react';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { StateUpdater } from '../util/NewState';

@@ -1,6 +1,6 @@
 import { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
 import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { SoulsMolecule } from '../core/souls/Soul';
 import { NodeMolecule } from '../node';
 import { HistoryKeyMapPluginMolecule } from './HistoryKeyMapPluginAtom';

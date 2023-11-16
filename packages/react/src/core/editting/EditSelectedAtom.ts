@@ -1,6 +1,6 @@
 import { htmlUtil, RaisinNode } from '@raisins/core';
 import { atom, SetStateAction } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { isFunction } from '../../util/isFunction';
 import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';

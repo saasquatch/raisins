@@ -1,6 +1,6 @@
 import { validateNode } from '@raisins/core';
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { CoreMolecule } from '../core';
 

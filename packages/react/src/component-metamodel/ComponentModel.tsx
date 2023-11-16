@@ -13,7 +13,7 @@ import {
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';

@@ -1,4 +1,4 @@
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import React from 'react';
 import { ProseEditor } from './prosemirror/ProseEditor';
 import { ProseEditorScopeProvider } from './prosemirror/ProseEditorScope';

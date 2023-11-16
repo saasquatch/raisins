@@ -1,7 +1,7 @@
 import { htmlParser, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { useAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import React from 'react';
 import {

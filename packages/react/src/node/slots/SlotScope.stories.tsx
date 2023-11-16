@@ -1,6 +1,6 @@
 import { htmlParser } from '@raisins/core';
 import { atom, useAtom } from 'jotai';
-import { molecule, ScopeProvider, useMolecule } from 'jotai-molecules';
+import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope';
 import { NodeChildrenEditor } from '../NodeChildrenEditor';

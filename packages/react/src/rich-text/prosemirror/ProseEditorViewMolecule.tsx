@@ -1,5 +1,5 @@
 import { Atom, atom, SetStateAction } from 'jotai';
-import { createScope, molecule } from 'jotai-molecules';
+import { createScope, molecule } from 'bunshi/react';
 import { EditorView } from 'prosemirror-view';
 import connectedAtom from '../../util/atoms/connectedAtom';
 import { ProseEditorStateMolecule } from './ProseEditorStateMolecule';

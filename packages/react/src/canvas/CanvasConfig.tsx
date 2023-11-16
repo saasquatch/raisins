@@ -1,5 +1,5 @@
 import { atom, Atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ConfigMolecule } from '../core/RaisinConfigScope';
 
 export type CanvasConfig = {

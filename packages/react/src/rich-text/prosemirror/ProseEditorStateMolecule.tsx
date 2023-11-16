@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { Node } from 'prosemirror-model';
 import { EditorState, SelectionBookmark, Transaction } from 'prosemirror-state';
 import { ProseEditorScope } from './ProseEditorScope';

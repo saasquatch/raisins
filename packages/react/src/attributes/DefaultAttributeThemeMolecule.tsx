@@ -1,16 +1,16 @@
+import { molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { AttributeMolecule } from './AttributeMolecule';
 import {
   AttributeField,
   AttributeTemplate,
-  AttributeThemeMolecule,
+  AttributeThemeMoleculeValue,
   AttributeWidget,
   DefaultAttributeComponent,
 } from './AttributeThemeMolecule';
 
-export const DefaultAttributeTemplate: AttributeTemplate = (props) => {
+export const DefaultAttributeTemplate: AttributeTemplate = props => {
   const { name, schemaAtom } = useMolecule(AttributeMolecule);
   const schema = useAtomValue(schemaAtom);
 
@@ -41,7 +41,7 @@ export const DefaultTextWidget: AttributeWidget = () => {
     <input
       type="text"
       value={value}
-      onInput={(e) => setValue((e.target as HTMLInputElement).value)}
+      onInput={e => setValue((e.target as HTMLInputElement).value)}
     />
   );
 };
@@ -53,7 +53,7 @@ export const DefaultBooleanWidget: AttributeWidget = () => {
     <input
       type="checkbox"
       checked={value}
-      onChange={(e) => setValue((e.target as HTMLInputElement).checked)}
+      onChange={e => setValue((e.target as HTMLInputElement).checked)}
     />
   );
 };
@@ -65,7 +65,7 @@ export const DefaultNumberWidget: AttributeWidget = () => {
     <input
       type="number"
       value={value}
-      onInput={(e) => setValue(+(e.target as HTMLInputElement).value)}
+      onInput={e => setValue(+(e.target as HTMLInputElement).value)}
     />
   );
 };
@@ -77,7 +77,7 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   const schema = useAtomValue(schemaAtom);
 
   return (
-    <select value={value} onChange={(e) => setValue(e.target.value)}>
+    <select value={value} onChange={e => setValue(e.target.value)}>
       {schema.enum?.map((key, idx) => (
         <option value={key}>{schema.enumNames?.[idx] ?? key}</option>
       ))}
@@ -85,22 +85,22 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   );
 };
 
-export const DefaultAttributeThemeMolecule: AttributeThemeMolecule = molecule(
-  () => {
-    return {
-      widgets: atom({
-        text: DefaultTextWidget,
-        boolean: DefaultBooleanWidget,
-        number: DefaultNumberWidget,
-        select: DefaultSelectWidget,
-        [DefaultAttributeComponent]: DefaultTextWidget,
-      }),
-      templates: atom({
-        [DefaultAttributeComponent]: DefaultAttributeTemplate,
-      }),
-      fields: atom({
-        [DefaultAttributeComponent]: DefaultAttributeField,
-      }),
-    };
-  }
-);
+export const DefaultAttributeThemeMolecule = molecule<
+  AttributeThemeMoleculeValue
+>(() => {
+  return {
+    widgets: atom<{}>({
+      text: DefaultTextWidget,
+      boolean: DefaultBooleanWidget,
+      number: DefaultNumberWidget,
+      select: DefaultSelectWidget,
+      [DefaultAttributeComponent]: DefaultTextWidget,
+    }),
+    templates: atom({
+      [DefaultAttributeComponent]: DefaultAttributeTemplate,
+    }),
+    fields: atom({
+      [DefaultAttributeComponent]: DefaultAttributeField,
+    }),
+  };
+});

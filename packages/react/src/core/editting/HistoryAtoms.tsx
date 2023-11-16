@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
 import { atom, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule, Selection } from '../selection';

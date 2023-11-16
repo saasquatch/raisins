@@ -1,6 +1,6 @@
 import { isElementNode, isRoot, RaisinNode } from '@raisins/core';
 import { useAtom, useAtomValue } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import React, { useContext } from 'react';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';

@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
 import { NPMRegistryAtom } from '../util/NPMRegistry';

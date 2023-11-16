@@ -1,6 +1,6 @@
 import { atom, Atom, PrimitiveAtom } from 'jotai';
-import { createScope, ScopeProvider } from 'jotai-molecules';
-import { molecule } from 'jotai-molecules';
+import { createScope, ScopeProvider } from 'bunshi/react';
+import { molecule } from 'bunshi/react';
 import React from 'react';
 import { AttributeConfig } from '../attributes/AttributeConfig';
 import { CanvasConfig } from '../canvas/CanvasConfig';

@@ -1,6 +1,6 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,

@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import { HotkeysMolecule } from './HotkeysMolecule';
 
 export function useHotkeys() {

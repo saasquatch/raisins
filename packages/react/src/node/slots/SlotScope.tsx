@@ -1,7 +1,7 @@
 import { RaisinElementNode, RaisinNodeWithChildren } from '@raisins/core';
 import type { Slot } from '@raisins/schema/schema';
 import { atom } from 'jotai';
-import { createScope, molecule, ScopeProvider } from 'jotai-molecules';
+import { createScope, molecule, ScopeProvider } from 'bunshi/react';
 import { focusAtom } from 'jotai/optics';
 import { splitAtom } from 'jotai/utils';
 import { optic_ } from 'optics-ts';

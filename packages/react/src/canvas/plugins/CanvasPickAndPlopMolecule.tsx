@@ -8,7 +8,7 @@ import {
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {

@@ -4,7 +4,7 @@
 import { act, renderHook } from '@testing-library/react-hooks/dom';
 import expect from 'expect';
 import { atom, useAtom } from 'jotai';
-import { molecule, ScopeProvider, useMolecule } from 'jotai-molecules';
+import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { h } from 'snabbdom';
 import { unpkgNpmRegistry } from '../../util/NPMRegistry';

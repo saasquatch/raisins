@@ -1,5 +1,5 @@
+import { useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
 import React from 'react';
 import { AttributeMolecule, AttributeProvider } from './AttributeMolecule';
 import { AttributesMolecule } from './AttributesMolecule';
@@ -19,9 +19,7 @@ export type AttributesControllerProps = {
  * Renders a Component in {@link AttributeProvider} for every attribute
  * in scope for the {@link AttributesMolecule}
  */
-export const AttributesController: React.FC<AttributesControllerProps> = (
-  props
-) => {
+export const AttributesController: React.FC<AttributesControllerProps> = props => {
   const { keysAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
 

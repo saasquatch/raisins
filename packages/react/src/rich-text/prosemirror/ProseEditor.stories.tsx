@@ -1,6 +1,6 @@
 import { htmlParser } from '@raisins/core';
 import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import { SelectionBookmark } from 'prosemirror-state';
 import React from 'react';
 import { DefaultProseSchema } from './default-schema/DefaultProseSchema';

@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { ScopeProvider, useMolecule } from 'jotai-molecules';
+import { ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { ProseEditorMolecule } from './ProseEditorMolecule';
 import { ProseEditorViewScope } from './ProseEditorViewMolecule';

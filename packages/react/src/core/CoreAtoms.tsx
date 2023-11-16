@@ -9,7 +9,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, SetStateAction, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { MutableRefObject } from 'react';
 import { ConfigMolecule } from './RaisinConfigScope';
 
