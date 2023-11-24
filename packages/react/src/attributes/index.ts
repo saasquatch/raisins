@@ -5,6 +5,6 @@ export {
 } from './AttributeMolecule';
 export {
   AttributesController,
-  AttributesControllerProps,
 } from './AttributesController';
+export type {  AttributesControllerProps,} from "./AttributesController"
 export { AttributesMolecule } from './AttributesMolecule';
