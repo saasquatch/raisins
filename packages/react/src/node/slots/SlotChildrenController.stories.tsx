@@ -490,7 +490,8 @@ const SlotChild: React.FC<{ idx?: number; atoms: any }> = ({ idx, atoms }) => {
   );
 };
 
-function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
+function PlopTarget(props: { idx: number; slot: string }) {
+  const { idx, slot } = props;
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
   const canPlop = useAtomValue(canPlopHereAtom);
   const plopNode = useSetAtom(plopNodeHere);

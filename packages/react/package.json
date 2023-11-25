@@ -2,7 +2,7 @@
   "name": "@raisins/react",
   "author": "ReferralSaaSquatch.com, Inc.",
   "description": "React package with tools for building a Raisins editor",
-  "version": "1.1.4-3",
+  "version": "1.1.4-4",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/react.esm.js",
@@ -58,7 +58,7 @@
     }
   ],
   "dependencies": {
-    "@raisins/core": "^1.1.1",
+    "@raisins/core": "^1.1.0",
     "@raisins/schema": "^1.0.0",
     "@storybook/cli": "^7.0.21",
     "bunshi": "^2.0.2",

@@ -57,10 +57,13 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     get => {
       const ref = get(NodeWithHtmlRefAtom);
       const html = get(HTMLAtom);
+
       if (ref.current?.html === html) {
         return ref.current.node;
       }
-      return htmlParser(html, { cleanWhitespace: true });
+      const parsedHtml = htmlParser(html, { cleanWhitespace: true });
+
+      return parsedHtml;
     },
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
@@ -84,6 +87,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     (get, set, next: InternalStateTransaction) => {
       const prev = get(NodeFromHtml);
       set(NodeFromHtml, next.next);
+
       if (next.type === 'set') {
         StateListeners.forEach(l => set(l, { prev: prev, next: next.next }));
       }
