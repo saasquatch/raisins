@@ -173,7 +173,6 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
           });
         });
 
-      // TODO: raisins-plop-targets are being added to vnodeChildren after updating jotai-molecules to bunshi
       const filteredChildren = (vnodeChildren as VNode[])?.filter(
         (node: VNode) => node.sel !== 'raisins-plop-target'
       );
