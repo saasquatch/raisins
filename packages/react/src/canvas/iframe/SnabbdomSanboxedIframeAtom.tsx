@@ -1,6 +1,6 @@
 import { Atom, atom, WritableAtom } from 'jotai';
-import { createScope, molecule } from 'jotai-molecules';
-import { Molecule } from 'jotai-molecules/dist/molecule';
+import { createScope, molecule } from 'bunshi/react';
+import { Molecule } from "bunshi/react";
 import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';

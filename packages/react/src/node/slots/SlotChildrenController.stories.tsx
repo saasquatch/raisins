@@ -1,7 +1,7 @@
 import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { atom, useAtom, useSetAtom } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai/utils';
 import React, { CSSProperties, FC, useCallback, useState } from 'react';
 import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
@@ -490,7 +490,8 @@ const SlotChild: React.FC<{ idx?: number; atoms: any }> = ({ idx, atoms }) => {
   );
 };
 
-function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
+function PlopTarget(props: { idx: number; slot: string }) {
+  const { idx, slot } = props;
   const { canPlopHereAtom, plopNodeHere } = useMolecule(NodeMolecule);
   const canPlop = useAtomValue(canPlopHereAtom);
   const plopNode = useSetAtom(plopNodeHere);

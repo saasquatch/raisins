@@ -6,11 +6,11 @@ export const MintComponents = [
   // },
   {
     package: '@saasquatch/bedrock-components',
-    version: '1.3.2-7',
+    version: '1.3.x',
   },
   {
     package: '@saasquatch/mint-components',
-    version: '1.6.1-40',
+    version: '1.6.x',
   },
   // {
   //   package: '@local',

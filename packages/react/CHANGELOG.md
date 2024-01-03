@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.4] - 2024-01-03
+
+### Changed
+
+- Updated default colors to more up to date design standard
+- replaced usage of jotai-molecules with bunshi
+
 ## [1.1.3] - 2023-09-07
 
 ### Changed
@@ -100,7 +107,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `SlotScopeProvider`
   - `ProseEditorScopeProvider`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.1.3...HEAD
+[unreleased]: https://github.com/saasquatch/raisins/compare/react@1.1.4...HEAD
+[1.1.4]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.4
 [1.1.3]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.3
 [1.1.2]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.2
 [1.1.1]: https://github.com/saasquatch/raisins/compare/react@1.0.0...react@1.1.1

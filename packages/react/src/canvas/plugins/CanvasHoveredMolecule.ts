@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { VNodeStyle } from 'snabbdom';
 import { PickAndPlopMolecule } from '../../core';
 import { HoveredNodeMolecule } from '../../core/selection/HoveredNodeMolecule';
@@ -43,7 +43,7 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isHovered ? '2px solid #6C7784' : rest.outline ?? '',
+        outline: isHovered ? '2px solid #59A7E8' : rest.outline ?? '',
         // Disabled outline due to flickering, may just render outside canvas instead
         // outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
         outlineOffset: '0',

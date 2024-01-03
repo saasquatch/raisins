@@ -8,7 +8,7 @@ import {
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { h, VNode, VNodeStyle } from 'snabbdom';
 import { ComponentModelMolecule } from '../../component-metamodel';
 import {
@@ -23,12 +23,16 @@ import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
 import { defaultRectAtom } from '../util/defaultRectAtom';
 import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
 
-export const CanvasPickAndPlopMolecule = molecule((getMol) => {
+export const CanvasPickAndPlopMolecule = molecule(getMol => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { ParentsAtom } = getMol(CoreMolecule);
-  const { PlopNodeInSlotAtom, PickedAtom, PickedNodeAtom, PloppingIsActive } =
-    getMol(PickAndPlopMolecule);
+  const {
+    PlopNodeInSlotAtom,
+    PickedAtom,
+    PickedNodeAtom,
+    PloppingIsActive,
+  } = getMol(PickAndPlopMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom, IsInteractibleAtom } = getMol(
     ComponentModelMolecule
@@ -61,12 +65,12 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
     }
 
     .plop-target-container *{
-      background: #6C7784;
+      background: #59A7E8;
       transition: 0.1s all ease-in-out;
     }
 
     .plop-target-container:hover *{
-      background: #2D3E50;
+      background: #0077DB;
     }
 
     .plop-target-container [targettype="label"]{
@@ -113,7 +117,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   );
   CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
 
-  const AppenderAtom = atom((get) => {
+  const AppenderAtom = atom(get => {
     const souls = get(GetSoulAtom);
     const isPloppingActive = get(PloppingIsActive);
     const picked = get(PickedAtom);
@@ -156,8 +160,8 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       );
 
       const plopsForZeroIndex = plopTargets
-        .filter((plop) => plop.idx === 0)
-        .map((plop) => {
+        .filter(plop => plop.idx === 0)
+        .map(plop => {
           return PlopTargetView({
             idx: plop.idx,
             slot: plop.slot,
@@ -169,13 +173,17 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
           });
         });
 
+      const filteredChildren = (vnodeChildren as VNode[])?.filter(
+        (node: VNode) => node.sel !== 'raisins-plop-target'
+      );
+
       const newChildren =
-        vnodeChildren?.reduce((acc, vnodeChild, idx) => {
+        filteredChildren?.reduce((acc, vnodeChild, idx) => {
           const plopsForNextIndex = plopTargets.filter(
-            (plop) => plop.idx === idx + 1
+            plop => plop.idx === idx + 1
           );
 
-          const plopViews = plopsForNextIndex.map((plop) => {
+          const plopViews = plopsForNextIndex.map(plop => {
             return PlopTargetView({
               idx: plop.idx,
               slot: plop.slot,
@@ -196,7 +204,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   });
   CanvasAtoms.AppendersSet.add(AppenderAtom);
 
-  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
+  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
     const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isPicked = picked === n;
@@ -206,7 +214,7 @@ export const CanvasPickAndPlopMolecule = molecule((getMol) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isPicked ? '2px dashed #2D3E50' : rest.outline ?? '',
+        outline: isPicked ? '2px dashed #0077DB' : rest.outline ?? '',
         outlineOffset: isPicked ? '-2px' : '',
       };
 
@@ -252,7 +260,7 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   addOrMove,
 }) => {
   const slotTitle =
-    parentSchema?.slots?.find((foundSlot) => slot === foundSlot.name)?.title ||
+    parentSchema?.slots?.find(foundSlot => slot === foundSlot.name)?.title ||
     parentSchema.title ||
     'Content';
 

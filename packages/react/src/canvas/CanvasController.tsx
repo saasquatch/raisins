@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import React from 'react';
 import { CanvasScopeMolecule } from './CanvasScopeMolecule';
 import { CanvasProvider } from './CanvasScope';

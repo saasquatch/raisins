@@ -5,7 +5,7 @@ import {
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'jotai-molecules';
+} from 'bunshi/react';
 import React from 'react';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { SoulsMolecule } from '../core/souls/Soul';

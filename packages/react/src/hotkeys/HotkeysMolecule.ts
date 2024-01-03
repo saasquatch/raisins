@@ -1,5 +1,5 @@
 import hotkeys, { KeyHandler } from 'hotkeys-js';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { PickAndPlopMolecule } from '../core';
 import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
 import { HistoryMolecule } from '../core/editting/HistoryAtoms';

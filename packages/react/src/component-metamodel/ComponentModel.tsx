@@ -13,7 +13,7 @@ import {
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
 import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
@@ -22,7 +22,7 @@ import {
   NPMRegistry,
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
-import shallowEqual from '../util/shallowEqual';
+import { shallowEqual } from 'fast-equals';
 import {
   blockFromHtml,
   moduleDetailsToBlocks,
@@ -61,8 +61,7 @@ export const ComponentModelMolecule = molecule(
      * Module details from NPM (loaded async)
      */
     const ModuleDetailsAsync = atom(
-      async (get) =>
-        await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
+      async get => await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
     );
     /**
      * Module details from NPM (or loading or error)
@@ -72,7 +71,7 @@ export const ComponentModelMolecule = molecule(
     /**
      * List of modules from NPM
      */
-    const ModuleDetailsAtom = atom((get) => {
+    const ModuleDetailsAtom = atom(get => {
       const state = get(ModuleDetailsStateAtom);
       if (state.state === 'hasData') return state.data;
       return [];
@@ -82,13 +81,13 @@ export const ComponentModelMolecule = molecule(
      * `true` while module information is being loaded from NPM
      */
     const ModulesLoadingAtom = atom(
-      (get) => get(ModuleDetailsStateAtom).state === 'loading'
+      get => get(ModuleDetailsStateAtom).state === 'loading'
     );
 
     /**
      * The array of {@link CustomElement} from ALL packages
      */
-    const ComponentsAtom = atom((get) => {
+    const ComponentsAtom = atom(get => {
       const moduleDetails = get(ModuleDetailsAtom);
       return [
         ...Object.values(HTMLComponents),
@@ -99,9 +98,9 @@ export const ComponentModelMolecule = molecule(
     /**
      * The array of {@link Block} from ALL packages
      */
-    const BlocksAtom = atom((get) => {
+    const BlocksAtom = atom(get => {
       const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-      const defaultBlocks = DEFAULT_BLOCKS.map((block) => {
+      const defaultBlocks = DEFAULT_BLOCKS.map(block => {
         return {
           title: block.title,
           content: blockFromHtml(block.examples?.[0]?.content as string),
@@ -115,7 +114,7 @@ export const ComponentModelMolecule = molecule(
      * Add another NPM package
      */
     const AddModuleAtom = atom(null, (_, set, next: Module) =>
-      set(PackagesAtom, (modules) => [...modules, next])
+      set(PackagesAtom, modules => [...modules, next])
     );
     AddModuleAtom.debugLabel = 'AddModuleAtom';
 
@@ -123,8 +122,8 @@ export const ComponentModelMolecule = molecule(
      * Remove an NPM package
      */
     const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
-      set(PackagesAtom, (modules) =>
-        modules.filter((e) => {
+      set(PackagesAtom, modules =>
+        modules.filter(e => {
           return !shallowEqual(e, next);
         })
       )
@@ -135,17 +134,17 @@ export const ComponentModelMolecule = molecule(
      * Remove all packages based on their NPM name
      */
     const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-      set(PackagesAtom, (modules) => modules.filter((e) => e.package !== name))
+      set(PackagesAtom, modules => modules.filter(e => e.package !== name))
     );
     RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
 
     /**
      * A function used to find components details
      */
-    const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
+    const ComponentMetaAtom = atom<ComponentMetaProvider>(get => {
       const components = get(ComponentsAtom);
       function getComponentMeta(tagName: string): CustomElement {
-        const found = components.find((c) => c.tagName === tagName);
+        const found = components.find(c => c.tagName === tagName);
         if (found) return found;
 
         return {
@@ -162,7 +161,7 @@ export const ComponentModelMolecule = molecule(
     /**
      * A function to get a list of possible children for a node/slot combo
      */
-    const ValidChildrenAtom = atom((get) => {
+    const ValidChildrenAtom = atom(get => {
       const blocks = get(BlocksAtom);
       const getComponentMeta = get(ComponentMetaAtom);
 
@@ -170,7 +169,7 @@ export const ComponentModelMolecule = molecule(
         // Non-documents and elements aren't allowed children
         if (!isElementNode(node) || !isRoot(node)) return [];
 
-        const allowedInParent = blocks.filter((block) => {
+        const allowedInParent = blocks.filter(block => {
           const childMeta = getComponentMeta(block.content.tagName);
           const childAllowsParents = doesChildAllowParent(childMeta, node);
           return childAllowsParents;
@@ -210,7 +209,7 @@ export const ComponentModelMolecule = molecule(
      * A mixed bag of functions used to grab data from the NPM package details
      * and enforce validation
      */
-    const ComponentModelAtom = atom<ComponentModel>((get) => {
+    const ComponentModelAtom = atom<ComponentModel>(get => {
       const getComponentMeta = get(ComponentMetaAtom);
       const blocks: Block[] = get(BlocksAtom);
       const groupedBlocks = group(blocks, getComponentMeta);
@@ -267,7 +266,7 @@ export const ComponentModelMolecule = molecule(
       };
     });
 
-    const NPMRegistryAtom = atom<NPMRegistry>((get) => get(RegistryAtom));
+    const NPMRegistryAtom = atom<NPMRegistry>(get => get(RegistryAtom));
 
     ComponentModelAtom.debugLabel = 'ComponentModelAtom';
 
@@ -276,7 +275,7 @@ export const ComponentModelMolecule = molecule(
      */
     const NonInteractibleTags = new Set<string>(DefaultTextMarks);
     const IsInteractibleAtom = atom<InteractibleProvider>(() => {
-      return (node) => {
+      return node => {
         if (node.type === 'text') return false;
         if (node.type === 'comment') return false;
         if (node.type === 'directive') return false;
@@ -321,7 +320,7 @@ const DEFAULT_BLOCKS = [
 
 type BlockGroups = Record<string, Block[]>;
 function group(list: Block[], getComponentMeta: Function): BlockGroups {
-  return list.reduce(function (allGroups: BlockGroups, block: Block) {
+  return list.reduce(function(allGroups: BlockGroups, block: Block) {
     const exampleGroup =
       getComponentMeta(block.content?.tagName)?.exampleGroup ??
       DEFAULT_BLOCK_GROUP;

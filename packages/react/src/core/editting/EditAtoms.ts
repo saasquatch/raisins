@@ -5,7 +5,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { CoreMolecule } from '../CoreAtoms';
 import { SoulsMolecule } from '../souls/Soul';
 

@@ -1,6 +1,6 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { Atom, atom, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,
@@ -77,7 +77,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     return () => set?.delete(listener);
   };
 
-  const VnodeAtom = atom((get) => {
+  const VnodeAtom = atom(get => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
@@ -88,7 +88,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
-      (a) => get(a) as SnabbdomRenderer
+      a => get(a) as SnabbdomRenderer
     );
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
       const soul = souls(n);
@@ -115,18 +115,19 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       };
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);
-    const appenders = Array.from(AppendersSet.values()).map((a) => get(a));
+    const appenders = Array.from(AppendersSet.values()).map(a => get(a));
     const appender = combineAppenders(...appenders);
 
     const rootRenderers = Array.from(
       get(RootRendererProxy.atom).values
-    ).map((r) => get(r));
+    ).map(r => get(r));
     const rootRenderer = rootRenderers.reduce(
       (prev, renderer) => {
         return (c, n) => renderer(prev(c, n), n);
       },
       (c, n) => c
     );
+
     const vnode = raisinToSnabbdom(
       node as RaisinDocumentNode,
       renderer,
@@ -155,7 +156,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     }
   });
 
-  const EventTypesAtom = atom((get) => {
+  const EventTypesAtom = atom(get => {
     return new Set(ListenersMap.keys());
   });
 
@@ -165,34 +166,34 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const geometryMap = new Map();
     const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
 
-    existing.entries?.forEach((geo) => {
+    existing.entries?.forEach(geo => {
       if (!geo.target?.attributes[raisinsAttribute]) return;
       geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
     });
 
-    next.entries?.forEach((geo) => {
+    next.entries?.forEach(geo => {
       if (!geo.target?.attributes[raisinsAttribute]) return;
       geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
     });
 
     const geometry = Array.from(geometryMap.values()).map(
-      (geo) => geo
+      geo => geo
     ) as GeometryEntry[];
 
     const newGeometry = { entries: geometry };
     set(GeometryAtom, newGeometry);
   });
 
-  const IframeHeadAtom = atom((get) => {
+  const IframeHeadAtom = atom(get => {
     const script = get(CanvasScriptsAtom);
     const extra = CanvasConfig.IframeHead ? get(CanvasConfig.IframeHead) : '';
     const bonus = Array.from(HTMLSet.values())
-      .map((a) => get(a))
+      .map(a => get(a))
       .join('');
     return script + extra + bonus;
   });
 
-  const selector = atom((get) => `[${get(EventSelectorAtom)}]`);
+  const selector = atom(get => `[${get(EventSelectorAtom)}]`);
   const IframeAtom = createAtoms({
     head: IframeHeadAtom,
     registry: NPMRegistryAtom,

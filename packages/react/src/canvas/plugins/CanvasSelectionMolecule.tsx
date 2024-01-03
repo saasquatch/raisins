@@ -1,5 +1,5 @@
 import { Atom, atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { VNodeStyle } from 'snabbdom';
 import { PickAndPlopMolecule } from '../../core';
 import { SelectedNodeMolecule } from '../../core/selection/SelectedNodeMolecule';
@@ -35,7 +35,7 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
       const style: VNodeStyle = {
         ...rest,
         cursor: 'pointer',
-        outline: isSelected ? '2px solid #2D3E50' : rest.outline ?? '',
+        outline: isSelected ? '2px solid #0077DB' : rest.outline ?? '',
         outlineOffset: '',
       };
 

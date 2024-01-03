@@ -1,5 +1,7 @@
 export {
   SlotChildrenController,
+} from './SlotChildrenController';
+export type {
   SlotChildrenControllerProps,
 } from './SlotChildrenController';
 export {

@@ -18,7 +18,7 @@ import {
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'jotai-molecules';
+} from 'bunshi/react';
 import React, { CSSProperties, FC, useCallback, useMemo } from 'react';
 import { AttributesController } from '../attributes';
 import {

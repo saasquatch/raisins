@@ -1,7 +1,7 @@
 import { DefaultTextMarks } from '@raisins/core';
 import { Meta } from '@storybook/react';
 import { Atom, useAtomValue } from 'jotai';
-import { useMolecule } from 'jotai-molecules';
+import { useMolecule } from 'bunshi/react';
 import React, { useState } from 'react';
 import {
   big,

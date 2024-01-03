@@ -9,7 +9,7 @@ import {
   RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom, SetStateAction, WritableAtom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { MutableRefObject } from 'react';
 import { ConfigMolecule } from './RaisinConfigScope';
 
@@ -54,13 +54,16 @@ export const CoreMolecule = molecule((getMol, getScope) => {
         And souls are preserved
   */
   const NodeFromHtml = atom(
-    (get) => {
+    get => {
       const ref = get(NodeWithHtmlRefAtom);
       const html = get(HTMLAtom);
+
       if (ref.current?.html === html) {
         return ref.current.node;
       }
-      return htmlParser(html, { cleanWhitespace: false });
+      const parsedHtml = htmlParser(html, { cleanWhitespace: true });
+
+      return parsedHtml;
     },
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
@@ -84,14 +87,15 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     (get, set, next: InternalStateTransaction) => {
       const prev = get(NodeFromHtml);
       set(NodeFromHtml, next.next);
+
       if (next.type === 'set') {
-        StateListeners.forEach((l) => set(l, { prev: prev, next: next.next }));
+        StateListeners.forEach(l => set(l, { prev: prev, next: next.next }));
       }
     }
   );
 
   const RootNodeAtom = atom(
-    (get) => get(NodeFromHtml),
+    get => get(NodeFromHtml),
     (get, set, next: SetStateAction<RaisinNode>) => {
       const nextNode =
         typeof next === 'function' ? next(get(NodeFromHtml)) : next;
@@ -100,7 +104,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   );
   RootNodeAtom.debugLabel = 'RootNodeAtom';
 
-  const IdentifierModelAtom = atom<IdentifierModel>((get) => {
+  const IdentifierModelAtom = atom<IdentifierModel>(get => {
     const current = get(RootNodeAtom);
     const parents = get(ParentsAtom);
 
@@ -123,15 +127,13 @@ export const CoreMolecule = molecule((getMol, getScope) => {
    * Map of children to their parents in the current document
    *
    */
-  const ParentsAtom = atom((get) => {
+  const ParentsAtom = atom(get => {
     const doc = get(RootNodeAtom);
     return getParents(doc);
   });
   ParentsAtom.debugLabel = 'ParentsAtom';
 
-  const JsonPointersAtom = atom((get) =>
-    generateJsonPointers(get(RootNodeAtom))
-  );
+  const JsonPointersAtom = atom(get => generateJsonPointers(get(RootNodeAtom)));
   JsonPointersAtom.debugLabel = 'JsonPointersAtom';
 
   /**

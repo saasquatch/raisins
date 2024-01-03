@@ -1,7 +1,7 @@
 import { RaisinElementNode } from '@raisins/core';
 import type { Attribute } from '@raisins/schema/schema';
 import { Atom, atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { SelectedNodeMolecule } from '../core';
 import { NodeMolecule } from '../node/NodeMolecule';

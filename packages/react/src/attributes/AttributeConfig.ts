@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { molecule } from 'jotai-molecules';
+import { molecule } from 'bunshi/react';
 import { ConfigMolecule } from '../core/RaisinConfigScope';
 import type { AttributeThemeMoleculeValue } from './AttributeThemeMolecule';
 import { DefaultAttributeThemeMolecule } from './DefaultAttributeThemeMolecule';

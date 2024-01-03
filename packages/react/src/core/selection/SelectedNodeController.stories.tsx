@@ -1,5 +1,5 @@
 import { atom, useAtomValue } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { RaisinConfig } from '..';
 import {

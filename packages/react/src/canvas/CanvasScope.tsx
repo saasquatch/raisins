@@ -1,7 +1,7 @@
-import { createScope, ScopeProvider } from 'jotai-molecules';
+import { createScope, ScopeProvider } from 'bunshi/react';
 import React from 'react';
 
-export const CanvasScope = createScope<unknown>();
+export const CanvasScope = createScope<unknown>(undefined);
 CanvasScope.displayName = 'CanvasScope';
 
 export function CanvasProvider({ children }: { children: React.ReactNode }) {

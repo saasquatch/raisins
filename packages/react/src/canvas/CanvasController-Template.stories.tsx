@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
-import { molecule, useMolecule } from 'jotai-molecules';
+import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { h } from 'snabbdom';
 import { big, MintComponents, mintMono } from '../examples/MintComponents';
@@ -37,10 +37,11 @@ const PaintItRedMolecule = molecule((getMol, getScope) => {
 
   const ColorAtom = atom('pink');
   const TextAtom = atom('I am magic');
-  const PaintItRed = atom<RootRenderer>((get) => {
+  const PaintItRed = atom<RootRenderer>(get => {
     const color = get(ColorAtom);
     const text = get(TextAtom);
     return (n, d) => {
+      if(!Array.isArray(n)) return n;
       return h(
         'div',
         {
@@ -67,7 +68,7 @@ const ShadowPicker = () => {
   const [text, setText] = useAtom(atoms.TextAtom);
   return (
     <>
-      {['pink', 'red', 'green'].map((c) => (
+      {['pink', 'red', 'green'].map(c => (
         <button onClick={() => setColor(c)}>{c}</button>
       ))}
 
@@ -75,7 +76,7 @@ const ShadowPicker = () => {
       <input
         type="text"
         value={text}
-        onInput={(e) => setText((e.target as HTMLInputElement).value)}
+        onInput={e => setText((e.target as HTMLInputElement).value)}
       />
     </>
   );
