@@ -30,9 +30,6 @@ jobs:
       - name: Install dependencies (globally)
         run: npm i
 
-      - name: Lerna bootrap dependencies for packages/**
-        run: npx lerna bootstrap
-
       - name: Build (via Turbo)
         run: npm run build
 
