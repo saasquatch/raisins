@@ -27,21 +27,28 @@ import { NodeMolecule } from '../node/NodeMolecule';
 import { AttributeMolecule } from './AttributeMolecule';
 import { AttributesController } from './AttributesController';
 import { AttributeTemplateProps } from './AttributeThemeMolecule';
+import type { Meta, StoryObj } from '@storybook/react';
+import { userEvent, within } from '@storybook/testing-library';
 
-export default {
+
+const meta = {
   title: 'Attributes Controller',
   argTypes: {
     canvas: {
       control: 'boolean',
     },
   },
-};
+} satisfies Meta;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
   return {
     ...getMol(StoryConfigMolecule),
     AttributeTheme: {
-      widgets: atom(widgets),
+        templates: atom({ default: CustomTemplate }),
+        widgets: atom(widgets),
     },
   };
 });
@@ -53,12 +60,11 @@ const CustomTemplate = (
   const schema = useAtomValue(schemaAtom);
 
   return (
-    <div>
+    <div data-testid={name}>
       <p>
         <b>{schema.title ?? name}</b>
       </p>
       <div>{props.children}</div>
-      <p style={{ color: 'red' }}>Description override</p>
     </div>
   );
 };
@@ -84,7 +90,7 @@ const CustomField = () => {
   );
 };
 
-const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
+const AttributesEditorBaseStory = ({ canvas }: { canvas: boolean }) => {
   const Canvas = () =>
     canvas ? (
       <div style={{ flex: 1 }}>
@@ -113,17 +119,36 @@ const AttributesAndChildren = () => {
   );
 };
 
-export const MyKitchenSink = ({ canvas }: { canvas: boolean }) => {
+export const MyKitchenSink:Story = ({ canvas }: { canvas: boolean }) => {
   return (
     <BasicStory
       startingHtml={`<my-ui-component first="Stencil" last="'Don't call me a framework' JS" picked-date="1649799530937" text-color="#F00"></my-ui-component>`}
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+MyKitchenSink.play = async ({ canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  const fields = ["first","last","picked-date","text-color"];
+
+  for(const field of fields){
+
+    const fieldDiv = canvas.getByTestId(field);
+
+    const inputElement = fieldDiv.querySelector("input")!;
+
+    await userEvent.type(inputElement, field.toUpperCase());
+
+    await sleep(500);
+  }
+}
 
 export const Mint = ({ canvas }: { canvas: boolean }) => {
   return (
@@ -132,7 +157,7 @@ export const Mint = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -146,7 +171,7 @@ export const MintErrors = ({ canvas }: { canvas: boolean }) => {
     >
       <>
         <ErrorListController />
-        <NodeChildrenEditorStory canvas={canvas} />
+        <AttributesEditorBaseStory canvas={canvas} />
       </>
     </BasicStory>
   );
@@ -159,7 +184,7 @@ export const MintBigStat = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -171,7 +196,7 @@ export const MintHeroImage = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -183,7 +208,7 @@ export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -203,7 +228,7 @@ export const MintTaskCardTemplate = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -223,7 +248,7 @@ export const MintTaskCardField = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -235,7 +260,7 @@ export const Vanilla = ({ canvas }: { canvas: boolean }) => {
       startingPackages={VanillaComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -246,7 +271,7 @@ export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
       startingPackages={VanillaComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };
@@ -258,7 +283,7 @@ export const Big = ({ canvas }: { canvas: boolean }) => {
       startingPackages={MintComponents}
       Molecule={ConfigMolecule}
     >
-      <NodeChildrenEditorStory canvas={canvas} />
+      <AttributesEditorBaseStory canvas={canvas} />
     </BasicStory>
   );
 };

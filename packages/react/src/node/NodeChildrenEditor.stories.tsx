@@ -17,6 +17,7 @@ import { NodeScopeMolecule } from './NodeScope';
 
 export default {
   title: 'Children Editor',
+  excludeStories: ["JsonPointers"]
 };
 
 export const LoadTest = () => {

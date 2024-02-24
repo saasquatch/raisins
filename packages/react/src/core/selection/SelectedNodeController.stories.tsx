@@ -1,5 +1,5 @@
-import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
+import { atom, useAtomValue } from 'jotai';
 import React from 'react';
 import { RaisinConfig } from '..';
 import {
@@ -13,24 +13,25 @@ import { BasicCanvasController } from '../../canvas/CanvasController';
 import { CanvasProvider } from '../../canvas/CanvasScope';
 import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
 import {
-  mintMono,
   MintComponents,
-  mintReferralTable,
   mintBigStat,
+  mintMono,
+  mintReferralTable,
 } from '../../examples/MintComponents';
 import { widgets } from '../../examples/MockWidgets';
 import {
-  referrerWidget,
   VanillaComponents,
+  referrerWidget,
 } from '../../examples/VanillaComponents';
 import { BasicStory, StoryConfigMolecule } from '../../index.stories';
 import { SelectedNodeController } from './SelectedNodeController';
 
 export default {
   title: 'Selected Node Controller',
+  excludeStories: ['AttributeEditor', 'DefaultAttributeComponent'],
 };
 
-const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+const ConfigMolecule = molecule<Partial<RaisinConfig>>(getMol => {
   return {
     ...getMol(StoryConfigMolecule),
     AttributeTheme: {
@@ -191,9 +192,7 @@ export const CustomSelectedComponentVanilla = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = (
-  props
-) => {
+const CustomAttributesController: React.FC<AttributesControllerProps> = props => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
@@ -206,7 +205,7 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = (
         return (
           <details key={idx}>
             <summary>{key}</summary>
-            {groupedSchema[key].map((attribute) => {
+            {groupedSchema[key].map(attribute => {
               return (
                 <AttributeProvider
                   attributeName={attribute.name}

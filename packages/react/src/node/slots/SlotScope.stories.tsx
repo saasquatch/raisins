@@ -1,6 +1,6 @@
 import { htmlParser } from '@raisins/core';
+import { ScopeProvider, molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom } from 'jotai';
-import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope';
 import { NodeChildrenEditor } from '../NodeChildrenEditor';
@@ -21,9 +21,11 @@ const StoryMolecule = molecule<Partial<RaisinConfig>>(() => {
 
 export const Test2 = () => {
   return (
-    <SlotScopeProvider slot={'test'}>
-      <TestComponent />
-    </SlotScopeProvider>
+    <RaisinsProvider molecule={StoryMolecule}>
+      <SlotScopeProvider slot={'test'}>
+        <TestComponent />
+      </SlotScopeProvider>
+    </RaisinsProvider>
   );
 };
 export const Test1 = () => {

@@ -122,7 +122,7 @@ const BlocksController = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = (
+const CustomAttributesController: React.FC<AttributesControllerProps> = (
   props
 ) => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);

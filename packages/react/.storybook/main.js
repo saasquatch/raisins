@@ -1,7 +1,7 @@
 import { dirname, join } from "path";
 module.exports = {
   stories: ['../**/*.stories.@(ts|tsx|js|jsx)'],
-  addons: [],
+  addons: ['@storybook/addon-interactions'],
 
   // core: { builder: '@storybook/builder-vite' },
   // https://storybook.js.org/docs/react/configure/typescript#mainjs-configuration
