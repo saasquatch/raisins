@@ -29,6 +29,7 @@ import { AttributesController } from './AttributesController';
 import { AttributeTemplateProps } from './AttributeThemeMolecule';
 import type { Meta, StoryObj } from '@storybook/react';
 import { userEvent, within } from '@storybook/testing-library';
+import { expect } from '@storybook/jest';
 
 
 const meta = {
@@ -140,12 +141,18 @@ MyKitchenSink.play = async ({ canvasElement }) => {
 
   for(const field of fields){
 
+    const newValue = field.toUpperCase();
+
     const fieldDiv = canvas.getByTestId(field);
 
     const inputElement = fieldDiv.querySelector("input")!;
 
-    await userEvent.type(inputElement, field.toUpperCase());
+    await userEvent.clear(inputElement);
 
+    await userEvent.type(inputElement, newValue);
+
+    // Confirms that our components are editable, don't throw errors when the attributes are edited
+    expect(inputElement.value).toBe(newValue);
     await sleep(500);
   }
 }

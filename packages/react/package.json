@@ -87,6 +87,7 @@
     "@size-limit/preset-small-lib": "^5.0.4",
     "@storybook/addon-interactions": "^7.6.17",
     "@storybook/addons": "^7.6.17",
+    "@storybook/jest": "^0.2.3",
     "@storybook/react": "^7.6.17",
     "@storybook/react-vite": "^7.6.17",
     "@storybook/test-runner": "^0.16.0",
