@@ -148,12 +148,10 @@ MyKitchenSink.play = async ({ canvasElement }) => {
     const inputElement = fieldDiv.querySelector("input")!;
 
     await userEvent.clear(inputElement);
-
     await userEvent.type(inputElement, newValue);
 
     // Confirms that our components are editable, don't throw errors when the attributes are edited
     expect(inputElement.value).toBe(newValue);
-    await sleep(500);
   }
 }
 
