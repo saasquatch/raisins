@@ -95,7 +95,7 @@ export interface CustomElement {
   /**
    * Array of meaningful tags to enforce feature use within the raisins editor
    */
-  featureTags?: string[];
+  requiredFeatures?: string[];
 
   /**
    * States for previewing the internal state of components
@@ -216,7 +216,7 @@ export interface Attribute {
   /**
    * Array of meaningful tags to enforce feature use within the raisins editor
    */
-  featureTags?: string[];
+  requiredFeatures?: string[];
 }
 
 export interface ComponentState {
