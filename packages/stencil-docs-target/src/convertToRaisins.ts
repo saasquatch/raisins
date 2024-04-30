@@ -51,6 +51,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               uiOrder: jsonTagValue(p, 'uiOrder'),
               required: required(p),
               requiredFeatures: jsonTagValue(p, 'requiredFeatures'),
+              featureTooltip: jsonTagValue(p, 'featureTooltip'),
             };
 
             return attr;
@@ -62,6 +63,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
           attributes,
           requiredFeatures: jsonTagValue(comp, 'requiredFeatures'),
+          featureTooltip: jsonTagValue(comp, 'featureTooltip'),
           exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
           examples: comp.docsTags
             .filter(d => d.name === 'example')
