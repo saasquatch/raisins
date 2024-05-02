@@ -2,7 +2,7 @@
   "name": "@raisins/core",
   "author": "ReferralSaaSquatch.com, Inc.",
   "description": "Core functions for manipulating and validating HTML and raisin nodes",
-  "version": "1.1.3-2",
+  "version": "1.1.3-3",
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/core.esm.js",
@@ -78,7 +78,7 @@
     "typescript": "^3.9.10"
   },
   "dependencies": {
-    "@raisins/schema": "^1.0.2-2",
+    "@raisins/schema": "^1.0.2-3",
     "color2k": "^2.0.0",
     "css": "^3.0.0",
     "css-select": "^5.1.0",
