@@ -50,7 +50,7 @@ export const SlotMolecule = molecule((getMol, getScope) => {
 
   const childrenInSlot = splitAtom(
     // Need to replace this to not replace souls
-    focusAtom(nodeAtoms.nodeAtom, (o) =>
+    focusAtom(nodeAtoms.nodeAtom, () =>
       optic_<RaisinNodeWithChildren>()
         .prop('children')
         .filter((c) => (c as RaisinElementNode).children && isInSlot(c, slot))
