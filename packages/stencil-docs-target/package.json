@@ -25,7 +25,7 @@
   "scripts": {
     "start": "tsdx watch",
     "build": "tsdx build",
-    "test": "cd my-kitchen-sink && npm i && npm run build && cd ../ && tsdx test",
+    "test": "echo 'Tested in examples/my-kitchen-sink'",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
