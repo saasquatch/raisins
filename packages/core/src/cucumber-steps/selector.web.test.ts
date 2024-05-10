@@ -6,7 +6,6 @@ import selector from "../html-dom/selector";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 import isJest from "../testing/isJest";
 
-
 const cucumber = (
   given: (...args: any[]) => void,
   when: (...args: any[]) => void,

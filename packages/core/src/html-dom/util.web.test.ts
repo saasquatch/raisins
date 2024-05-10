@@ -29,6 +29,7 @@ it("Visitor skip node", () => {
   visit(node, visitor, true);
   visit(node, visitor, false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(spySkip).to.be.called;
 });
 
@@ -61,5 +62,6 @@ it("Visit all", () => {
     return n;
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   expect(callbackSpy).to.be.called;
 });
