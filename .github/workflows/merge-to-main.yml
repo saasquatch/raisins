@@ -1,0 +1,32 @@
+name: Merge to Main
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-pr:
+    name: Update PR or Release
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - uses: bahmutov/npm-install@v1
+
+      - name: Create Release Pull Request
+        uses: changesets/action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
