@@ -32,7 +32,7 @@ function parseCSS(input: string, options?: css5Options): string {
  */
 function cleanUpCSS(html: string) {
   html = html
-    .replace(/(?<=style=([\"']))(?:(?=(\\?))\2.)*?(?=\1)/gs, input =>
+    .replace(/(?<=style=(["']))(?:(?=(\\?))\2.)*?(?=\1)/gs, input =>
       parseCSS(input, { inline: true })
     )
     .replace(

@@ -2,6 +2,7 @@ import { CssNodePlain } from "css-tree";
 import { encodeXML, escapeAttribute } from "entities";
 import cssSerializer from "../css-om/serializer";
 import foreignNames from "./foreignNames";
+// eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
   RaisinElementNode,

@@ -191,7 +191,7 @@ describe("createUpdater", () => {
         reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
       ) => {
         updatedNode = reducer(node);
-        updatedNode;
+        return updatedNode;
       }) as StateUpdater<StyleNodeWithChildren>
     };
 

@@ -5,7 +5,6 @@ import { removeWhitespace, visit } from "../html-dom/util";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
 import isJest from "../testing/isJest";
 
-
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,

@@ -1,4 +1,6 @@
+// eslint-disable-next-line prettier/prettier
 import type { CssNodePlain } from 'css-tree';
+// eslint-disable-next-line prettier/prettier
 import type { StateUpdater } from '../util/NewState';
 
 

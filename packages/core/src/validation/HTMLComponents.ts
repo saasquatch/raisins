@@ -8,7 +8,6 @@ import { CustomElement, Slot } from "@raisins/schema/schema";
  *
  *
  */
-undefined;
 
 //Future improvement:
 //  Set up content categories to be used as boilerplate valid children/parents
