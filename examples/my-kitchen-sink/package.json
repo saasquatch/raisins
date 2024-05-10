@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "@/my-kitchen-sink",
   "raisins": "docs/raisins.json",
   "main": "dist/index.cjs.js",
   "module": "dist/custom-elements/index.js",
