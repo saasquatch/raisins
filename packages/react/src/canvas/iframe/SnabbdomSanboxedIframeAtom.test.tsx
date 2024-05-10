@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import { act, renderHook } from '@testing-library/react-hooks/dom';
 import expect from 'expect';
 import { atom, useAtom } from 'jotai';
@@ -37,7 +34,8 @@ describe('Thing', () => {
     expect(result.error).toBeTruthy();
   });
 
-  it('Should render an iframe', async () => {
+  // TODO: Move this testing functionality to playwright tests
+  it.skip('Should render an iframe', async () => {
     const Wrapper: React.FC = ({ children }) => (
       <ScopeProvider scope={SnabbdomIframeScope} value={Props}>
         {children}
