@@ -26,15 +26,10 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "echo 'Tested in examples/my-kitchen-sink'",
-    "lint": "tsdx lint",
+    "lint": "eslint src",
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
   },
   "prettier": {
     "printWidth": 80,
@@ -53,15 +48,19 @@
     }
   ],
   "devDependencies": {
+    "@eslint/js": "^8.57.0",
     "@size-limit/preset-small-lib": "^5.0.4",
     "@stencil/core": "^2.8.1",
     "@types/jest": "^27.0.2",
     "ajv": "^6",
+    "eslint": "^8.57.0",
+    "globals": "^15.2.0",
     "husky": "^7.0.2",
     "size-limit": "^5.0.4",
     "tsdx": "^0.14.1",
     "tslib": "^2.3.1",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "typescript-eslint": "^7.8.0"
   },
   "bugs": {
     "url": "https://github.com/saasquatch/raisins/issues"

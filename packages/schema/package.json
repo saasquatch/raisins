@@ -15,7 +15,8 @@
   "scripts": {
     "build": "typescript-json-schema --required --ignoreErrors schema.d.ts -o schema.json Package",
     "prepublishOnly": "npm run build",
-    "test": ""
+    "test": "echo 'No tests'",
+    "lint": "eslint schema.d.ts"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,11 @@
   },
   "homepage": "https://github.com/saasquatch/raisins",
   "devDependencies": {
+    "@eslint/js": "^8.57.0",
+    "eslint": "^8.57.0",
+    "globals": "^15.2.0",
     "typescript": "^4.4.3",
+    "typescript-eslint": "^7.8.0",
     "typescript-json-schema": "^0.51.0"
   }
 }
