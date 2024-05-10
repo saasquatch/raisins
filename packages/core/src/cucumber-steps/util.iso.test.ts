@@ -3,8 +3,8 @@ import expect from "expect";
 import { RaisinNode } from "../html-dom/RaisinNode";
 import { removeWhitespace, visit } from "../html-dom/util";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+import isJest from "../testing/isJest";
 
-const JEST = process.env.JEST_WORKER_ID !== undefined;
 
 const cucumber = (
   given: (...args: any[]) => void,
@@ -153,7 +153,7 @@ const cucumber = (
   });
 
   and(/^the visitor has a (.*) function defined$/, (callback: any) => {
-    if (JEST) {
+    if (isJest()) {
       callbacks = callback;
       callbackSpy = jest.spyOn(visitor, callbacks);
     }
@@ -164,7 +164,7 @@ const cucumber = (
   });
 
   then("the callback is called with the node", () => {
-    if (JEST) {
+    if (isJest()) {
       expect(callbackSpy).toBeCalledTimes(1);
     }
   });

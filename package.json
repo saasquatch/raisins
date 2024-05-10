@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "build": "npm i && turbo run build",
+    "build": "turbo run build",
     "storybook": "turbo run storybook",
     "test": "turbo run test"
   },
