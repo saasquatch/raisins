@@ -1,6 +1,11 @@
 {
   "name": "Playwright Testing",
-  "image": "mcr.microsoft.com/playwright:v1.36.0-jammy",
+  "image": "mcr.microsoft.com/playwright:v1.44.0-jammy",
   "forwardPorts": [9323],
-  "postCreateCommand": "npm install"
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": ["esbenp.prettier-vscode"]
+    }
+  }
 }
