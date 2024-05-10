@@ -7,7 +7,7 @@ import { ProseEditorStateMolecule } from './ProseEditorStateMolecule';
 type ToggleMarkAction = {
   mark: MarkType;
   e: React.MouseEvent;
-  attrs?: { [key: string]: any };
+  attrs?: { [key: string]: unknown };
 };
 
 export const ProseToggleMarkMolecule = molecule((getMol) => {

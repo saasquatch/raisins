@@ -1,6 +1,6 @@
 import { DefaultProseSchema as defaultSchema } from '../default-schema/DefaultProseSchema';
 import { htmlParser, htmlSerializer, RaisinNode } from '@raisins/core';
-import { DOMParser, DOMSerializer, Node, Fragment } from 'prosemirror-model';
+import { DOMParser, DOMSerializer, Fragment } from 'prosemirror-model';
 import { stringToNativeDom, nativeDomToString } from './nativeDom';
 
 export type ProseRawNode = ProseRawDoc | ProseTextNode | ProseElementNode;

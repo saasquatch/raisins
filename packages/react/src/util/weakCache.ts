@@ -14,6 +14,7 @@ const getWeakCacheItem = <T>(
   cache: WeakCache<T>,
   deps: readonly object[]
 ): T | undefined => {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const [dep, ...rest] = deps;
     const entry = cache.get(dep as object);
@@ -33,6 +34,7 @@ const setWeakCacheItem = <T>(
   deps: readonly object[],
   item: T
 ): void => {
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const [dep, ...rest] = deps;
     let entry = cache.get(dep as object);
@@ -50,8 +52,8 @@ const setWeakCacheItem = <T>(
 };
 
 export const createMemoizeAtom = () => {
-  const cache: WeakCache<{}> = new WeakMap();
-  const memoizeAtom = <T extends {}, Deps extends readonly object[]>(
+  const cache: WeakCache<object> = new WeakMap();
+  const memoizeAtom = <T extends object, Deps extends readonly object[]>(
     createAtom: () => T,
     deps: Deps
   ) => {

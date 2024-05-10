@@ -39,7 +39,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
   // Build editor state
   const editorStateAtom = atom<EditorState, Transaction>(
     (get) => {
-      let state = EditorState.create({
+      const state = EditorState.create({
         doc: get(proseNodeAtom),
         selection: get(proseSelectionAtom),
         schema: get(get(scope).schema),
