@@ -149,6 +149,7 @@ export interface Attribute {
   /**
    * Array of possible values to select from where elements might be of any type, including null.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   enum?: any[];
 
   /**
