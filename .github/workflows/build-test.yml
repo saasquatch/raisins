@@ -28,6 +28,9 @@ jobs:
 
       - uses: bahmutov/npm-install@v1
 
+      - name: Lint (via Turbo)
+        run: npm run lint
+
       - name: Build (via Turbo)
         run: npm run build
 
