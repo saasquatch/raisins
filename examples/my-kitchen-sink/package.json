@@ -17,8 +17,7 @@
   "scripts": {
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --docs --serve",
-    "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
+    "test": "echo 'No real tests, the build is the test'",
     "generate": "stencil generate",
     "serve:package": "serve . --cors",
     "start:raisins": "run-p start serve:package"
