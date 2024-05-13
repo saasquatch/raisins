@@ -26,7 +26,18 @@ jobs:
 
       - uses: bahmutov/npm-install@v1
 
-      - name: Create Release Pull Request
+      - name: Build
+        run: npm run build
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
         uses: changesets/action@v1
+        with:
+          # Runs `npm i` after changeset to make sure that `package-lock.json` files are also updated
+          # Without this change only `package.json` files are updated, without `package-lock.json` changes.
+          version: npm run version
+          # Runs changesets on publish - will create tags and deploy to NPM
+          publish: npm run publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.LOGAN_NPM_PUBLISHING_TOKEN }}
