@@ -36,3 +36,6 @@ jobs:
 
       - name: Test (via Turbo)
         run: npm test
+        env:
+          # For Playwright -- Firefox is unable to launch if the $HOME folder isn't owned by the current user. 
+          HOME: /root
