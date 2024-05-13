@@ -19,15 +19,39 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
+      - name: Debug
+        run: |
+          pwd;
+          echo $GITHUB_WORKSPACE;
+          echo ${{github.workspace}};
+
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      - name: Debug
+        run: |
+          pwd;
+          echo $GITHUB_WORKSPACE;
+          echo ${{github.workspace}};
+
       - uses: bahmutov/npm-install@v1
 
+      - name: Debug
+        run: |
+          pwd;
+          echo $GITHUB_WORKSPACE;
+          echo ${{github.workspace}};
+          
       - name: Build
         run: npm run build
+
+      - name: Debug
+        run: |
+          pwd;
+          echo $GITHUB_WORKSPACE;
+          echo ${{github.workspace}};
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
