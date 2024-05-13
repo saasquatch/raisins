@@ -31,6 +31,11 @@ jobs:
 
       - name: Debug
         run: ls -la
+
+      - name: Setup Git user
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
         
       - name: Create Release Pull Request or Publish to npm
         id: changesets
@@ -41,8 +46,8 @@ jobs:
           version: npm run version
           # Runs changesets on publish - will create tags and deploy to NPM
           publish: npm run publish
-          # From $GITHUB_WORKSPACE -- we should do this better
-          cwd: /__w/raisins/raisins
+          # This seems to fail in the container, so it's done a step ahead
+          setupGitUser: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.LOGAN_NPM_PUBLISHING_TOKEN }}
