@@ -41,10 +41,8 @@ import { useHotkeys } from './hotkeys/useHotkeys';
 import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
-import { StyleEditorController } from './stylesheets/StyleEditor';
 import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
 import { BasicCanvasController } from './canvas';
-import { waitForUpdate } from './util/waitForUpdate';
 
 const meta: Meta = {
   title: 'Editor',
@@ -366,7 +364,6 @@ export function EditorView() {
 
         <div style={Edits}>
           <PackageEditor />
-          <StyleEditorController />
         </div>
       </div>
     </>
