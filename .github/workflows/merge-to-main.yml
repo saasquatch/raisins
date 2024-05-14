@@ -13,14 +13,12 @@ jobs:
   create-pr:
     name: Update PR or Release
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.44.0-jammy
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js 20
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
