@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+### Patch Changes
+
+- [`dc9ac7e`](https://github.com/saasquatch/raisins/commit/dc9ac7ef9919bd1e7744ac6deb840589158749ed) Thanks [@loganvolkers](https://github.com/loganvolkers)! - - Remove unused `husky` dependency
+
 ## [1.1.2] - 2024-01-18
 
 ### Updated
