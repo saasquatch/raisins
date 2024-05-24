@@ -23,11 +23,6 @@ jobs:
           node-version: 20
 
       - uses: bahmutov/npm-install@v1
-        with:
-          # We can't use our lockfile, because of platform-specific optional dependencies in Vite
-          # https://github.com/npm/cli/issues/4828
-          # Will create errors like: `Error: Cannot find module @rollup/rollup-linux-x64-gnu.`
-          useLockFile: false
 
       - name: Build
         run: npm run build
