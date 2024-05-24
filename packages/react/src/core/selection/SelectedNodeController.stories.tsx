@@ -25,12 +25,19 @@ import {
 } from '../../examples/VanillaComponents';
 import { BasicStory, StoryConfigMolecule } from '../../index.stories';
 import { SelectedNodeController } from './SelectedNodeController';
+import { Meta } from '@storybook/react';
 
-export default {
+const meta: Meta = {
   title: 'Selected Node Controller',
+  excludeStories: [
+    'AttributeEditor',
+    'CustomAttributesController',
+    'DefaultAttributeComponent',
+  ],
 };
+export default meta;
 
-const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+const ConfigMolecule = molecule<Partial<RaisinConfig>>(getMol => {
   return {
     ...getMol(StoryConfigMolecule),
     AttributeTheme: {
@@ -191,9 +198,7 @@ export const CustomSelectedComponentVanilla = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = (
-  props
-) => {
+export const CustomAttributesController: React.FC<AttributesControllerProps> = props => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
@@ -206,7 +211,7 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = (
         return (
           <details key={idx}>
             <summary>{key}</summary>
-            {groupedSchema[key].map((attribute) => {
+            {groupedSchema[key].map(attribute => {
               return (
                 <AttributeProvider
                   attributeName={attribute.name}

@@ -1,7 +1,6 @@
+import { createScope, molecule, ScopeProvider, use } from 'bunshi/react';
 import { atom, Atom, PrimitiveAtom } from 'jotai';
-import { createScope, ScopeProvider } from 'bunshi/react';
-import { molecule } from 'bunshi/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AttributeConfig } from '../attributes/AttributeConfig';
 import { CanvasConfig } from '../canvas/CanvasConfig';
 import { Module } from '../component-metamodel/types';
@@ -38,14 +37,15 @@ type Molecule<T> = ReturnType<typeof molecule>;
  */
 export type RaisinConfigMolecule = Molecule<Partial<RaisinConfig>>;
 
-const configScope = createScope<RaisinConfigMolecule | undefined>(undefined);
+type ScopeValue = { molecule: RaisinConfigMolecule };
+const configScope = createScope<ScopeValue | undefined>(undefined);
 configScope.displayName = 'ConfigScope';
 
-export const ConfigMolecule = molecule<RaisinConfig>((getMol, getScope) => {
+export const ConfigMolecule = molecule<RaisinConfig>(() => {
   /**
    * This will create a new set of atoms for every {@link configScope}
    */
-  const config = getScope(configScope);
+  const config = use(configScope);
   if (!config)
     throw new Error(
       'Must use this molecule in a wrapping <RaisinsProvider> element'
@@ -57,7 +57,7 @@ export const ConfigMolecule = molecule<RaisinConfig>((getMol, getScope) => {
   const HTMLAtom = atom('');
   HTMLAtom.debugLabel = 'HTMLAtom';
 
-  const provided = getMol(config) as Partial<RaisinConfig>;
+  const provided = use(config.molecule) as Partial<RaisinConfig>;
 
   return {
     ...provided,
@@ -78,8 +78,9 @@ export const ConfigScopeProvider = ({
   molecule: RaisinConfigMolecule;
   children: React.ReactNode;
 }) => {
+  const scopeValue: ScopeValue = useMemo(() => ({ molecule }), [molecule]);
   return (
-    <ScopeProvider scope={configScope} value={molecule}>
+    <ScopeProvider scope={configScope} value={scopeValue}>
       {children}
     </ScopeProvider>
   );

@@ -4,8 +4,10 @@
 node_modules
 .cache
 dist
+.out
 /.end2end-report/
 /.end2end-results/
+/.screenshots/
 /playwright-report/
 /blob-report/
 /playwright/.cache/

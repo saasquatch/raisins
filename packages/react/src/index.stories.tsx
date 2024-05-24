@@ -45,9 +45,15 @@ import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
 import { BasicCanvasController } from './canvas';
 
 const meta: Meta = {
-  title: 'Editor',
+  title: 'Index',
   component: Editor,
-  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
+  excludeStories: [
+    'EditorView',
+    'StoryConfigMolecule',
+    'ErrorListController',
+    // FIXME: This is probably related to a limitation or bug in Bunshi with "Conditional Dependencies"
+    'ExternalHTMLControl',
+  ],
 };
 export default meta;
 
@@ -424,12 +430,12 @@ function ToolbarController() {
           {s.name}
         </button>
       ))}
-      <button
+      {/* <button
         onClick={() => setOutlined(o => !o)}
         style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}
       >
         {outlined ? 'Outlined' : 'No Outline'}
-      </button>
+      </button> */}
       Hovered: {hovered}
     </div>
   );

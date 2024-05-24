@@ -164,10 +164,12 @@ class TemplateSwitcher extends HTMLElement {
 
 customElements.define('template-switcher', TemplateSwitcher);
 </script>
-`
+`;
 const basicTemplateHTML = `<style>template{border: 1px dashed red; padding: 20px; display:block;}</style><template>I am inside a template</template>`;
 export const TemplateTags = () => <CanvasStory html={basicTemplateHTML} />;
-export const TemplateSwitcher = () => <CanvasStory html={templateSwitcherExample} />;
+export const TemplateSwitcher = () => (
+  <CanvasStory html={templateSwitcherExample} />
+);
 
 export const BigCanvasWithHover = () => (
   <BigCanvasOnly Component={CanvasWithHover} />
@@ -359,7 +361,7 @@ const SVGExample = ({ html = '' }) => (
 
 const meta: Meta = {
   title: 'Canvas Controller',
-  excludeStories: ['CanvasFull'],
+  excludeStories: ['CanvasFull', 'Toolbars'],
   argTypes: {
     CanvasType: {
       options: Object.keys(CanvasTypes),

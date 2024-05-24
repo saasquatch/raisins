@@ -133,49 +133,6 @@ export function BaseExample() {
   );
 }
 
-export function ExternalHTMLControl() {
-  const Editor = () => {
-    useHotkeys();
-    const { HTMLAtom } = useMolecule(ConfigMolecule);
-    const [html, setHtml] = useAtom(HTMLAtom!);
-
-    return (
-      <>
-        <textarea
-          value={html}
-          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-          rows={10}
-          style={{ width: '500px' }}
-        />
-        <div style={{ display: 'flex' }}>
-          <div style={{ flex: 0.7 }}>
-            <BasicCanvasController />
-          </div>
-          <div style={{ flex: 0.3 }}>
-            <AttributeEditor />
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  return (
-    <ScopeProvider
-      scope={WidgetScope}
-      value={{
-        startingHtml,
-        startingPackages: [],
-      }}
-    >
-      <RaisinsProvider molecule={ConfigMolecule}>
-        <CanvasProvider>
-          <Editor />
-        </CanvasProvider>
-      </RaisinsProvider>
-    </ScopeProvider>
-  );
-}
-
 export function WithToolbars() {
   const Editor = () => {
     useHotkeys();
@@ -345,7 +302,7 @@ export function FullExample() {
       <>
         <textarea
           value={html}
-          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+          onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
           rows={10}
           style={{ width: '500px' }}
         />
@@ -410,7 +367,7 @@ export function FullExample() {
   );
 }
 
-const ToolbarMolecule = molecule((getMol) => {
+const ToolbarMolecule = molecule(getMol => {
   return {
     ...getMol(HoveredNodeMolecule),
     ...getMol(SelectedNodeMolecule),
@@ -490,12 +447,12 @@ const PositionedToolbar = ({
   );
 };
 
-const LayersMolecule = molecule((getMol) => {
+const LayersMolecule = molecule(getMol => {
   const { InsertNodeAtom } = getMol(EditMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const RootHasChildren = atom(
-    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+    get => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
   );
 
   return {

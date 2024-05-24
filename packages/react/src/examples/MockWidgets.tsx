@@ -19,7 +19,7 @@ export const ColorWidget = () => {
       <input
         type="text"
         value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
+        onInput={e => setValue((e.target as HTMLInputElement).value)}
       />
       <Clear />
       <div>
@@ -56,7 +56,7 @@ export const DateRangeWidget = () => {
       <input
         type="date"
         value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
+        onInput={e => setValue((e.target as HTMLInputElement).value)}
       />
     </div>
   );
@@ -70,7 +70,7 @@ export const ImageUpload = () => {
       <input
         type="text"
         value={value}
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
+        onInput={e => setValue((e.target as HTMLInputElement).value)}
       />
     </div>
   );
@@ -84,7 +84,7 @@ export const StatTypeSelectWidget = () => {
       <input
         value={value}
         list="stats"
-        onInput={(e) => setValue((e.target as HTMLInputElement).value)}
+        onInput={e => setValue((e.target as HTMLInputElement).value)}
       />
       <datalist id="stats">
         <option value="/referralsCount" />

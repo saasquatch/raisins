@@ -40,7 +40,7 @@ import { Module, ModuleDetails } from './types';
 const meta: Meta = {
   title: 'Component Metamodel',
   component: PackageEditorController,
-  excludeStories: ['PackageEditor'],
+  excludeStories: ['PackageEditor', 'CustomAttributesController'],
 };
 export default meta;
 
@@ -99,7 +99,7 @@ const BlocksController = () => {
       }}
     >
       <h2>Blocks</h2>
-      {(blocks.length ? blocks : fakeBlocks).map((block) => {
+      {(blocks.length ? blocks : fakeBlocks).map(block => {
         return (
           <div
             style={{
@@ -122,9 +122,7 @@ const BlocksController = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = (
-  props
-) => {
+export const CustomAttributesController: React.FC<AttributesControllerProps> = props => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
@@ -136,7 +134,7 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = (
       {Object.keys(groupedSchema).map((key, idx) => {
         return (
           <>
-            {groupedSchema[key].map((attribute) => {
+            {groupedSchema[key].map(attribute => {
               return (
                 <AttributeProvider
                   attributeName={attribute.name}
@@ -307,7 +305,7 @@ const CustomThemeTest = () => {
     <>
       <textarea
         value={html}
-        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+        onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
         rows={6}
         style={{ width: '300px' }}
       />
@@ -379,7 +377,7 @@ function PackageEditorView(props: ModuleManagement) {
       <div>Loading: {props.loadingModules}</div>
       Modules:
       <ul>
-        {props.modules.map((m) => (
+        {props.modules.map(m => (
           <li key={m.package + '@' + m.version + '/' + m.filePath}>
             {m.package} @ {m.version} for {m.filePath}
           </li>
@@ -411,7 +409,7 @@ function PackageEditorView(props: ModuleManagement) {
       <h2>Add</h2>
       <button
         onClick={() => {
-          setOfThings.map((m) => props.addModule(m));
+          setOfThings.map(m => props.addModule(m));
         }}
       >
         Shoelace + theme
@@ -441,11 +439,11 @@ function PackageEditorView(props: ModuleManagement) {
         Mint (alpha)
       </button>
       <ul>
-        {PACKAGES.map((m) => {
+        {PACKAGES.map(m => {
           return (
             <li key={m}>
               <button
-                onClick={(e) => {
+                onClick={e => {
                   props.addModule({
                     package: m,
                   });
@@ -459,7 +457,7 @@ function PackageEditorView(props: ModuleManagement) {
       </ul>
       <h2>Remove</h2>
       <ul>
-        {PACKAGES.map((m) => {
+        {PACKAGES.map(m => {
           return (
             <li key={m}>
               <button onClick={() => props.removeModuleByName(m)}>{m}</button>

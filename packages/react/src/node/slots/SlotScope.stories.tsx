@@ -19,13 +19,6 @@ const StoryMolecule = molecule<Partial<RaisinConfig>>(() => {
   };
 });
 
-export const Test2 = () => {
-  return (
-    <SlotScopeProvider slot={'test'}>
-      <TestComponent />
-    </SlotScopeProvider>
-  );
-};
 export const Test1 = () => {
   return (
     <RaisinsProvider molecule={StoryMolecule}>

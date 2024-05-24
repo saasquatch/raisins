@@ -12,7 +12,7 @@ import { test, expect } from '@playwright/test';
 //   expect(selectionHover).toBeInViewport();
 // });
 
-test('Load a page, read text', async ({ page }) => {
+test('Load a story in storybook', async ({ page }) => {
   await page.goto(
     '/iframe.html?path=/story/attributes-controller--my-kitchen-sink'
   );

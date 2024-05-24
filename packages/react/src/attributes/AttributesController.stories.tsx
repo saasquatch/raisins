@@ -1,21 +1,23 @@
-import { atom, useAtomValue } from 'jotai';
+import { StoryObj } from '@storybook/react';
+import { userEvent, within } from '@storybook/test';
 import { molecule, useMolecule } from 'bunshi/react';
+import { atom, useAtomValue } from 'jotai';
 import React from 'react';
 import { CanvasController } from '../canvas';
 import { RaisinConfig } from '../core/RaisinConfigScope';
 import {
+  MintComponents,
   big,
   mintBigStat,
-  MintComponents,
   mintHeroImage,
   mintMono,
   mintTaskCard,
 } from '../examples/MintComponents';
 import { widgets } from '../examples/MockWidgets';
 import {
+  VanillaComponents,
   referralList,
   referrerWidget,
-  VanillaComponents,
 } from '../examples/VanillaComponents';
 import {
   BasicStory,
@@ -25,8 +27,9 @@ import {
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
 import { NodeMolecule } from '../node/NodeMolecule';
 import { AttributeMolecule } from './AttributeMolecule';
-import { AttributesController } from './AttributesController';
 import { AttributeTemplateProps } from './AttributeThemeMolecule';
+import { AttributesController } from './AttributesController';
+import { screenshot } from '../StorybookTestEnvironment';
 
 export default {
   title: 'Attributes Controller',
@@ -35,9 +38,10 @@ export default {
       control: 'boolean',
     },
   },
+  tags: ['end2end'],
 };
 
-const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+const ConfigMolecule = molecule<Partial<RaisinConfig>>(getMol => {
   return {
     ...getMol(StoryConfigMolecule),
     AttributeTheme: {
@@ -189,7 +193,7 @@ export const MintTaskCard = ({ canvas }: { canvas: boolean }) => {
 };
 
 export const MintTaskCardTemplate = ({ canvas }: { canvas: boolean }) => {
-  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>(getMol => {
     return {
       ...getMol(StoryConfigMolecule),
       AttributeTheme: {
@@ -209,7 +213,7 @@ export const MintTaskCardTemplate = ({ canvas }: { canvas: boolean }) => {
 };
 
 export const MintTaskCardField = ({ canvas }: { canvas: boolean }) => {
-  const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
+  const ConfigMolecule = molecule<Partial<RaisinConfig>>(getMol => {
     return {
       ...getMol(StoryConfigMolecule),
       AttributeTheme: {
@@ -251,16 +255,24 @@ export const VanillaReferralList = ({ canvas }: { canvas: boolean }) => {
   );
 };
 
-export const Big = ({ canvas }: { canvas: boolean }) => {
-  return (
-    <BasicStory
-      startingHtml={big}
-      startingPackages={MintComponents}
-      Molecule={ConfigMolecule}
-    >
-      <NodeChildrenEditorStory canvas={canvas} />
-    </BasicStory>
-  );
+export const Big: StoryObj<{ canvas: boolean }> = {
+  render: ({ canvas }) => {
+    return (
+      <BasicStory
+        startingHtml={big}
+        startingPackages={MintComponents}
+        Molecule={ConfigMolecule}
+      >
+        <NodeChildrenEditorStory canvas={canvas} />
+      </BasicStory>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.type(document.querySelector('input')!, 'example-value');
+    await screenshot();
+  },
 };
 
 function AttributesEditor() {
@@ -280,7 +292,7 @@ const Errors = () => {
     <div>
       Errors:
       <ul>
-        {errors.map((e) => (
+        {errors.map(e => (
           <li>{e.error.rule}</li>
         ))}
       </ul>

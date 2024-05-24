@@ -14,10 +14,13 @@ import {
 } from './NodeChildrenEditor';
 import { NodeMolecule } from './NodeMolecule';
 import { NodeScopeMolecule } from './NodeScope';
+import { Meta } from '@storybook/react';
 
-export default {
+const meta: Meta = {
   title: 'Children Editor',
+  excludeStories: ['JsonPointers'],
 };
+export default meta;
 
 export const LoadTest = () => {
   return (
@@ -58,7 +61,7 @@ const ValidationTest = () => {
     <>
       <textarea
         value={html}
-        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
+        onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
         rows={6}
         style={{ width: '300px' }}
       />
@@ -106,7 +109,7 @@ export const JsonPointers = () => {
         <>
           <p>Errors for this node</p>
           <ul>
-            {errors.map((e) => (
+            {errors.map(e => (
               <li>
                 {e.jsonPointer} - {e.error.rule}
               </li>
@@ -162,7 +165,7 @@ const DumbCase = ({ node }: { node: RaisinNode }) => {
     <div>
       {tagName}
       <div style={{ borderLeft: '4px solid #CCC' }}>
-        {children.map((c) => (
+        {children.map(c => (
           <DumbCase node={c} />
         ))}
       </div>
