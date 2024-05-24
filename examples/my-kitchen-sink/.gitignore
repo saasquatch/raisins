@@ -1,7 +1,8 @@
 dist/
 www/
 loader/
-raisins.js
+raisins.json
+docs
 
 *~
 *.sw[mnpcod]

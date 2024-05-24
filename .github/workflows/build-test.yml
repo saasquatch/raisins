@@ -36,3 +36,17 @@ jobs:
 
       - name: Test (via Turbo)
         run: npm test
+        env:
+          # For Playwright -- Firefox is unable to launch if the $HOME folder isn't owned by the current user. 
+          HOME: /root
+
+        # Uploads the playwright test results folder, this has HTML and video of failures in it
+      - uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          # If nothing is found, then we have a configuration error
+          # The reports should always exist, even on success
+          if-no-files-found: error
+          # Bring other test results into this one artefact (if other packages get them)
+          path: |
+            packages/react/.end2end-report
