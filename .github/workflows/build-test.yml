@@ -28,12 +28,6 @@ jobs:
 
       - uses: bahmutov/npm-install@v1
 
-        # Because of platform-specific optional dependencies in Vite
-        # https://github.com/npm/cli/issues/4828
-        # Will create errors like: `Error: Cannot find module @rollup/rollup-linux-x64-gnu.`
-      - name: Install Playwright Browsers
-        run: npx playwright install
-
       - name: Lint (via Turbo)
         run: npm run lint
 
