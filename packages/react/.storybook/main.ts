@@ -1,5 +1,7 @@
-import { dirname, join } from "path";
-module.exports = {
+import { StorybookConfig } from '@storybook/react-vite';
+import { dirname, join } from 'path';
+
+const config: StorybookConfig = {
   stories: ['../**/*.stories.@(ts|tsx|js|jsx)'],
   addons: [],
 
@@ -10,15 +12,17 @@ module.exports = {
   },
 
   framework: {
-    name: getAbsolutePath("@storybook/react-vite"),
-    options: {}
+    name: getAbsolutePath('@storybook/react-vite'),
+    options: {},
   },
 
   docs: {
-    autodocs: true
-  }
+    autodocs: true,
+  },
 };
 
+export default config;
+
 function getAbsolutePath(value) {
-  return dirname(require.resolve(join(value, "package.json")));
+  return dirname(require.resolve(join(value, 'package.json')));
 }
