@@ -1,3 +1,4 @@
+import { dirname, join } from 'path';
 import { StorybookConfig } from '@storybook/react-vite';
 
 const config: StorybookConfig = {
@@ -10,11 +11,14 @@ const config: StorybookConfig = {
     check: true, // type-check stories during Storybook build
   },
 
-  framework: '@storybook/react-vite',
+  framework: getAbsolutePath('@storybook/react-vite'),
 
-  docs: {
-    autodocs: true,
-  },
+  docs: {},
 };
 
 export default config;
+
+// Required due to Storybook bug: https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
+function getAbsolutePath(value: string): any {
+  return dirname(require.resolve(join(value, 'package.json')));
+}
