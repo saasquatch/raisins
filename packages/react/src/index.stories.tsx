@@ -51,8 +51,8 @@ const meta: Meta = {
     'EditorView',
     'StoryConfigMolecule',
     'ErrorListController',
-    // FIXME: This is probably related to a limitation or bug in Bunshi with "Conditional Dependencies"
-    'ExternalHTMLControl',
+    // // FIXME: This is probably related to a limitation or bug in Bunshi with "Conditional Dependencies"
+    // 'ExternalHTMLControl',
   ],
 };
 export default meta;
