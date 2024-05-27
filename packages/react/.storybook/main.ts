@@ -1,5 +1,4 @@
 import { StorybookConfig } from '@storybook/react-vite';
-import { dirname, join } from 'path';
 
 const config: StorybookConfig = {
   stories: ['../**/*.stories.@(ts|tsx|js|jsx)'],
@@ -11,10 +10,7 @@ const config: StorybookConfig = {
     check: true, // type-check stories during Storybook build
   },
 
-  framework: {
-    name: getAbsolutePath('@storybook/react-vite'),
-    options: {},
-  },
+  framework: '@storybook/react-vite',
 
   docs: {
     autodocs: true,
@@ -22,7 +18,3 @@ const config: StorybookConfig = {
 };
 
 export default config;
-
-function getAbsolutePath(value) {
-  return dirname(require.resolve(join(value, 'package.json')));
-}
