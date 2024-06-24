@@ -11,7 +11,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
       try {
         const demos: schema.ComponentState[] = comp.props.reduce((arr, p) => {
           const demosForProp = p.docsTags
-            .filter(t => t.name == 'demo')
+            .filter(t => t.name === 'demo')
             .map(t => {
               const [title, propsRaw] = splitOnFirst(t.text!, ' - ');
               const componentState: schema.ComponentState = {

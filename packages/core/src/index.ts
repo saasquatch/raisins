@@ -14,6 +14,7 @@ import {
   isTextNode
 } from "./html-dom/isNode";
 import htmlParser from "./html-dom/parser";
+// eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
   RaisinDocumentNode,

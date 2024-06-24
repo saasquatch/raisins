@@ -13,7 +13,7 @@ import { EditorState, Plugin, Transaction } from 'prosemirror-state';
 import { DefaultProseSchema } from './DefaultProseSchema';
 
 const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
-  let { $from, $to } = state.selection;
+  // const { $from, $to } = state.selection;
   // if (!$from.parent.isBlock) return false;
   // if ($from.parent.type != schema.nodes.paragraph) return false;
   if (dispatch) {

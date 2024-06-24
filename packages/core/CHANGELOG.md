@@ -1,11 +1,10 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 1.1.3
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Patch Changes
 
-## [Unreleased]
+- [`dc9ac7e`](https://github.com/saasquatch/raisins/commit/dc9ac7ef9919bd1e7744ac6deb840589158749ed) Thanks [@loganvolkers](https://github.com/loganvolkers)! - - Remove unused `husky` dependency
 
 ## [1.1.2] - 2024-01-18
 
@@ -97,7 +96,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `cssUtil`
     - `cssSelector`
 
-[unreleased]: https://github.com/saasquatch/raisins/compare/core@1.1.2...HEAD
 [1.1.2]: https://github.com/saasquatch/raisins/releases/tag/core@1.1.2..core@1.1.1
 [1.1.1]: https://github.com/saasquatch/raisins/releases/tag/core@1.1.1..core@1.1.0
 [1.1.0]: https://github.com/saasquatch/raisins/releases/tag/core@1.1.0...core@1.0.1

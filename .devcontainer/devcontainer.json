@@ -1,12 +1,15 @@
 {
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "development",
-  "forwardPorts": [8080],
-  "extensions": [
-    "esbenp.prettier-vscode",
-    // LiveShare : https://marketplace.visualstudio.com/items?itemName=ms-vsliveshare.vsliveshare
-    "ms-vsliveshare.vsliveshare",
-    // Cucumber: https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete
-    "alexkrechik.cucumberautocomplete"
-  ]
+  "name": "Playwright Testing",
+  "image": "mcr.microsoft.com/playwright:v1.44.0-jammy",
+  "forwardPorts": [9323],
+  "postCreateCommand": "npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "github.vscode-github-actions"
+      ]
+    }
+  }
 }

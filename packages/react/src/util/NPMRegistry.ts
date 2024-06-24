@@ -80,10 +80,8 @@ export function makeLocalRegistry(url: string): NPMRegistry {
       const json = await resp.json();
       return json;
     },
-    resolvePath(module, path) {
-      const version = module.version ?? 'latest';
-      const resolved = `${url}/${path}`;
-      return resolved;
+    resolvePath(_, path) {
+      return `${url}/${path}`;
     },
   };
 }

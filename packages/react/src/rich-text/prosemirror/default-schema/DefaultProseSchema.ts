@@ -77,7 +77,7 @@ export const DefaultProseSchema = new Schema({
         },
       ],
       toDOM(node) {
-        let { href, title } = node.attrs;
+        const { href, title } = node.attrs;
         return [
           'a',
           {

@@ -1,5 +1,5 @@
 import { Config } from '@stencil/core';
-import plugin from "../";
+import plugin from "@raisins/stencil-docs-target";
 
 export const config: Config = {
   namespace: 'my-kitchen-sink',

@@ -1,14 +1,13 @@
 import { autoBindSteps } from "@saasquatch/scoped-autobindsteps";
 import { defineStep } from "cypress-cucumber-preprocessor/steps";
 import { StepDefinitions } from "jest-cucumber";
-
-const JEST = process.env.JEST_WORKER_ID !== undefined;
+import isJest from "../testing/isJest";
 
 export function bindIsomorphicCucumberSteps(
   stepDefs: IsoStepDefs,
   file: string
 ) {
-  if (!JEST) {
+  if (!isJest()) {
     stepDefs(defineStep, defineStep, defineStep, defineStep);
   } else {
     const jest_cucumber = require("jest-cucumber");

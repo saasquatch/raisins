@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
 
 Important!
@@ -18,9 +19,9 @@ import type { Props } from './childApiSrc';
 type Snabbdom = typeof SnabbdomType;
 type Penpal = typeof PenpalType;
 
-declare var props: Props;
-declare var snabbdom: Snabbdom;
-declare var Penpal: Penpal;
+declare let props: Props;
+declare let snabbdom: Snabbdom;
+declare let Penpal: Penpal;
 
 export const ChildAPIModule: string = function RaisinsChildAPI() {
   let currentNode: VNode | HTMLElement = document.body;
@@ -230,8 +231,6 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     rendering = true;
     try {
       patch(currentNode, next);
-    } catch (e) {
-      throw e;
     } finally {
       rendering = false;
     }
@@ -258,7 +257,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
         }
       },
     };
-    let myConnection = (window as any).Penpal.connectToParent({
+    const myConnection = (window as any).Penpal.connectToParent({
       // Methods child is exposing to parent
       methods,
     });

@@ -137,7 +137,7 @@ const Toolbar = () => {
 
 export const SwappablePlugin = () => {
   const atoms = useAtomValue(proseAtom);
-  const [plugins, setPlugin] = useAtom(atoms.plugins as PrimitiveAtom<any[]>);
+  const [plugins, setPlugin] = useAtom(atoms.plugins as PrimitiveAtom<unknown[]>);
   return (
     <>
       <span>{plugins.length} plugins</span>

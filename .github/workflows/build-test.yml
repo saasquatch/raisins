@@ -1,37 +1,35 @@
-name: Build and Test
+name: Validate PR
 
 on:
-  push:
-    branches:
-      - production
-    paths:
-      - packages/**
   pull_request:
-    paths:
-      - packages/**
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
-    name: Deploy to static site bucket
+    name: Build and test
     runs-on: ubuntu-latest
-
+    container:
+      image: mcr.microsoft.com/playwright:v1.44.0-jammy
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Node Setup 16.x
-        uses: actions/setup-node@v1
+      - name: Node Setup 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          cache: npm
+          node-version: 20.x
 
-      - name: Install dependencies (globally)
-        run: npm i
+      - uses: bahmutov/npm-install@v1
 
-      - name: Lerna bootrap dependencies for packages/**
-        run: npx lerna bootstrap
+      - name: Lint (via Turbo)
+        run: npm run lint
 
       - name: Build (via Turbo)
         run: npm run build

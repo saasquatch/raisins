@@ -17,7 +17,12 @@ export function isNodeAllowed(
   parentMeta: CustomElement,
   slot: string
 ) {
-  const parentAllowsChild = doesParentAllowChild(child, parentMeta, slot, parent);
+  const parentAllowsChild = doesParentAllowChild(
+    child,
+    parentMeta,
+    slot,
+    parent
+  );
   const childAllowsParents = doesChildAllowParent(childMeta, parent);
   return parentAllowsChild && childAllowsParents;
 }

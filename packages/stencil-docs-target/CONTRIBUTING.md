@@ -22,10 +22,6 @@ To do a one-off build, use `npm run build` or `yarn build`.
 
 To run tests, use `npm test` or `yarn test`.
 
-## Configuration
-
-Code quality is set up for you with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
 ### Jest
 
 Jest tests are set up to run with `npm test` or `yarn test`.

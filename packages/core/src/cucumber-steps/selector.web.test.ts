@@ -4,8 +4,7 @@ import parse from "../html-dom/parser";
 import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
 import selector from "../html-dom/selector";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
-
-const JEST = process.env.JEST_WORKER_ID !== undefined;
+import isJest from "../testing/isJest";
 
 const cucumber = (
   given: (...args: any[]) => void,
@@ -25,7 +24,7 @@ const cucumber = (
   });
 
   then(/^it should return "(.*)"$/, (jsSelector: string) => {
-    if (!JEST) {
+    if (!isJest()) {
       cy.task("getJsonata", { jsSelector, node, found }).then((result: any) => {
         for (let i = 0; i < result.f_array.length; i++) {
           expect(result.f_array[i]).toStrictEqual(result.expected_array[i]);
