@@ -56,7 +56,7 @@
   "dependencies": {
     "@raisins/core": "^1.1.3",
     "@raisins/schema": "^1.0.0",
-    "bunshi": "^2.1.4",
+    "bunshi": "~2.0.2",
     "css-tree": "^1.1.3",
     "fast-equals": "^5.0.1",
     "hotkeys-js": "^3.8.7",
