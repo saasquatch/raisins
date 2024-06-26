@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- [#16](https://github.com/saasquatch/raisins/pull/16) [`cae0203`](https://github.com/saasquatch/raisins/commit/cae02034bca4a139c761d876d2da22ac42564857) Thanks [@Locrian24](https://github.com/Locrian24)! - Added support for feature enforcement tags on components
+
+### Patch Changes
+
+- Updated dependencies [[`cae0203`](https://github.com/saasquatch/raisins/commit/cae02034bca4a139c761d876d2da22ac42564857)]:
+  - @raisins/schema@1.1.0
+
 ## [1.0.1] - 2023-04-20
 
 ### Changed
