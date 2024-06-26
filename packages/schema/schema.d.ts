@@ -93,6 +93,16 @@ export interface CustomElement {
   exampleGroup?: string;
 
   /**
+   * Array of meaningful tags to enforce feature use within the raisins editor
+   */
+  requiredFeatures?: string[];
+
+  /**
+   * Text to display in a tooltip when the element is disabled due to feature enforcement.
+   */
+  featureTooltip?: string;
+
+  /**
    * States for previewing the internal state of components
    */
   demoStates?: Array<ComponentState>;
@@ -208,6 +218,16 @@ export interface Attribute {
    * If required is set to true this attribute must not be undefined.
    */
   required?: boolean;
+
+  /**
+   * Array of meaningful tags to enforce feature use within the raisins editor.
+   */
+  requiredFeatures?: string[];
+
+  /**
+   * Text to display in a tooltip when the attribute is disabled due to feature enforcement.
+   */
+  featureTooltip?: string;
 }
 
 export interface ComponentState {
