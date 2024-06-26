@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- [#17](https://github.com/saasquatch/raisins/pull/17) [`f6e0c9d`](https://github.com/saasquatch/raisins/commit/f6e0c9d6db2bc0296358067dd84574ffbfc45afb) Thanks [@Locrian24](https://github.com/Locrian24)! - Regress to bunshi@2.0.2
+
+- Updated dependencies [[`cae0203`](https://github.com/saasquatch/raisins/commit/cae02034bca4a139c761d876d2da22ac42564857)]:
+  - @raisins/schema@1.1.0
+  - @raisins/core@1.1.4
+
 ## 1.2.0
 
 ### Minor Changes
