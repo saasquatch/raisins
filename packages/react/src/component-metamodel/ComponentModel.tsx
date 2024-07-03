@@ -39,8 +39,11 @@ export type ComponentModelMoleculeType = {
   ComponentsAtom: Atom<CustomElement[]>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
+  // @ts-ignore TODO jotai 2 update
   AddModuleAtom: WritableAtom<null, Module>;
+  // @ts-ignore TODO jotai 2 update
   RemoveModuleAtom: WritableAtom<null, Module>;
+  // @ts-ignore TODO jotai 2 update
   RemoveModuleByNameAtom: WritableAtom<null, string>;
   ComponentMetaAtom: Atom<ComponentMetaProvider>;
   ValidChildrenAtom: Atom<
@@ -81,17 +84,24 @@ export const ComponentModelMolecule = molecule(
      * `true` while module information is being loaded from NPM
      */
     const ModulesLoadingAtom = atom(
-      get => get(ModuleDetailsStateAtom).state === 'loading'
+      get =>
+        get(ModuleDetailsStateAtom).state === 'loading' ||
+      // @ts-expect-error figure out why this is happening
+        get(ModuleDetailsAtom).status === 'pending'
     );
 
     /**
      * The array of {@link CustomElement} from ALL packages
      */
     const ComponentsAtom = atom(get => {
+      if (get(ModulesLoadingAtom)) return [];
       const moduleDetails = get(ModuleDetailsAtom);
+
+      console.log({ moduleDetails });
       return [
         ...Object.values(HTMLComponents),
-        ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
+        ...(moduleDetails?.reduce(moduleDetailsToTags, [] as CustomElement[]) ||
+          []),
       ];
     });
 

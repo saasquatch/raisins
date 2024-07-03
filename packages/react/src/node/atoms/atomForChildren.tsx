@@ -1,6 +1,6 @@
 import { RaisinNode } from '@raisins/core';
 import { PrimitiveAtom } from 'jotai';
-import { focusAtom } from 'jotai/optics';
+import { focusAtom } from 'jotai-optics';
 import { OpticFor } from 'optics-ts';
 
 const childOptic = (o: OpticFor<RaisinNode>) =>
@@ -9,5 +9,6 @@ const childOptic = (o: OpticFor<RaisinNode>) =>
 export function atomForChildren(
   nodeAtom: PrimitiveAtom<RaisinNode>
 ): PrimitiveAtom<RaisinNode[]> {
+  // @ts-ignore TODO jotai 2 update
   return focusAtom(nodeAtom, childOptic);
 }

@@ -12,6 +12,8 @@ import { ModuleDetails } from '../types';
  * @returns
  */
 export function moduleDetailsToBlocks(moduleDetails: ModuleDetails[]): Block[] {
+  console.log({ moduleDetails });
+  if (!moduleDetails?.length) return [];
   return moduleDetails.reduce((agg, npmMod) => {
     // Adds each NPM modules list of `raisin` contents`
     return (
