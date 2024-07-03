@@ -86,7 +86,7 @@ export const ComponentModelMolecule = molecule(
     const ModulesLoadingAtom = atom(
       get =>
         get(ModuleDetailsStateAtom).state === 'loading' ||
-      // @ts-expect-error figure out why this is happening
+        // @ts-expect-error figure out why this is happening
         get(ModuleDetailsAtom).status === 'pending'
     );
 
@@ -94,14 +94,11 @@ export const ComponentModelMolecule = molecule(
      * The array of {@link CustomElement} from ALL packages
      */
     const ComponentsAtom = atom(get => {
-      if (get(ModulesLoadingAtom)) return [];
       const moduleDetails = get(ModuleDetailsAtom);
 
-      console.log({ moduleDetails });
       return [
         ...Object.values(HTMLComponents),
-        ...(moduleDetails?.reduce(moduleDetailsToTags, [] as CustomElement[]) ||
-          []),
+        ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),
       ];
     });
 
