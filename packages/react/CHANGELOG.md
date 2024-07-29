@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+### Patch Changes
+
+- [#20](https://github.com/saasquatch/raisins/pull/20) [`77e9ad0`](https://github.com/saasquatch/raisins/commit/77e9ad0b6504f901164e6c8aaa99ebe62bdcf6e5) Thanks [@00salmon](https://github.com/00salmon)! - increased penpal connection timeout
+
 ## 1.2.1
 
 ### Patch Changes
