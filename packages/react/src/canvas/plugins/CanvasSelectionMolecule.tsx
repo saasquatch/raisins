@@ -32,12 +32,12 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
     const renderer: SnabbdomRenderer = (d, n) => {
       const isSelected = selected === n && !picked;
       const { delayed, remove, ...rest } = d.style || {};
-      const style: VNodeStyle = {
+      const style = {
         ...rest,
         cursor: 'pointer',
         outline: isSelected ? '2px solid #0077DB' : rest.outline ?? '',
         outlineOffset: '',
-      };
+      } as VNodeStyle;
 
       return {
         ...d,

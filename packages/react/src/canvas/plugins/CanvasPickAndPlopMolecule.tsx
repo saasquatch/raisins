@@ -211,12 +211,12 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       if (!isPicked) return d;
 
       const { delayed, remove, ...rest } = d.style || {};
-      const style: VNodeStyle = {
+      const style = {
         ...rest,
         cursor: 'pointer',
         outline: isPicked ? '2px dashed #0077DB' : rest.outline ?? '',
         outlineOffset: isPicked ? '-2px' : '',
-      };
+      } as VNodeStyle;
 
       return {
         ...d,

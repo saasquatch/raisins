@@ -17,7 +17,7 @@ export const childApiSrc = (
   <script src="${registry.resolvePath(
     {
       package: 'penpal',
-      version: '6.2.1',
+      version: '6.2.2',
     },
     'dist/penpal.min.js'
   )}"></script>
@@ -25,7 +25,7 @@ export const childApiSrc = (
   import * as snabbdom from "${registry.resolvePath(
     {
       package: 'snabbdom',
-      version: '3.5.1',
+      version: '3.6.2',
     },
     '+esm'
   )}"
