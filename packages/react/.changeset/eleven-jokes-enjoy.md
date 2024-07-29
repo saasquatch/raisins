@@ -2,4 +2,4 @@
 '@raisins/react': patch
 ---
 
-increased penpal connection timeout
+increased penpal connection timeout 
