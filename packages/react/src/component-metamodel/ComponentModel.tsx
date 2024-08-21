@@ -39,12 +39,9 @@ export type ComponentModelMoleculeType = {
   ComponentsAtom: Atom<CustomElement[]>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
-  // @ts-ignore TODO jotai 2 update
-  AddModuleAtom: WritableAtom<null, Module>;
-  // @ts-ignore TODO jotai 2 update
-  RemoveModuleAtom: WritableAtom<null, Module>;
-  // @ts-ignore TODO jotai 2 update
-  RemoveModuleByNameAtom: WritableAtom<null, string>;
+  AddModuleAtom: WritableAtom<null, Module[], void>;
+  RemoveModuleAtom: WritableAtom<null, Module[], void>;
+  RemoveModuleByNameAtom: WritableAtom<null, string[], void>;
   ComponentMetaAtom: Atom<ComponentMetaProvider>;
   ValidChildrenAtom: Atom<
     (node: RaisinNode, slot?: string | undefined) => Block[]

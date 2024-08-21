@@ -69,8 +69,8 @@ export type SnabbdomIframeProps = {
    * Set of types that will be listened to in the canvas
    */
   eventTypes: Atom<Set<string>>;
-  onEvent: WritableAtom<null, RawCanvasEvent>;
-  onResize: WritableAtom<null, GeometryDetail>;
+  onEvent: WritableAtom<null, RawCanvasEvent[], void>;
+  onResize: WritableAtom<null, GeometryDetail[], void>;
 };
 
 export function createAtoms(props: SnabbdomIframeProps) {

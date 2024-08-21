@@ -9,6 +9,6 @@ const childOptic = (o: OpticFor<RaisinNode>) =>
 export function atomForChildren(
   nodeAtom: PrimitiveAtom<RaisinNode>
 ): PrimitiveAtom<RaisinNode[]> {
-  // @ts-ignore TODO jotai 2 update
+  // @ts-expect-error jotai-optics types have changed
   return focusAtom(nodeAtom, childOptic);
 }
