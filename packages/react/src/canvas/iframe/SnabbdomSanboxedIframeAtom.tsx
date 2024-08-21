@@ -123,7 +123,7 @@ export function createAtoms(props: SnabbdomIframeProps) {
           iframe,
           // Methods the parent is exposing to the child
           methods: parentRPC,
-          timeout: 1000,
+          timeout: 5000,
           childOrigin: 'null',
         });
         // for atom `onMount` cleanup

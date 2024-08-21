@@ -33,21 +33,21 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   CanvasHoveredListenerAtom.debugLabel = 'CanvasHoveredListenerAtom';
   CanvasAtoms.addEventListener('mouseover', CanvasHoveredListenerAtom);
 
-  const RendererAtom = atom((get) => {
+  const RendererAtom = atom(get => {
     const hovered = get(HoveredNodeAtom);
     const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isHovered = hovered === n && !picked;
 
       const { delayed, remove, ...rest } = d.style || {};
-      const style: VNodeStyle = {
+      const style = {
         ...rest,
         cursor: 'pointer',
         outline: isHovered ? '2px solid #59A7E8' : rest.outline ?? '',
         // Disabled outline due to flickering, may just render outside canvas instead
         // outlineOffset: isHovered ? '-2px' : rest.outlineOffset,
         outlineOffset: '0',
-      };
+      } as VNodeStyle;
 
       return {
         ...d,
