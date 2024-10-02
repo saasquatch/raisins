@@ -1,19 +1,20 @@
 import {
+  DefaultTextMarks,
   doesChildAllowParent,
   doesParentAllowChild,
   getSlots,
   HTMLComponents,
   isNodeAllowed,
   NodeWithSlots,
+  RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
-  DefaultTextMarks,
   RaisinNodeWithChildren,
-  RaisinDocumentNode,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
+import { shallowEqual } from 'fast-equals';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
@@ -22,7 +23,6 @@ import {
   NPMRegistry,
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
-import { shallowEqual } from 'fast-equals';
 import {
   blockFromHtml,
   moduleDetailsToBlocks,
@@ -39,9 +39,9 @@ export type ComponentModelMoleculeType = {
   ComponentsAtom: Atom<CustomElement[]>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
-  AddModuleAtom: WritableAtom<null, Module>;
-  RemoveModuleAtom: WritableAtom<null, Module>;
-  RemoveModuleByNameAtom: WritableAtom<null, string>;
+  AddModuleAtom: WritableAtom<null, Module[], void>;
+  RemoveModuleAtom: WritableAtom<null, Module[], void>;
+  RemoveModuleByNameAtom: WritableAtom<null, string[], void>;
   ComponentMetaAtom: Atom<ComponentMetaProvider>;
   ValidChildrenAtom: Atom<
     (node: RaisinNode, slot?: string | undefined) => Block[]
@@ -81,7 +81,11 @@ export const ComponentModelMolecule = molecule(
      * `true` while module information is being loaded from NPM
      */
     const ModulesLoadingAtom = atom(
-      get => get(ModuleDetailsStateAtom).state === 'loading'
+      get =>
+        get(ModuleDetailsStateAtom).state === 'loading' ||
+        // Only has status while details are being loaded
+        ((get(ModuleDetailsAtom) as unknown) as ModuleDetails).status ===
+          'pending'
     );
 
     /**
@@ -89,6 +93,7 @@ export const ComponentModelMolecule = molecule(
      */
     const ComponentsAtom = atom(get => {
       const moduleDetails = get(ModuleDetailsAtom);
+
       return [
         ...Object.values(HTMLComponents),
         ...moduleDetails.reduce(moduleDetailsToTags, [] as CustomElement[]),

@@ -14,7 +14,7 @@ export type Attributes = Record<string, any>;
 export function atomForAttributes(baseAtom: PrimitiveAtom<RaisinNode>) {
   return memoizeAtom(
     () =>
-      atom<Attributes, SetStateAction<Attributes>>(
+      atom<Attributes, SetStateAction<Attributes>[], void>(
         get => {
           const el = get(baseAtom);
           return isElementNode(el) ? el.attribs : undefined ?? {};

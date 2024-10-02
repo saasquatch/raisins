@@ -12,12 +12,12 @@ export function polymorphicAtom<T, V, A>(
   router: (
     node: T,
     nodeAtom: PrimitiveAtom<T>
-  ) => WritableAtom<V, A> | undefined
+  ) => WritableAtom<V, A[], void> | undefined
 ) {
   return memoizeAtom(
     () =>
       atom(
-        (get) => {
+        get => {
           const value = get(nodeAtom);
           const atomForType = router(value, nodeAtom);
           if (!atomForType) return undefined;

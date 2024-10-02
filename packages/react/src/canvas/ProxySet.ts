@@ -1,4 +1,4 @@
-import { atomWithStore } from 'jotai/zustand';
+import { atomWithStore } from 'jotai-zustand';
 import { createStore } from 'zustand/vanilla';
 
 type SetStore<T> = { values: T[]; add(item: T): void };

@@ -79,7 +79,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
   );
 
   const StateListeners = new Set<
-    WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }>
+    WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }[], void>
   >([]);
 
   const InternalTransactionAtom = atom(

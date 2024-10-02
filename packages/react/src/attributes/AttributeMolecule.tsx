@@ -34,7 +34,7 @@ export const AttributeMolecule = molecule(getMol => {
       return get(attributesAtoms.valuesAtom)[name];
     },
     (_, set, next: SetStateAction<string | undefined>) => {
-      set(attributesAtoms.valuesAtom, prev => {
+      set(attributesAtoms.valuesAtom, (prev: { [key: string]: string }) => {
         // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(prev[name]) : next;
         const attrbsClone = { ...prev };
@@ -116,7 +116,10 @@ function toNumber(value: string | undefined): number | undefined {
 /**
  * Provides scope for a {@link AttributeScopeMolecule} and {@link AttributeMolecule}
  */
-export const AttributeProvider: React.FC<{ attributeName: string }> = props => (
+export const AttributeProvider: React.FC<{
+  attributeName: string;
+  children: React.PropsWithChildren['children'];
+}> = props => (
   <ScopeProvider scope={AttributeScope} value={props.attributeName}>
     {props.children}
   </ScopeProvider>

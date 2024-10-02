@@ -10,6 +10,7 @@ export type Module = {
 export type ModuleDetails = {
   'package.json': PackageJson;
   raisins?: schema.Package;
+  status?: string;
 } & Module;
 
 export type ResolveType<T> = T extends Promise<infer V> ? V : T;

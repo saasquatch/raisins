@@ -8,7 +8,7 @@ export function throttledWriteAtom(delay: number) {
   const throttledSetAtom = atom({ current: null as null | Setter });
   const throttledOnEvent = atom(
     null,
-    (get, set, e: { atom: WritableAtom<any, any>; value: any }) => {
+    (get, set, e: { atom: WritableAtom<any, any, void>; value: any }) => {
       const throttledSetRef = get(throttledSetAtom);
       let throttledSet = throttledSetRef.current;
       if (!throttledSet) {
@@ -29,11 +29,11 @@ export function throttledWriteAtom(delay: number) {
  */
 export function throttleAtom<R, W>(
   ms: number,
-  atomToThrottle: WritableAtom<R, W>
-): WritableAtom<R, W> {
+  atomToThrottle: WritableAtom<R, W[], void>
+): WritableAtom<R, W[], void> {
   const throttleSet = throttledWriteAtom(ms);
   return atom(
-    (get) => get(atomToThrottle),
+    get => get(atomToThrottle),
     (get, set, next: W) =>
       set(throttleSet, { atom: atomToThrottle, value: next })
   );

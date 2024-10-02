@@ -16,14 +16,14 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       'ProseEditorStateMolecule must be used in a ProseEditorProvider'
     );
 
-  const proseDocAtom = atom((get) => raisinToProseDoc(get(get(scope).node)));
-  const proseNodeAtom = atom((get) => {
+  const proseDocAtom = atom(get => raisinToProseDoc(get(get(scope).node)));
+  const proseNodeAtom = atom(get => {
     const schema = get(get(scope).schema);
     const doc = get(proseDocAtom);
     const richDoc = Node.fromJSON(schema, doc);
     return richDoc;
   });
-  const proseSelectionAtom = atom((get) => {
+  const proseSelectionAtom = atom(get => {
     const doc = get(proseNodeAtom);
     const bookmark: SelectionBookmark | undefined = get(get(scope).selection);
     if (!bookmark) return undefined;
@@ -37,8 +37,8 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
   });
 
   // Build editor state
-  const editorStateAtom = atom<EditorState, Transaction>(
-    (get) => {
+  const editorStateAtom = atom<EditorState, Transaction[], void>(
+    get => {
       const state = EditorState.create({
         doc: get(proseNodeAtom),
         selection: get(proseSelectionAtom),

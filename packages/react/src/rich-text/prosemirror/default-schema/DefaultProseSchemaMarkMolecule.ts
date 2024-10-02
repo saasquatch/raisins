@@ -11,7 +11,8 @@ import { DefaultProseSchema } from './DefaultProseSchema';
 
 type ToggleMarkAtom = WritableAtom<
   boolean,
-  React.MouseEvent<Element, MouseEvent>
+  React.MouseEvent<Element, MouseEvent>[],
+  void
 >;
 type MarkKey = typeof DefaultTextMarks[number];
 
