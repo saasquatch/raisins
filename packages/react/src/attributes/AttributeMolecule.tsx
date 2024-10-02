@@ -116,7 +116,10 @@ function toNumber(value: string | undefined): number | undefined {
 /**
  * Provides scope for a {@link AttributeScopeMolecule} and {@link AttributeMolecule}
  */
-export const AttributeProvider: React.FC<{ attributeName: string }> = props => (
+export const AttributeProvider: React.FC<{
+  attributeName: string;
+  children: React.PropsWithChildren['children'];
+}> = props => (
   <ScopeProvider scope={AttributeScope} value={props.attributeName}>
     {props.children}
   </ScopeProvider>
