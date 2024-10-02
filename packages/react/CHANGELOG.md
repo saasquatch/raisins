@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+- [#22](https://github.com/saasquatch/raisins/pull/22) [`73055b5`](https://github.com/saasquatch/raisins/commit/73055b55358484803dc00e9e0d1ca6d33220befd) Thanks [@00salmon](https://github.com/00salmon)! - Bump raisins to support React 18
+
 ## 1.2.2
 
 ### Patch Changes
