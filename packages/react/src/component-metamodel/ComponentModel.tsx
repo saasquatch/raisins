@@ -1,19 +1,20 @@
 import {
+  DefaultTextMarks,
   doesChildAllowParent,
   doesParentAllowChild,
   getSlots,
   HTMLComponents,
   isNodeAllowed,
   NodeWithSlots,
+  RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
-  DefaultTextMarks,
   RaisinNodeWithChildren,
-  RaisinDocumentNode,
 } from '@raisins/core';
 import { CustomElement, Slot } from '@raisins/schema/schema';
-import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
+import { shallowEqual } from 'fast-equals';
+import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { loadable } from 'jotai/utils';
 import { ConfigMolecule } from '../core';
 import { CoreMolecule } from '../core/CoreAtoms';
@@ -22,7 +23,6 @@ import {
   NPMRegistry,
   NPMRegistryAtom as RegistryAtom,
 } from '../util/NPMRegistry';
-import { shallowEqual } from 'fast-equals';
 import {
   blockFromHtml,
   moduleDetailsToBlocks,
@@ -83,8 +83,9 @@ export const ComponentModelMolecule = molecule(
     const ModulesLoadingAtom = atom(
       get =>
         get(ModuleDetailsStateAtom).state === 'loading' ||
-        // @ts-expect-error figure out why this is happening
-        get(ModuleDetailsAtom).status === 'pending'
+        // Only has status while details are being loaded
+        ((get(ModuleDetailsAtom) as unknown) as ModuleDetails).status ===
+          'pending'
     );
 
     /**
