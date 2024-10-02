@@ -1,23 +1,24 @@
 import { RaisinElementNode, RaisinNode } from '@raisins/core';
 import { Meta } from '@storybook/react';
-import { Atom, atom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
 } from 'bunshi/react';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { Atom, atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+
 import JSONPointer from 'jsonpointer';
 import React, { CSSProperties, useMemo } from 'react';
 import {
+  BasicCanvasController,
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasScopeMolecule,
   CanvasSelectionMolecule,
 } from './canvas';
-import { CanvasController } from './canvas/CanvasController';
+import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
 import { ComponentModelMolecule, Module } from './component-metamodel';
 import { PackageEditor } from './component-metamodel/ComponentModel.stories';
 import { CoreMolecule, SelectedNodeMolecule } from './core';
@@ -42,9 +43,6 @@ import { NodeMolecule } from './node';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
 import { StyleEditorController } from './stylesheets/StyleEditor';
-import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
-import { BasicCanvasController } from './canvas';
-import { waitForUpdate } from './util/waitForUpdate';
 
 const meta: Meta = {
   title: 'Editor',
@@ -392,8 +390,8 @@ const sizes: Size[] = [
 function ToolbarController() {
   const atoms = useMolecule(ToolbarMolecule);
   const historySize = useAtom(atoms.HistorySizeAtom)[0];
-  const undo = useUpdateAtom(atoms.UndoAtom);
-  const redo = useUpdateAtom(atoms.RedoAtom);
+  const undo = useSetAtom(atoms.UndoAtom);
+  const redo = useSetAtom(atoms.RedoAtom);
   const [mode, setMode] = useAtom(atoms.ModeAtom);
   const [size, setSize] = useAtom(atoms.SizeAtom);
   const [outlined, setOutlined] = useAtom(atoms.OutlineAtom);
