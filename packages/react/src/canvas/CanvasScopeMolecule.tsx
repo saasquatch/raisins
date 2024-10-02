@@ -29,7 +29,7 @@ import {
   SnabbdomRenderer,
 } from './util/raisinToSnabdom';
 
-type CanvasEventListener = WritableAtom<null, RichCanvasEvent>;
+type CanvasEventListener = WritableAtom<null, RichCanvasEvent[], void>;
 
 /**
  * Used to "burn down" a snabbdom view for full replacement instead of incremental replacement.
