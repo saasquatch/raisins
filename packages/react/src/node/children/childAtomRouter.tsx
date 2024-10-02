@@ -1,5 +1,5 @@
 import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import { PrimitiveAtom, useAtom } from 'jotai';
+import { Atom, PrimitiveAtom, useAtom } from 'jotai';
 import { focusAtom } from 'jotai-optics';
 import { splitAtom } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
@@ -24,15 +24,18 @@ const childAtomRouter = (
 export function useChildAtoms(
   nodeAtom: PrimitiveAtom<RaisinNode>
 ): PrimitiveAtom<RaisinNode>[] {
-  const childrenOrUndefined = polymorphicAtom(nodeAtom, childAtomRouter);
+  const childrenOrUndefined = polymorphicAtom(
+    nodeAtom,
+    childAtomRouter
+  ) as Atom<unknown>;
 
   const [
     childAtoms,
     // TODO: At some point, figure out how to provide `removeChild` down the tree.
     removeChild,
   ] = useAtom(childrenOrUndefined) ?? [undefined, undefined];
-  // @ts-ignore TODO jotai 2 update
-  return childAtoms ?? [];
+
+  return (childAtoms as PrimitiveAtom<RaisinNode>[]) ?? [];
 }
 
 const chilOptic = () =>
@@ -56,7 +59,7 @@ export function useChildAtomsForked(
     removeChild,
   ] = useAtom(childrenOrUndefined) ?? [undefined, undefined];
 
-  return childAtoms ?? [];
+  return (childAtoms as PrimitiveAtom<RaisinNode>[]) ?? [];
 }
 
 const memoize = createMemoizeAtom();
