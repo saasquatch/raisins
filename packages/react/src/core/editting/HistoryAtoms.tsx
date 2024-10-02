@@ -13,7 +13,7 @@ type HistoryState = {
  * A set of atoms for dealing with undo/redo history
  *
  */
-export const HistoryMolecule = molecule((getMol) => {
+export const HistoryMolecule = molecule(getMol => {
   const {
     InternalTransactionAtom,
     StateListeners,
@@ -37,7 +37,7 @@ export const HistoryMolecule = molecule((getMol) => {
   /**
    * Returns the sizes of the undo/redo stacks for the UI
    */
-  const HistorySizeAtom = atom((get) => {
+  const HistorySizeAtom = atom(get => {
     return {
       undoSize: get(undoAtoms.stack).length,
       redoSize: get(redoAtoms.stack).length,
@@ -121,18 +121,21 @@ export function branchAtoms<T>() {
     }
   });
 
-  const pop = atom(null, (get, set, target: WritableAtom<unknown, T>) => {
-    const items = get(stack);
-    if (items.length <= 0) {
-      // Can't pop an empty stack
-      return;
-    }
-    const [item, ...rest] = items;
+  const pop = atom(
+    null,
+    (get, set, target: WritableAtom<unknown, T[], void>) => {
+      const items = get(stack);
+      if (items.length <= 0) {
+        // Can't pop an empty stack
+        return;
+      }
+      const [item, ...rest] = items;
 
-    set(prevTime, undefined);
-    set(stack, rest);
-    set(target, item);
-  });
+      set(prevTime, undefined);
+      set(stack, rest);
+      set(target, item);
+    }
+  );
 
   return {
     stack,
