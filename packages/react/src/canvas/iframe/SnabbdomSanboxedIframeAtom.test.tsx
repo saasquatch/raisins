@@ -1,4 +1,3 @@
-import { act, renderHook } from '@testing-library/react-hooks/dom';
 import expect from 'expect';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
@@ -10,9 +9,10 @@ import {
   SnabbdomIframeProps,
   SnabbdomIframeScope,
 } from './SnabbdomSanboxedIframeAtom';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 describe('Thing', () => {
-  const useSnabbsom = () => {
+  const useSnabbdom = () => {
     const atoms = useMolecule(SnabbdomIframeMolecule);
     const [state, setState] = useAtom(atoms);
     return { state, setState };
@@ -30,8 +30,9 @@ describe('Thing', () => {
     };
   });
   it('Fails without a wrapper', () => {
-    const { result } = renderHook(() => useSnabbsom());
-    expect(result.error).toBeTruthy();
+    expect(() => {
+      const { result } = renderHook(() => useSnabbdom());
+    }).toThrowError();
   });
 
   // TODO: Move this testing functionality to playwright tests
@@ -41,7 +42,7 @@ describe('Thing', () => {
         {children}
       </ScopeProvider>
     );
-    const { result, waitForNextUpdate } = renderHook(() => useSnabbsom(), {
+    const { result } = renderHook(() => useSnabbdom(), {
       wrapper: Wrapper,
     });
 
@@ -56,7 +57,7 @@ describe('Thing', () => {
     expect((result.current.state as any).error).toBeUndefined();
     expect(result.current.state.type).toBe('initializing');
 
-    await waitForNextUpdate();
+    await waitFor(() => result.current.state.type === 'loaded');
     expect((result.current.state as any).error).toBeUndefined();
     expect(result.current.state.type).toBe('loaded');
   });
