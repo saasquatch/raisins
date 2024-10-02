@@ -8,7 +8,7 @@ import { DefaultProseSchema } from './prosemirror/default-schema/DefaultProseSch
 import { DefaultProseSchemaHotkeysPlugin } from './prosemirror/default-schema/DefaultProseSchemaHotkeysPlugin';
 import { ProseEditorScopeProps } from './prosemirror/ProseEditorScope';
 
-export const RichTextMolecule = molecule((getMol) => {
+export const RichTextMolecule = molecule(getMol => {
   const nodeAtoms = getMol(NodeMolecule);
   const nodeAtom = nodeAtoms.nodeAtom as PrimitiveAtom<RaisinElementNode>;
 
@@ -18,9 +18,10 @@ export const RichTextMolecule = molecule((getMol) => {
 
   const docNodeAtom = atom<
     RaisinDocumentNode,
-    SetStateAction<RaisinDocumentNode>
+    SetStateAction<RaisinDocumentNode>[],
+    void
   >(
-    (get) => {
+    get => {
       return {
         type: 'root',
         children: get(nodeAtom)?.children,
@@ -45,7 +46,7 @@ export const RichTextMolecule = molecule((getMol) => {
   const proseAtom = atom<ProseEditorScopeProps>({
     node: docNodeAtom,
     selection: nodeAtoms.bookmarkForNode,
-    plugins: atom((get) => {
+    plugins: atom(get => {
       const HistoryPlugin = get(historyPluginAtoms.HistoryKeyMapPluginAtom);
       if (!HistoryPlugin) {
         return [DefaultProseSchemaHotkeysPlugin];
