@@ -1,7 +1,7 @@
 {
   "name": "@raisins/stencil-docs-target",
   "description": "A custom docs target for Stencil components. Edit in Raisins.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "author": "ReferralSaaSquatch.com, Inc.",
   "module": "dist/stencil-docs-target.esm.js",
@@ -66,6 +66,6 @@
   },
   "homepage": "https://github.com/saasquatch/raisins",
   "dependencies": {
-    "@raisins/schema": "^1.1.0"
+    "@raisins/schema": "^1.1.1"
   }
 }
