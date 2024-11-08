@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2
+
+### Patch Changes
+
+- [#26](https://github.com/saasquatch/raisins/pull/26) [`ca29df3`](https://github.com/saasquatch/raisins/commit/ca29df3c84f5445392c5337e82f31fd174726642) Thanks [@00salmon](https://github.com/00salmon)! - bump prosemirror package versions and remove global whitespace cleanup to prevent issues editing text nodes
+
 ## 1.3.1
 
 ### Patch Changes
