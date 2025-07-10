@@ -1,30 +1,85 @@
-import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
+import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import splitOnFirst from './split-on-first';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
+// @ts-expect-error: asdf
+function walk(obj, cb, ignoreKeys: Set<string> = new Set()) {
+  const newSet = new Set(ignoreKeys);
+  if (typeof obj === 'string' || !obj) return cb(obj);
+  if (Array.isArray(obj)) {
+    const tags = obj.filter(tag => !newSet.has(tag));
+    tags.forEach(tag => newSet.add(tag));
+    return tags.map(cb);
+  }
+
+  const keys = Object.keys(obj).filter(key => !newSet.has(key));
+  keys.forEach(key => newSet.add(key));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return keys.reduce((prev, key): any => {
+    return {
+      ...prev,
+      [key]: {
+        children: walk(obj[key], cb, newSet),
+        ...cb(key),
+      },
+    };
+  }, {});
+}
+
 export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
+  const getStates = (tag: string): schema.ComponentState[] => {
+    const component = docs.components.find(c => c.tag === tag);
+    const states: schema.ComponentState[] =
+      component?.props.reduce((arr, p) => {
+        const demosForProp = p.docsTags
+          .filter(t => t.name === 'componentState')
+          .map(t => {
+            console.log('text', t.text);
+            const parsed = JSON.parse(t.text!);
+            const componentState: schema.ComponentState = {
+              title: parsed.title!,
+              // @ts-expect-error: add slot to type
+              slot: parsed.slot,
+              dependencies: parsed.dependencies,
+              props: {
+                [p.name]: parsed.props,
+              },
+            };
+            // Sorry future people for doing mutable.
+            return componentState;
+          });
+        return [...arr, ...demosForProp];
+      }, [] as schema.ComponentState[]) || [];
+
+    return states;
+  };
+
   const tags: schema.CustomElement[] = docs.components
-    .filter(isUndocumented)
+    .filter(documented)
     .map(comp => {
       try {
-        const demos: schema.ComponentState[] = comp.props.reduce((arr, p) => {
-          const demosForProp = p.docsTags
-            .filter(t => t.name === 'demo')
-            .map(t => {
-              const [title, propsRaw] = splitOnFirst(t.text!, ' - ');
-              const componentState: schema.ComponentState = {
-                title: title!,
-                props: {
-                  [p.name]: JSON.parse(propsRaw!),
-                },
-              };
-              // Sorry future people for doing mutable.
-              return componentState;
-            });
-          return [...arr, ...demosForProp];
-        }, [] as schema.ComponentState[]);
+        // TEST
+        console.log({
+          comp: comp.tag,
+          graph: JSON.stringify(comp.dependencies, null, 2),
+        });
+        const ignoreTags = new Set<string>([comp.tag]);
+        const includeTag = (tag: string) => {
+          const states = getStates(tag);
+          const component = docs.components.find(c => c.tag === tag);
+          const dependencies = component?.dependencies || [];
+
+          const children = walk(dependencies, includeTag, ignoreTags);
+          return {
+            states,
+            tag,
+            children,
+          };
+        };
+        const stateNode = includeTag(comp.tag);
+
         const attributes = comp.props
           .filter(p => typeof p.attr !== 'undefined')
           .filter(documented)
@@ -57,6 +112,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
+        // @ts-expect-error: FIXME
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
@@ -79,7 +135,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                 content,
               };
             }),
-          demoStates: demos.length > 0 ? demos : undefined,
+          ...(stateNode.states.length ? { demoStates: stateNode } : {}),
           validParents: jsonTagValue(comp, 'validParents'),
           slotEditor: slotEditor(comp),
           canvasRenderer: canvasRenderer(comp),
@@ -115,11 +171,6 @@ function jsonTagValue(tags: HasDocsTags, name: string) {
     throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e);
   }
 }
-function hasTag(tagName: string) {
-  return (d: HasDocsTags) =>
-    d.docsTags?.find(t => t.name === tagName) ? true : false;
-}
-const isUndocumented = () => hasTag('undocumented');
 const documented = (x: HasDocsTags) =>
   !x.docsTags.find(tag => tag.name === 'undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
