@@ -39,4 +39,6 @@ export type ParentRPC = {
 
 export type ChildRPC = {
   render(html: VNode): void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  postMessage(data: any, targetOrigin: string): void;
 };
