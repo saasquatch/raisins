@@ -38,13 +38,15 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           .map(t => {
             console.log('text', t.text);
             const parsed = JSON.parse(t.text!);
+            const { title, slot, dependencies, props, ...meta } = parsed;
             const componentState: schema.ComponentState = {
-              title: parsed.title!,
+              title,
               // @ts-expect-error: add slot to type
-              slot: parsed.slot,
-              dependencies: parsed.dependencies,
+              slot,
+              dependencies,
+              meta,
               props: {
-                [p.name]: parsed.props,
+                [p.name]: props,
               },
             };
             // Sorry future people for doing mutable.
@@ -60,11 +62,6 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
     .filter(documented)
     .map(comp => {
       try {
-        // TEST
-        console.log({
-          comp: comp.tag,
-          graph: JSON.stringify(comp.dependencies, null, 2),
-        });
         const ignoreTags = new Set<string>([comp.tag]);
         const includeTag = (tag: string) => {
           const states = getStates(tag);
