@@ -6,7 +6,7 @@ import { ModuleDetails } from '../types';
 /**
  * Converts module details into a set of `Block`
  *
- * Blocks are used for inserting example content into Raisin
+ * Blocks are used for inserting example content into Raisins
  *
  * @param moduleDetails
  * @returns
@@ -40,6 +40,7 @@ function reduceExamples(
   const blockExample = {
     title: currentValue.title,
     content: elm,
+    exampleGroup: currentValue.exampleGroup,
   };
   return [...previousValue, blockExample];
 }

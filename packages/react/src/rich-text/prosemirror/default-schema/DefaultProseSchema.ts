@@ -41,7 +41,7 @@ const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== 'a').reduce(
               const link = dom as HTMLElement;
               const fromDom = component?.attributes?.reduce((attrs, attr) => {
                 return { ...attrs, [attr.name]: link.getAttribute(attr.name) };
-              }, {} as Record<string, string | null>);
+              }, {} as Record<string, string | null>) || {};
               return fromDom;
             },
           },

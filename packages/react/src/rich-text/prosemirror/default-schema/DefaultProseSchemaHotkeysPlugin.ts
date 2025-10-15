@@ -1,6 +1,5 @@
 import {
   chainCommands,
-  Command,
   createParagraphNear,
   liftEmptyBlock,
   newlineInCode,
@@ -9,7 +8,7 @@ import {
 } from 'prosemirror-commands';
 import {} from 'prosemirror-transform';
 import { keymap } from 'prosemirror-keymap';
-import { EditorState, Plugin, Transaction } from 'prosemirror-state';
+import { Command, EditorState, Plugin, Transaction } from 'prosemirror-state';
 import { DefaultProseSchema } from './DefaultProseSchema';
 
 const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
