@@ -1,6 +1,6 @@
 import { DefaultTextMarks } from '@raisins/core';
-import { atom, WritableAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
+import { atom, WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import type { MarkType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
