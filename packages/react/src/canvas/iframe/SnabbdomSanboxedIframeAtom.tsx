@@ -26,7 +26,7 @@ const iframeSrc = (
   ${head}
   ${childApiSrc(registry, selector, events)}
 </head>
-<body></body>
+<body style="padding:2px; background: #eaeaea !important;"></body>
 </html>`;
 
 function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
