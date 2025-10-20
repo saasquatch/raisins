@@ -35,7 +35,6 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const demosForProp = p.docsTags
           .filter(t => t.name === 'componentState')
           .map(t => {
-            console.log('text', t.text);
             const parsed = JSON.parse(t.text!);
             const { title, slot, dependencies, props, ...meta } = parsed;
             const componentState: schema.ComponentState = {
