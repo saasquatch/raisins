@@ -40,6 +40,7 @@ function reduceExamples(
   const blockExample = {
     title: currentValue.title,
     content: elm,
+    componentTag: currentValue.tagName,
   };
   return [...previousValue, blockExample];
 }

@@ -15,6 +15,7 @@ export interface Package {
 export type Example = {
   title: string;
   content: string;
+  tagName: string;
 };
 
 // Custom element modules

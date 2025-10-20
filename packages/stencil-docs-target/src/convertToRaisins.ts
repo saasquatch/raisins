@@ -4,7 +4,6 @@ import splitOnFirst from './split-on-first';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
-// @ts-expect-error: asdf
 function walk(obj, cb, ignoreKeys: Set<string> = new Set()) {
   const newSet = new Set(ignoreKeys);
   if (typeof obj === 'string' || !obj) return cb(obj);
@@ -130,6 +129,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               return {
                 title,
                 content,
+                tagName: comp.tag,
               };
             }),
           ...(stateNode.states.length ? { demoStates: stateNode } : {}),
