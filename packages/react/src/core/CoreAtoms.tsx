@@ -61,7 +61,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       if (ref.current?.html === html) {
         return ref.current.node;
       }
-      const parsedHtml = htmlParser(html, { cleanWhitespace: true });
+      const parsedHtml = htmlParser(html, { cleanWhitespace: false });
 
       return parsedHtml;
     },

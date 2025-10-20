@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.3.2
+
+### Patch Changes
+
+- [#26](https://github.com/saasquatch/raisins/pull/26) [`ca29df3`](https://github.com/saasquatch/raisins/commit/ca29df3c84f5445392c5337e82f31fd174726642) Thanks [@00salmon](https://github.com/00salmon)! - bump prosemirror package versions and remove global whitespace cleanup to prevent issues editing text nodes
+
+## 1.3.1
+
+### Patch Changes
+
+- [#24](https://github.com/saasquatch/raisins/pull/24) [`c446297`](https://github.com/saasquatch/raisins/commit/c4462972a42b401ca313ca6b63e9ee34b610084d) Thanks [@00salmon](https://github.com/00salmon)! - Includes example group with example blocks to allow examples that don't have the component as the wrapper to be properly grouped
+
+- Updated dependencies [[`c446297`](https://github.com/saasquatch/raisins/commit/c4462972a42b401ca313ca6b63e9ee34b610084d)]:
+  - @raisins/schema@1.1.1
+  - @raisins/core@1.1.5
+
 ## 1.3.0
 
 ### Minor Changes

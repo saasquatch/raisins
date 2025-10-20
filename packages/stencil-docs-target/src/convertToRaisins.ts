@@ -123,13 +123,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               const [title, content] = splitOnFirst(d.text ?? '', ' - ');
               if (!title || !content) {
                 throw new Error(
-                  `Invalid example om ${comp.tag} is missing a title or content`
+                  `Invalid example on ${comp.tag} is missing a title or content`
                 );
               }
               return {
                 title,
                 content,
                 tagName: comp.tag,
+                exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
               };
             }),
           ...(stateNode.states.length ? { demoStates: stateNode } : {}),

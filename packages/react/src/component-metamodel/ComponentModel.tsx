@@ -110,6 +110,7 @@ export const ComponentModelMolecule = molecule(
           title: block.title,
           content: blockFromHtml(block.examples?.[0]?.content as string),
           componentTag: block.tagName,
+          exampleGroup: block.exampleGroup,
         };
       }) as Block[];
       return [...blocksFromModules, ...defaultBlocks];
@@ -328,8 +329,9 @@ type BlockGroups = Record<string, Block[]>;
 function group(list: Block[], getComponentMeta: Function): BlockGroups {
   return list.reduce(function(allGroups: BlockGroups, block: Block) {
     const exampleGroup =
-      getComponentMeta(block.componentTag || block.content?.tagName)
-        ?.exampleGroup ?? DEFAULT_BLOCK_GROUP;
+      getComponentMeta(block.content?.tagName)?.exampleGroup ??
+      block.exampleGroup ??
+      DEFAULT_BLOCK_GROUP;
     const groupArray = allGroups[exampleGroup] ?? [];
     const withBlock = [...groupArray, block];
     return {
@@ -346,6 +348,7 @@ export type Block = {
   title: string;
   content: RaisinElementNode;
   componentTag: string;
+  exampleGroup?: string;
 };
 
 export type ComponentModel = {

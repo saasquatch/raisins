@@ -16,6 +16,7 @@ export type Example = {
   title: string;
   content: string;
   tagName: string;
+  exampleGroup?: string;
 };
 
 // Custom element modules
