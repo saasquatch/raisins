@@ -257,7 +257,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
         }
       },
       postMessage(data, targetOrigin) {
-        window.postMessage(data, targetOrigin)
+        window.postMessage(data, targetOrigin);
       }
     };
     const myConnection = (window as any).Penpal.connectToParent({
