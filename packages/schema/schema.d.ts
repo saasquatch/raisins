@@ -246,6 +246,18 @@ export interface ComponentState {
    * Map of property names to values.
    */
   props: object;
+  /**
+   * Name of slot
+   */
+  slot: string;
+  /**
+   * Array of component tags that this state depends on
+   */
+  dependencies: Array<string>;
+  /**
+   * Metadata
+   */
+  meta: Record<string, unknown>;
 }
 
 export interface Slot {

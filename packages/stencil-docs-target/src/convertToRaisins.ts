@@ -1,40 +1,9 @@
 import * as schema from '@raisins/schema/schema';
 import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import splitOnFirst from './split-on-first';
+import { walk } from './walk';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
-type WalkableValue = string;
-interface WalkableObject {
-  [key: string]: WalkableObject | WalkableValue[];
-}
-
-function walk(
-  obj: WalkableObject | WalkableValue[],
-  cb: (value: string) => object,
-  ignoreKeys: Set<string> = new Set()
-) {
-  const newSet = new Set(ignoreKeys);
-  if (typeof obj === 'string') return cb(obj);
-  if (obj === null || obj === undefined) return cb(obj);
-  if (Array.isArray(obj)) {
-    const tags = obj.filter(tag => !newSet.has(tag));
-    tags.forEach(tag => newSet.add(tag));
-    return tags.map(cb);
-  }
-
-  const keys = Object.keys(obj).filter(key => !newSet.has(key));
-  keys.forEach(key => newSet.add(key));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return keys.reduce((prev, key): any => {
-    return {
-      ...prev,
-      [key]: {
-        children: walk(obj[key], cb, newSet),
-        ...cb(key),
-      },
-    };
-  }, {});
-}
 
 export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
   const getStates = (tag: string): schema.ComponentState[] => {
@@ -55,7 +24,6 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             const { title, slot, dependencies, props, ...meta } = parsed;
             const componentState: schema.ComponentState = {
               title,
-              // @ts-expect-error: add slot to type
               slot,
               dependencies,
               meta,
