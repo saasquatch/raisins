@@ -43,7 +43,14 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const demosForProp = p.docsTags
           .filter(t => t.name === 'componentState')
           .map(t => {
-            const parsed = JSON.parse(t.text!);
+            let parsed;
+            try {
+              parsed = JSON.parse(t.text!);
+            } catch (e) {
+              throw new Error(
+                `Unable to parse JSON for @componentState tag on component "${component?.tag}" and property "${p.name}". Reason: ${e}`
+              );
+            }
             const { title, slot, dependencies, props, ...meta } = parsed;
             const componentState: schema.ComponentState = {
               title,
