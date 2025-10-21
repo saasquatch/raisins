@@ -14,7 +14,8 @@ function walk(
   ignoreKeys: Set<string> = new Set()
 ) {
   const newSet = new Set(ignoreKeys);
-  if (typeof obj === 'string' || !obj) return cb(obj);
+  if (typeof obj === 'string') return cb(obj);
+  if (obj === null || obj === undefined) return cb(obj);
   if (Array.isArray(obj)) {
     const tags = obj.filter(tag => !newSet.has(tag));
     tags.forEach(tag => newSet.add(tag));
