@@ -107,7 +107,12 @@ export interface CustomElement {
   /**
    * States for previewing the internal state of components
    */
-  demoStates?: Array<ComponentState>;
+  demoStates?: {
+    states: Array<ComponentState>;
+    tag: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    children: any;
+  };
 
   /**
    * Which editor toolbar to show when this element is selected

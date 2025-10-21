@@ -3,8 +3,16 @@ import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import splitOnFirst from './split-on-first';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
+type WalkableValue = string;
+interface WalkableObject {
+  [key: string]: WalkableObject | WalkableValue[];
+}
 
-function walk(obj, cb, ignoreKeys: Set<string> = new Set()) {
+function walk(
+  obj: WalkableObject | WalkableValue[],
+  cb: (value: string) => object,
+  ignoreKeys: Set<string> = new Set()
+) {
   const newSet = new Set(ignoreKeys);
   if (typeof obj === 'string' || !obj) return cb(obj);
   if (Array.isArray(obj)) {
@@ -107,7 +115,6 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
-        // @ts-expect-error: FIXME
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
