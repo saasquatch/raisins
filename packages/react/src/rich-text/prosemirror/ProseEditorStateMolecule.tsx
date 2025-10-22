@@ -66,7 +66,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       }
 
       const state = nextState.state;
-
+// selects entire text block within prose on initial click
       if (
         currentState.selection.$anchor.pos === 0 &&
         currentState.selection.$head.pos === 0
