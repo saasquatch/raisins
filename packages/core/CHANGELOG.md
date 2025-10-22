@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.6
+
+### Patch Changes
+
+- Updated dependencies [[`df59327`](https://github.com/saasquatch/raisins/commit/df59327345c57e7b6ca0a41a25b566d5e66bf8a0)]:
+  - @raisins/schema@1.2.0
+
 ## 1.1.5
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- [#28](https://github.com/saasquatch/raisins/pull/28) [`df59327`](https://github.com/saasquatch/raisins/commit/df59327345c57e7b6ca0a41a25b566d5e66bf8a0) Thanks [@Locrian24](https://github.com/Locrian24)! - Add support for component states as well as various updates to support states in the raisins editor
+
 ## 1.1.1
 
 ### Patch Changes
