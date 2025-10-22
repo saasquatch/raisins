@@ -15,7 +15,7 @@ export interface Package {
 export type Example = {
   title: string;
   content: string;
-  tagName: string;
+  tagName?: string;
   exampleGroup?: string;
 };
 
