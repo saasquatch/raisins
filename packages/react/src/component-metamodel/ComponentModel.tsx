@@ -109,6 +109,7 @@ export const ComponentModelMolecule = molecule(
         return {
           title: block.title,
           content: blockFromHtml(block.examples?.[0]?.content as string),
+          componentTag: block.tagName,
           exampleGroup: block.exampleGroup,
         };
       }) as Block[];
@@ -346,6 +347,7 @@ function group(list: Block[], getComponentMeta: Function): BlockGroups {
 export type Block = {
   title: string;
   content: RaisinElementNode;
+  componentTag: string;
   exampleGroup?: string;
 };
 

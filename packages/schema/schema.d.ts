@@ -15,6 +15,7 @@ export interface Package {
 export type Example = {
   title: string;
   content: string;
+  tagName: string;
   exampleGroup?: string;
 };
 
@@ -106,7 +107,12 @@ export interface CustomElement {
   /**
    * States for previewing the internal state of components
    */
-  demoStates?: Array<ComponentState>;
+  demoStates?: {
+    states: Array<ComponentState>;
+    tag: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    children: any;
+  };
 
   /**
    * Which editor toolbar to show when this element is selected
@@ -240,6 +246,18 @@ export interface ComponentState {
    * Map of property names to values.
    */
   props: object;
+  /**
+   * Name of slot
+   */
+  slot: string;
+  /**
+   * Array of component tags that this state depends on
+   */
+  dependencies: Array<string>;
+  /**
+   * Metadata
+   */
+  meta: Record<string, unknown>;
 }
 
 export interface Slot {

@@ -8,8 +8,8 @@ import {
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, SetStateAction, WritableAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
+import { atom, SetStateAction, WritableAtom } from 'jotai';
 import { MutableRefObject } from 'react';
 import { ConfigMolecule } from './RaisinConfigScope';
 

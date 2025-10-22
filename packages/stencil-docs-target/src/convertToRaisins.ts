@@ -1,30 +1,64 @@
-import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import * as schema from '@raisins/schema/schema';
+import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
 import splitOnFirst from './split-on-first';
+import { walk } from './walk';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
 export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
+  const getStates = (tag: string): schema.ComponentState[] => {
+    const component = docs.components.find(c => c.tag === tag);
+    const states: schema.ComponentState[] =
+      component?.props.reduce((arr, p) => {
+        const demosForProp = p.docsTags
+          .filter(t => t.name === 'componentState')
+          .map(t => {
+            let parsed;
+            try {
+              parsed = JSON.parse(t.text!);
+            } catch (e) {
+              throw new Error(
+                `Unable to parse JSON for @componentState tag on component "${component?.tag}" and property "${p.name}". Reason: ${e}`
+              );
+            }
+            const { title, slot, dependencies, props, ...meta } = parsed;
+            const componentState: schema.ComponentState = {
+              title,
+              slot,
+              dependencies,
+              meta,
+              props: {
+                [p.name]: props,
+              },
+            };
+            // Sorry future people for doing mutable.
+            return componentState;
+          });
+        return [...arr, ...demosForProp];
+      }, [] as schema.ComponentState[]) || [];
+
+    return states;
+  };
+
   const tags: schema.CustomElement[] = docs.components
-    .filter(isUndocumented)
+    .filter(documented)
     .map(comp => {
       try {
-        const demos: schema.ComponentState[] = comp.props.reduce((arr, p) => {
-          const demosForProp = p.docsTags
-            .filter(t => t.name === 'demo')
-            .map(t => {
-              const [title, propsRaw] = splitOnFirst(t.text!, ' - ');
-              const componentState: schema.ComponentState = {
-                title: title!,
-                props: {
-                  [p.name]: JSON.parse(propsRaw!),
-                },
-              };
-              // Sorry future people for doing mutable.
-              return componentState;
-            });
-          return [...arr, ...demosForProp];
-        }, [] as schema.ComponentState[]);
+        const ignoreTags = new Set<string>([comp.tag]);
+        const includeTag = (tag: string) => {
+          const states = getStates(tag);
+          const component = docs.components.find(c => c.tag === tag);
+          const dependencies = component?.dependencies || [];
+
+          const children = walk(dependencies, includeTag, ignoreTags);
+          return {
+            states,
+            tag,
+            children,
+          };
+        };
+        const stateNode = includeTag(comp.tag);
+
         const attributes = comp.props
           .filter(p => typeof p.attr !== 'undefined')
           .filter(documented)
@@ -77,10 +111,11 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               return {
                 title,
                 content,
+                tagName: comp.tag,
                 exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
               };
             }),
-          demoStates: demos.length > 0 ? demos : undefined,
+          ...(stateNode.states.length ? { demoStates: stateNode } : {}),
           validParents: jsonTagValue(comp, 'validParents'),
           slotEditor: slotEditor(comp),
           canvasRenderer: canvasRenderer(comp),
@@ -116,11 +151,6 @@ function jsonTagValue(tags: HasDocsTags, name: string) {
     throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e);
   }
 }
-function hasTag(tagName: string) {
-  return (d: HasDocsTags) =>
-    d.docsTags?.find(t => t.name === tagName) ? true : false;
-}
-const isUndocumented = () => hasTag('undocumented');
 const documented = (x: HasDocsTags) =>
   !x.docsTags.find(tag => tag.name === 'undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');

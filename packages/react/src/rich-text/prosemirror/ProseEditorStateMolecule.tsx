@@ -1,7 +1,12 @@
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { Node } from 'prosemirror-model';
-import { EditorState, SelectionBookmark, Transaction } from 'prosemirror-state';
+import {
+  EditorState,
+  SelectionBookmark,
+  TextSelection,
+  Transaction,
+} from 'prosemirror-state';
 import { ProseEditorScope } from './ProseEditorScope';
 import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin';
 
@@ -59,6 +64,24 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
         );
         set(get(scope).node, nextRaisinNode);
       }
+
+      const state = nextState.state;
+// selects entire text block within prose on initial click
+      if (
+        currentState.selection.$anchor.pos === 0 &&
+        currentState.selection.$head.pos === 0
+      ) {
+        set(
+          get(scope).selection,
+          TextSelection.create(
+            state.doc,
+            0,
+            state.doc.content.size
+          ).getBookmark()
+        );
+        return;
+      }
+
       // IMPORTANT: This currently works ONLY if selection is updated AFTER document.
       // Otherwise typing at the end of a text area will throw an error.
       // e.g. "Position 51 out of range"

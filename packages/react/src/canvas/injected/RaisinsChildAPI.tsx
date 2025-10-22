@@ -256,6 +256,19 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
           dispatchResizeAll();
         }
       },
+      /**
+       * Sends a message to the child window using the browser's postMessage API.
+       * This method is exposed via the ChildRPC contract for parent-child communication,
+       * and is intended to be used by the parent to send data to the child in a controlled manner.
+       * It differs from direct usage of `window.postMessage` in that it is proxied through the RPC layer,
+       * allowing for more structured communication between parent and child frames.
+       *
+       * @param data - The data to send to the child window.
+       * @param targetOrigin - Specifies what the origin of the target window must be for the event to be dispatched.
+       */
+      postMessage(data, targetOrigin) {
+        window.postMessage(data, targetOrigin);
+      }
     };
     const myConnection = (window as any).Penpal.connectToParent({
       // Methods child is exposing to parent
