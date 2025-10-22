@@ -347,7 +347,7 @@ function group(list: Block[], getComponentMeta: Function): BlockGroups {
 export type Block = {
   title: string;
   content: RaisinElementNode;
-  componentTag: string;
+  componentTag?: string;
   exampleGroup?: string;
 };
 
