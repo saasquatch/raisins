@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+
+### Patch Changes
+
+- [#31](https://github.com/saasquatch/raisins/pull/31) [`b159852`](https://github.com/saasquatch/raisins/commit/b1598521bf2e628438bb81c099ca9af5657fa936) Thanks [@Locrian24](https://github.com/Locrian24)! - Remove grey iframe canvas background
+
 ## 1.4.0
 
 ### Minor Changes
