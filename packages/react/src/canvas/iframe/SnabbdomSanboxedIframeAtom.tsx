@@ -1,6 +1,5 @@
+import { createScope, molecule, Molecule } from 'bunshi/react';
 import { Atom, atom, WritableAtom } from 'jotai';
-import { createScope, molecule } from 'bunshi/react';
-import { Molecule } from 'bunshi/react';
 import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
 import { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';
@@ -26,7 +25,7 @@ const iframeSrc = (
   ${head}
   ${childApiSrc(registry, selector, events)}
 </head>
-<body style="padding:2px; background: #eaeaea !important;"></body>
+<body style="padding:2px"></body>
 </html>`;
 
 function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
