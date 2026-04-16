@@ -235,6 +235,11 @@ export interface Attribute {
    * Text to display in a tooltip when the attribute is disabled due to feature enforcement.
    */
   featureTooltip?: string;
+
+  /**
+   * The flavor required for this attribute to be available in the raisins editor.
+   */
+  requiredFlavor?: string;
 }
 
 export interface ComponentState {
