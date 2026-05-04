@@ -56,7 +56,7 @@
   ],
   "dependencies": {
     "@raisins/core": "^1.1.6",
-    "@raisins/schema": "^1.2.1",
+    "@raisins/schema": "^1.2.0",
     "@storybook/cli": "^7.0.21",
     "bunshi": "~2.0.2",
     "css-tree": "^1.1.3",
