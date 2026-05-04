@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- [#33](https://github.com/saasquatch/raisins/pull/33) [`91c7885`](https://github.com/saasquatch/raisins/commit/91c7885a435aa316d25062e0e1f34f469dcb67f7) Thanks [@00salmon](https://github.com/00salmon)! - Added new @requiredFlavor jsdoc to stencil-docs-target and schema
+
 ## 1.2.0
 
 ### Minor Changes
