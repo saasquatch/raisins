@@ -86,6 +86,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               required: required(p),
               requiredFeatures: jsonTagValue(p, 'requiredFeatures'),
               featureTooltip: tagValue(p.docsTags, 'featureTooltip'),
+              requiredFlavor: tagValue(p.docsTags, 'requiredFlavor'),
             };
 
             return attr;
