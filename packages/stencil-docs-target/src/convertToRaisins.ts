@@ -92,11 +92,29 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
+        const cssParts: schema.CssPart[] | undefined = comp.parts?.length
+          ? comp.parts.map(p => ({
+              name: p.name,
+              description: p.docs || undefined,
+            }))
+          : undefined;
+
+        const cssProperties:
+          | schema.CssCustomProperty[]
+          | undefined = comp.styles?.length
+          ? comp.styles.map(s => ({
+              name: s.name,
+              description: s.docs || undefined,
+            }))
+          : undefined;
+
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
           attributes,
+          cssParts,
+          cssProperties,
           requiredFeatures: jsonTagValue(comp, 'requiredFeatures'),
           featureTooltip: tagValue(comp.docsTags, 'featureTooltip'),
           exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),

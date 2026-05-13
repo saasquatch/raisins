@@ -85,6 +85,24 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   );
 };
 
+/**
+ * Raw CSS editor — round-trips the attribute value as-is. Used by attributes
+ * that store CSS (e.g. `data-raisin-css`) so consumers can opt into a CSS
+ * editing surface via `uiWidget: "css"`.
+ */
+export const DefaultCssWidget: AttributeWidget = () => {
+  const { valueAtom } = useMolecule(AttributeMolecule);
+  const [value, setValue] = useAtom(valueAtom);
+  return (
+    <textarea
+      rows={6}
+      style={{ width: '100%', fontFamily: 'monospace' }}
+      value={value ?? ''}
+      onChange={e => setValue((e.target as HTMLTextAreaElement).value)}
+    />
+  );
+};
+
 export const DefaultAttributeThemeMolecule = molecule<
   AttributeThemeMoleculeValue
 >(() => {
@@ -94,6 +112,7 @@ export const DefaultAttributeThemeMolecule = molecule<
       boolean: DefaultBooleanWidget,
       number: DefaultNumberWidget,
       select: DefaultSelectWidget,
+      css: DefaultCssWidget,
       [DefaultAttributeComponent]: DefaultTextWidget,
     }),
     templates: atom({
