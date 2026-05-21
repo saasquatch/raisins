@@ -78,7 +78,7 @@ export type CssEditingMoleculeType = {
    */
   SetInstanceCssAtom: WritableAtom<
     null,
-    { node: RaisinElementNode; css: string },
+    [{ node: RaisinElementNode; css: string }],
     void
   >;
 };
