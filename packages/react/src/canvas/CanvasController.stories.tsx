@@ -177,13 +177,13 @@ export const BigCanvasWithSelection = () => (
 );
 export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -242,13 +242,13 @@ const PositionedToolbar = ({
 
 export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -290,13 +290,13 @@ export const SQMText = ({ Component = BasicCanvasController }) => (
     startingHtml={`<div>First</div><div>Before</div><sqm-text>in sqm-text</sqm-text><div>After</div>`}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>

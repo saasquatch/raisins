@@ -91,20 +91,22 @@ const BlocksController = () => {
   return (
     <div
       style={{
-        width: '25%',
-        position: 'fixed',
-        overflowY: 'scroll',
-        height: '95vh',
+        overflowY: 'auto',
+        padding: '12px',
       }}
     >
-      <h2>Blocks</h2>
+      <h3 style={{ margin: '0 0 8px' }}>Blocks</h3>
       {(blocks.length ? blocks : fakeBlocks).map(block => {
         return (
           <div
+            key={block.title}
             style={{
-              border: '1px solid grey',
-              margin: '10px',
-              background: pickedBlock === block ? 'red' : 'inherit',
+              border: '1px solid #e0e0e0',
+              borderRadius: '4px',
+              padding: '8px 12px',
+              marginBottom: '6px',
+              cursor: 'pointer',
+              background: pickedBlock === block ? '#bbdefb' : '#fff',
             }}
             onClick={() =>
               pick({
@@ -154,9 +156,9 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = p
 const EditorWithProps = () => {
   return (
     <CanvasProvider>
-      <div style={{ display: 'flex' }}>
-        <div>
-          <details>
+      <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+        <div style={{ flex: '0 0 260px', borderRight: '1px solid #e0e0e0', overflowY: 'auto', padding: '12px' }}>
+          <details open>
             <summary>Blocks</summary>
             <BlocksController />
           </details>
@@ -169,7 +171,7 @@ const EditorWithProps = () => {
             )}
           />
         </div>
-        <div style={{ width: '74%', position: 'absolute', right: 0 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
           <CanvasFull />
         </div>
       </div>
@@ -180,9 +182,11 @@ const EditorWithProps = () => {
 const Editor = () => {
   useHotkeys();
   return (
-    <div style={{ display: 'flex' }}>
-      <BlocksController />
-      <div style={{ width: '74%', position: 'absolute', right: 0 }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+      <div style={{ flex: '0 0 260px', borderRight: '1px solid #e0e0e0', overflowY: 'auto' }}>
+        <BlocksController />
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
