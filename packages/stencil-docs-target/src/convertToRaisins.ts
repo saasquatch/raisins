@@ -95,20 +95,30 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const cssParts: schema.CssPart[] | undefined = comp.docsTags
               .filter(t => t.name === 'csspart')
               .map(t => {
-                const [name, ...rest] = (t.text ?? '').split(' - ');
+                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+                if (!name) {
+                  throw new Error(
+                    `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
+                  );
+                }
                 return {
                   name: name.trim(),
-                  description: rest.join(' - ').trim() || undefined,
+                  description: description?.trim() || undefined,
                 };
               }) || undefined;
 
         const cssProperties: schema.CssCustomProperty[] | undefined = comp.docsTags
               .filter(t => t.name === 'cssprop')
               .map(t => {
-                const [name, ...rest] = (t.text ?? '').split(' - ');
+                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+                if (!name) {
+                  throw new Error(
+                    `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
+                  );
+                }
                 return {
                   name: name.trim(),
-                  description: rest.join(' - ').trim() || undefined,
+                  description: description?.trim() || undefined,
                 };
               }) || undefined;;
 
