@@ -47,7 +47,9 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   const resizeObserver = new window.ResizeObserver(
     (entries: ResizeObserverEntry[]) => {
       const elements = entries.map((e) => e.target);
-      dispatchResize(elements);
+      // ResizeObserver only reports the elements whose size changed; this
+      // is a partial delta, not a full snapshot.
+      dispatchResize(elements, false);
     }
   );
 
@@ -206,11 +208,12 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     templateModule(()=>patch)
   ]);
 
-  function dispatchResize(elements: Element[]) {
+  function dispatchResize(elements: Element[], full?: boolean) {
     document.body.dispatchEvent(
       new CustomEvent(geometryEvent, {
         bubbles: true,
         detail: {
+          full: !!full,
           entries: elements.map((e) => {
             const mappedEntry: GeometryEntry = {
               contentRect: e.getBoundingClientRect(),
@@ -323,6 +326,9 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   });
 
   function dispatchResizeAll() {
-    dispatchResize(Array.from(document.querySelectorAll('*')));
+    // Full document snapshot: signals the parent to replace its cached
+    // geometry rather than merge, so stale entries for removed elements
+    // (e.g. plop targets after a drag ends) are evicted.
+    dispatchResize(Array.from(document.querySelectorAll('*')), true);
   }
 }.toString();

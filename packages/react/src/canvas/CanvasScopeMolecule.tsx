@@ -166,14 +166,36 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const geometryMap = new Map();
     const raisinsAttribute = get(CanvasConfig.SoulAttributeAtom);
 
-    existing.entries?.forEach(geo => {
-      if (!geo.target?.attributes[raisinsAttribute]) return;
-      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
-    });
+    const keyFor = (geo: GeometryEntry): string | undefined => {
+      const attrs = geo.target?.attributes;
+      if (!attrs) return undefined;
+      const soulId = attrs[raisinsAttribute];
+      if (soulId) return `soul:${soulId}`;
+      // Also track plop targets so parent-side overlays (e.g. canvas drag
+      // and drop) can locate them via the cursor position.
+      // NOTE: boolean snabbdom attrs become empty-string DOM attrs, so we
+      // use `in` rather than a truthy check.
+      if ('raisin-plop-target' in attrs) {
+        return `plop:${attrs['raisin-plop-parent']}/${attrs['raisin-plop-slot']}/${attrs['raisin-plop-idx']}`;
+      }
+      return undefined;
+    };
+
+    // For a *full* snapshot (dispatched after every iframe render), discard
+    // any existing entries first so elements that no longer exist in the
+    // iframe (e.g. plop targets removed when a drag ends) are evicted.
+    // For partial deltas (ResizeObserver callbacks), preserve existing
+    // entries and merge the new ones in.
+    if (!next.full) {
+      existing.entries?.forEach(geo => {
+        const key = keyFor(geo);
+        if (key) geometryMap.set(key, geo);
+      });
+    }
 
     next.entries?.forEach(geo => {
-      if (!geo.target?.attributes[raisinsAttribute]) return;
-      geometryMap.set(geo.target?.attributes[raisinsAttribute], geo);
+      const key = keyFor(geo);
+      if (key) geometryMap.set(key, geo);
     });
 
     const geometry = Array.from(geometryMap.values()).map(

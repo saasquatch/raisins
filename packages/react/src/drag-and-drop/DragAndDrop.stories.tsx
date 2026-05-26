@@ -34,6 +34,8 @@ import { NodeRichTextController } from '../rich-text/RichTextEditor';
 import { CoreMolecule } from '../core/CoreAtoms';
 import {
   BasicCanvasController,
+  CanvasDragAndDropMolecule,
+  CanvasDragDropWrapper,
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasProvider,
@@ -401,23 +403,33 @@ function DragDropSlotWidget() {
   const hasEditor = slotWidget === 'inline';
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
+  if (hasEditor) {
+    return (
+      <div>
+        <div style={SlotLabel}>
+          {slotDetails.title ?? slotDetails.name} ({childNodes.length})
+        </div>
+        <NodeRichTextController />
+      </div>
+    );
+  }
+
   return (
     <div>
       <div style={SlotLabel}>
         {slotDetails.title ?? slotDetails.name} ({childNodes.length})
       </div>
-      {hasEditor && <NodeRichTextController />}
-      {!hasEditor && !isEmpty && (
-        <div>
-          <DragDropTarget idx={0} slot={slotDetails.name} />
+      <div>
+        <DragDropTarget idx={0} slot={slotDetails.name} />
+        {!isEmpty && (
           <ChildrenEditorForAtoms
             childAtoms={childNodes}
             Component={({ idx }) => (
               <DragDropSlotChild idx={idx} slotName={atoms.slotName} />
             )}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -440,7 +452,12 @@ function DragDropCanvas() {
   useMolecule(CanvasSelectionMolecule);
   useMolecule(CanvasHoveredMolecule);
   useMolecule(CanvasPickAndPlopMolecule);
-  return <BasicCanvasController />;
+  useMolecule(CanvasDragAndDropMolecule);
+  return (
+    <CanvasDragDropWrapper>
+      <BasicCanvasController />
+    </CanvasDragDropWrapper>
+  );
 }
 
 // -- Editor composition --

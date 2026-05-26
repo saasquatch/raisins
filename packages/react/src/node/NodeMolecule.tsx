@@ -104,11 +104,14 @@ export const NodeMolecule = molecule((getMol, getScope) => {
 
   const canPlopHereAtom = atom((get) => {
     const node = get(n);
-    const pickedNode = get(PickedNodeAtom);
-    if (!pickedNode || !node) return () => false;
+    if (!node || !isElementNode(node)) return () => false;
+    const picked = get(PickedAtom);
+    // Support both element moves (PickedNodeAtom) and block additions
+    // (PickedAtom of type 'block', which has no path until plopped).
+    const pickedNode =
+      picked?.type === 'block' ? picked.block.content : get(PickedNodeAtom);
+    if (!pickedNode || !isElementNode(pickedNode)) return () => false;
     const { isValidChild } = get(ComponentModelAtom);
-    if (!isElementNode(pickedNode)) return () => false;
-    if (!isElementNode(node)) return () => false;
 
     const fn = ({ slot, idx }: { slot: string; idx: number }) => {
       return isValidChild(pickedNode, node, slot);

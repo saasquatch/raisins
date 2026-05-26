@@ -81,6 +81,17 @@ export const DragAndDropMolecule = molecule(getMol => {
   );
 
   /**
+   * The most-recently-hovered plop target, regardless of which surface
+   * (layer panel or canvas) reported the hover. Used as a fallback drop
+   * destination when the platform's native `drop` event cannot reliably
+   * fire — most notably when dragging into a cross-origin sandboxed iframe.
+   *
+   * Set on `dragenter` and cleared on `dragleave` by drop-target consumers.
+   * Cleared automatically when the drag ends or commits.
+   */
+  const LastHoveredPlopAtom = atom<DragPlopDestination | undefined>(undefined);
+
+  /**
    * Drop the dragged node into a specific slot at a given index
    */
   const DropNodeInSlotAtom = atom(
@@ -125,13 +136,32 @@ export const DragAndDropMolecule = molecule(getMol => {
       }
       // Clear drag state after drop
       set(DraggedAtom, undefined);
+      set(LastHoveredPlopAtom, undefined);
     }
   );
+
+  /**
+   * Attempts to commit a drop using {@link LastHoveredPlopAtom}.
+   *
+   * Called by drag sources from their `onDragEnd` handler as a fallback for
+   * when a synchronous `drop` event never arrived (e.g. cross-origin iframe).
+   * Safe to call after a drop already committed — `DropNodeInSlotAtom` is a
+   * no-op when `DraggedAtom` has already been cleared.
+   */
+  const TryCommitLastHoveredAtom = atom(null, (get, set) => {
+    const dragged = get(DraggedAtom);
+    if (!dragged) return;
+    const target = get(LastHoveredPlopAtom);
+    if (!target) return;
+    set(DropNodeInSlotAtom, target);
+  });
 
   return {
     DraggedAtom,
     DraggedNodeAtom,
     DraggingIsActive,
     DropNodeInSlotAtom,
+    LastHoveredPlopAtom,
+    TryCommitLastHoveredAtom,
   };
 });

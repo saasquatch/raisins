@@ -341,6 +341,10 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
           transform: 'translateY(-50%)',
         },
         attrs: { ...defaultAttrs, class: 'plop-target-container' },
+        // Track plop target geometry so parent-side drag handlers can
+        // hit-test the cursor against plop targets when the iframe has
+        // `pointer-events: none` during a drag (see CanvasDragAndDropMolecule).
+        resizeObserver: true,
       },
       [targetBar, PlopLabel, targetBar]
     )

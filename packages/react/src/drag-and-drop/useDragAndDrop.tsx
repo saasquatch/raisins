@@ -15,10 +15,17 @@ import { NodeMolecule } from '../node/NodeMolecule';
  * so that existing canPlopHereAtom validation works seamlessly with drag targets.
  */
 export function useDragBlock(block: Block) {
-  const { DraggedAtom, DraggingIsActive } = useMolecule(DragAndDropMolecule);
+  const {
+    DraggedAtom,
+    DraggingIsActive,
+    LastHoveredPlopAtom,
+    TryCommitLastHoveredAtom,
+  } = useMolecule(DragAndDropMolecule);
   const { PickedAtom } = useMolecule(PickAndPlopMolecule);
   const [dragged, setDragged] = useAtom(DraggedAtom);
   const setPicked = useSetAtom(PickedAtom);
+  const setLastHovered = useSetAtom(LastHoveredPlopAtom);
+  const tryCommit = useSetAtom(TryCommitLastHoveredAtom);
   const isDragging = useAtomValue(DraggingIsActive);
 
   const isThisBlockDragged =
@@ -36,9 +43,17 @@ export function useDragBlock(block: Block) {
   );
 
   const onDragEnd = useCallback(() => {
+    // The native HTML5 `drop` event does not reliably fire when the cursor
+    // is over a cross-origin sandboxed iframe (the canvas). However
+    // `dragenter`/`dragleave` *do* fire and update LastHoveredPlopAtom
+    // through the canvas drag plugin. Use that as a fallback drop target.
+    // For synchronous in-page drops (e.g. the layers panel) this is a no-op
+    // because DropNodeInSlotAtom already cleared DraggedAtom.
+    tryCommit();
     setDragged(undefined);
     setPicked(undefined);
-  }, [setDragged, setPicked]);
+    setLastHovered(undefined);
+  }, [tryCommit, setDragged, setPicked, setLastHovered]);
 
   return {
     draggable: true,
@@ -54,8 +69,13 @@ export function useDragBlock(block: Block) {
  * Also sets PickedNodeAtom so that plop target validation works.
  */
 export function useDragNode() {
-  const { DraggedAtom, DraggingIsActive, DraggedNodeAtom } =
-    useMolecule(DragAndDropMolecule);
+  const {
+    DraggedAtom,
+    DraggingIsActive,
+    DraggedNodeAtom,
+    LastHoveredPlopAtom,
+    TryCommitLastHoveredAtom,
+  } = useMolecule(DragAndDropMolecule);
   const { PickedAtom, PickedNodeAtom } = useMolecule(PickAndPlopMolecule);
   const { nodeAtom } = useMolecule(NodeMolecule);
   const node = useAtomValue(nodeAtom);
@@ -63,6 +83,8 @@ export function useDragNode() {
   const setDragged = useSetAtom(DraggedAtom);
   const setPicked = useSetAtom(PickedAtom);
   const setPickedNode = useSetAtom(PickedNodeAtom);
+  const setLastHovered = useSetAtom(LastHoveredPlopAtom);
+  const tryCommit = useSetAtom(TryCommitLastHoveredAtom);
   const isDragging = useAtomValue(DraggingIsActive);
   const draggedNode = useAtomValue(DraggedNodeAtom);
 
@@ -80,9 +102,12 @@ export function useDragNode() {
   );
 
   const onDragEnd = useCallback(() => {
+    // See note in useDragBlock.onDragEnd above.
+    tryCommit();
     setDragged(undefined);
     setPicked(undefined);
-  }, [setDragged, setPicked]);
+    setLastHovered(undefined);
+  }, [tryCommit, setDragged, setPicked, setLastHovered]);
 
   return {
     draggable: true,
@@ -105,7 +130,7 @@ export type DropTargetProps = {
  * DragAndDropMolecule's DropNodeInSlotAtom and clears PickedAtom.
  */
 export function useDropTarget({ idx, slot }: DropTargetProps) {
-  const { DraggingIsActive, DropNodeInSlotAtom } =
+  const { DraggingIsActive, DropNodeInSlotAtom, LastHoveredPlopAtom } =
     useMolecule(DragAndDropMolecule);
   const { PickedAtom } = useMolecule(PickAndPlopMolecule);
   const { canPlopHereAtom, nodeAtom } = useMolecule(NodeMolecule);
@@ -115,6 +140,7 @@ export function useDropTarget({ idx, slot }: DropTargetProps) {
   const node = useAtomValue(nodeAtom);
   const dropNode = useSetAtom(DropNodeInSlotAtom);
   const setPicked = useSetAtom(PickedAtom);
+  const setLastHovered = useSetAtom(LastHoveredPlopAtom);
 
   const [isOver, setIsOver] = React.useState(false);
 
@@ -138,13 +164,19 @@ export function useDropTarget({ idx, slot }: DropTargetProps) {
       if (!isDroppable) return;
       e.preventDefault();
       setIsOver(true);
+      setLastHovered({
+        parent: node as RaisinNodeWithChildren,
+        idx,
+        slot,
+      });
     },
-    [isDroppable]
+    [isDroppable, setLastHovered, node, idx, slot]
   );
 
   const onDragLeave = useCallback(() => {
     setIsOver(false);
-  }, []);
+    setLastHovered(undefined);
+  }, [setLastHovered]);
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
