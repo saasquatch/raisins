@@ -1,7 +1,7 @@
 import { RaisinElementNode } from '@raisins/core';
 import { CssPart, CustomElement } from '@raisins/schema/schema';
 import { molecule, useMolecule } from 'bunshi/react';
-import { atom, useAtom, useAtomValue } from 'jotai';
+import { atom, useAtom, useAtomValue, Atom, WritableAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
@@ -12,7 +12,29 @@ import {
   SectionKey,
   selectorOf,
   writeSection,
+  writeSectionProperty,
 } from './cssSections';
+
+export type StyleMoleculeType = {
+  selectedElementAtom: Atom<RaisinElementNode | undefined>;
+  componentMetaAtom: Atom<CustomElement | undefined>;
+  partsAtom: Atom<CssPart[]>;
+  customPropsAtom: Atom<
+    { name: string; syntax?: string; description?: string }[]
+  >;
+  cssAtom: Atom<string>;
+  sectionReadAtom: Atom<(section: SectionKey) => string>;
+  sectionWriteAtom: WritableAtom<
+    null,
+    [{ section: SectionKey; declarations: string }],
+    void
+  >;
+  sectionPropertyWriteAtom: WritableAtom<
+    null,
+    [{ section: SectionKey; property: string; value: string }],
+    void
+  >;
+};
 
 /**
  * Per-instance CSS editor for the currently selected element. Exposes:
@@ -27,84 +49,108 @@ import {
  * molecule deliberately stops at the source-of-truth string so widgets can
  * be composed freely.
  */
-export const StyleMolecule = molecule(getMol => {
-  const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
-  const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
-  const {
-    GetInstanceCssAtom,
-    SetInstanceCssAtom,
-  } = getMol(CssEditingMolecule);
+export const StyleMolecule = molecule(
+  (getMol): StyleMoleculeType => {
+    const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
+    const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
+    const { GetInstanceCssAtom, SetInstanceCssAtom } = getMol(
+      CssEditingMolecule
+    );
 
-  const selectedElementAtom = atom(get => {
-    const node = get(SelectedNodeAtom);
-    if (!node || !isElementNode(node)) return undefined;
-    return node;
-  });
+    const selectedElementAtom = atom(get => {
+      const node = get(SelectedNodeAtom);
+      if (!node || !isElementNode(node)) return undefined;
+      return node;
+    });
 
-  const componentMetaAtom = atom(get => {
-    const node = get(selectedElementAtom);
-    if (!node) return undefined;
-    return get(ComponentMetaAtom)(node.tagName) as CustomElement;
-  });
-
-  const partsAtom = atom<CssPart[]>(
-    get => get(componentMetaAtom)?.cssParts ?? []
-  );
-
-  const customPropsAtom = atom(get => get(componentMetaAtom)?.cssProperties ?? []);
-
-  const cssAtom = atom(
-    get => {
+    const componentMetaAtom = atom(get => {
       const node = get(selectedElementAtom);
-      if (!node) return '';
-      return get(GetInstanceCssAtom)(node);
-    },
-    (get, set, next: string) => {
-      const node = get(selectedElementAtom);
-      if (!node) return;
-      set(SetInstanceCssAtom, { node, css: next });
-    }
-  );
+      if (!node) return undefined;
+      return get(ComponentMetaAtom)(node.tagName) as CustomElement;
+    });
 
-  /**
-   * Returns the declarations text for a specific editable section
-   * (e.g. `:host` or `::part(header)`) of the currently selected element's
-   * per-instance CSS.
-   */
-  const sectionReadAtom = atom(get => {
-    const css = get(cssAtom);
-    return (section: SectionKey) => readSection(css, section);
-  });
+    const partsAtom = atom<CssPart[]>(
+      get => get(componentMetaAtom)?.cssParts ?? []
+    );
 
-  /**
-   * Writes new declarations for a single section. Other sections (and any
-   * unrecognised rules) in the per-instance CSS are preserved untouched.
-   */
-  const sectionWriteAtom = atom(
-    null,
-    (
-      get,
-      set,
-      { section, declarations }: { section: SectionKey; declarations: string }
-    ) => {
-      const node = get(selectedElementAtom);
-      if (!node) return;
-      const prev = get(GetInstanceCssAtom)(node);
-      const next = writeSection(prev, section, declarations);
-      set(SetInstanceCssAtom, { node, css: next });
-    }
-  );
+    const customPropsAtom = atom(
+      get => get(componentMetaAtom)?.cssProperties ?? []
+    );
 
-  return {
-    selectedElementAtom,
-    componentMetaAtom,
-    partsAtom,
-    customPropsAtom,
-    cssAtom,
-    sectionReadAtom,
-    sectionWriteAtom,
-  };
-});
+    const cssAtom = atom(
+      get => {
+        const node = get(selectedElementAtom);
+        if (!node) return '';
+        return get(GetInstanceCssAtom)(node);
+      },
+      (get, set, next: string) => {
+        const node = get(selectedElementAtom);
+        if (!node) return;
+        set(SetInstanceCssAtom, { node, css: next });
+      }
+    );
+
+    /**
+     * Returns the declarations text for a specific editable section
+     * (e.g. `:host` or `::part(header)`) of the currently selected element's
+     * per-instance CSS.
+     */
+    const sectionReadAtom = atom(get => {
+      const css = get(cssAtom);
+      return (section: SectionKey, property?: string) =>
+        readSection(css, section, property);
+    });
+
+    /**
+     * Writes new declarations for a single section. Other sections (and any
+     * unrecognised rules) in the per-instance CSS are preserved untouched.
+     */
+    const sectionWriteAtom = atom(
+      null,
+      (
+        get,
+        set,
+        { section, declarations }: { section: SectionKey; declarations: string }
+      ) => {
+        const node = get(selectedElementAtom);
+        if (!node) return;
+        const prev = get(GetInstanceCssAtom)(node);
+        const next = writeSection(prev, section, declarations);
+        set(SetInstanceCssAtom, { node, css: next });
+      }
+    );
+
+    const sectionPropertyWriteAtom = atom(
+      null,
+      (
+        get,
+        set,
+        {
+          section,
+          property,
+          value,
+        }: { section: SectionKey; property: string; value: string }
+      ) => {
+        const node = get(selectedElementAtom);
+        if (!node) return;
+        const prev = get(GetInstanceCssAtom)(node);
+        const next = writeSectionProperty(prev, section, property, value);
+        set(SetInstanceCssAtom, { node, css: next });
+      }
+    );
+
+    return {
+      selectedElementAtom,
+      componentMetaAtom,
+      partsAtom,
+      customPropsAtom,
+      cssAtom,
+      sectionReadAtom,
+      sectionWriteAtom,
+      sectionPropertyWriteAtom,
+    };
+  }
+);
 
 /**
  * Per-instance CSS editor. Renders one editable section for the element
@@ -137,7 +183,9 @@ export const StylePanel: React.FC = () => {
       <h3>Style: {selected.tagName}</h3>
 
       <SectionEditor
-        key={`element-${selected.tagName}-${selected.attribs['data-raisin-id'] ?? ''}`}
+        key={`element-${selected.tagName}-${selected.attribs[
+          'data-raisin-id'
+        ] ?? ''}`}
         section={{ type: 'element' }}
         title="Element"
         description={`Applies to the component itself (rendered as :host).`}

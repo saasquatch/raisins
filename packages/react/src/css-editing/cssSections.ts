@@ -10,9 +10,7 @@ import { cssParser, cssSerializer } from '@raisins/core';
  * Other rules in the CSS (e.g. raw selectors, at-rules) are left untouched by
  * {@link writeSection} — only the matching rule, if any, is rewritten.
  */
-export type SectionKey =
-  | { type: 'element' }
-  | { type: 'part'; name: string };
+export type SectionKey = { type: 'element' } | { type: 'part'; name: string };
 
 export function selectorOf(section: SectionKey): string {
   if (section.type === 'element') return ':host';
@@ -20,11 +18,15 @@ export function selectorOf(section: SectionKey): string {
 }
 
 /**
- * Reads the declarations of the rule that matches `section`, formatted as a
- * CSS declaration block string (e.g. `color: red;\npadding: 10px`). Returns
- * "" if no matching rule exists.
+ * Reads the declarations of the rule that matches `section` if a property is not specified, formatted as a
+ * CSS declaration block string (e.g. `color: red;\npadding: 10px`). If a property is specified, returns the value of that property.
+ * Returns "" if no matching rule or property exists.
  */
-export function readSection(css: string, section: SectionKey): string {
+export function readSection(
+  css: string,
+  section: SectionKey,
+  property?: string
+): string {
   if (!css.trim()) return '';
   let ast: any;
   try {
@@ -34,6 +36,12 @@ export function readSection(css: string, section: SectionKey): string {
   }
   const rule = findMatchingRule(ast, section);
   if (!rule) return '';
+  if (property) {
+    const decl = rule.block.children.find(
+      (d: any) => d.type === 'Declaration' && d.property === property
+    );
+    return decl && decl.value ? cssSerializer(decl.value) : '';
+  }
   return serializeDeclarations(rule.block);
 }
 
@@ -80,6 +88,44 @@ export function writeSection(
   return cssSerializer(ast);
 }
 
+export function writeSectionProperty(
+  css: string,
+  section: SectionKey,
+  property: string,
+  value: string
+): string {
+  const current = readSection(css, section);
+
+  // Parse existing declarations into a block AST
+  let block: any = current.trim()
+    ? parseDeclarationBlock(current)
+    : parseDeclarationBlock('');
+  if (!block) block = { type: 'Block', children: [] };
+
+  const declIdx = block.children.findIndex(
+    (d: any) => d.type === 'Declaration' && d.property === property
+  );
+
+  if (value.trim().length === 0) {
+    // Remove property
+    if (declIdx >= 0) block.children.splice(declIdx, 1);
+  } else {
+    // Parse a fresh declaration to get a proper AST node with correct .value
+    const freshBlock = parseDeclarationBlock(`${property}: ${value}`);
+    const freshDecl = freshBlock?.children?.[0];
+    if (!freshDecl) return css;
+
+    if (declIdx >= 0) {
+      block.children[declIdx] = freshDecl;
+    } else {
+      block.children.push(freshDecl);
+    }
+  }
+
+  const newDeclarations = serializeDeclarations(block);
+  return writeSection(css, section, newDeclarations);
+}
+
 function findMatchingRule(ast: any, section: SectionKey): any | undefined {
   if (!Array.isArray(ast.children)) return undefined;
   return ast.children.find(
@@ -122,7 +168,10 @@ function serializeDeclarations(block: any): string {
     .map((decl: any) => {
       const fauxBlock = { ...block, children: [decl] };
       const inner = cssSerializer(fauxBlock);
-      return inner.replace(/^\{/, '').replace(/\}$/, '').trim();
+      return inner
+        .replace(/^\{/, '')
+        .replace(/\}$/, '')
+        .trim();
     })
     .filter((line: string) => line.length > 0)
     .join(';\n');

@@ -92,21 +92,25 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
-        const cssParts: schema.CssPart[] | undefined = comp.parts?.length
-          ? comp.parts.map(p => ({
-              name: p.name,
-              description: p.docs || undefined,
-            }))
-          : undefined;
+        const cssParts: schema.CssPart[] | undefined = comp.docsTags
+              .filter(t => t.name === 'csspart')
+              .map(t => {
+                const [name, ...rest] = (t.text ?? '').split(' - ');
+                return {
+                  name: name.trim(),
+                  description: rest.join(' - ').trim() || undefined,
+                };
+              }) || undefined;
 
-        const cssProperties:
-          | schema.CssCustomProperty[]
-          | undefined = comp.styles?.length
-          ? comp.styles.map(s => ({
-              name: s.name,
-              description: s.docs || undefined,
-            }))
-          : undefined;
+        const cssProperties: schema.CssCustomProperty[] | undefined = comp.docsTags
+              .filter(t => t.name === 'cssprop')
+              .map(t => {
+                const [name, ...rest] = (t.text ?? '').split(' - ');
+                return {
+                  name: name.trim(),
+                  description: rest.join(' - ').trim() || undefined,
+                };
+              }) || undefined;;
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
