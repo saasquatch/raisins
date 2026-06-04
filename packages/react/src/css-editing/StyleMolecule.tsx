@@ -8,9 +8,13 @@ import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { isElementNode } from '../util/isNode';
 import { CssEditingMolecule } from './CssEditingMolecule';
 import {
+  CssDimension,
   readSection,
+  readSectionDimension,
+  readSectionShorthandDimension,
   SectionKey,
   selectorOf,
+  ShorthandDimensions,
   writeSection,
   writeSectionProperty,
 } from './cssSections';
@@ -23,7 +27,13 @@ export type StyleMoleculeType = {
     { name: string; syntax?: string; description?: string }[]
   >;
   cssAtom: Atom<string>;
-  sectionReadAtom: Atom<(section: SectionKey) => string>;
+  sectionReadAtom: Atom<(section: SectionKey, property?: string) => string>;
+  sectionReadDimensionAtom: Atom<
+    (section: SectionKey, property: string) => CssDimension | null
+  >;
+  sectionReadShorthandDimensionAtom: Atom<
+    (section: SectionKey, property: string) => ShorthandDimensions
+  >;
   sectionWriteAtom: WritableAtom<
     null,
     [{ section: SectionKey; declarations: string }],
@@ -97,8 +107,20 @@ export const StyleMolecule = molecule(
      */
     const sectionReadAtom = atom(get => {
       const css = get(cssAtom);
-      return (section: SectionKey, property?: string) =>
-        readSection(css, section, property);
+      return (section: SectionKey, property?: string, exclude?: RegExp[]) =>
+        readSection(css, section, property, exclude);
+    });
+
+    const sectionReadDimensionAtom = atom(get => {
+      const css = get(cssAtom);
+      return (section: SectionKey, property: string) =>
+        readSectionDimension(css, section, property);
+    });
+
+    const sectionReadShorthandDimensionAtom = atom(get => {
+      const css = get(cssAtom);
+      return (section: SectionKey, property: string) =>
+        readSectionShorthandDimension(css, section, property);
     });
 
     /**
@@ -146,6 +168,8 @@ export const StyleMolecule = molecule(
       customPropsAtom,
       cssAtom,
       sectionReadAtom,
+      sectionReadDimensionAtom,
+      sectionReadShorthandDimensionAtom,
       sectionWriteAtom,
       sectionPropertyWriteAtom,
     };

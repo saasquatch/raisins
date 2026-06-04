@@ -5,6 +5,7 @@ export {
 } from './CssEditingMolecule';
 export type { CssEditingMoleculeType } from './CssEditingMolecule';
 export type { StyleMoleculeType } from './StyleMolecule';
-export type { SectionKey } from './cssSections';
+export type { SectionKey, CssDimension, ShorthandDimensions } from './cssSections';
+export { readSectionDimension, readSectionShorthandDimension } from './cssSections';
 export { StyleMolecule, StylePanel } from './StyleMolecule';
 export { DocumentCssMolecule, DocumentCssEditor } from './DocumentCssMolecule';

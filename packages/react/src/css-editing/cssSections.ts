@@ -17,6 +17,15 @@ export function selectorOf(section: SectionKey): string {
   return `::part(${section.name})`;
 }
 
+export type CssDimension = { value: string; unit: string };
+
+export type ShorthandDimensions = {
+  top: CssDimension | null;
+  right: CssDimension | null;
+  bottom: CssDimension | null;
+  left: CssDimension | null;
+};
+
 /**
  * Reads the declarations of the rule that matches `section` if a property is not specified, formatted as a
  * CSS declaration block string (e.g. `color: red;\npadding: 10px`). If a property is specified, returns the value of that property.
@@ -25,7 +34,8 @@ export function selectorOf(section: SectionKey): string {
 export function readSection(
   css: string,
   section: SectionKey,
-  property?: string
+  property?: string,
+  exclude?: RegExp[]
 ): string {
   if (!css.trim()) return '';
   let ast: any;
@@ -37,12 +47,105 @@ export function readSection(
   const rule = findMatchingRule(ast, section);
   if (!rule) return '';
   if (property) {
-    const decl = rule.block.children.find(
-      (d: any) => d.type === 'Declaration' && d.property === property
-    );
+    const decl = findDeclaration(rule, property);
     return decl && decl.value ? cssSerializer(decl.value) : '';
   }
-  return serializeDeclarations(rule.block);
+  return serializeDeclarations(rule.block, exclude);
+}
+
+export function readSectionDimension(
+  css: string,
+  section: SectionKey,
+  property: string
+): CssDimension | null {
+  if (!css.trim()) return null;
+  let ast: any;
+  try {
+    ast = cssParser(css);
+  } catch {
+    return null;
+  }
+  const rule = findMatchingRule(ast, section);
+  if (!rule) return null;
+  const decl = findDeclaration(rule, property);
+  if (decl && decl.value?.children?.at(0)?.type === 'Dimension') {
+    return {
+      value: decl.value.children[0].value,
+      unit: decl.value.children[0].unit,
+    };
+  } else if (decl && decl.value?.children?.at(0)?.type === 'Percentage') {
+    return {
+      value: decl.value.children[0].value,
+      unit: '%',
+    };
+  }
+  return null;
+}
+
+export function readSectionShorthandDimension(
+  css: string,
+  section: SectionKey,
+  property: string
+): ShorthandDimensions {
+  const nil: ShorthandDimensions = {
+    top: null,
+    right: null,
+    bottom: null,
+    left: null,
+  };
+  if (!css.trim()) return nil;
+  let ast: any;
+  try {
+    ast = cssParser(css);
+  } catch {
+    return nil;
+  }
+  const rule = findMatchingRule(ast, section);
+  if (!rule) return nil;
+
+  const shorthandDecl = findDeclaration(rule, property);
+  const result = { ...nil };
+
+  if (shorthandDecl) {
+    const values = (shorthandDecl.value?.children ?? []).filter(
+      (n: any) => n.type !== 'WhiteSpace'
+    );
+    const dims = values.map(nodeToDimension);
+
+    if (dims.length === 1) {
+      result.top = result.right = result.bottom = result.left = dims[0];
+    } else if (dims.length === 2) {
+      result.top = result.bottom = dims[0];
+      result.right = result.left = dims[1];
+    } else if (dims.length === 3) {
+      result.top = dims[0];
+      result.right = result.left = dims[1];
+      result.bottom = dims[2];
+    } else if (dims.length >= 4) {
+      result.top = dims[0];
+      result.right = dims[1];
+      result.bottom = dims[2];
+      result.left = dims[3];
+    }
+  }
+
+  const sides = ['top', 'right', 'bottom', 'left'] as const;
+  for (const side of sides) {
+    const longhand = findDeclaration(rule, `${property}-${side}`);
+    if (longhand) {
+      const val = nodeToDimension(longhand.value?.children?.[0]);
+      if (val) result[side] = val;
+    }
+  }
+
+  return result;
+}
+
+function nodeToDimension(node: any): CssDimension | null {
+  if (!node) return null;
+  if (node.type === 'Dimension') return { value: node.value, unit: node.unit };
+  if (node.type === 'Percentage') return { value: node.value, unit: '%' };
+  return null;
 }
 
 /**
@@ -123,6 +226,7 @@ export function writeSectionProperty(
   }
 
   const newDeclarations = serializeDeclarations(block);
+  console.log('New declarations:', newDeclarations);
   return writeSection(css, section, newDeclarations);
 }
 
@@ -130,6 +234,12 @@ function findMatchingRule(ast: any, section: SectionKey): any | undefined {
   if (!Array.isArray(ast.children)) return undefined;
   return ast.children.find(
     (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
+  );
+}
+
+function findDeclaration(rule: any, property: string): any | undefined {
+  return rule.block.children.find(
+    (d: any) => d.type === 'Declaration' && d.property === property
   );
 }
 
@@ -162,10 +272,11 @@ function selectorMatches(selector: any, section: SectionKey): boolean {
   return only.children[0]?.value === section.name;
 }
 
-function serializeDeclarations(block: any): string {
+function serializeDeclarations(block: any, exclude: RegExp[] = []): string {
   if (!block || !Array.isArray(block.children)) return '';
   return block.children
     .map((decl: any) => {
+      if (exclude.some(regex => regex.test(decl.property))) return '';
       const fauxBlock = { ...block, children: [decl] };
       const inner = cssSerializer(fauxBlock);
       return inner

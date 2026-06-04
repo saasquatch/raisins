@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import { CssNodePlain, parse, toPlainObject } from "css-tree";
+import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
 
 /**
  * Rewrites every selector in a stylesheet AST so that the rules apply only to
@@ -10,6 +10,8 @@ import { CssNodePlain, parse, toPlainObject } from "css-tree";
  * - `::part(name)` selectors are prefixed with the scope attribute selector,
  *   so the rule pierces the shadow boundary on the scoped element only.
  * - Bare selectors become descendants of the scope attribute selector.
+ * - Nested rules using `&` (CSS Nesting syntax) are expanded and lifted to the
+ *   top level with the parent's scoped selector substituted for `&`.
  *
  * The stylesheet is not parsed or serialized — the caller controls that. The
  * returned AST shares no structural references with the input.
@@ -19,20 +21,62 @@ export function scopeStylesheet(
   scope: string
 ): CssNodePlain {
   const clone = JSON.parse(JSON.stringify(stylesheet));
-  visitRules(clone, (rule: any) => scopeRule(rule, scope));
+  processChildren(clone, scope);
   return clone;
 }
 
-function visitRules(node: any, visit: (rule: any) => void): void {
-  if (!node) return;
-  if (node.type === "Rule") {
-    visit(node);
-    return;
+function processChildren(node: any, scope: string): void {
+  if (!node || !Array.isArray(node.children)) return;
+  const result: any[] = [];
+  for (const child of node.children) {
+    if (child.type === "Rule") {
+      scopeRule(child, scope);
+      const { kept, lifted } = expandNesting(child);
+      if (kept.length > 0) {
+        child.block.children = kept;
+        result.push(child);
+      }
+      result.push(...lifted);
+    } else {
+      if (child.block) processChildren(child.block, scope);
+      result.push(child);
+    }
   }
-  if (Array.isArray(node.children)) {
-    node.children.forEach((c: any) => visitRules(c, visit));
+  node.children = result;
+}
+
+function expandNesting(rule: any): { kept: any[]; lifted: any[] } {
+  const block = rule.block;
+  if (!block || !Array.isArray(block.children))
+    return { kept: [], lifted: [] };
+
+  const selectorStr = serializeNode(rule.prelude);
+  const kept: any[] = [];
+  const lifted: any[] = [];
+
+  for (const child of block.children) {
+    if (
+      child.type === "Raw" &&
+      typeof child.value === "string" &&
+      child.value.includes("&")
+    ) {
+      const expanded = child.value.replace(/&/g, selectorStr);
+      const parsed: any = toPlainObject(parse(expanded));
+      if (parsed.type === "StyleSheet" && Array.isArray(parsed.children)) {
+        lifted.push(...parsed.children);
+      }
+    } else {
+      kept.push(child);
+    }
   }
-  if (node.block) visitRules(node.block, visit);
+
+  return { kept, lifted };
+}
+
+function serializeNode(node: any): string {
+  return csstree.generate(
+    csstree.fromPlainObject(JSON.parse(JSON.stringify(node)))
+  );
 }
 
 function scopeRule(rule: any, scope: string): void {

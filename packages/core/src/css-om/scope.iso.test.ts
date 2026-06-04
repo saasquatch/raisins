@@ -65,6 +65,36 @@ describe("scopeStylesheet", () => {
     );
   });
 
+  it("expands nested & in ::part pseudoclasses", () => {
+    expect(
+      scoped("::part(primarybutton-base){&:hover{background-color: blue}}")
+    ).toEqual(
+      '[data-raisin-id="abc"]::part(primarybutton-base):hover{background-color:blue}'
+    );
+  });
+
+  it("expands nested & with mixed declarations and nested rules", () => {
+    expect(
+      scoped("::part(button){color:red;&:hover{background:blue}}")
+    ).toEqual(
+      '[data-raisin-id="abc"]::part(button){color:red}[data-raisin-id="abc"]::part(button):hover{background:blue}'
+    );
+  });
+
+  it("expands multiple nested rules", () => {
+    expect(
+      scoped("::part(btn){&:hover{background:blue}&:focus{outline:none}}")
+    ).toEqual(
+      '[data-raisin-id="abc"]::part(btn):hover{background:blue}[data-raisin-id="abc"]::part(btn):focus{outline:none}'
+    );
+  });
+
+  it("expands nested & in :host rules", () => {
+    expect(scoped(":host{&:hover{color:red}}")).toEqual(
+      '[data-raisin-id="abc"]:hover{color:red}'
+    );
+  });
+
   it("does not mutate the input AST", () => {
     const ast = parser(":host { color: red }");
     const before = JSON.stringify(ast);
