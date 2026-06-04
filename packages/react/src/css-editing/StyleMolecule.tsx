@@ -8,10 +8,9 @@ import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { isElementNode } from '../util/isNode';
 import { CssEditingMolecule } from './CssEditingMolecule';
 import {
-  CssDimension,
   readSection,
-  readSectionDimension,
   readSectionShorthandDimension,
+  ReadSectionOptions,
   SectionKey,
   selectorOf,
   ShorthandDimensions,
@@ -27,16 +26,15 @@ export type StyleMoleculeType = {
     { name: string; syntax?: string; description?: string }[]
   >;
   cssAtom: Atom<string>;
-  sectionReadAtom: Atom<(section: SectionKey, property?: string) => string>;
-  sectionReadDimensionAtom: Atom<
-    (section: SectionKey, property: string) => CssDimension | null
+  sectionReadAtom: Atom<
+    (section: SectionKey, options?: ReadSectionOptions) => string
   >;
   sectionReadShorthandDimensionAtom: Atom<
     (section: SectionKey, property: string) => ShorthandDimensions
   >;
   sectionWriteAtom: WritableAtom<
     null,
-    [{ section: SectionKey; declarations: string }],
+    [{ section: SectionKey; declarations: string; preserve?: RegExp[] }],
     void
   >;
   sectionPropertyWriteAtom: WritableAtom<
@@ -107,16 +105,13 @@ export const StyleMolecule = molecule(
      */
     const sectionReadAtom = atom(get => {
       const css = get(cssAtom);
-      return (section: SectionKey, property?: string, exclude?: RegExp[]) =>
-        readSection(css, section, property, exclude);
+      return (section: SectionKey, options?: ReadSectionOptions) =>
+        readSection(css, section, options);
     });
 
-    const sectionReadDimensionAtom = atom(get => {
-      const css = get(cssAtom);
-      return (section: SectionKey, property: string) =>
-        readSectionDimension(css, section, property);
-    });
-
+    /**
+     * Returns the values of the `top`/`right`/`bottom`/`left` dimensions for a single section and property, if that property is a valid CSS shorthand for 1-4 directional values. Otherwise returns null for all directions.
+     */
     const sectionReadShorthandDimensionAtom = atom(get => {
       const css = get(cssAtom);
       return (section: SectionKey, property: string) =>
@@ -132,16 +127,23 @@ export const StyleMolecule = molecule(
       (
         get,
         set,
-        { section, declarations }: { section: SectionKey; declarations: string }
+        {
+          section,
+          declarations,
+          preserve,
+        }: { section: SectionKey; declarations: string; preserve?: RegExp[] }
       ) => {
         const node = get(selectedElementAtom);
         if (!node) return;
         const prev = get(GetInstanceCssAtom)(node);
-        const next = writeSection(prev, section, declarations);
+        const next = writeSection(prev, section, declarations, preserve);
         set(SetInstanceCssAtom, { node, css: next });
       }
     );
 
+    /**
+     * Writes a single property within a section, other properties in that section and other sections in the per-instance CSS are preserved untouched.
+     */
     const sectionPropertyWriteAtom = atom(
       null,
       (
@@ -168,7 +170,6 @@ export const StyleMolecule = molecule(
       customPropsAtom,
       cssAtom,
       sectionReadAtom,
-      sectionReadDimensionAtom,
       sectionReadShorthandDimensionAtom,
       sectionWriteAtom,
       sectionPropertyWriteAtom,

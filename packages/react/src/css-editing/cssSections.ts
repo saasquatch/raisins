@@ -26,6 +26,11 @@ export type ShorthandDimensions = {
   left: CssDimension | null;
 };
 
+export type ReadSectionOptions = {
+  property?: string;
+  exclude?: RegExp[];
+};
+
 /**
  * Reads the declarations of the rule that matches `section` if a property is not specified, formatted as a
  * CSS declaration block string (e.g. `color: red;\npadding: 10px`). If a property is specified, returns the value of that property.
@@ -34,9 +39,9 @@ export type ShorthandDimensions = {
 export function readSection(
   css: string,
   section: SectionKey,
-  property?: string,
-  exclude?: RegExp[]
+  options?: ReadSectionOptions
 ): string {
+  const { property, exclude } = options ?? {};
   if (!css.trim()) return '';
   let ast: any;
   try {
@@ -51,35 +56,6 @@ export function readSection(
     return decl && decl.value ? cssSerializer(decl.value) : '';
   }
   return serializeDeclarations(rule.block, exclude);
-}
-
-export function readSectionDimension(
-  css: string,
-  section: SectionKey,
-  property: string
-): CssDimension | null {
-  if (!css.trim()) return null;
-  let ast: any;
-  try {
-    ast = cssParser(css);
-  } catch {
-    return null;
-  }
-  const rule = findMatchingRule(ast, section);
-  if (!rule) return null;
-  const decl = findDeclaration(rule, property);
-  if (decl && decl.value?.children?.at(0)?.type === 'Dimension') {
-    return {
-      value: decl.value.children[0].value,
-      unit: decl.value.children[0].unit,
-    };
-  } else if (decl && decl.value?.children?.at(0)?.type === 'Percentage') {
-    return {
-      value: decl.value.children[0].value,
-      unit: '%',
-    };
-  }
-  return null;
 }
 
 export function readSectionShorthandDimension(
@@ -153,11 +129,18 @@ function nodeToDimension(node: any): CssDimension | null {
  * `section` replaced by `declarations`. If no matching rule exists, appends
  * a new rule. If `declarations` is empty / whitespace, removes the matching
  * rule entirely. Other rules are preserved unchanged.
+ *
+ * When `preserve` is provided, any existing declarations whose property name
+ * matches one of the patterns are kept in the block even if they are absent
+ * from the incoming `declarations`. This lets a partial editor (e.g. an
+ * "advanced CSS" textarea that deliberately hides managed properties) write
+ * freely without accidentally wiping those managed values.
  */
 export function writeSection(
   css: string,
   section: SectionKey,
-  declarations: string
+  declarations: string,
+  preserve: RegExp[] = []
 ): string {
   const trimmed = declarations.trim();
   let ast: any;
@@ -172,13 +155,39 @@ export function writeSection(
     (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
   );
 
-  if (trimmed.length === 0) {
+  if (trimmed.length === 0 && preserve.length === 0) {
     if (existingIdx >= 0) ast.children.splice(existingIdx, 1);
     return cssSerializer(ast);
   }
 
-  const newBlock = parseDeclarationBlock(trimmed);
+  const newBlock = trimmed.length > 0 ? parseDeclarationBlock(trimmed) : { type: 'Block', children: [] as any[] };
   if (!newBlock) return css;
+
+  if (preserve.length > 0 && existingIdx >= 0) {
+    const existingBlock = ast.children[existingIdx].block;
+    if (existingBlock && Array.isArray(existingBlock.children)) {
+      const preservedDecls = existingBlock.children.filter(
+        (d: any) =>
+          d.type === 'Declaration' &&
+          typeof d.property === 'string' &&
+          preserve.some(regex => regex.test(d.property))
+      );
+      const newPropSet = new Set(
+        newBlock.children
+          .filter((d: any) => d.type === 'Declaration')
+          .map((d: any) => d.property as string)
+      );
+      const toKeep = preservedDecls.filter(
+        (d: any) => !newPropSet.has(d.property)
+      );
+      newBlock.children = [...toKeep, ...newBlock.children];
+    }
+  }
+
+  if (newBlock.children.length === 0 && trimmed.length === 0) {
+    if (existingIdx >= 0) ast.children.splice(existingIdx, 1);
+    return cssSerializer(ast);
+  }
 
   if (existingIdx >= 0) {
     ast.children[existingIdx] = {
@@ -226,7 +235,6 @@ export function writeSectionProperty(
   }
 
   const newDeclarations = serializeDeclarations(block);
-  console.log('New declarations:', newDeclarations);
   return writeSection(css, section, newDeclarations);
 }
 
