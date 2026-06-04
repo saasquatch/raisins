@@ -120,7 +120,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                   name: name.trim(),
                   description: description?.trim() || undefined,
                 };
-              }) || undefined;;
+              }) || undefined;
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
