@@ -47,8 +47,7 @@ function processChildren(node: any, scope: string): void {
 
 function expandNesting(rule: any): { kept: any[]; lifted: any[] } {
   const block = rule.block;
-  if (!block || !Array.isArray(block.children))
-    return { kept: [], lifted: [] };
+  if (!block || !Array.isArray(block.children)) return { kept: [], lifted: [] };
 
   const selectorStr = serializeNode(rule.prelude);
   const kept: any[] = [];

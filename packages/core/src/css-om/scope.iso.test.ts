@@ -53,9 +53,7 @@ describe("scopeStylesheet", () => {
   it("rewrites rules nested inside at-rules", () => {
     expect(
       scoped("@media (min-width: 100px) { :host { color: red } }")
-    ).toEqual(
-      '@media (min-width:100px){[data-raisin-id="abc"]{color:red}}'
-    );
+    ).toEqual('@media (min-width:100px){[data-raisin-id="abc"]{color:red}}');
   });
 
   it("handles multiple rules in a stylesheet", () => {

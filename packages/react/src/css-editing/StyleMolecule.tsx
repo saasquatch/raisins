@@ -274,7 +274,6 @@ const SectionEditor: React.FC<{
     if (document.activeElement?.tagName !== 'TEXTAREA') {
       setDraft(persisted);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [persisted]);
 
   return (
