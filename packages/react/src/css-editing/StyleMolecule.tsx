@@ -42,6 +42,7 @@ export type StyleMoleculeType = {
     [{ section: SectionKey; property: string; value: string }],
     void
   >;
+  conflictsAtom: Atom<boolean>;
 };
 
 /**
@@ -118,6 +119,8 @@ export const StyleMolecule = molecule(
         readSectionShorthandDimension(css, section, property);
     });
 
+    const conflictsAtom = atom(false);
+
     /**
      * Writes new declarations for a single section. Other sections (and any
      * unrecognised rules) in the per-instance CSS are preserved untouched.
@@ -136,8 +139,9 @@ export const StyleMolecule = molecule(
         const node = get(selectedElementAtom);
         if (!node) return;
         const prev = get(GetInstanceCssAtom)(node);
-        const next = writeSection(prev, section, declarations, preserve);
-        set(SetInstanceCssAtom, { node, css: next });
+        const {css, conflict} = writeSection(prev, section, declarations, preserve);
+        set(conflictsAtom, conflict);
+        set(SetInstanceCssAtom, { node, css });
       }
     );
 
@@ -173,6 +177,7 @@ export const StyleMolecule = molecule(
       sectionReadShorthandDimensionAtom,
       sectionWriteAtom,
       sectionPropertyWriteAtom,
+      conflictsAtom,
     };
   }
 );

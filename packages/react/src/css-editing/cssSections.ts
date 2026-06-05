@@ -141,7 +141,7 @@ export function writeSection(
   section: SectionKey,
   declarations: string,
   preserve: RegExp[] = []
-): string {
+): { css: string; conflict: boolean } {
   const trimmed = declarations.trim();
   let ast: any;
   try {
@@ -157,11 +157,16 @@ export function writeSection(
 
   if (trimmed.length === 0 && preserve.length === 0) {
     if (existingIdx >= 0) ast.children.splice(existingIdx, 1);
-    return cssSerializer(ast);
+    return { css: cssSerializer(ast), conflict: false };
   }
 
-  const newBlock = trimmed.length > 0 ? parseDeclarationBlock(trimmed) : { type: 'Block', children: [] as any[] };
-  if (!newBlock) return css;
+  const newBlock =
+    trimmed.length > 0
+      ? parseDeclarationBlock(trimmed)
+      : { type: 'Block', children: [] as any[] };
+  if (!newBlock) return { css, conflict: false };
+
+  const conflict = identifyAndFilterConflicts(newBlock, preserve);
 
   if (preserve.length > 0 && existingIdx >= 0) {
     const existingBlock = ast.children[existingIdx].block;
@@ -172,21 +177,13 @@ export function writeSection(
           typeof d.property === 'string' &&
           preserve.some(regex => regex.test(d.property))
       );
-      const newPropSet = new Set(
-        newBlock.children
-          .filter((d: any) => d.type === 'Declaration')
-          .map((d: any) => d.property as string)
-      );
-      const toKeep = preservedDecls.filter(
-        (d: any) => !newPropSet.has(d.property)
-      );
-      newBlock.children = [...toKeep, ...newBlock.children];
+      newBlock.children = [...preservedDecls, ...newBlock.children];
     }
   }
 
   if (newBlock.children.length === 0 && trimmed.length === 0) {
     if (existingIdx >= 0) ast.children.splice(existingIdx, 1);
-    return cssSerializer(ast);
+    return { css: cssSerializer(ast), conflict };
   }
 
   if (existingIdx >= 0) {
@@ -197,7 +194,28 @@ export function writeSection(
   } else {
     ast.children.push(buildRule(section, newBlock));
   }
-  return cssSerializer(ast);
+  return { css: cssSerializer(ast), conflict };
+}
+
+function identifyAndFilterConflicts(block: any, preserve: RegExp[]): boolean {
+  if (!block || !Array.isArray(block.children)) return false;
+  let conflict = false;
+  const filteredBlock = block.children.filter((d: any) => {
+    if (
+      !(
+        d.type === 'Declaration' &&
+        typeof d.property === 'string' &&
+        preserve.some(regex => regex.test(d.property))
+      )
+    ) {
+      return true;
+    } else {
+      conflict = true;
+      return false;
+    }
+  });
+  block.children = filteredBlock;
+  return conflict;
 }
 
 export function writeSectionProperty(
@@ -235,7 +253,7 @@ export function writeSectionProperty(
   }
 
   const newDeclarations = serializeDeclarations(block);
-  return writeSection(css, section, newDeclarations);
+  return writeSection(css, section, newDeclarations).css;
 }
 
 function findMatchingRule(ast: any, section: SectionKey): any | undefined {
