@@ -8,6 +8,7 @@ import {
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../core';
+import { CssEditingMolecule } from '../css-editing/CssEditingMolecule';
 import { Soul } from '../core/souls/Soul';
 import { NPMRegistryAtom } from '../util/NPMRegistry';
 import {
@@ -62,6 +63,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { rerenderNodeAtom } = getMol(CoreMolecule);
   const { PloppingIsActive } = getMol(PickAndPlopMolecule);
+  const { ManagedStyleSheetAtom } = getMol(CssEditingMolecule);
   const HTMLSet = new Set<Atom<string>>();
   const AppendersSet = new Set<Atom<SnabbdomAppender>>([]);
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
@@ -190,7 +192,11 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const bonus = Array.from(HTMLSet.values())
       .map(a => get(a))
       .join('');
-    return script + extra + bonus;
+    const managedCss = get(ManagedStyleSheetAtom);
+    const managedStyle = managedCss
+      ? `<style data-raisin-managed>${managedCss}</style>`
+      : '';
+    return script + extra + bonus + managedStyle;
   });
 
   const selector = atom(get => `[${get(EventSelectorAtom)}]`);
