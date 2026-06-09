@@ -4,6 +4,7 @@ import {
   htmlSerializer,
   htmlUtil,
   NodePath,
+  ParseErrorStack,
   parseWithErrors,
   RaisinNode,
   RaisinNodeWithChildren,
@@ -30,8 +31,9 @@ export type InternalStateTransaction =
       next: RaisinNode;
     };
 
+type ParsedHtml = { node: RaisinNode; errors: ParseErrorStack };
 type NodeAndHTML = MutableRefObject<
-  { html: string; node: RaisinNode } | undefined
+  { html: string; node: RaisinNode; parsed?: ParsedHtml } | undefined
 >;
 
 export const CoreMolecule = molecule((getMol, getScope) => {
@@ -57,10 +59,15 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     const ref = get(NodeWithHtmlRefAtom);
     const html = get(HTMLAtom);
 
+    if (ref.current?.html === html && ref.current.parsed) {
+      return ref.current.parsed;
+    }
     if (ref.current?.html === html) {
       return { node: ref.current.node, errors: [] };
     }
-    return parseWithErrors(html, { cleanWhitespace: false });
+    const parsed = parseWithErrors(html, { cleanWhitespace: false });
+    ref.current = { html, node: parsed.node, parsed };
+    return parsed;
   });
   ParsedHtmlAtom.debugLabel = 'ParsedHtmlAtom';
 
