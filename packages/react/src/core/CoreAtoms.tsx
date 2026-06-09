@@ -1,10 +1,11 @@
 import {
   generateJsonPointers,
   getPath,
-  htmlParser,
   htmlSerializer,
   htmlUtil,
   NodePath,
+  ParseErrorStack,
+  parseWithErrors,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
@@ -31,8 +32,10 @@ export type InternalStateTransaction =
     };
 
 type NodeAndHTML = MutableRefObject<
-  { html: string; node: RaisinNode } | undefined
+  { html: string; node: RaisinNode; parsed?: ParsedHtml } | undefined
 >;
+
+type ParsedHtml = { node: RaisinNode; errors: ParseErrorStack };
 
 export const CoreMolecule = molecule((getMol, getScope) => {
   const { HTMLAtom } = getMol(ConfigMolecule);
@@ -53,18 +56,22 @@ export const CoreMolecule = molecule((getMol, getScope) => {
         And a cached node is used
         And souls are preserved
   */
+  const ParsedHtmlAtom = atom(get => {
+    const ref = get(NodeWithHtmlRefAtom);
+    const html = get(HTMLAtom);
+
+    if (ref.current?.html === html && ref.current.parsed) {
+      return ref.current.parsed;
+    }
+    if (ref.current?.html === html) {
+      return { node: ref.current.node, errors: [] };
+    }
+    return parseWithErrors(html, { cleanWhitespace: false });
+  });
+  ParsedHtmlAtom.debugLabel = 'ParsedHtmlAtom';
+
   const NodeFromHtml = atom(
-    get => {
-      const ref = get(NodeWithHtmlRefAtom);
-      const html = get(HTMLAtom);
-
-      if (ref.current?.html === html) {
-        return ref.current.node;
-      }
-      const parsedHtml = htmlParser(html, { cleanWhitespace: false });
-
-      return parsedHtml;
-    },
+    get => get(ParsedHtmlAtom).node,
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
       let htmlString = cache.get(current);
@@ -77,6 +84,9 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       set(HTMLAtom, htmlString);
     }
   );
+
+  const ParseErrorsAtom = atom(get => get(ParsedHtmlAtom).errors);
+  ParseErrorsAtom.debugLabel = 'ParseErrorsAtom';
 
   const StateListeners = new Set<
     WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }[], void>
@@ -148,6 +158,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     IdentifierModelAtom,
     ParentsAtom,
     JsonPointersAtom,
+    ParseErrorsAtom,
     StateListeners,
     InternalTransactionAtom,
     rerenderNodeAtom,

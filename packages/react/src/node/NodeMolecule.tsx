@@ -40,7 +40,8 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const { ComponentMetaAtom, ComponentModelAtom } = getMol(
     ComponentModelMolecule
   );
-  const { JsonPointersAtom, rerenderNodeAtom } = getMol(CoreMolecule);
+  const { JsonPointersAtom, rerenderNodeAtom, ParseErrorsAtom } = getMol(CoreMolecule);
+
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
   const ValidationAtoms = getMol(ValidationMolecule);
@@ -52,18 +53,30 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   });
   const errorsAtom = atom((get) => {
     const jsonPointer = get(jsonPointerAtom);
-    const errors = get(ValidationAtoms.errorsAtom);
-    return getSubErrors(errors, jsonPointer);
+    const validation = get(ValidationAtoms.errorsAtom);
+    const parseErrors = get(ParseErrorsAtom);
+    return [
+      ...getSubErrors(validation, jsonPointer),
+      ...getSubErrors(parseErrors, jsonPointer),
+    ];
   });
   const childrenErrorsAtom = atom((get) => {
     const jsonPointer = get(jsonPointerAtom);
-    const errors = get(ValidationAtoms.errorsAtom);
-    return getSubErrors(errors, jsonPointer + '/children');
+    const validation = get(ValidationAtoms.errorsAtom);
+    const parseErrors = get(ParseErrorsAtom);
+    return [
+      ...getSubErrors(validation, jsonPointer + '/children'),
+      ...getSubErrors(parseErrors, jsonPointer + '/children'),
+    ];
   });
   const attributeErrorsAtom = atom((get) => {
     const jsonPointer = get(jsonPointerAtom);
-    const errors = get(ValidationAtoms.errorsAtom);
-    return getSubErrors(errors, jsonPointer + '/attribs');
+    const validation = get(ValidationAtoms.errorsAtom);
+    const parseErrors = get(ParseErrorsAtom);
+    return [
+      ...getSubErrors(validation, jsonPointer + '/attribs'),
+      ...getSubErrors(parseErrors, jsonPointer + '/attribs'),
+    ];
   });
 
   const hasErrors = atom((get) => get(errorsAtom).length > 0);
