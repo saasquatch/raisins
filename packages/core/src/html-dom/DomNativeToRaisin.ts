@@ -96,12 +96,12 @@ function nodeToRaisin(
         };
         if (textContent) {
           styleNode.contents = cssParser(textContent, {
-            onParseError: (error) =>
+            onParseError: error =>
               report(
                 {
                   rule: "css",
                   // @ts-ignore - @types/css-tree type is incomplete
-                  message: `${error.message} at "${error.source}"`,
+                  message: `${error.message} at "${error.source}"`
                 },
                 pointer
               )
@@ -119,16 +119,17 @@ function nodeToRaisin(
       if (style !== undefined) {
         elementNode.style = cssParser(style, {
           context: "declarationList",
-          onParseError: (error) => {
+          onParseError: error => {
             report(
               {
                 rule: "css",
                 // @ts-ignore - @types/css-tree type is incomplete
-                message: `${error.message} at "${error.source}"`,
+                message: `${error.message} at "${error.source}"`
               },
               `${pointer}/attribs/style`
-            )
-        }});
+            );
+          }
+        });
       }
       return elementNode;
     case Node.TEXT_NODE:

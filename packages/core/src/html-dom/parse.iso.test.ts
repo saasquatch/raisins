@@ -147,10 +147,7 @@ describe("parseWithErrors", () => {
       {
         name: "sibling malformed style attributes",
         html: '<div style="a b"></div><div style="c d"></div>',
-        pointers: [
-          "/children/0/attribs/style",
-          "/children/1/attribs/style"
-        ]
+        pointers: ["/children/0/attribs/style", "/children/1/attribs/style"]
       },
       {
         name: "nested malformed style attribute",
@@ -159,8 +156,7 @@ describe("parseWithErrors", () => {
       },
       {
         name: "valid sibling does not produce an error",
-        html:
-          '<div style="color: red"></div><div style="bad val"></div>',
+        html: '<div style="color: red"></div><div style="bad val"></div>',
         pointers: ["/children/1/attribs/style"]
       }
     ];
