@@ -16,7 +16,7 @@ type Options = {
  */
 export default function parse(
   html: string,
-  options: Options = {}
+  options: Options = {},
 ): RaisinDocumentNode {
   return parseWithErrors(html, options).node;
 }
@@ -29,7 +29,7 @@ export default function parse(
  */
 export function parseWithErrors(
   html: string,
-  { cleanWhitespace = false, onParseError }: Options = {}
+  { cleanWhitespace = false, onParseError }: Options = {},
 ): { node: RaisinDocumentNode; errors: ParseErrorStack } {
   const { node, errors } = parseDomParser(html, onParseError);
   const clean = cleanWhitespace
@@ -48,12 +48,12 @@ export function parseWithErrors(
  */
 function parseDomParser(
   html: string,
-  onParseError?: (error: ParseError, jsonPointer: string) => void
+  onParseError?: (error: ParseError, jsonPointer: string) => void,
 ) {
-  const isDoctype = /<!doctype[^>]*?>/is.test(html);
-  const isHtml = /<\/?html[^>]*?>/is.test(html);
-  const isHead = /<\/?head[^>]*?>/is.test(html);
-  const isBody = /<\/?body[^>]*?>/is.test(html);
+  const isDoctype = /<!doctype[\s/>]/i.test(html);
+  const isHtml = /<\/?html[\s/>]/i.test(html);
+  const isHead = /<\/?head[\s/>]/i.test(html);
+  const isBody = /<\/?body[\s/>]/i.test(html);
 
   // removes any excess new line characters after a closing <html> tag
   html = html.replace(/<\/html>\n*/g, `</html>`);

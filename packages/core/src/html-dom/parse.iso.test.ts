@@ -37,10 +37,16 @@ describe("Parse simple nodes", () => {
   parseElement('<img src="www.example.com"></img>', "img", {
     src: "www.example.com"
   });
+  
   parseElement('<div center class="my-class"></div>', "div", {
     center: "",
     class: "my-class"
   });
+
+  // Guards against the regex matching <htmlfoo> as an html tag, for example.
+  parseElement("<htmlfoo></htmlfoo>", "htmlfoo");
+  parseElement("<bodyfoo></bodyfoo>", "bodyfoo");
+  parseElement("<headfoo></headfoo>", "headfoo");
 });
 
 describe("Parse + serialize edge cases", () => {
@@ -78,6 +84,14 @@ describe("Parse + serialize edge cases", () => {
 
   parseSimpleNodes(
     "<!DOCTYPE html><html><head></head><body><div>hello world</div></body></html>"
+  );
+
+  // Whitespace delimiter after tagname 
+  parseSimpleNodes('<html lang="en"><div>hello world</div></html>');
+  parseSimpleNodes('<body class="page"><div>hello world</div></body>');
+  parseSimpleNodes('<head lang="en"></head><div>hello world</div>');
+  parseSimpleNodes(
+    '<!DOCTYPE html><html lang="en"><body class="page"><div>hi</div></body></html>'
   );
 });
 
