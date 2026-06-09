@@ -4,7 +4,6 @@ import {
   htmlSerializer,
   htmlUtil,
   NodePath,
-  ParseErrorStack,
   parseWithErrors,
   RaisinNode,
   RaisinNodeWithChildren,
