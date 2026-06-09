@@ -32,10 +32,8 @@ export type InternalStateTransaction =
     };
 
 type NodeAndHTML = MutableRefObject<
-  { html: string; node: RaisinNode; parsed?: ParsedHtml } | undefined
+  { html: string; node: RaisinNode } | undefined
 >;
-
-type ParsedHtml = { node: RaisinNode; errors: ParseErrorStack };
 
 export const CoreMolecule = molecule((getMol, getScope) => {
   const { HTMLAtom } = getMol(ConfigMolecule);
@@ -60,9 +58,6 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     const ref = get(NodeWithHtmlRefAtom);
     const html = get(HTMLAtom);
 
-    if (ref.current?.html === html && ref.current.parsed) {
-      return ref.current.parsed;
-    }
     if (ref.current?.html === html) {
       return { node: ref.current.node, errors: [] };
     }
