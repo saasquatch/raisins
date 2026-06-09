@@ -69,6 +69,10 @@ export function raisinToSnabbdom(
         if (el.style) {
           styleObj = styleToObject(cssSerializer(el.style));
         }
+      } catch (e) {
+        // If the style string is malformed, avoid throwing an error that breaks the entire render
+        console.warn('Failed to serialize style for', el.tagName, e);
+        styleObj = {};
       } finally {
         styleObj = styleObj || {};
       }
