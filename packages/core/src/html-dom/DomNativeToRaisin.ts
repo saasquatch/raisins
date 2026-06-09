@@ -88,50 +88,46 @@ function nodeToRaisin(
       }
       if (element.nodeName === "STYLE") {
         const textContent = node.textContent;
-        const styleNode: RaisinNode = {
+        return {
           type: STYLE,
           tagName: "style",
-          contents: undefined,
+          contents: textContent
+            ? cssParser(textContent, {
+                onParseError: error =>
+                  report(
+                    {
+                      rule: "css",
+                      // @ts-ignore - @types/css-tree type is incomplete
+                      message: `${error.message} at "${error.source}"`
+                    },
+                    pointer
+                  )
+              })
+            : undefined,
           attribs: getAttribues(element)
         };
-        if (textContent) {
-          styleNode.contents = cssParser(textContent, {
-            onParseError: error =>
-              report(
-                {
-                  rule: "css",
-                  // @ts-ignore - @types/css-tree type is incomplete
-                  message: `${error.message} at "${error.source}"`
-                },
-                pointer
-              )
-          });
-        }
-        return styleNode;
       }
-      const elementNode: RaisinNode = {
+      return {
         type: TAG,
         attribs: { ...otherAttribs },
         tagName: element.nodeName.toLowerCase(),
         children: nodeListToRaisin(element.childNodes, false, pointer, report),
-        style: undefined
+        style:
+          style !== undefined
+            ? cssParser(style, {
+                context: "declarationList",
+                onParseError: error =>
+                  report(
+                    {
+                      rule: "css",
+                      // @ts-ignore - @types/css-tree type is incomplete
+                      message: `${error.message} at "${error.source}"`
+                    },
+                    `${pointer}/attribs/style`
+                  )
+              })
+            : undefined
       };
-      if (style !== undefined) {
-        elementNode.style = cssParser(style, {
-          context: "declarationList",
-          onParseError: error => {
-            report(
-              {
-                rule: "css",
-                // @ts-ignore - @types/css-tree type is incomplete
-                message: `${error.message} at "${error.source}"`
-              },
-              `${pointer}/attribs/style`
-            );
-          }
-        });
-      }
-      return elementNode;
     case Node.TEXT_NODE:
       const textNode = node as Text;
       return {

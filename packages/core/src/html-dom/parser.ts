@@ -50,10 +50,10 @@ function parseDomParser(
   html: string,
   onParseError?: (error: ParseError, jsonPointer: string) => void
 ) {
-  const isDoctype = /<!doctype.*?>/is.test(html);
-  const isHtml = /<\/?html.*?>/is.test(html);
-  const isHead = /<\/?head.*?>/is.test(html);
-  const isBody = /<\/?body.*?>/is.test(html);
+  const isDoctype = /<!doctype[^>]*?>/is.test(html);
+  const isHtml = /<\/?html[^>]*?>/is.test(html);
+  const isHead = /<\/?head[^>]*?>/is.test(html);
+  const isBody = /<\/?body[^>]*?>/is.test(html);
 
   // removes any excess new line characters after a closing <html> tag
   html = html.replace(/<\/html>\n*/g, `</html>`);
