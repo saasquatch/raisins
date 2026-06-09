@@ -37,7 +37,7 @@ describe("Parse simple nodes", () => {
   parseElement('<img src="www.example.com"></img>', "img", {
     src: "www.example.com"
   });
-  
+
   parseElement('<div center class="my-class"></div>', "div", {
     center: "",
     class: "my-class"
@@ -86,7 +86,7 @@ describe("Parse + serialize edge cases", () => {
     "<!DOCTYPE html><html><head></head><body><div>hello world</div></body></html>"
   );
 
-  // Whitespace delimiter after tagname 
+  // Whitespace delimiter after tagname
   parseSimpleNodes('<html lang="en"><div>hello world</div></html>');
   parseSimpleNodes('<body class="page"><div>hello world</div></body>');
   parseSimpleNodes('<head lang="en"></head><div>hello world</div>');
