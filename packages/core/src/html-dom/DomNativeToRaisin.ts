@@ -123,7 +123,7 @@ function nodeToRaisin(
                       // @ts-ignore - @types/css-tree type is incomplete
                       message: `${error.message} at "${error.source}"`
                     },
-                    `${pointer}/attribs/style`
+                    `${pointer}/style`
                   )
               })
             : undefined

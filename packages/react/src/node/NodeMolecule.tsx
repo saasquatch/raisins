@@ -63,20 +63,17 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const childrenErrorsAtom = atom((get) => {
     const jsonPointer = get(jsonPointerAtom);
     const validation = get(ValidationAtoms.errorsAtom);
-    const parseErrors = get(ParseErrorsAtom);
-    return [
-      ...getSubErrors(validation, jsonPointer + '/children'),
-      ...getSubErrors(parseErrors, jsonPointer + '/children'),
-    ];
+    return getSubErrors(validation, jsonPointer + '/children');
   });
   const attributeErrorsAtom = atom((get) => {
     const jsonPointer = get(jsonPointerAtom);
     const validation = get(ValidationAtoms.errorsAtom);
+    return getSubErrors(validation, jsonPointer + '/attribs');
+  });
+  const styleErrorsAtom = atom((get) => {
+    const jsonPointer = get(jsonPointerAtom);
     const parseErrors = get(ParseErrorsAtom);
-    return [
-      ...getSubErrors(validation, jsonPointer + '/attribs'),
-      ...getSubErrors(parseErrors, jsonPointer + '/attribs'),
-    ];
+    return getSubErrors(parseErrors, jsonPointer + '/style');
   });
 
   const hasErrors = atom((get) => get(errorsAtom).length > 0);
@@ -300,6 +297,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     errorsAtom: atomWithShallowCheck(errorsAtom),
     childrenErrorsAtom: atomWithShallowCheck(childrenErrorsAtom),
     attributeErrorsAtom: atomWithShallowCheck(attributeErrorsAtom),
+    styleErrorsAtom: atomWithShallowCheck(styleErrorsAtom),
     hasErrorsAtom: hasErrors,
   };
 });
