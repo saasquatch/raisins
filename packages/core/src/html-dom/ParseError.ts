@@ -2,6 +2,7 @@
 import type { ErrorEntry, ErrorStack } from "../validation/validateNode/types";
 
 export type CssParseError = {
+  type: "css";
   rule: "css";
   message: string;
 };
