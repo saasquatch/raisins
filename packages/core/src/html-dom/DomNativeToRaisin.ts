@@ -96,6 +96,7 @@ function nodeToRaisin(
                 onParseError: error =>
                   report(
                     {
+                      type: "css",
                       rule: "css",
                       // @ts-ignore - @types/css-tree type is incomplete
                       message: `${error.message} at "${error.source}"`
@@ -119,6 +120,7 @@ function nodeToRaisin(
                 onParseError: error =>
                   report(
                     {
+                      type: "css",
                       rule: "css",
                       // @ts-ignore - @types/css-tree type is incomplete
                       message: `${error.message} at "${error.source}"`

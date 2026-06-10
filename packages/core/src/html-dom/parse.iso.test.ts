@@ -182,6 +182,7 @@ describe("parseWithErrors", () => {
         expect(result.errors).toHaveLength(pointers.length);
         result.errors.forEach((entry, i) => {
           expect(entry.jsonPointer).toBe(pointers[i]);
+          expect(entry.error.type).toBe("css");
           expect(entry.error.rule).toBe("css");
           expect(typeof entry.error.message).toBe("string");
           expect(entry.error.message.length).toBeGreaterThan(0);
@@ -237,7 +238,7 @@ describe("parseWithErrors", () => {
       it(name, () => {
         const result = parseWithErrors(html, options);
         expect(result.errors.length).toBeGreaterThanOrEqual(1);
-        expect(result.errors[0].error.rule).toBe("css");
+        expect(result.errors[0].error.type).toBe("css");
       });
     });
   });
