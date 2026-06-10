@@ -1,6 +1,7 @@
 import { ElementType } from "domelementtype";
 import expect from "expect";
-import { ParseError, ParseErrorStack } from "./ParseError";
+// eslint-disable-next-line prettier/prettier
+import type { ParseError, ParseErrorStack } from "./ParseError";
 import parse, { parseWithErrors } from "./parser";
 import { RaisinNode } from "./RaisinNode";
 import serializer from "./serializer";

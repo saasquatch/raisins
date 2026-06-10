@@ -4,10 +4,13 @@ import {
   htmlSerializer,
   htmlUtil,
   NodePath,
-  ParseErrorStack,
   parseWithErrors,
   RaisinNode,
   RaisinNodeWithChildren,
+} from '@raisins/core';
+// eslint-disable-next-line prettier/prettier
+import type {
+  ParseErrorStack,
 } from '@raisins/core';
 import { molecule } from 'bunshi/react';
 import { atom, SetStateAction, WritableAtom } from 'jotai';
