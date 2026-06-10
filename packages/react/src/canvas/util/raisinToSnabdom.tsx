@@ -71,7 +71,9 @@ export function raisinToSnabbdom(
         }
       } catch (e) {
         // If the style string is malformed, avoid throwing an error that breaks the entire render
-        console.warn('Failed to serialize style for', el.tagName, e);
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Failed to serialize style for', el.tagName, e);
+        }
         styleObj = {};
       } finally {
         styleObj = styleObj || {};
@@ -88,7 +90,7 @@ export function raisinToSnabbdom(
               // inside of the iframe API. This fixes an issue where template
               // children are rendered as `template.childNodes` instead of
               // `template.content.childNodes`. To learn more, read the MDN
-              // article on Document Fragments 
+              // article on Document Fragments
               // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
               templateContent: fragment(appender(children, el)),
             },
