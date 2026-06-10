@@ -1,4 +1,4 @@
-import { ErrorEntry, ErrorStack } from "../validation/validateNode/types";
+import type { ErrorEntry, ErrorStack } from "../validation/validateNode/types";
 
 export type CssParseError = {
   rule: "css";
