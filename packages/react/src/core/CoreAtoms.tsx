@@ -8,7 +8,6 @@ import {
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-// eslint-disable-next-line prettier/prettier
 import type {
   ParseErrorStack,
 } from '@raisins/core';
