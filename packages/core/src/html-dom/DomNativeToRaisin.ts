@@ -61,6 +61,28 @@ function nodeListToRaisin(
   );
 }
 
+/**
+ * Builds an `onParseError` callback for {@link cssParser} that reports
+ * recoverable CSS parse errors at the given json pointer.
+ *
+ * Note: `source` is missing from @types/css-tree's SyntaxParseError,
+ * but exists at runtime, hence the structural parameter type.
+ */
+function cssErrorReporter(
+  report: (error: ParseError, jsonPointer: string) => void,
+  jsonPointer: string
+) {
+  return (error: { message: string; source?: string }) =>
+    report(
+      {
+        type: "css",
+        rule: "css",
+        message: `${error.message} at "${error.source}"`
+      },
+      jsonPointer
+    );
+}
+
 function nodeToRaisin(
   node: Node,
   pointer: string,
@@ -93,16 +115,7 @@ function nodeToRaisin(
           tagName: "style",
           contents: textContent
             ? cssParser(textContent, {
-                onParseError: error =>
-                  report(
-                    {
-                      type: "css",
-                      rule: "css",
-                      // @ts-ignore - @types/css-tree type is incomplete
-                      message: `${error.message} at "${error.source}"`
-                    },
-                    pointer
-                  )
+                onParseError: cssErrorReporter(report, pointer)
               })
             : undefined,
           attribs: getAttribues(element)
@@ -117,16 +130,7 @@ function nodeToRaisin(
           style !== undefined
             ? cssParser(style, {
                 context: "declarationList",
-                onParseError: error =>
-                  report(
-                    {
-                      type: "css",
-                      rule: "css",
-                      // @ts-ignore - @types/css-tree type is incomplete
-                      message: `${error.message} at "${error.source}"`
-                    },
-                    `${pointer}/style`
-                  )
+                onParseError: cssErrorReporter(report, `${pointer}/style`)
               })
             : undefined
       };
