@@ -72,15 +72,17 @@ function cssErrorReporter(
   report: (error: ParseError, jsonPointer: string) => void,
   jsonPointer: string
 ) {
-  return (error: { message: string; source?: string }) =>
+  return (error: { message: string; source?: string }) => {
+    const sourceSuffix = error.source ? ` at "${error.source}"` : "";
     report(
       {
         type: "css",
         rule: "css",
-        message: `${error.message} at "${error.source}"`
+        message: `${error.message}${sourceSuffix}`
       },
       jsonPointer
     );
+  };
 }
 
 function nodeToRaisin(
