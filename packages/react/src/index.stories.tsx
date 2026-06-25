@@ -304,43 +304,46 @@ Editor.args = {
   domain: 'https://localhost:5000',
 };
 
-const Row: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'nowrap',
-  width: '100%',
-};
-
 const Header: CSSProperties = {
   gridArea: 'header',
+  borderBottom: '1px solid #e0e0e0',
+  padding: '8px 12px',
+  background: '#fafafa',
 };
 const Edits: CSSProperties = {
   gridArea: 'edits',
+  padding: '12px',
+  borderLeft: '1px solid #e0e0e0',
+  overflowY: 'auto',
 };
 const CanvasCss: CSSProperties = {
   gridArea: 'canvas',
-  overflow: 'scroll',
+  overflow: 'auto',
+  padding: '12px',
 };
 const LayersCss: CSSProperties = {
   gridArea: 'layers',
-  overflowY: 'scroll',
+  overflowY: 'auto',
+  padding: '12px',
+  borderRight: '1px solid #e0e0e0',
 };
 
 const Main: CSSProperties = {
   display: 'grid',
-  gridGap: '1em',
   gridTemplateAreas: `
     'header header header'
     'layers canvas edits'
     'footer footer footer'`,
   gridTemplateRows: 'auto 1fr auto',
-  gridTemplateColumns: '20% 1fr 15%',
-  gridRowGap: '10px',
-  gridColumnGap: '10px',
+  gridTemplateColumns: '220px 1fr 200px',
+  gridRowGap: '0',
+  gridColumnGap: '0',
   height: '100vh',
   margin: '0',
-
   overflowY: 'hidden',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '13px',
+  color: '#1a1a1a',
 };
 
 export function EditorView() {
@@ -397,39 +400,36 @@ function ToolbarController() {
   const hovered = useAtomValue(atoms.HoveredBreadcrumbsAtom);
 
   return (
-    <div>
-      Toolbar
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+      <span style={{ fontWeight: 600, marginRight: '8px' }}>Toolbar</span>
       <button onClick={undo} disabled={historySize.undoSize <= 0}>
         Undo ({historySize.undoSize})
       </button>
       <button onClick={redo} disabled={historySize.redoSize <= 0}>
         Redo ({historySize.redoSize})
       </button>
-      {mode}
+      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
       <button disabled={mode === 'edit'} onClick={() => setMode('edit')}>
         Edit
       </button>
       <button disabled={mode === 'preview'} onClick={() => setMode('preview')}>
         Preview
       </button>
-      <button
-        disabled
-        style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}
-      >
-        Screen
-      </button>
+      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
       {sizes.map(s => (
         <button onClick={() => setSize(s)} disabled={size === s} key={s.name}>
           {s.name}
         </button>
       ))}
-      <button
-        onClick={() => setOutlined(o => !o)}
-        style={{ cursor: 'initial' } as CSSProperties & CSSStyleDeclaration}
-      >
+      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
+      <button onClick={() => setOutlined(o => !o)}>
         {outlined ? 'Outlined' : 'No Outline'}
       </button>
-      Hovered: {hovered}
+      {hovered && (
+        <span style={{ marginLeft: '12px', color: '#666', fontSize: '12px' }}>
+          Hovered: {hovered}
+        </span>
+      )}
     </div>
   );
 }
