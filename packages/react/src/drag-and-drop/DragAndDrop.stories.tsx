@@ -7,6 +7,7 @@ import {
   PickAndPlopMolecule,
   SelectedNodeController,
 } from '../core';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { Block, ComponentModelMolecule } from '../component-metamodel';
 import {
   big,
@@ -21,7 +22,7 @@ import { useHotkeys } from '../hotkeys';
 import { BasicStory } from '../index.stories';
 import { AttributesController } from '../attributes';
 import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
-import { useDragBlock, useDropTarget } from './useDragAndDrop';
+import { useDragBlock, useDragSelectedNode, useDropTarget } from './useDragAndDrop';
 import {
   NodeChildrenEditor,
   ChildrenEditorForAtoms,
@@ -462,6 +463,44 @@ function DragDropCanvas() {
 
 // -- Editor composition --
 
+/**
+ * A "drag to move" handle for the currently selected element, rendered in the
+ * Properties panel — i.e. *outside* of the selected node's {@link NodeScope}.
+ *
+ * This demonstrates {@link useDragSelectedNode}, which reads the node to drag
+ * from the selection rather than the surrounding scope, so it can be used from
+ * overlays such as a canvas toolbar.
+ */
+function MoveSelectedHandle() {
+  const { SelectedNodeAtom } = useMolecule(SelectedNodeMolecule);
+  const selectedNode = useAtomValue(SelectedNodeAtom);
+  const { draggable, onDragStart, onDragEnd, isDragging } =
+    useDragSelectedNode();
+
+  if (!selectedNode) return <></>;
+
+  return (
+    <div
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      style={{
+        cursor: 'grab',
+        userSelect: 'none',
+        padding: '6px 10px',
+        marginBottom: '12px',
+        border: '1px solid #1976d2',
+        borderRadius: '4px',
+        color: '#1976d2',
+        background: isDragging ? '#e3f2fd' : '#ffffff',
+        textAlign: 'center',
+      }}
+    >
+      ⠿ Drag to move selected
+    </div>
+  );
+}
+
 function DragDropEditor() {
   useHotkeys();
 
@@ -479,6 +518,7 @@ function DragDropEditor() {
         >
           Properties
         </div>
+        <MoveSelectedHandle />
         <SelectedNodeController
           HasSelectionComponent={AttributesController}
         />

@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'bunshi/react';
-import { RaisinNodeWithChildren } from '@raisins/core';
+import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
 import { Block } from '../component-metamodel/ComponentModel';
 import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
 import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { NodeMolecule } from '../node/NodeMolecule';
 
 /**
@@ -65,10 +66,15 @@ export function useDragBlock(block: Block) {
 }
 
 /**
- * Hook for making an existing element layer draggable (for move operations).
- * Also sets PickedNodeAtom so that plop target validation works.
+ * Shared implementation for making an existing element draggable (for move
+ * operations). The `node` to drag is provided by the caller so that this can be
+ * used both from within a node's own scope and from an overlay (such as a
+ * canvas toolbar) that lives outside of any {@link NodeScope}.
+ *
+ * On drag start this sets both DraggedNodeAtom and PickedNodeAtom so that the
+ * existing canPlopHereAtom validation works seamlessly with drag targets.
  */
-export function useDragNode() {
+function useDragForNode(node: RaisinNode | undefined) {
   const {
     DraggedAtom,
     DraggingIsActive,
@@ -77,8 +83,6 @@ export function useDragNode() {
     TryCommitLastHoveredAtom,
   } = useMolecule(DragAndDropMolecule);
   const { PickedAtom, PickedNodeAtom } = useMolecule(PickAndPlopMolecule);
-  const { nodeAtom } = useMolecule(NodeMolecule);
-  const node = useAtomValue(nodeAtom);
   const setDraggedNode = useSetAtom(DraggedNodeAtom);
   const setDragged = useSetAtom(DraggedAtom);
   const setPicked = useSetAtom(PickedAtom);
@@ -88,10 +92,11 @@ export function useDragNode() {
   const isDragging = useAtomValue(DraggingIsActive);
   const draggedNode = useAtomValue(DraggedNodeAtom);
 
-  const isThisNodeDragged = draggedNode === node;
+  const isThisNodeDragged = node !== undefined && draggedNode === node;
 
   const onDragStart = useCallback(
     (e: React.DragEvent) => {
+      if (!node) return;
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', 'node');
       setDraggedNode(node);
@@ -116,6 +121,36 @@ export function useDragNode() {
     isDragging: isThisNodeDragged,
     anyDragging: isDragging,
   };
+}
+
+/**
+ * Hook for making an existing element layer draggable (for move operations).
+ * Also sets PickedNodeAtom so that plop target validation works.
+ *
+ * By default the dragged node is the current {@link NodeScope} node (matching
+ * the previous behaviour). Pass `nodeOverride` to drag a specific node instead
+ * — useful from overlays that live outside of the node's scope. See
+ * {@link useDragSelectedNode} for a convenience wrapper that drags the selected
+ * node.
+ */
+export function useDragNode(nodeOverride?: RaisinNode) {
+  const { nodeAtom } = useMolecule(NodeMolecule);
+  const scopeNode = useAtomValue(nodeAtom);
+  return useDragForNode(nodeOverride ?? scopeNode);
+}
+
+/**
+ * Hook for making a drag handle that moves the currently selected element.
+ *
+ * Unlike {@link useDragNode}, this reads the node to drag from the
+ * {@link SelectedNodeMolecule} rather than the surrounding {@link NodeScope}, so
+ * it works from overlays such as a canvas toolbar that are not rendered inside
+ * the selected node's scope.
+ */
+export function useDragSelectedNode() {
+  const { SelectedNodeAtom } = useMolecule(SelectedNodeMolecule);
+  const selectedNode = useAtomValue(SelectedNodeAtom);
+  return useDragForNode(selectedNode);
 }
 
 export type DropTargetProps = {

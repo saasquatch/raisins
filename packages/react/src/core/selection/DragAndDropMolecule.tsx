@@ -14,8 +14,30 @@ import { isFunction } from '../../util/isFunction';
 import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule } from './SelectedNodeMolecule';
+import { PickAndPlopMolecule } from './PickAndPlopMolecule';
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
+
+/**
+ * Finds the node in `root` whose `children` array is the exact same instance as
+ * `childrenRef`. Used to locate a node after a `moveNode` shallow-clone, which
+ * preserves the moved node's `children` array by reference even though the node
+ * object itself is a fresh clone.
+ */
+function findNodeByChildrenRef(
+  root: RaisinNode,
+  childrenRef: RaisinNode[] | undefined
+): RaisinNode | undefined {
+  if (!childrenRef) return undefined;
+  const children = (root as RaisinNodeWithChildren).children;
+  if (children === undefined) return undefined;
+  if (children === childrenRef) return root;
+  for (const child of children) {
+    const found = findNodeByChildrenRef(child, childrenRef);
+    if (found) return found;
+  }
+  return undefined;
+}
 
 export type DragPlopDestination = {
   parent: RaisinNodeWithChildren;
@@ -36,6 +58,7 @@ export type DraggedOption =
 export const DragAndDropMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SelectedAtom } = getMol(SelectedNodeMolecule);
+  const { PickedAtom } = getMol(PickAndPlopMolecule);
 
   /**
    * Tracks the currently dragged item. Can only drag one item at a time.
@@ -132,10 +155,29 @@ export const DragAndDropMolecule = molecule(getMol => {
           idx
         );
 
+        // `moveNode` shallow-clones the dragged node to apply the new slot, so
+        // `draggedNode` is no longer present in `newDocument` by reference and
+        // can't be used for selection. The clone keeps the *same* `children`
+        // array instance though, so we can locate the moved node by that
+        // identity and select it once the new document is committed.
+        const movedNode = findNodeByChildrenRef(
+          newDocument,
+          draggedNode.children
+        );
+
         set(RootNodeAtom, newDocument);
+        await waitForUpdate();
+        // Select the node that was just moved so it shows in the edit sidebar.
+        if (movedNode) {
+          set(SelectedAtom, movedNode);
+        }
       }
-      // Clear drag state after drop
+      // Clear drag *and* pick state after drop. The pick state is also set by
+      // the drag source (so canPlopHereAtom validation works) and must be
+      // cleared here at commit time — relying on the drag source's `onDragEnd`
+      // is unreliable because the source can unmount when the document changes.
       set(DraggedAtom, undefined);
+      set(PickedAtom, undefined);
       set(LastHoveredPlopAtom, undefined);
     }
   );

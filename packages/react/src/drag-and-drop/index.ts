@@ -3,5 +3,10 @@ export type {
   DraggedOption,
   DragPlopDestination,
 } from '../core/selection/DragAndDropMolecule';
-export { useDragBlock, useDragNode, useDropTarget } from './useDragAndDrop';
+export {
+  useDragBlock,
+  useDragNode,
+  useDragSelectedNode,
+  useDropTarget,
+} from './useDragAndDrop';
 export type { DropTargetProps } from './useDragAndDrop';
