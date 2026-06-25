@@ -1,6 +1,16 @@
 import cssParser from "../css-om/parser";
 import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType";
+import { ParseError, ParseErrorStack } from "./ParseError";
 import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
+
+export type DomNativeToRaisinOptions = {
+  onParseError?: (error: ParseError, jsonPointer: string) => void;
+};
+
+export type DomNativeToRaisinResult = {
+  node: RaisinDocumentNode;
+  errors: ParseErrorStack;
+};
 
 /**
  * Parses a DOM (Document or Document Fragment) into a Raisin object
@@ -11,21 +21,32 @@ import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
  */
 export function domNativeToRaisin(
   Dom: DocumentFragment | Document,
-  isHtml: boolean = false
-): RaisinDocumentNode {
-  const raisin: RaisinDocumentNode = {
+  isHtml: boolean = false,
+  options: DomNativeToRaisinOptions = {}
+): DomNativeToRaisinResult {
+  const errors: ParseErrorStack = [];
+  const report = (error: ParseError, jsonPointer: string) => {
+    errors.push({ jsonPointer, error });
+    options.onParseError?.(error, jsonPointer);
+  };
+
+  const node: RaisinDocumentNode = {
     type: "root",
     children: nodeListToRaisin(
       Dom.childNodes,
-      isHtml && Dom instanceof Document
+      isHtml && Dom instanceof Document,
+      "",
+      report
     )
   };
-  return raisin;
+  return { node, errors };
 }
 
 function nodeListToRaisin(
   nodes: NodeList,
-  isHtml: boolean = false
+  isHtml: boolean,
+  pointer: string,
+  report: (error: ParseError, jsonPointer: string) => void
 ): RaisinNode[] {
   var nodesArray = Array.from(nodes);
   if (isHtml) {
@@ -35,10 +56,40 @@ function nodeListToRaisin(
       }
     }
   }
-  return nodesArray.map(nodeToRaisin);
+  return nodesArray.map((n, idx) =>
+    nodeToRaisin(n, `${pointer}/children/${idx}`, report)
+  );
 }
 
-function nodeToRaisin(node: Node): RaisinNode {
+/**
+ * Builds an `onParseError` callback for {@link cssParser} that reports
+ * recoverable CSS parse errors at the given json pointer.
+ *
+ * Note: `source` is missing from @types/css-tree's SyntaxParseError,
+ * but exists at runtime, hence the structural parameter type.
+ */
+function cssErrorReporter(
+  report: (error: ParseError, jsonPointer: string) => void,
+  jsonPointer: string
+) {
+  return (error: { message: string; source?: string }) => {
+    const sourceSuffix = error.source ? ` at "${error.source}"` : "";
+    report(
+      {
+        type: "css",
+        rule: "css",
+        message: `${error.message}${sourceSuffix}`
+      },
+      jsonPointer
+    );
+  };
+}
+
+function nodeToRaisin(
+  node: Node,
+  pointer: string,
+  report: (error: ParseError, jsonPointer: string) => void
+): RaisinNode {
   switch (node.nodeType) {
     case Node.ELEMENT_NODE:
       const element = node as HTMLElement;
@@ -51,7 +102,12 @@ function nodeToRaisin(node: Node): RaisinNode {
           type: TAG,
           attribs: getAttribues(element),
           tagName: element.nodeName.toLowerCase(),
-          children: nodeListToRaisin(template.content.childNodes)
+          children: nodeListToRaisin(
+            template.content.childNodes,
+            false,
+            pointer,
+            report
+          )
         };
       }
       if (element.nodeName === "STYLE") {
@@ -59,7 +115,11 @@ function nodeToRaisin(node: Node): RaisinNode {
         return {
           type: STYLE,
           tagName: "style",
-          contents: textContent ? cssParser(textContent) : undefined,
+          contents: textContent
+            ? cssParser(textContent, {
+                onParseError: cssErrorReporter(report, pointer)
+              })
+            : undefined,
           attribs: getAttribues(element)
         };
       }
@@ -67,10 +127,13 @@ function nodeToRaisin(node: Node): RaisinNode {
         type: TAG,
         attribs: { ...otherAttribs },
         tagName: element.nodeName.toLowerCase(),
-        children: nodeListToRaisin(element.childNodes),
+        children: nodeListToRaisin(element.childNodes, false, pointer, report),
         style:
           style !== undefined
-            ? cssParser(style, { context: "declarationList" })
+            ? cssParser(style, {
+                context: "declarationList",
+                onParseError: cssErrorReporter(report, `${pointer}/style`)
+              })
             : undefined
       };
     case Node.TEXT_NODE:
