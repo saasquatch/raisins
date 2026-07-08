@@ -1,6 +1,5 @@
 import { RaisinElementNode } from '@raisins/core';
 import {
-  getNode,
   getPath,
   htmlUtil,
   NodePath,
@@ -11,10 +10,10 @@ import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
+import { tryGetNode } from '../../util/tryGetNode';
 import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule } from './SelectedNodeMolecule';
-import { PickAndPlopMolecule } from './PickAndPlopMolecule';
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 
@@ -58,7 +57,6 @@ export type DraggedOption =
 export const DragAndDropMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SelectedAtom } = getMol(SelectedNodeMolecule);
-  const { PickedAtom } = getMol(PickAndPlopMolecule);
 
   /**
    * Tracks the currently dragged item. Can only drag one item at a time.
@@ -72,7 +70,9 @@ export const DragAndDropMolecule = molecule(getMol => {
       if (!dragged) return undefined;
       if (dragged.type !== 'element') return undefined;
 
-      return getNode(currentDoc, dragged.path);
+      // The stored path may dangle if the document changed since drag start
+      // (undo/redo, external edits) — a dangling drag resolves to undefined.
+      return tryGetNode(currentDoc, dragged.path);
     },
     (get, set, next) => {
       const node = isFunction(next)
@@ -104,6 +104,20 @@ export const DragAndDropMolecule = molecule(getMol => {
   );
 
   /**
+   * The content being dragged: the block's content for adds, the resolved
+   * document node for moves, or undefined when nothing is dragged (or the
+   * dragged node no longer resolves). This is the drag half of the "plop
+   * candidate" — plop validation derives from `dragged ?? picked` instead of
+   * drag sources writing pick state.
+   */
+  const DraggedContentAtom = atom<RaisinElementNode | undefined>(get => {
+    const dragged = get(DraggedAtom);
+    if (!dragged) return undefined;
+    if (dragged.type === 'block') return dragged.block.content;
+    return get(DraggedNodeAtom) as RaisinElementNode | undefined;
+  });
+
+  /**
    * The most-recently-hovered plop target, regardless of which surface
    * (layer panel or canvas) reported the hover. Used as a fallback drop
    * destination when the platform's native `drop` event cannot reliably
@@ -124,13 +138,33 @@ export const DragAndDropMolecule = molecule(getMol => {
       if (!dragged) return;
 
       const currentDoc = get(RootNodeAtom);
-      const parentPath = getPath(currentDoc, parent)!;
+      // The destination parent was captured on dragenter/dragover; if the
+      // document changed since (so the parent is no longer in it) there is no
+      // valid destination — abandon the drop rather than crash downstream.
+      const parentPath = getPath(currentDoc, parent);
+      if (!parentPath) {
+        set(DraggedAtom, undefined);
+        set(LastHoveredPlopAtom, undefined);
+        return;
+      }
+
+      // Clearing drag state BEFORE committing the new document is load-bearing:
+      // DraggedAtom holds a NodePath valid only for `currentDoc`. If the new
+      // document were committed first, every DraggedNodeAtom subscriber would
+      // re-resolve the stale path against the new tree during the awaited gap.
+      const commit = (newDocument: RaisinNode) => {
+        set(DraggedAtom, undefined);
+        set(LastHoveredPlopAtom, undefined);
+        set(RootNodeAtom, newDocument);
+      };
 
       if (dragged.type === 'block') {
-        dragged.block.content.attribs.slot = slot;
+        // Clone first, then set the slot — the block definition is shared
+        // metamodel config and must never be mutated.
         const cloneOfDraggedNode = clone(
           dragged.block.content
         ) as RaisinElementNode;
+        cloneOfDraggedNode.attribs.slot = slot;
 
         const newDocument = insertAtPath(
           currentDoc,
@@ -138,7 +172,7 @@ export const DragAndDropMolecule = molecule(getMol => {
           parentPath,
           idx
         );
-        set(RootNodeAtom, newDocument);
+        commit(newDocument);
         await waitForUpdate();
         set(SelectedAtom, cloneOfDraggedNode);
       } else {
@@ -165,20 +199,13 @@ export const DragAndDropMolecule = molecule(getMol => {
           draggedNode.children
         );
 
-        set(RootNodeAtom, newDocument);
+        commit(newDocument);
         await waitForUpdate();
         // Select the node that was just moved so it shows in the edit sidebar.
         if (movedNode) {
           set(SelectedAtom, movedNode);
         }
       }
-      // Clear drag *and* pick state after drop. The pick state is also set by
-      // the drag source (so canPlopHereAtom validation works) and must be
-      // cleared here at commit time — relying on the drag source's `onDragEnd`
-      // is unreliable because the source can unmount when the document changes.
-      set(DraggedAtom, undefined);
-      set(PickedAtom, undefined);
-      set(LastHoveredPlopAtom, undefined);
     }
   );
 
@@ -200,6 +227,7 @@ export const DragAndDropMolecule = molecule(getMol => {
 
   return {
     DraggedAtom,
+    DraggedContentAtom,
     DraggedNodeAtom,
     DraggingIsActive,
     DropNodeInSlotAtom,

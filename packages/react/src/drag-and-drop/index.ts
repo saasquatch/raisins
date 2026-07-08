@@ -9,4 +9,10 @@ export {
   useDragSelectedNode,
   useDropTarget,
 } from './useDragAndDrop';
-export type { DropTargetProps } from './useDragAndDrop';
+export type {
+  DragGhostOptions,
+  DropTargetProps,
+  UseDragOptions,
+} from './useDragAndDrop';
+export { DragHandle } from './DragHandle';
+export type { DragHandleProps } from './DragHandle';

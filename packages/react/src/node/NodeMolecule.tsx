@@ -6,6 +6,7 @@ import { SelectionBookmark } from 'prosemirror-state';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
+import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
 import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule';
 import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
@@ -29,9 +30,11 @@ export const NodeMolecule = molecule((getMol, getScope) => {
 
   const {
     PickedAtom,
+    PickedContentAtom,
     PickedNodeAtom,
     PlopNodeInSlotAtom: DropPloppedNodeInSlotAtom,
   } = getMol(PickAndPlopMolecule);
+  const { DraggedContentAtom } = getMol(DragAndDropMolecule);
   const { HoveredNodeAtom, HoveredSoulAtom } = getMol(HoveredNodeMolecule);
   const { SelectedAtom, SelectedNodeAtom, SelectedBookmark } = getMol(
     SelectedNodeMolecule
@@ -115,16 +118,15 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const canPlopHereAtom = atom((get) => {
     const node = get(n);
     if (!node || !isElementNode(node)) return () => false;
-    const picked = get(PickedAtom);
-    // Support both element moves (PickedNodeAtom) and block additions
-    // (PickedAtom of type 'block', which has no path until plopped).
-    const pickedNode =
-      picked?.type === 'block' ? picked.block.content : get(PickedNodeAtom);
-    if (!pickedNode || !isElementNode(pickedNode)) return () => false;
+    // The plop candidate is whatever is being placed — dragged (HTML5 DnD)
+    // or picked (click-based pick-and-plop). Derived here instead of drag
+    // sources writing pick state, so the two interactions stay independent.
+    const candidate = get(DraggedContentAtom) ?? get(PickedContentAtom);
+    if (!candidate || !isElementNode(candidate)) return () => false;
     const { isValidChild } = get(ComponentModelAtom);
 
     const fn = ({ slot, idx }: { slot: string; idx: number }) => {
-      return isValidChild(pickedNode, node, slot);
+      return isValidChild(candidate, node, slot);
     };
     return fn;
   });

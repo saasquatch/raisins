@@ -184,15 +184,15 @@ export type DropResolution = {
  * ## Parent-side overlay approach
  *
  * Instead, we drive drops entirely from the parent window:
- *   1. `CanvasPickAndPlopMolecule` already renders plop targets inside the
- *      iframe whenever a drag/pick is active. Their geometry is forwarded
- *      to `GeometryAtom` thanks to `resizeObserver: true` + the plop-target
- *      entries we keep in `SetGeometryAtom`.
+ *   1. Souled elements in the canvas report their geometry to `GeometryAtom`
+ *      (via `resizeObserver: true`), so we always have iframe-relative rects
+ *      for the rendered document — no plop targets are injected during a
+ *      drag, and the canvas never reflows under the cursor.
  *   2. While a drag is active, the iframe is given `pointer-events: none`
  *      so the parent's wrapping container receives drag events instead of
  *      them being captured by the iframe element.
  *   3. On `dragover` on the wrapper, we hit-test the cursor position
- *      against plop target rects from `GeometryAtom`, set
+ *      against souled-element rects from `GeometryAtom`, set
  *      `LastHoveredPlopAtom`, and `preventDefault()` so `drop` will fire.
  *   4. On `drop` on the wrapper, we commit via `DropNodeInSlotAtom`.
  *
@@ -206,7 +206,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
     LastHoveredPlopAtom,
     DraggingIsActive,
     DraggedAtom,
-    DraggedNodeAtom,
+    DraggedContentAtom,
   } = getMol(DragAndDropMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
@@ -242,8 +242,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
 
       const noop = () => undefined;
       if (!dragged) return noop;
-      const possiblePlop =
-        dragged.type === 'block' ? dragged.block.content : get(DraggedNodeAtom);
+      const possiblePlop = get(DraggedContentAtom);
       if (!possiblePlop || !isElementNode(possiblePlop)) return noop;
       const addOrMove = dragged.type === 'block' ? 'add' : 'move';
 
@@ -417,6 +416,15 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
  * the action ("Add to …" / "Move to …"). No plop targets are injected into
  * the iframe during a drag, so the canvas layout never reflows under the
  * cursor.
+ *
+ * ## Stacking context
+ *
+ * The wrapper is `position: relative` (its drop indicator needs a containing
+ * block) and `isolation: isolate`, so its internal overlay z-indexes never
+ * compete with the host app's layers. Because the wrapper is positioned, it
+ * paints above non-positioned and `z-index: 0` siblings — sibling overlays
+ * (toolbars, selection outlines) that must appear above the canvas need
+ * `z-index: 1` or higher.
  */
 export function CanvasDragDropWrapper({
   children,
@@ -442,7 +450,7 @@ export function CanvasDragDropWrapper({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      style={{ position: 'relative', ...style }}
+      style={{ position: 'relative', isolation: 'isolate', ...style }}
       className={className}
     >
       {children}
