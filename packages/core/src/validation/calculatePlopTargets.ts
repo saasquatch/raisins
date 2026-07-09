@@ -17,10 +17,20 @@ export function calculatePlopTargets(
   parents: WeakMap<RaisinNode, RaisinNode>
 ): PlopTarget[] {
   if (isRoot(parent)) {
-    // Allow root plop target if there is only text, spaces, or newlines inside root
-    if (!parent.children?.length || parent.children?.[0]?.type === "text") {
-      return [{ idx: 0, slot: "" }];
+    const hasElementChildren = parent.children?.some(isElementNode);
+    if (!hasElementChildren) {
+      // Empty root still enforces validParents, else restricted nodes get a
+      // free top-level target.
+      const isValid = isNodeAllowed(
+        possiblePlop,
+        schema.possiblePlopMeta,
+        parent,
+        schema.parentMeta,
+        ""
+      );
+      return isValid ? [{ idx: 0, slot: "" }] : [];
     }
+    // Root with elements: use the per-child logic below (validates each slot).
   }
 
   if (!isElementNode(parent) && !isRoot(parent)) return [];

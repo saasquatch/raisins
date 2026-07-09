@@ -17,6 +17,14 @@ export type CanvasConfig = {
   EventSelectorAtom: Atom<string>;
 
   /**
+   * Predicate for containers that lay out their own plop targets (e.g.
+   * tables that render injected targets as column headers). During a drag
+   * these containers get plop targets injected and hit-tested directly;
+   * all other containers use gap-geometry drop resolution.
+   */
+  CustomPlopContainersAtom: Atom<(tagName: string) => boolean>;
+
+  /**
    * HTML content to be rendered in the head of the iframe.
    *
    * NOTE: Changing this will cause a full re-render, so this
@@ -26,6 +34,8 @@ export type CanvasConfig = {
   IframeHead: Atom<string>;
 };
 
+const noCustomPlopContainers = () => false;
+
 export const CanvasConfigMolecule = molecule((getMol) => {
   const props = getMol(ConfigMolecule);
 
@@ -33,5 +43,7 @@ export const CanvasConfigMolecule = molecule((getMol) => {
     IframeHead: props.IframeHead,
     SoulAttributeAtom: props.SoulAttributeAtom ?? atom('raisins-soul'),
     EventAttributeAtom: props.EventSelectorAtom ?? atom('raisins-events'),
+    CustomPlopContainersAtom:
+      props.CustomPlopContainersAtom ?? atom(() => noCustomPlopContainers),
   };
 });
