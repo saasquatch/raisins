@@ -24,12 +24,8 @@ export type DragGhostOptions = {
 };
 
 export type UseDragOptions = {
-  /**
-   * Replace the browser's default drag image (a snapshot of the drag source
-   * element) with a translucent placeholder box. Strongly recommended when
-   * the drag source is a small handle (e.g. a toolbar button) rather than
-   * the element being moved itself.
-   */
+  /** Replace the default drag image (a snapshot of the source) with a
+   * translucent box. Use when the source is a small handle, not the element. */
   ghost?: DragGhostOptions;
 };
 
@@ -44,11 +40,9 @@ const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
 /**
- * Owns the lifecycle of the transient element used as the native drag image.
- * Created on drag start, removed on drag end AND on unmount — the drag source
- * can unmount mid-drag (e.g. its toolbar re-renders), in which case `dragend`
- * never reaches the source's handler and the ghost would otherwise leak into
- * `document.body`.
+ * Owns the drag-image element's lifecycle: created on drag start, removed on
+ * drag end AND on unmount (the source can unmount mid-drag, so `dragend` may
+ * never fire and the ghost would leak into `document.body`).
  */
 function useDragGhost(options?: DragGhostOptions) {
   const enabled = options !== undefined;
@@ -79,7 +73,7 @@ function useDragGhost(options?: DragGhostOptions) {
       const ghost = document.createElement('div');
       ghost.style.cssText = [
         'position: absolute',
-        // Render off-screen; the browser captures the bitmap synchronously.
+        // Off-screen; the browser captures the bitmap synchronously.
         'top: -1000px',
         'left: -1000px',
         `width: ${w}px`,
@@ -103,11 +97,9 @@ function useDragGhost(options?: DragGhostOptions) {
 }
 
 /**
- * Hook for making a sidebar block draggable via the HTML Drag and Drop API.
- * Returns props to spread onto a draggable element.
- *
- * Plop-target validation derives from the dragged state directly
- * (see `canPlopHereAtom`), so dragging does not touch pick state.
+ * Makes a sidebar block draggable via the HTML Drag and Drop API. Returns
+ * props to spread onto a draggable element. Plop validation reads the dragged
+ * state directly, so this does not touch pick state.
  */
 export function useDragBlock(block: Block, options?: UseDragOptions) {
   const {
@@ -137,12 +129,8 @@ export function useDragBlock(block: Block, options?: UseDragOptions) {
 
   const onDragEnd = useCallback(() => {
     removeGhost();
-    // The native HTML5 `drop` event does not reliably fire when the cursor
-    // is over a cross-origin sandboxed iframe (the canvas). However
-    // `dragenter`/`dragleave` *do* fire and update LastHoveredPlopAtom
-    // through the canvas drag plugin. Use that as a fallback drop target.
-    // For synchronous in-page drops (e.g. the layers panel) this is a no-op
-    // because DropNodeInSlotAtom already cleared DraggedAtom.
+    // Fallback drop: native `drop` doesn't fire over the sandboxed canvas
+    // iframe, so commit the last hovered target. No-op for in-page drops.
     tryCommit();
     setDragged(undefined);
     setLastHovered(undefined);
@@ -158,13 +146,10 @@ export function useDragBlock(block: Block, options?: UseDragOptions) {
 }
 
 /**
- * Shared implementation for making an existing element draggable (for move
- * operations). The `node` to drag is provided by the caller so that this can be
- * used both from within a node's own scope and from an overlay (such as a
- * canvas toolbar) that lives outside of any {@link NodeScope}.
- *
- * Plop-target validation derives from the dragged state directly
- * (see `canPlopHereAtom`), so dragging does not touch pick state.
+ * Shared move-drag implementation. The caller supplies the `node` so this works
+ * both inside a node's scope and from an overlay (e.g. a canvas toolbar) that
+ * lives outside any {@link NodeScope}. Reads dragged state for plop validation,
+ * so it does not touch pick state.
  */
 function useDragForNode(
   node: RaisinNode | undefined,
@@ -200,7 +185,7 @@ function useDragForNode(
 
   const onDragEnd = useCallback(() => {
     removeGhost();
-    // See note in useDragBlock.onDragEnd above.
+    // Fallback drop for the sandboxed canvas iframe (see useDragBlock).
     tryCommit();
     setDragged(undefined);
     setLastHovered(undefined);
@@ -235,12 +220,9 @@ export function useDragNode(
 }
 
 /**
- * Hook for making a drag handle that moves the currently selected element.
- *
- * Unlike {@link useDragNode}, this reads the node to drag from the
- * {@link SelectedNodeMolecule} rather than the surrounding {@link NodeScope}, so
- * it works from overlays such as a canvas toolbar that are not rendered inside
- * the selected node's scope.
+ * Drag handle for moving the currently selected element. Reads the node from
+ * {@link SelectedNodeMolecule} (not the surrounding scope), so it works from
+ * overlays like a canvas toolbar.
  */
 export function useDragSelectedNode(options?: UseDragOptions) {
   const { SelectedNodeAtom } = useMolecule(SelectedNodeMolecule);
@@ -254,10 +236,8 @@ export type DropTargetProps = {
 };
 
 /**
- * Hook for making a plop target accept drops via the HTML Drag and Drop API.
- * Uses canPlopHereAtom from NodeMolecule (which validates against the dragged
- * or picked candidate) to determine if a drop is valid. When a valid drop
- * occurs, it invokes the DragAndDropMolecule's DropNodeInSlotAtom.
+ * Makes a plop target accept drops via the HTML Drag and Drop API. Validity
+ * comes from `canPlopHereAtom`; a valid drop invokes `DropNodeInSlotAtom`.
  */
 export function useDropTarget({ idx, slot }: DropTargetProps) {
   const { DraggingIsActive, DropNodeInSlotAtom, LastHoveredPlopAtom } =

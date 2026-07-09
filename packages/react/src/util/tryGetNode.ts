@@ -1,14 +1,9 @@
 import { isNodeWithChildren, NodePath, RaisinNode } from '@raisins/core';
 
 /**
- * Resolves a {@link NodePath} against a document, returning `undefined` when
- * the path no longer resolves — unlike core's `getNode`, which throws.
- *
- * A path is only valid for the exact document it was computed against. Any
- * atom that HOLDS a path across document updates (picked, dragged) must
- * resolve it with this: the document can change while the path is held
- * (drop commits, undo/redo, external edits), leaving the path pointing at a
- * text node or out of bounds.
+ * Resolves a {@link NodePath} against a document, returning `undefined` for a
+ * dangling path instead of throwing like core's `getNode`. Use for any path
+ * held across document updates (picked, dragged), which can go stale.
  */
 export function tryGetNode(
   root: RaisinNode,

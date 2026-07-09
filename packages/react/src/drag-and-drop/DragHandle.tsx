@@ -13,28 +13,20 @@ export type DragHandleProps = {
 };
 
 /**
- * Wraps an arbitrary element (icon, button, web component) so it reliably
- * acts as a native HTML5 drag source. Spread the props returned by
- * {@link useDragNode}, {@link useDragSelectedNode} or {@link useDragBlock}:
+ * Wraps an element as a reliable native drag source. Spread the props from
+ * {@link useDragNode}/{@link useDragSelectedNode}/{@link useDragBlock}.
  *
  * ```tsx
- * const drag = useDragSelectedNode({ ghost: { width, height } });
- * <DragHandle {...drag} title="Drag to move">
+ * <DragHandle {...useDragSelectedNode({ ghost })} title="Drag to move">
  *   <MoveIcon />
  * </DragHandle>
  * ```
  *
- * Why not put `draggable` on the child directly? Interactive children —
- * especially web components that render an inner `<button>` and lay out with
- * `display: contents` — capture the mousedown themselves, and
- * `pointer-events: none` on a `display: contents` host has no effect (it
- * generates no box). This wrapper makes a plain span the drag source and
- * blocks the child's pointer events through a real intermediate box, so the
- * drag starts regardless of what the child renders.
- *
- * Note: do not wrap a DragHandle in components that remount their children on
- * re-render (e.g. tooltip wrappers using unstable `key`s) — a remount mid-drag
- * aborts the native drag.
+ * A plain span is the drag source and a real intermediate box blocks the
+ * child's pointer events — `draggable` on an interactive `display: contents`
+ * web component fails (host generates no box, so `pointer-events` is ignored).
+ * Don't wrap in components that remount children (e.g. tooltips with unstable
+ * keys): a remount mid-drag aborts the drag.
  */
 export function DragHandle({
   draggable,

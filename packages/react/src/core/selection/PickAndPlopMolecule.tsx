@@ -44,8 +44,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
       if (!picked) return undefined;
       if (picked.type !== 'element') return undefined;
 
-      // The stored path may dangle if the document changed since pick time
-      // (undo/redo, external edits) — a dangling pick resolves to undefined.
+      // Dangling path (doc changed since pick) resolves to undefined.
       return tryGetNode(currentDoc, picked.path);
     },
     (get, set, next) => {
@@ -78,9 +77,8 @@ export const PickAndPlopMolecule = molecule(getMol => {
   );
 
   /**
-   * The content being picked: the block's content for adds, the resolved
-   * document node for moves, or undefined when nothing is picked. The pick
-   * half of the "plop candidate" used by plop validation.
+   * Content being picked (block content for adds, resolved node for moves).
+   * The pick half of the plop candidate.
    */
   const PickedContentAtom = atom<RaisinElementNode | undefined>(get => {
     const picked = get(PickedAtom);
@@ -96,9 +94,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
       if (!picked) return;
 
       const currentDoc = get(RootNodeAtom);
-      // The destination parent may no longer be in the document (it changed
-      // since the plop targets were shown) — abandon the plop rather than
-      // crash downstream on an unresolvable path.
+      // Destination gone from the doc — abandon rather than crash downstream.
       const parentPath = getPath(currentDoc, parent);
       if (!parentPath) {
         set(PickedAtom, undefined);
@@ -106,8 +102,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
       }
 
       if (picked.type === 'block') {
-        // Clone first, then set the slot — the block definition is shared
-        // metamodel config and must never be mutated.
+        // Clone before setting slot — block content is shared metamodel config.
         const cloneOfPickedNode = clone(
           picked.block.content
         ) as RaisinElementNode;

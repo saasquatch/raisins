@@ -171,33 +171,16 @@ export type DropResolution = {
 };
 
 /**
- * Canvas-side drag-and-drop support.
+ * Canvas-side drag-and-drop.
  *
- * ## Why we don't use drag events from inside the iframe
+ * The canvas iframe is sandboxed (`allow-scripts`, no `allow-same-origin`), so
+ * the browser never delivers parent-initiated drag events into it. Instead we
+ * drive drops from the parent: while dragging, the iframe gets
+ * `pointer-events: none` so the wrapper receives events; on `dragover` we
+ * hit-test the cursor against souled-element rects from `GeometryAtom` (no plop
+ * targets injected, so the canvas never reflows) and commit on `drop`.
  *
- * The canvas iframe uses `sandbox="allow-scripts"` (no `allow-same-origin`),
- * which puts it at a null/opaque origin. Browsers do not deliver drag events
- * initiated in the parent window across this boundary — `dragenter`,
- * `dragover`, `dragleave`, and `drop` never fire inside the iframe document
- * for parent-initiated drags. CSS `:hover` is similarly suppressed.
- *
- * ## Parent-side overlay approach
- *
- * Instead, we drive drops entirely from the parent window:
- *   1. Souled elements in the canvas report their geometry to `GeometryAtom`
- *      (via `resizeObserver: true`), so we always have iframe-relative rects
- *      for the rendered document — no plop targets are injected during a
- *      drag, and the canvas never reflows under the cursor.
- *   2. While a drag is active, the iframe is given `pointer-events: none`
- *      so the parent's wrapping container receives drag events instead of
- *      them being captured by the iframe element.
- *   3. On `dragover` on the wrapper, we hit-test the cursor position
- *      against souled-element rects from `GeometryAtom`, set
- *      `LastHoveredPlopAtom`, and `preventDefault()` so `drop` will fire.
- *   4. On `drop` on the wrapper, we commit via `DropNodeInSlotAtom`.
- *
- * Use {@link CanvasDragDropWrapper} (or {@link useCanvasDragDrop}) to wrap
- * the canvas container.
+ * Wrap the canvas with {@link CanvasDragDropWrapper} or {@link useCanvasDragDrop}.
  */
 export const CanvasDragAndDropMolecule = molecule(getMol => {
   const CanvasAtoms = getMol(CanvasScopeMolecule);
@@ -406,25 +389,15 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
 });
 
 /**
- * Wraps the canvas container so that native HTML5 drag events fire on the
- * parent-side wrapper instead of being swallowed by the cross-origin
- * sandboxed iframe. Inside this wrapper, render your canvas controller.
+ * Wraps the canvas so native drag events fire on the parent-side wrapper
+ * instead of being swallowed by the sandboxed iframe. Renders a BeeFree-style
+ * drop indicator (container highlight, insertion line, action pill) from
+ * souled-element geometry — no plop targets injected, so the canvas never
+ * reflows.
  *
- * Also renders a BeeFree-style drop indicator computed entirely from the
- * geometry of existing souled elements: a highlight border around the target
- * container, a thin insertion line at the chosen gap, and a pill describing
- * the action ("Add to …" / "Move to …"). No plop targets are injected into
- * the iframe during a drag, so the canvas layout never reflows under the
- * cursor.
- *
- * ## Stacking context
- *
- * The wrapper is `position: relative` (its drop indicator needs a containing
- * block) and `isolation: isolate`, so its internal overlay z-indexes never
- * compete with the host app's layers. Because the wrapper is positioned, it
- * paints above non-positioned and `z-index: 0` siblings — sibling overlays
- * (toolbars, selection outlines) that must appear above the canvas need
- * `z-index: 1` or higher.
+ * The wrapper is `position: relative` + `isolation: isolate`; being positioned,
+ * it paints above `z-index: 0` siblings, so sibling overlays (toolbars) need
+ * `z-index >= 1`.
  */
 export function CanvasDragDropWrapper({
   children,

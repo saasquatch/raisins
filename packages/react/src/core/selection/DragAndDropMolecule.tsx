@@ -70,8 +70,7 @@ export const DragAndDropMolecule = molecule(getMol => {
       if (!dragged) return undefined;
       if (dragged.type !== 'element') return undefined;
 
-      // The stored path may dangle if the document changed since drag start
-      // (undo/redo, external edits) — a dangling drag resolves to undefined.
+      // Dangling path (doc changed since drag start) resolves to undefined.
       return tryGetNode(currentDoc, dragged.path);
     },
     (get, set, next) => {
@@ -104,11 +103,8 @@ export const DragAndDropMolecule = molecule(getMol => {
   );
 
   /**
-   * The content being dragged: the block's content for adds, the resolved
-   * document node for moves, or undefined when nothing is dragged (or the
-   * dragged node no longer resolves). This is the drag half of the "plop
-   * candidate" — plop validation derives from `dragged ?? picked` instead of
-   * drag sources writing pick state.
+   * Content being dragged (block content for adds, resolved node for moves).
+   * The drag half of the plop candidate; plop validation reads dragged ?? picked.
    */
   const DraggedContentAtom = atom<RaisinElementNode | undefined>(get => {
     const dragged = get(DraggedAtom);
@@ -138,9 +134,7 @@ export const DragAndDropMolecule = molecule(getMol => {
       if (!dragged) return;
 
       const currentDoc = get(RootNodeAtom);
-      // The destination parent was captured on dragenter/dragover; if the
-      // document changed since (so the parent is no longer in it) there is no
-      // valid destination — abandon the drop rather than crash downstream.
+      // Destination gone from the doc — abandon rather than crash downstream.
       const parentPath = getPath(currentDoc, parent);
       if (!parentPath) {
         set(DraggedAtom, undefined);
@@ -148,10 +142,8 @@ export const DragAndDropMolecule = molecule(getMol => {
         return;
       }
 
-      // Clearing drag state BEFORE committing the new document is load-bearing:
-      // DraggedAtom holds a NodePath valid only for `currentDoc`. If the new
-      // document were committed first, every DraggedNodeAtom subscriber would
-      // re-resolve the stale path against the new tree during the awaited gap.
+      // Clear drag state before committing: DraggedAtom's path is valid only
+      // for currentDoc, so subscribers must never see new-doc + old-path.
       const commit = (newDocument: RaisinNode) => {
         set(DraggedAtom, undefined);
         set(LastHoveredPlopAtom, undefined);
@@ -159,8 +151,7 @@ export const DragAndDropMolecule = molecule(getMol => {
       };
 
       if (dragged.type === 'block') {
-        // Clone first, then set the slot — the block definition is shared
-        // metamodel config and must never be mutated.
+        // Clone before setting slot — block content is shared metamodel config.
         const cloneOfDraggedNode = clone(
           dragged.block.content
         ) as RaisinElementNode;

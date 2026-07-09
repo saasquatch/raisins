@@ -118,9 +118,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   const canPlopHereAtom = atom((get) => {
     const node = get(n);
     if (!node || !isElementNode(node)) return () => false;
-    // The plop candidate is whatever is being placed — dragged (HTML5 DnD)
-    // or picked (click-based pick-and-plop). Derived here instead of drag
-    // sources writing pick state, so the two interactions stay independent.
+    // Plop candidate is whatever is being placed: dragged (DnD) or picked.
     const candidate = get(DraggedContentAtom) ?? get(PickedContentAtom);
     if (!candidate || !isElementNode(candidate)) return () => false;
     const { isValidChild } = get(ComponentModelAtom);
