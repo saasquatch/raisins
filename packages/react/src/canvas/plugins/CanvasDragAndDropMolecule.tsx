@@ -195,7 +195,9 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { ParentsAtom, RootNodeAtom } = getMol(CoreMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
-  const { SoulAttributeAtom } = getMol(CanvasConfigMolecule);
+  const { SoulAttributeAtom, CustomPlopContainersAtom } = getMol(
+    CanvasConfigMolecule
+  );
 
   /**
    * Resolves a drop placement from a cursor position (in iframe-relative
@@ -222,6 +224,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
       const metamodel = get(ComponentModelAtom);
       const dragged = get(DraggedAtom);
       const soulAttr = get(SoulAttributeAtom);
+      const isCustomPlopContainer = get(CustomPlopContainersAtom);
 
       const noop = () => undefined;
       if (!dragged) return noop;
@@ -231,9 +234,26 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
 
       // node -> rect (iframe-relative), only for souled elements.
       const rectByNode = new Map<RaisinNode, Rect>();
+      // Injected plop targets (custom-layout containers only, during drags).
+      const plopEntries: { rect: Rect; dest: DragPlopDestination }[] = [];
       for (const e of geo.entries) {
         const attrs = e.target?.attributes;
         if (!attrs) continue;
+        if ('raisin-plop-target' in attrs) {
+          const soul = idToSoul(attrs['raisin-plop-parent']);
+          const parent = soul && soulToNode(soul);
+          if (!parent) continue;
+          const r = e.contentRect;
+          plopEntries.push({
+            rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
+            dest: {
+              parent: parent as RaisinNodeWithChildren,
+              idx: Number(attrs['raisin-plop-idx']),
+              slot: attrs['raisin-plop-slot'] ?? '',
+            },
+          });
+          continue;
+        }
         const soulId = attrs[soulAttr];
         if (!soulId) continue;
         const soul = idToSoul(soulId);
@@ -262,6 +282,12 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
 
       const tryParent = (parentNode: RaisinNode) => {
         if (!isElementNode(parentNode) && !isRoot(parentNode)) return undefined;
+        // Custom-layout containers accept drops only via injected targets.
+        if (
+          isElementNode(parentNode) &&
+          isCustomPlopContainer(parentNode.tagName)
+        )
+          return undefined;
         const parentMeta = isRoot(parentNode)
           ? ROOT_META
           : metamodel.getComponentMeta((parentNode as RaisinElementNode).tagName);
@@ -307,7 +333,61 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
         return insertionLineForGap(axis, prevRect, nextRect, parentRect);
       };
 
+      // Injected targets (custom-layout containers) win over gap geometry:
+      // the container positions them itself, so their rect IS the drop zone.
+      const PLOP_HIT_PADDING = 8;
+      const plopResolution = (x: number, y: number): DropResolution | undefined => {
+        let best: { rect: Rect; dest: DragPlopDestination } | undefined;
+        let bestDist = Infinity;
+        for (const p of plopEntries) {
+          const padded: Rect = {
+            left: p.rect.left - PLOP_HIT_PADDING,
+            top: p.rect.top - PLOP_HIT_PADDING,
+            right: p.rect.right + PLOP_HIT_PADDING,
+            bottom: p.rect.bottom + PLOP_HIT_PADDING,
+          };
+          if (!rectContains(padded, x, y)) continue;
+          const d = Math.hypot(
+            x - (p.rect.left + p.rect.right) / 2,
+            y - (p.rect.top + p.rect.bottom) / 2
+          );
+          if (d < bestDist) {
+            bestDist = d;
+            best = p;
+          }
+        }
+        if (!best) return undefined;
+        const parent = best.dest.parent;
+        const parentMeta = isRoot(parent)
+          ? ROOT_META
+          : metamodel.getComponentMeta((parent as RaisinElementNode).tagName);
+        const slotTitle =
+          parentMeta?.slots?.find(s => s.name === best!.dest.slot)?.title ||
+          parentMeta?.title ||
+          'Content';
+        const { rect } = best;
+        const axis: Axis =
+          rect.right - rect.left >= rect.bottom - rect.top
+            ? 'vertical'
+            : 'horizontal';
+        const midX = (rect.left + rect.right) / 2;
+        const midY = (rect.top + rect.bottom) / 2;
+        const line: InsertionLine =
+          axis === 'vertical'
+            ? { axis, x0: rect.left, y0: midY, x1: rect.right, y1: midY }
+            : { axis, x0: midX, y0: rect.top, x1: midX, y1: rect.bottom };
+        return {
+          destination: best.dest,
+          parentRect: rectByNode.get(parent),
+          line,
+          label: `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`,
+        };
+      };
+
       return (x: number, y: number): DropResolution | undefined => {
+        const plopHit = plopResolution(x, y);
+        if (plopHit) return plopHit;
+
         const containing: { node: RaisinNode; rect: Rect }[] = [];
         for (const [node, rect] of rectByNode) {
           if (rectContains(rect, x, y)) containing.push({ node, rect });

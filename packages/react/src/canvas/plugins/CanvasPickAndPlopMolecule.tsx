@@ -39,7 +39,9 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     ComponentModelMolecule
   );
   const { GetSoulAtom } = getMol(SoulsMolecule);
-  const { DraggingIsActive } = getMol(DragAndDropMolecule);
+  const { DraggingIsActive, DraggedAtom, DraggedContentAtom } = getMol(
+    DragAndDropMolecule
+  );
 
   /**
    * Listens for double click events, marks double clicked elements as selected
@@ -128,19 +130,29 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
     const isInteractible = get(IsInteractibleAtom);
-    // Canvas drag uses a parent-side overlay (see CanvasDragAndDropMolecule),
-    // not injected plop targets, so we never inject during a drag. This keeps
-    // the iframe layout from reflowing under the cursor.
     const isDragging = get(DraggingIsActive);
+    const dragged = get(DraggedAtom);
+    const draggedContent = get(DraggedContentAtom);
+    const isCustomPlopContainer = get(CanvasConfig.CustomPlopContainersAtom);
 
+    const active = isDragging ? dragged : picked;
     const addOrMove =
-      picked?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
-    const pickedNode =
-      picked?.type === 'block' ? picked.block.content : pickedForMove;
+      active?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
+    const candidate = isDragging
+      ? draggedContent
+      : picked?.type === 'block'
+      ? picked.block.content
+      : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
-      if (isDragging) return vnodeChildren;
-      if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
-      if (!isPloppingActive) return vnodeChildren;
+      // Drags resolve via parent-side gap geometry, except custom-layout
+      // containers (config predicate) which need real injected targets.
+      if (
+        isDragging &&
+        !isCustomPlopContainer((n as RaisinElementNode).tagName ?? '')
+      )
+        return vnodeChildren;
+      if (!candidate || !isElementNode(candidate)) return vnodeChildren;
+      if (!isDragging && !isPloppingActive) return vnodeChildren;
       if (!isInteractible(n)) return vnodeChildren;
 
       // FIXME: Root node should allow any children. This only checks for allowed element plops.
@@ -148,17 +160,17 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
 
       const slot =
         (n as RaisinElementNode).attribs?.slot ??
-        pickedNode.attribs?.slot ??
+        candidate.attribs?.slot ??
         '';
-      const isValid = metamodel.isValidChild(pickedNode, n, slot);
+      const isValid = metamodel.isValidChild(candidate, n, slot);
       if (!isValid) return vnodeChildren;
       const parent = n as RaisinElementNode & RaisinNodeWithChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
-      const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
+      const possiblePlopMeta = metamodel.getComponentMeta(candidate.tagName);
       const plopTargets = calculatePlopTargets(
         parent,
-        pickedNode,
+        candidate,
         {
           parentMeta,
           possiblePlopMeta,
