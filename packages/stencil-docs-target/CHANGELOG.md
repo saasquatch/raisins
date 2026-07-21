@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+- [#37](https://github.com/saasquatch/raisins/pull/37) [`c9dcffc`](https://github.com/saasquatch/raisins/commit/c9dcffce45b6ab34f3816782890e672c66db4520) Thanks [@00salmon](https://github.com/00salmon)! - Propagate the `@hidden` JSDoc tag from Stencil component classes onto the generated raisins meta as `hidden: true`. Pairs with the new `CustomElement.hidden` schema field.
+
+### Patch Changes
+
+- Updated dependencies [[`c9dcffc`](https://github.com/saasquatch/raisins/commit/c9dcffce45b6ab34f3816782890e672c66db4520)]:
+  - @raisins/schema@1.3.0
+
 ## 1.2.1
 
 ### Patch Changes
