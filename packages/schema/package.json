@@ -1,6 +1,6 @@
 {
   "name": "@raisins/schema",
-  "version": "1.2.2-0",
+  "version": "1.2.1",
   "description": "Types (a.k.a. schema) for the Raisins ecosystem",
   "author": "ReferralSaaSquatch.com, Inc.",
   "license": "MIT",
