@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+- [#37](https://github.com/saasquatch/raisins/pull/37) [`c9dcffc`](https://github.com/saasquatch/raisins/commit/c9dcffce45b6ab34f3816782890e672c66db4520) Thanks [@00salmon](https://github.com/00salmon)! - Add optional `hidden?: boolean` flag to `CustomElement`. Editors can use it to surface custom elements that have no visible canvas representation (e.g. modals) via dedicated affordances such as a "hidden components" flyout.
+
 ## 1.2.1
 
 ### Patch Changes
