@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 import cssParser from "./css-om/parser";
+import { scopeStylesheet } from "./css-om/scope";
 import cssSerializer from "./css-om/serializer";
 import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
 import * as cssUtil from "./css-om/util";
@@ -85,7 +86,8 @@ export {
   cssSerializer,
   cssParser,
   cssSelector,
-  cssUtil
+  cssUtil,
+  scopeStylesheet
 };
 export type {
   RaisinNodeVisitor,

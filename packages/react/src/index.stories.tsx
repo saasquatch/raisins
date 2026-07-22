@@ -25,6 +25,8 @@ import { CoreMolecule, SelectedNodeMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
+import { DocumentCssEditor } from './css-editing/DocumentCssMolecule';
+import { StylePanel } from './css-editing/StyleMolecule';
 import {
   big,
   LocalBedrockComponents,
@@ -278,6 +280,34 @@ export const TemplatesExample = () => (
   />
 );
 
+const kitchenSinkHtml = `
+<my-card label="Edit me">
+  <span slot="title">Hello world</span>
+  <p>This card exposes <code>::part(header)</code> and <code>::part(body)</code>. Click it, then edit the Style panel on the right.</p>
+</my-card>
+`;
+
+const CssEditingStoryMolecule = molecule<Partial<RaisinConfig>>(() => ({
+  HTMLAtom: atom(kitchenSinkHtml),
+  PackagesAtom: atom([{ package: '@local', version: 'next' }] as Module[]),
+  uiWidgetsAtom: atom({}),
+  LocalURLAtom: atom('http://localhost:5000'),
+}));
+
+/**
+ * Demonstrates the CSS editing surfaces against the kitchen-sink `<my-card>`
+ * component (annotated with `@csspart header` and `@csspart body`).
+ *
+ * Requires the kitchen-sink Stencil dev server to be running:
+ *   cd examples/my-kitchen-sink && npm run start:raisins
+ */
+export const CssEditing = () => (
+  <BasicStory
+    startingHtml={kitchenSinkHtml}
+    Molecule={CssEditingStoryMolecule}
+  />
+);
+
 const ToolbarMolecule = molecule(getMol => {
   return {
     ...getMol(HoveredNodeMolecule),
@@ -363,6 +393,10 @@ export function EditorView() {
 
         <div style={Edits}>
           <PackageEditor />
+          <hr />
+          <StylePanel />
+          <hr />
+          <DocumentCssEditor />
         </div>
       </div>
     </>

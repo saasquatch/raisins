@@ -92,11 +92,43 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
+        const cssParts: schema.CssPart[] | undefined = comp.docsTags
+              .filter(t => t.name === 'csspart')
+              .map(t => {
+                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+                if (!name) {
+                  throw new Error(
+                    `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
+                  );
+                }
+                return {
+                  name: name.trim(),
+                  description: description?.trim() || undefined,
+                };
+              }) || undefined;
+
+        const cssProperties: schema.CssCustomProperty[] | undefined = comp.docsTags
+              .filter(t => t.name === 'cssprop')
+              .map(t => {
+                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+                if (!name) {
+                  throw new Error(
+                    `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
+                  );
+                }
+                return {
+                  name: name.trim(),
+                  description: description?.trim() || undefined,
+                };
+              }) || undefined;
+
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
           attributes,
+          cssParts,
+          cssProperties,
           requiredFeatures: jsonTagValue(comp, 'requiredFeatures'),
           featureTooltip: tagValue(comp.docsTags, 'featureTooltip'),
           exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
