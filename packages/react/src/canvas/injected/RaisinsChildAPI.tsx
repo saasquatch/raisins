@@ -8,7 +8,7 @@ Since this file is used to generate serialized code from this function, it can o
 */
 import type PenpalType from 'penpal';
 import type * as SnabbdomType from 'snabbdom';
-import type { Module, VNode, VNodeData } from 'snabbdom';
+import type { DOMAPI, Module, VNode, VNodeData } from 'snabbdom';
 import type {
   ChildRPC,
   GeometryEntry,
@@ -196,6 +196,32 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     update: updateAttrs,
   };
 
+  /**
+   * Web components that own their light DOM (e.g. Stencil's non-shadow `<slot>` polyfill)
+   * re-parent our nodes, so anchor writes where a node actually lives to avoid `NotFoundError`.
+   */
+  const relocationTolerantDomApi: DOMAPI = Object.assign(
+    {},
+    snabbdom.htmlDomApi,
+    {
+      insertBefore: function (
+        parent: Node,
+        newNode: Node,
+        reference: Node | null
+      ) {
+        const relocatedParent = reference && reference.parentNode;
+        snabbdom.htmlDomApi.insertBefore(
+          relocatedParent || parent,
+          newNode,
+          reference
+        );
+      },
+      removeChild: function (node: Node, child: Node) {
+        snabbdom.htmlDomApi.removeChild(child.parentNode || node, child);
+      },
+    }
+  );
+
   const patch = snabbdom.init([
     // Init patch function with chosen modules
     shadowDomModule,
@@ -206,7 +232,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     snabbdom.styleModule,
     snabbdom.datasetModule,
     templateModule(()=>patch)
-  ]);
+  ], relocationTolerantDomApi);
 
   function dispatchResize(elements: Element[], full?: boolean) {
     document.body.dispatchEvent(
@@ -233,11 +259,16 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   function patchAndCache(next: VNode) {
     rendering = true;
     try {
+      // An element means first render, or recovery from a patch that left the DOM stale
+      if (isElement(currentNode)) document.body.innerHTML = '';
       patch(currentNode, next);
+      currentNode = next;
+    } catch (e) {
+      currentNode = document.body;
+      throw e;
     } finally {
       rendering = false;
     }
-    currentNode = next;
   }
   window.addEventListener('DOMContentLoaded', function () {
     const methods: ChildRPC = {
