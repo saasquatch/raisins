@@ -130,6 +130,14 @@ export interface CustomElement {
    *
    */
   canvasRenderer?: "in-place-update" | "always-replace";
+
+  /**
+   * When `true`, this element renders no visible UI on the canvas (e.g. a modal
+   * that is only displayed in response to an event). Editors can use this flag
+   * to surface otherwise-invisible content via dedicated affordances such as a
+   * "hidden components" flyout.
+   */
+  hidden?: boolean;
 }
 
 export interface Attribute {

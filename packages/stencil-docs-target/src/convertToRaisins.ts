@@ -120,6 +120,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           validParents: jsonTagValue(comp, 'validParents'),
           slotEditor: slotEditor(comp),
           canvasRenderer: canvasRenderer(comp),
+          ...(hidden(comp) ? { hidden: true } : {}),
         };
         return elem;
       } catch (e) {
@@ -161,3 +162,5 @@ const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
 const required = (x: HasDocsTags) =>
   !!x.docsTags.find(tag => tag.name === 'required');
+const hidden = (x: HasDocsTags) =>
+  !!x.docsTags.find(tag => tag.name === 'hidden');
