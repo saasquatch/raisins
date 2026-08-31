@@ -192,7 +192,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
     DraggedContentAtom,
   } = getMol(DragAndDropMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
-  const { GetSoulAtom } = getMol(SoulsMolecule);
+  getMol(SoulsMolecule);
   const { ParentsAtom, RootNodeAtom } = getMol(CoreMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { SoulAttributeAtom, CustomPlopContainersAtom } = getMol(
