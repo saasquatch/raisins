@@ -11,7 +11,7 @@ import { atom, Atom, useAtomValue, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ComponentModelMolecule } from '../../component-metamodel';
-import { CoreMolecule, SoulsInDocMolecule, SoulsMolecule } from '../../core';
+import { CoreMolecule, SoulsInDocMolecule } from '../../core';
 import {
   DragAndDropMolecule,
   DragPlopDestination,
@@ -191,7 +191,6 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
     DraggedContentAtom,
   } = getMol(DragAndDropMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
-  getMol(SoulsMolecule);
   const { ParentsAtom, RootNodeAtom } = getMol(CoreMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { SoulAttributeAtom, CustomPlopContainersAtom } = getMol(
@@ -522,7 +521,7 @@ export function CanvasDragDropWrapper({
                 background: 'rgba(0, 119, 219, 0.06)',
                 boxSizing: 'border-box',
                 pointerEvents: 'none',
-                zIndex: 9998,
+                zIndex: OVERLAY_Z.parentHighlight,
               }}
             />
           )}
@@ -537,7 +536,7 @@ export function CanvasDragDropWrapper({
               background: '#0077DB',
               borderRadius: '2px',
               pointerEvents: 'none',
-              zIndex: 9999,
+              zIndex: OVERLAY_Z.insertionLine,
             }}
           />
           <div
@@ -555,7 +554,7 @@ export function CanvasDragDropWrapper({
               borderRadius: '100px',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
-              zIndex: 10000,
+              zIndex: OVERLAY_Z.pill,
             }}
           >
             {overlay.pill.text}
@@ -577,6 +576,14 @@ type DropOverlay = {
 };
 
 const LINE_THICKNESS = 3;
+
+// Drop-indicator stacking order (highlight < line < pill) inside the wrapper's
+// isolated stacking context; the values only need to beat the canvas iframe.
+const OVERLAY_Z = {
+  parentHighlight: 9998,
+  insertionLine: 9999,
+  pill: 10000,
+} as const;
 
 /**
  * Lower-level hook for integrating canvas drag-and-drop into a custom
