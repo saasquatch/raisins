@@ -2,7 +2,6 @@ import {
   calculatePlopTargets,
   isElementNode,
   isRoot,
-  RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
