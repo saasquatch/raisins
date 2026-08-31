@@ -17,6 +17,7 @@ import {
   SoulsInDocMolecule,
   SoulsMolecule,
 } from '../../core';
+import { DragAndDropMolecule } from '../../core/selection/DragAndDropMolecule';
 import { RawCanvasEvent } from '../api/_CanvasRPCContract';
 import { CanvasConfigMolecule } from '../CanvasConfig';
 import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
@@ -38,6 +39,9 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     ComponentModelMolecule
   );
   const { GetSoulAtom } = getMol(SoulsMolecule);
+  const { DraggingIsActive, DraggedAtom, DraggedContentAtom } = getMol(
+    DragAndDropMolecule
+  );
 
   /**
    * Listens for double click events, marks double clicked elements as selected
@@ -126,14 +130,29 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     const metamodel = get(ComponentModelAtom);
     const eventsAttribute = get(CanvasConfig.EventAttributeAtom);
     const isInteractible = get(IsInteractibleAtom);
+    const isDragging = get(DraggingIsActive);
+    const dragged = get(DraggedAtom);
+    const draggedContent = get(DraggedContentAtom);
+    const isCustomPlopContainer = get(CanvasConfig.CustomPlopContainersAtom);
 
+    const active = isDragging ? dragged : picked;
     const addOrMove =
-      picked?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
-    const pickedNode =
-      picked?.type === 'block' ? picked.block.content : pickedForMove;
+      active?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
+    const candidate = isDragging
+      ? draggedContent
+      : picked?.type === 'block'
+      ? picked.block.content
+      : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
-      if (!pickedNode || !isElementNode(pickedNode)) return vnodeChildren;
-      if (!isPloppingActive) return vnodeChildren;
+      // Drags resolve via parent-side gap geometry, except custom-layout
+      // containers (config predicate) which need real injected targets.
+      if (
+        isDragging &&
+        !isCustomPlopContainer((n as RaisinElementNode).tagName ?? '')
+      )
+        return vnodeChildren;
+      if (!candidate || !isElementNode(candidate)) return vnodeChildren;
+      if (!isDragging && !isPloppingActive) return vnodeChildren;
       if (!isInteractible(n)) return vnodeChildren;
 
       // FIXME: Root node should allow any children. This only checks for allowed element plops.
@@ -141,17 +160,17 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
 
       const slot =
         (n as RaisinElementNode).attribs?.slot ??
-        pickedNode.attribs?.slot ??
+        candidate.attribs?.slot ??
         '';
-      const isValid = metamodel.isValidChild(pickedNode, n, slot);
+      const isValid = metamodel.isValidChild(candidate, n, slot);
       if (!isValid) return vnodeChildren;
       const parent = n as RaisinElementNode & RaisinNodeWithChildren;
       const soulId = souls(parent).toString();
       const parentMeta = metamodel.getComponentMeta(parent.tagName);
-      const possiblePlopMeta = metamodel.getComponentMeta(pickedNode.tagName);
+      const possiblePlopMeta = metamodel.getComponentMeta(candidate.tagName);
       const plopTargets = calculatePlopTargets(
         parent,
-        pickedNode,
+        candidate,
         {
           parentMeta,
           possiblePlopMeta,
@@ -264,14 +283,18 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
     parentSchema.title ||
     'Content';
 
-  // Prevent plop target from being cut off at the top/bottom of the canvas
-  const paddedPlopStyle =
-    isRoot(parent) && (idx <= 1 || idx === parent.children.length - 1)
-      ? {
-          height: '14px',
-          marginTop: '26px',
-        }
-      : {};
+  // Root-edge targets (the first couple and the last child of root) would
+  // otherwise be drawn right at the canvas top/bottom and get clipped. We nudge
+  // them inward VISUALLY via the inner element's transform rather than reserving
+  // outer layout height/margin — so the target keeps a true zero footprint and
+  // toggling visibility never reflows the canvas (which would desync proximity
+  // geometry). The previous `height:14px; marginTop:26px` approach offset the
+  // inner content by ~33px, so we reproduce that here as a transform.
+  const isPaddedEdge =
+    isRoot(parent) && (idx <= 1 || idx === parent.children.length - 1);
+  const innerTransform = isPaddedEdge
+    ? 'translateY(calc(-50% + 33px))'
+    : 'translateY(-50%)';
 
   const key = `${soulId}/${idx}/${slot}`;
 
@@ -318,14 +341,21 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
       // Helps snabbdom know how to remove nodes
       key,
       attrs: { slot },
+      // The target keeps a zero layout footprint: `height: 0` plus
+      // `minHeight: 0` / `minWidth: 0` defeat the flex/grid `min-height: auto`
+      // rule that would otherwise inflate this box to its content's min-size
+      // and reserve whitespace; the bar/label overflow out of the zero-height
+      // box (`overflow: visible`) and any root-edge nudge is applied on the
+      // inner element's transform.
       style: {
         height: '0px',
+        minHeight: '0',
+        minWidth: '0',
         margin: '0',
         overflow: 'visible',
         position: 'relative',
         display: 'block',
         marginTop: '0',
-        ...paddedPlopStyle,
       },
     },
     h(
@@ -338,9 +368,13 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
           gridRow: '1',
           gridTemplateColumns: '1fr max-content 1fr',
           cursor: 'pointer',
-          transform: 'translateY(-50%)',
+          transform: innerTransform,
         },
         attrs: { ...defaultAttrs, class: 'plop-target-container' },
+        // Track plop target geometry so parent-side drag handlers can
+        // hit-test the cursor against plop targets when the iframe has
+        // `pointer-events: none` during a drag (see CanvasDragAndDropMolecule).
+        resizeObserver: true,
       },
       [targetBar, PlopLabel, targetBar]
     )

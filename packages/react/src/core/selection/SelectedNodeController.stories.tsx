@@ -48,22 +48,22 @@ export const AttributeEditor = ({
 }) => {
   useMolecule(CanvasSelectionMolecule);
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
       <div
         style={{
-          width: '40%',
-          position: 'fixed',
-          overflowY: 'scroll',
-          height: '95vh',
+          flex: '0 0 320px',
+          overflowY: 'auto',
+          padding: '12px',
+          borderRight: '1px solid #e0e0e0',
         }}
       >
         <Controller />
       </div>
       <div
         style={{
-          width: '59%',
-          position: 'absolute',
-          right: 0,
+          flex: 1,
+          overflowY: 'auto',
+          padding: '12px',
         }}
       >
         <BasicCanvasController />
