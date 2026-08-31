@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0
+
+### Minor Changes
+
+- [#36](https://github.com/saasquatch/raisins/pull/36) [`85ee1e7`](https://github.com/saasquatch/raisins/commit/85ee1e71537a79cf55838b22b43165a28fe6beac) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - `calculatePlopTargets` now validates `validParents` for an empty root, instead of unconditionally
+  returning a single top-level target. A component restricted to a specific parent no longer gets a
+  free drop target at the top level of an empty document.
+
 ## 1.2.1
 
 ### Patch Changes
