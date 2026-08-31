@@ -15,24 +15,24 @@ const restrictedPlop: RaisinElementNode = {
   type: "tag",
   tagName: "sqm-stat",
   attribs: {},
-  children: [],
+  children: []
 };
 const restrictedMeta: CustomElement = {
   tagName: "sqm-stat",
-  validParents: ["sqm-stat-container"],
+  validParents: ["sqm-stat-container"]
 };
 
 const unrestrictedPlop: RaisinElementNode = {
   type: "tag",
   tagName: "sqm-text",
   attribs: {},
-  children: [],
+  children: []
 };
 const unrestrictedMeta: CustomElement = { tagName: "sqm-text" };
 
 const rootMeta: CustomElement = {
   tagName: "",
-  slots: [{ name: "", title: "Content" }],
+  slots: [{ name: "", title: "Content" }]
 };
 
 function rootFor(html: string) {
