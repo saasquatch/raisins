@@ -92,26 +92,28 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
-        const cssParts: schema.CssPart[] | undefined = comp.docsTags
-              .filter(t => t.name === 'csspart')
-              .map(t => {
-                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
-                if (!name) {
-                  throw new Error(
-                    `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
-                  );
-                }
-                return {
-                  name: name.trim(),
-                  description: description?.trim() || undefined,
-                };
-              }) || undefined;
+        const cssPartTags = comp.docsTags.filter(t => t.name === 'csspart');
+        const cssParts: schema.CssPart[] | undefined = cssPartTags.length
+          ? cssPartTags.map(t => {
+              const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+              if (!name?.trim()) {
+                throw new Error(
+                  `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
+                );
+              }
+              return {
+                name: name.trim(),
+                description: description?.trim() || undefined,
+              };
+            })
+          : undefined;
 
-        const cssProperties: schema.CssCustomProperty[] | undefined = comp.docsTags
-              .filter(t => t.name === 'cssprop')
-              .map(t => {
+        const cssPropTags = comp.docsTags.filter(t => t.name === 'cssprop');
+        const cssProperties: schema.CssCustomProperty[] | undefined =
+          cssPropTags.length
+            ? cssPropTags.map(t => {
                 const [name, description] = splitOnFirst(t.text ?? '', ' - ');
-                if (!name) {
+                if (!name?.trim()) {
                   throw new Error(
                     `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
                   );
@@ -120,7 +122,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
                   name: name.trim(),
                   description: description?.trim() || undefined,
                 };
-              }) || undefined;
+              })
+            : undefined;
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,
