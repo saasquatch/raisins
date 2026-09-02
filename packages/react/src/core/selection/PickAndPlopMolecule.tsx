@@ -1,6 +1,5 @@
 import { RaisinElementNode } from '@raisins/core';
 import {
-  getNode,
   getPath,
   htmlUtil,
   NodePath,
@@ -11,6 +10,7 @@ import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { Block } from '../../component-metamodel/ComponentModel';
 import { isFunction } from '../../util/isFunction';
+import { tryGetNode } from '../../util/tryGetNode';
 import { waitForUpdate } from '../../util/waitForUpdate';
 import { CoreMolecule } from '../CoreAtoms';
 import { SelectedNodeMolecule } from './SelectedNodeMolecule';
@@ -44,7 +44,8 @@ export const PickAndPlopMolecule = molecule(getMol => {
       if (!picked) return undefined;
       if (picked.type !== 'element') return undefined;
 
-      return getNode(currentDoc, picked.path);
+      // Dangling path (doc changed since pick) resolves to undefined.
+      return tryGetNode(currentDoc, picked.path);
     },
     (get, set, next) => {
       const node = isFunction(next)
@@ -75,6 +76,17 @@ export const PickAndPlopMolecule = molecule(getMol => {
     get => (get(PickedAtom) !== undefined) as boolean
   );
 
+  /**
+   * Content being picked (block content for adds, resolved node for moves).
+   * The pick half of the plop candidate.
+   */
+  const PickedContentAtom = atom<RaisinElementNode | undefined>(get => {
+    const picked = get(PickedAtom);
+    if (!picked) return undefined;
+    if (picked.type === 'block') return picked.block.content;
+    return get(PickedNodeAtom) as RaisinElementNode | undefined;
+  });
+
   const PlopNodeInSlotAtom = atom(
     null,
     async (get, set, { parent, idx, slot }: PlopDestination) => {
@@ -82,13 +94,19 @@ export const PickAndPlopMolecule = molecule(getMol => {
       if (!picked) return;
 
       const currentDoc = get(RootNodeAtom);
-      const parentPath = getPath(currentDoc, parent)!;
+      // Destination gone from the doc — abandon rather than crash downstream.
+      const parentPath = getPath(currentDoc, parent);
+      if (!parentPath) {
+        set(PickedAtom, undefined);
+        return;
+      }
 
       if (picked.type === 'block') {
-        picked.block.content.attribs.slot = slot;
+        // Clone before setting slot — block content is shared metamodel config.
         const cloneOfPickedNode = clone(
           picked.block.content
         ) as RaisinElementNode;
+        cloneOfPickedNode.attribs.slot = slot;
 
         const newDocument = insertAtPath(
           currentDoc,
@@ -123,6 +141,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
 
   return {
     PickedAtom,
+    PickedContentAtom,
     PickedNodeAtom,
     PloppingIsActive,
     PlopNodeInSlotAtom,

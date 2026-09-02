@@ -104,21 +104,19 @@ const AttributeEditor = () => {
 
 export const BigLayersOnly = () => (
   <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <LayersController />
       </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
   </BasicStory>
 );
 export const MintLayersOnly = () => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <LayersController />
       </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
   </BasicStory>
 );
@@ -142,11 +140,10 @@ export const SVGLayersOnly = () => (
   `}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <LayersController />
       </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
   </BasicStory>
 );
@@ -161,19 +158,18 @@ function Canvas() {
 export const MintLayersFull = () => {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '33%' }}>
+      <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+        <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
           <LayersController />
         </div>
-        <div style={{ width: '33%' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
           <CanvasProvider>
             <Canvas />
           </CanvasProvider>
         </div>
-        <div style={{ width: '33%' }}>
+        <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
           <AttributeEditor />
         </div>
-        {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
       </div>
     </BasicStory>
   );
@@ -235,19 +231,18 @@ export const ReferralTableFull = () => (
     startingHtml={referralTableExamples}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '33%' }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
         <LayersController />
       </div>
-      <div style={{ width: '33%' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
       </div>
-      <div style={{ width: '33%' }}>
+      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
         <AttributeEditor />
       </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
   </BasicStory>
 );
@@ -257,19 +252,18 @@ export const VanillaLayersFull = () => (
     startingHtml={referrerWidget}
     startingPackages={VanillaComponents}
   >
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '33%' }}>
+    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
         <LayersController />
       </div>
-      <div style={{ width: '33%' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
       </div>
-      <div style={{ width: '33%' }}>
+      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
         <AttributeEditor />
       </div>
-      {/* <pre style={{ width: '50%' }}>{stateTuple[0]}</pre> */}
     </div>
   </BasicStory>
 );
@@ -280,8 +274,6 @@ export const LayersController: FC<{}> = () => {
 
   return (
     <div data-layers>
-      {' '}
-      Don't re-render unless number of children changes!
       <div data-layers-root>
         <NodeScopeProvider nodeAtom={atoms.RootNodeAtom}>
           {hasChildren && (

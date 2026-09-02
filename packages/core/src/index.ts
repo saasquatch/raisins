@@ -14,7 +14,14 @@ import {
   isStyleNode,
   isTextNode
 } from "./html-dom/isNode";
-import htmlParser from "./html-dom/parser";
+import htmlParser, { parseWithErrors } from "./html-dom/parser";
+// eslint-disable-next-line prettier/prettier
+import type {
+  CssParseError,
+  ParseError,
+  ParseErrorEntry,
+  ParseErrorStack
+} from "./html-dom/ParseError";
 // eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
@@ -47,6 +54,7 @@ import {
 export {
   htmlSerializer,
   htmlParser,
+  parseWithErrors,
   htmlUtil,
   // Node types
   isNodeWithChildren,
@@ -100,6 +108,11 @@ export type {
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode
+  RaisinTextNode,
+  // Parse errors
+  ParseError,
+  CssParseError,
+  ParseErrorEntry,
+  ParseErrorStack
 };
 

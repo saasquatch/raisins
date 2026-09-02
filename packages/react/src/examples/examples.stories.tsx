@@ -66,6 +66,31 @@ const meta: Meta = {
 };
 export default meta;
 
+// -- Shared layout styles --
+const panelLayout: CSSProperties = {
+  display: 'flex',
+  height: '100vh',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: '13px',
+};
+const sidePanel: CSSProperties = {
+  flex: '0 0 280px',
+  overflowY: 'auto',
+  padding: '12px',
+  borderRight: '1px solid #e0e0e0',
+};
+const mainPanel: CSSProperties = {
+  flex: 1,
+  overflowY: 'auto',
+  padding: '12px',
+};
+const rightPanel: CSSProperties = {
+  flex: '0 0 280px',
+  overflowY: 'auto',
+  padding: '12px',
+  borderLeft: '1px solid #e0e0e0',
+};
+
 const WidgetScope = createScope<{
   startingHtml: string;
   startingPackages: Module[];
@@ -105,11 +130,11 @@ export function BaseExample() {
   const Editor = () => {
     useHotkeys();
     return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 0.7 }}>
+      <div style={panelLayout}>
+        <div style={mainPanel}>
           <BasicCanvasController />
         </div>
-        <div style={{ flex: 0.3 }}>
+        <div style={rightPanel}>
           <AttributeEditor />
         </div>
       </div>
@@ -144,14 +169,14 @@ export function ExternalHTMLControl() {
         <textarea
           value={html}
           onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-          rows={10}
-          style={{ width: '500px' }}
+          rows={6}
+          style={{ width: '100%', fontFamily: 'monospace', fontSize: '12px', marginBottom: '12px' }}
         />
-        <div style={{ display: 'flex' }}>
-          <div style={{ flex: 0.7 }}>
+        <div style={panelLayout}>
+          <div style={mainPanel}>
             <BasicCanvasController />
           </div>
-          <div style={{ flex: 0.3 }}>
+          <div style={rightPanel}>
             <AttributeEditor />
           </div>
         </div>
@@ -185,11 +210,11 @@ export function WithToolbars() {
         <NodeScopeProvider nodeAtom={EditSelectedNodeAtom}>
           <Toolbars />
         </NodeScopeProvider>
-        <div style={{ display: 'flex' }}>
-          <div style={{ flex: 0.7 }}>
+        <div style={panelLayout}>
+          <div style={mainPanel}>
             <BasicCanvasController />
           </div>
-          <div style={{ flex: 0.3 }}>
+          <div style={rightPanel}>
             <AttributeEditor />
           </div>
         </div>
@@ -218,14 +243,14 @@ export function WithLayers() {
   const Editor = () => {
     useHotkeys();
     return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 0.3 }}>
+      <div style={panelLayout}>
+        <div style={sidePanel}>
           <LayersControllerSimple />
         </div>
-        <div style={{ flex: 0.4 }}>
+        <div style={mainPanel}>
           <BasicCanvasController />
         </div>
-        <div style={{ flex: 0.3 }}>
+        <div style={rightPanel}>
           <AttributeEditor />
         </div>
       </div>
@@ -253,14 +278,14 @@ export function WithLayersAndButtons() {
   const Editor = () => {
     useHotkeys();
     return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 0.3 }}>
+      <div style={panelLayout}>
+        <div style={sidePanel}>
           <LayersController />
         </div>
-        <div style={{ flex: 0.4 }}>
+        <div style={mainPanel}>
           <BasicCanvasController />
         </div>
-        <div style={{ flex: 0.3 }}>
+        <div style={rightPanel}>
           <AttributeEditor />
         </div>
       </div>
@@ -288,14 +313,14 @@ export function WithMintComponents() {
   const Editor = () => {
     useHotkeys();
     return (
-      <div style={{ display: 'flex' }}>
-        <div style={{ flex: 0.3 }}>
+      <div style={panelLayout}>
+        <div style={sidePanel}>
           <LayersController />
         </div>
-        <div style={{ flex: 0.4 }}>
+        <div style={mainPanel}>
           <BasicCanvasController />
         </div>
-        <div style={{ flex: 0.3 }}>
+        <div style={rightPanel}>
           <AttributeEditor />
         </div>
       </div>
@@ -346,20 +371,20 @@ export function FullExample() {
         <textarea
           value={html}
           onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
-          rows={10}
-          style={{ width: '500px' }}
+          rows={6}
+          style={{ width: '100%', fontFamily: 'monospace', fontSize: '12px', marginBottom: '12px' }}
         />
-        <div style={{ display: 'flex' }}>
-          <div style={{ flex: 0.3 }}>
+        <div style={panelLayout}>
+          <div style={sidePanel}>
             <LayersController />
           </div>
-          <div style={{ flex: 0.4 }}>
+          <div style={mainPanel}>
             <NodeScopeProvider nodeAtom={EditSelectedNodeAtom}>
               <Toolbars />
             </NodeScopeProvider>
             <BasicCanvasController />
           </div>
-          <div style={{ flex: 0.3 }}>
+          <div style={rightPanel}>
             <AttributeEditor />
           </div>
         </div>

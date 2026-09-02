@@ -1,5 +1,57 @@
 # Changelog
 
+## 1.6.0
+
+### Minor Changes
+
+- [#36](https://github.com/saasquatch/raisins/pull/36) [`85ee1e7`](https://github.com/saasquatch/raisins/commit/85ee1e71537a79cf55838b22b43165a28fe6beac) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add native HTML drag-and-drop as a first-class alternative to click-based pick-and-plop.
+
+  - New `DragAndDropMolecule` (`DraggedAtom`, `DraggedNodeAtom`, `DraggedContentAtom`,
+    `DraggingIsActive`, `LastHoveredPlopAtom`, `DropNodeInSlotAtom`, `TryCommitLastHoveredAtom`).
+  - New `drag-and-drop` entrypoint: `useDragBlock`, `useDragNode`, `useDragSelectedNode`,
+    `useDropTarget` and the `DragHandle` drag-source primitive.
+  - New `CanvasDragAndDropMolecule` with `CanvasDragDropWrapper` / `useCanvasDragDrop`, which resolve
+    drops from parent-side geometry so the sandboxed canvas iframe never has to receive drag events,
+    and render a container highlight, insertion line and action pill.
+  - New `CanvasConfig.CustomPlopContainersAtom` for containers that lay out their own plop targets
+    (e.g. tables rendering targets as column headers).
+  - `NodeMolecule.canPlopHereAtom` now validates against the dragged _or_ picked candidate, via the
+    new `PickAndPlopMolecule.PickedContentAtom`.
+  - Fix `NotFoundError` from snabbdom when non-shadow web components relocate their light-DOM
+    children: the canvas now patches through a relocation-tolerant `DOMAPI`.
+  - Fix stale parent-side geometry: full snapshots (`GeometryDetail.full`) replace the cache instead
+    of merging, so removed plop targets are evicted.
+  - Picked/dragged node paths now resolve leniently, so a dangling path after a document update
+    yields `undefined` rather than throwing.
+
+### Patch Changes
+
+- Updated dependencies [[`85ee1e7`](https://github.com/saasquatch/raisins/commit/85ee1e71537a79cf55838b22b43165a28fe6beac)]:
+  - @raisins/core@1.3.0
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [[`c9dcffc`](https://github.com/saasquatch/raisins/commit/c9dcffce45b6ab34f3816782890e672c66db4520)]:
+  - @raisins/schema@1.3.0
+  - @raisins/core@1.2.1
+
+## 1.5.0
+
+### Minor Changes
+
+- [#38](https://github.com/saasquatch/raisins/pull/38) [`7d6a345`](https://github.com/saasquatch/raisins/commit/7d6a345a9ef711ff45ef8ed3378c80c62c7f6d00) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - Add parse error reporting for malformed CSS and harden rendering against invalid style serialization.
+
+  `@raisins/core` now exposes `parseWithErrors()` and parse error types so callers can inspect recoverable CSS parse issues found in `style` attributes and `<style>` tags.
+
+  `@raisins/react` now surfaces those parse errors in the node error stack and avoids crashing canvas rendering when style serialization fails.
+
+### Patch Changes
+
+- Updated dependencies [[`7d6a345`](https://github.com/saasquatch/raisins/commit/7d6a345a9ef711ff45ef8ed3378c80c62c7f6d00)]:
+  - @raisins/core@1.2.0
+
 ## 1.4.2
 
 ### Patch Changes

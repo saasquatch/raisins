@@ -1,3 +1,4 @@
+export * from './DragAndDropMolecule';
 export * from './HoveredNodeMolecule';
 export * from './PickAndPlopMolecule';
 export * from './SelectedNodeController';
