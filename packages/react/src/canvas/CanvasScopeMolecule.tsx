@@ -193,8 +193,9 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       .map(a => get(a))
       .join('');
     const managedCss = get(ManagedStyleSheetAtom);
-    const managedStyle = managedCss
-      ? `<style data-raisin-managed>${managedCss}</style>`
+    const safeManagedCss = managedCss.replace(/<\s*\/\s*style/gi, '<\\/style');
+    const managedStyle = safeManagedCss
+      ? `<style data-raisin-managed>${safeManagedCss}</style>`
       : '';
     return script + extra + bonus + managedStyle;
   });
