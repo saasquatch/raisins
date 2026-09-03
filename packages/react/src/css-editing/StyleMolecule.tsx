@@ -291,6 +291,7 @@ const SectionEditor: React.FC<{
         <div style={{ fontSize: 11, color: '#666' }}>{description}</div>
       )}
       <textarea
+        aria-label={`${title} CSS declarations`}
         rows={4}
         style={{ width: '100%', fontFamily: 'monospace', fontSize: 12 }}
         value={draft}
