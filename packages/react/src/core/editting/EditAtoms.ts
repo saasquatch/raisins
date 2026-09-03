@@ -8,12 +8,42 @@ import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { CoreMolecule } from '../CoreAtoms';
 import { SoulsMolecule } from '../souls/Soul';
+import {
+  generateId,
+  RAISIN_ID_ATTR,
+} from '../../css-editing/RaisinCssIds';
+import { RaisinIdsMolecule } from '../../css-editing/RaisinIdsMolecule';
 
-const { duplicate, insertAt, remove, replace, replacePath } = htmlUtil;
+const { duplicate, insertAt, remove, replace, replacePath, visit } = htmlUtil;
+
+function cloneWithFreshRaisinIds(node: RaisinNode, usedIds: Set<string>) {
+  const nextId = () => {
+    let id = generateId();
+    while (usedIds.has(id)) id = generateId();
+    usedIds.add(id);
+    return id;
+  };
+
+  return visit<RaisinNode>(node, {
+    onText: text => text,
+    onDirective: directive => directive,
+    onComment: comment => comment,
+    onStyle: style => style,
+    onElement: (element, children) => ({
+      ...element,
+      attribs: element.attribs[RAISIN_ID_ATTR]
+        ? { ...element.attribs, [RAISIN_ID_ATTR]: nextId() }
+        : element.attribs,
+      children,
+    }),
+    onRoot: (root, children) => ({ ...root, children }),
+  })!;
+}
 
 export const EditMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SoulSaverAtom } = getMol(SoulsMolecule);
+  const { UsedRaisinIdsAtom } = getMol(RaisinIdsMolecule);
 
   /**
    * Deletes a raisin node from the document
@@ -28,7 +58,12 @@ export const EditMolecule = molecule((getMol) => {
    * Deletes a raisins node, adding a duplicate as a sibling in the document
    */
   const DuplicateNodeAtom = atom(null, (get, set, toClone: RaisinNode) => {
-    set(RootNodeAtom, (prev) => duplicate(prev, toClone, get(SoulSaverAtom)));
+    const usedIds = new Set(get(UsedRaisinIdsAtom));
+    set(RootNodeAtom, previous =>
+      duplicate(previous, toClone, get(SoulSaverAtom), node =>
+        cloneWithFreshRaisinIds(node, usedIds)
+      )
+    );
   });
 
   /**

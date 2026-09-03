@@ -10,24 +10,17 @@ import { molecule } from 'bunshi/react';
 import { atom, Atom, PrimitiveAtom, WritableAtom } from 'jotai';
 import { CoreMolecule } from '../core/CoreAtoms';
 import { EditMolecule } from '../core/editting/EditAtoms';
+import { generateId, RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
+import { RaisinIdsMolecule } from './RaisinIdsMolecule';
 
 /**
  * HTML attributes used by Raisins to mark elements that participate in
  * per-instance CSS editing.
  */
-export const RAISIN_CSS_ATTR = 'data-raisin-css';
-export const RAISIN_ID_ATTR = 'data-raisin-id';
+export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
 
 const { visit } = htmlUtil;
 
-/**
- * Generates a short, stable-ish id for new `data-raisin-id` attributes. Not
- * required to be cryptographically random — just unique enough that two
- * elements on the same page do not collide.
- */
-function generateId(): string {
-  return 'r' + Math.random().toString(36).slice(2, 10);
-}
 
 function isElement(n: RaisinNode): n is RaisinElementNode {
   return n.type === 'tag';
@@ -87,6 +80,7 @@ export const CssEditingMolecule = molecule(
   (getMol): CssEditingMoleculeType => {
     const { RootNodeAtom } = getMol(CoreMolecule);
     const { ReplaceNodeAtom } = getMol(EditMolecule);
+    const { UsedRaisinIdsAtom } = getMol(RaisinIdsMolecule);
 
     const DocumentCssAtom = atom<string>('');
     DocumentCssAtom.debugLabel = 'DocumentCssAtom';
@@ -119,14 +113,19 @@ export const CssEditingMolecule = molecule(
 
     const SetInstanceCssAtom = atom(
       null,
-      (_get, set, { node, css }: { node: RaisinElementNode; css: string }) => {
+      (get, set, { node, css }: { node: RaisinElementNode; css: string }) => {
         const nextAttribs = { ...node.attribs };
         if (css.length === 0) {
           delete nextAttribs[RAISIN_CSS_ATTR];
         } else {
           nextAttribs[RAISIN_CSS_ATTR] = css;
           if (!nextAttribs[RAISIN_ID_ATTR]) {
-            nextAttribs[RAISIN_ID_ATTR] = generateId();
+            let id = generateId();
+            const existingIds = get(UsedRaisinIdsAtom);
+            while (existingIds.has(id)) {
+              id = generateId();
+            }
+            nextAttribs[RAISIN_ID_ATTR] = id;
           }
         }
         const nextNode: RaisinElementNode = { ...node, attribs: nextAttribs };
