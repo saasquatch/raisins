@@ -95,7 +95,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const cssPartTags = comp.docsTags.filter(t => t.name === 'csspart');
         const cssParts: schema.CssPart[] | undefined = cssPartTags.length
           ? cssPartTags.map(t => {
-              const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+              const text = t.text?.trim() ?? '';
+              const [name = text, description] = splitOnFirst(text, ' - ');
               if (!name?.trim()) {
                 throw new Error(
                   `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
@@ -112,7 +113,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const cssProperties: schema.CssCustomProperty[] | undefined =
           cssPropTags.length
             ? cssPropTags.map(t => {
-                const [name, description] = splitOnFirst(t.text ?? '', ' - ');
+                const text = t.text?.trim() ?? '';
+                const [name = text, description] = splitOnFirst(text, ' - ');
                 if (!name?.trim()) {
                   throw new Error(
                     `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`

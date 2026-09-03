@@ -27,7 +27,7 @@ export type StyleMoleculeType = {
   customPropsAtom: Atom<
     { name: string; syntax?: string; description?: string }[]
   >;
-  cssAtom: Atom<string>;
+  cssAtom: WritableAtom<string, [string], void>;
   sectionReadAtom: Atom<
     (section: SectionKey, options?: ReadSectionOptions) => string
   >;
@@ -216,9 +216,6 @@ export const StylePanel: React.FC = () => {
       <h3>Style: {selected.tagName}</h3>
 
       <SectionEditor
-        key={`element-${selected.tagName}-${selected.attribs[
-          'data-raisin-id'
-        ] ?? ''}`}
         section={{ type: 'element' }}
         title="Element"
         description={`Applies to the component itself (rendered as :host).`}
@@ -226,7 +223,7 @@ export const StylePanel: React.FC = () => {
 
       {parts.map(part => (
         <SectionEditor
-          key={`part-${part.name}-${selected.attribs['data-raisin-id'] ?? ''}`}
+          key={`part-${part.name}`}
           section={{ type: 'part', name: part.name }}
           title={`::part(${part.name})`}
           description={part.description}
