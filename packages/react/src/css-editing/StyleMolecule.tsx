@@ -1,6 +1,6 @@
 import { RaisinElementNode } from '@raisins/core';
 import { CssPart, CustomElement } from '@raisins/schema/schema';
-import { molecule, useMolecule } from 'bunshi/react';
+import { createScope, molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue, Atom, WritableAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { ComponentModelMolecule } from '../component-metamodel';
@@ -17,6 +17,8 @@ import {
   writeSection,
   writeSectionProperty,
 } from './cssSections';
+
+export const PartScope = createScope<SectionKey>({ type: "element" });
 
 export type StyleMoleculeType = {
   selectedElementAtom: Atom<RaisinElementNode | undefined>;
@@ -59,7 +61,8 @@ export type StyleMoleculeType = {
  * be composed freely.
  */
 export const StyleMolecule = molecule(
-  (getMol): StyleMoleculeType => {
+  (getMol, getScope): StyleMoleculeType => {
+    getScope(PartScope);
     const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
     const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
     const { GetInstanceCssAtom, SetInstanceCssAtom } = getMol(

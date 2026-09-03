@@ -17,13 +17,13 @@ export function selectorOf(section: SectionKey): string {
   return `::part(${section.name})`;
 }
 
-export type CssDimension = { value: string; unit: string };
+export type CssDimension = { value: string; unit: string } | null;
 
 export type ShorthandDimensions = {
-  top: CssDimension | null;
-  right: CssDimension | null;
-  bottom: CssDimension | null;
-  left: CssDimension | null;
+  top: CssDimension;
+  right: CssDimension;
+  bottom: CssDimension;
+  left: CssDimension;
 };
 
 export type ReadSectionOptions = {
