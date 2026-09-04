@@ -19,6 +19,7 @@ export const DocumentCssEditor: React.FC = () => {
     <div>
       <h3>Document CSS</h3>
       <textarea
+        aria-label="Document CSS"
         rows={10}
         style={{ width: '100%', fontFamily: 'monospace' }}
         value={css}

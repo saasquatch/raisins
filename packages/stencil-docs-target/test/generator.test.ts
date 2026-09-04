@@ -8,6 +8,10 @@ const fs = fsSync.promises;
 
 // JSON file
 const schema = require('@raisins/schema');
+const kitchenSinkPath = path.resolve(
+  __dirname,
+  '../../../examples/my-kitchen-sink'
+);
 
 describe('Stencil docs target', () => {
   it('builds and matches schema', async () => {
@@ -18,7 +22,7 @@ describe('Stencil docs target', () => {
       // });
       // console.log(handle.stdout);
       const dataStr = await fs.readFile(
-        path.resolve(__dirname, '../my-kitchen-sink/', 'raisins.json'),
+        path.resolve(kitchenSinkPath, 'raisins.json'),
         { encoding: 'utf-8' }
       );
       if (!dataStr) throw new Error();
@@ -36,7 +40,7 @@ describe('Stencil docs target', () => {
   });
   it('contains custom uiSchema properties', async () => {
     const dataStr = await fs.readFile(
-      path.resolve(__dirname, '../my-kitchen-sink/docs', 'raisins.json'),
+      path.resolve(kitchenSinkPath, 'docs', 'raisins.json'),
       { encoding: 'utf-8' }
     );
     if (!dataStr) throw new Error();
@@ -59,5 +63,16 @@ describe('Stencil docs target', () => {
     if (!dataStr.includes('default'))
       throw new Error('undocumented prop found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
+    if (!dataStr.includes('cssParts')) throw new Error('No cssParts found');
+    if (!dataStr.includes('greeting')) throw new Error('No cssPart name found');
+    if (!dataStr.includes('The greeting text container'))
+      throw new Error('No cssPart description found');
+    if (!dataStr.includes('cssProperties'))
+      throw new Error('No cssProperties found');
+    if (!dataStr.includes('--my-ui-component-color'))
+      throw new Error('No cssProperty name found');
+    if (!dataStr.includes('Controls the greeting text color'))
+      throw new Error('No cssProperty description found');
   });
+
 });

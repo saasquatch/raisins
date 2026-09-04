@@ -11,6 +11,10 @@ import { Component, Prop, h } from '@stencil/core';
  * @exampleGroup Cool Kids
  * @slotEditor richText
  * @canvasRenderer always-replace
+ * @csspart greeting - The greeting text container
+ * @csspart date - The formatted date text
+ * @cssprop --my-ui-component-color - Controls the greeting text color
+ * @cssprop --my-ui-component-date-color - Controls the date text color
  */
 @Component({
   tag: 'my-ui-component',
@@ -120,9 +124,9 @@ export class MyUiComponent {
 
   render() {
     return (
-      <div style={{ color: this.textColor }}>
+      <div part="greeting" style={{ color: this.textColor }}>
         Hello, {this.myDemoProp?.person ?? this.anonymousLabel}! I'm {this.getText()}
-        <p>Your date is: {this.getDate()}</p>
+        <p part="date">Your date is: {this.getDate()}</p>
       </div>
     );
   }
