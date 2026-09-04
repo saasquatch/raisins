@@ -1,3 +1,4 @@
+import { isElementNode } from '@raisins/core';
 import { molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import React from 'react';
@@ -9,6 +10,11 @@ import {
   AttributeWidget,
   DefaultAttributeComponent,
 } from './AttributeThemeMolecule';
+import {
+  CssEditingMolecule,
+  RAISIN_CSS_ATTR,
+} from '../css-editing/CssEditingMolecule';
+import { SelectedNodeMolecule } from '../core';
 
 export const DefaultAttributeTemplate: AttributeTemplate = props => {
   const { name, schemaAtom } = useMolecule(AttributeMolecule);
@@ -79,9 +85,38 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   return (
     <select value={value} onChange={e => setValue(e.target.value)}>
       {schema.enum?.map((key, idx) => (
-        <option value={key}>{schema.enumNames?.[idx] ?? key}</option>
+        <option key={key} value={key}>{schema.enumNames?.[idx] ?? key}</option>
       ))}
     </select>
+  );
+};
+
+/**
+ * Raw CSS editor — round-trips the attribute value as-is. Used by attributes
+ * that store CSS (e.g. `data-raisin-css`) so consumers can opt into a CSS
+ * editing surface via `uiWidget: "css"`.
+ */
+export const DefaultCssWidget: AttributeWidget = () => {
+  const { name, valueAtom } = useMolecule(AttributeMolecule);
+  const [value, setValue] = useAtom(valueAtom);
+  const { SelectedNodeAtom } = useMolecule(SelectedNodeMolecule);
+  const node = useAtomValue(SelectedNodeAtom);
+  const { SetInstanceCssAtom } = useMolecule(CssEditingMolecule);
+  const [, setInstanceCss] = useAtom(SetInstanceCssAtom);
+  return (
+    <textarea
+      rows={6}
+      style={{ width: '100%', fontFamily: 'monospace' }}
+      value={value ?? ''}
+      onChange={e => {
+        const next = (e.target as HTMLTextAreaElement).value;
+        if (name === RAISIN_CSS_ATTR && node && isElementNode(node)) {
+          setInstanceCss({ node, css: next });
+          return;
+        }
+        setValue(next);
+      }}
+    />
   );
 };
 
@@ -94,6 +129,7 @@ export const DefaultAttributeThemeMolecule = molecule<
       boolean: DefaultBooleanWidget,
       number: DefaultNumberWidget,
       select: DefaultSelectWidget,
+      css: DefaultCssWidget,
       [DefaultAttributeComponent]: DefaultTextWidget,
     }),
     templates: atom({

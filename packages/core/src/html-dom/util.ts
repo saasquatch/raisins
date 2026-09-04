@@ -151,9 +151,11 @@ export function removePath(
 export function duplicate(
   root: RaisinNode,
   node: RaisinNode,
-  onReplace = DefaultOnReplace
+  onReplace = DefaultOnReplace,
+  cloneNode: (node: RaisinNode) => RaisinNode = clone
 ): RaisinNode {
-  const cloneIfMatching = (n: RaisinNode) => (n === node ? [n, clone(n)] : [n]);
+  const cloneIfMatching = (n: RaisinNode) =>
+    n === node ? [n, cloneNode(n)] : [n];
   const DuplicateVisitor: NodeVisitor<RaisinNode[]> = {
     onText: cloneIfMatching,
     onDirective: cloneIfMatching,
@@ -161,7 +163,7 @@ export function duplicate(
     onStyle: cloneIfMatching,
     onElement: (n, dupeChildren) => {
       if (node === n) {
-        return [n, clone(n)];
+        return [n, cloneNode(n)];
       }
       const children = flatDeep<RaisinNode>(dupeChildren);
       return [onReplace(n, { ...n, children })];

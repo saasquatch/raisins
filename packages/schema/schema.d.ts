@@ -85,6 +85,11 @@ export interface CustomElement {
   cssProperties?: CssCustomProperty[];
 
   /**
+   * The CSS shadow parts (`::part(name)`) this element exposes for external styling.
+   */
+  cssParts?: CssPart[];
+
+  /**
    * HTML examples of how this content can be used
    */
   examples?: Array<Example>;
@@ -308,6 +313,23 @@ export interface Slot {
    * rich text editing of children.
    */
   editor?: string;
+}
+
+export interface CssPart {
+  /**
+   * The name of the part, used in `::part(name)` selectors.
+   */
+  name: string;
+
+  /**
+   * A markdown title suitable for display in a listing.
+   */
+  title?: string;
+
+  /**
+   * A markdown description.
+   */
+  description?: string;
 }
 
 export interface CssCustomProperty {

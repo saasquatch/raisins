@@ -110,6 +110,15 @@ it("Duplicate node", () => {
     type: "root",
     children: [node, node]
   });
+  expect(
+    duplicate(root, node, undefined, original => ({
+      ...clone(original),
+      attribs: { open: "false" }
+    }))
+  ).toStrictEqual({
+    type: "root",
+    children: [node, { ...node, attribs: { open: "false" } }]
+  });
   expect(() => duplicate(root, root)).toThrowError();
   expect(() => duplicate(node, node)).toThrowError();
 });

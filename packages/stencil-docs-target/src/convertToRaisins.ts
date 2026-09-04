@@ -92,11 +92,48 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
             return attr;
           });
 
+        const cssPartTags = comp.docsTags.filter(t => t.name === 'csspart');
+        const cssParts: schema.CssPart[] | undefined = cssPartTags.length
+          ? cssPartTags.map(t => {
+              const text = t.text?.trim() ?? '';
+              const [name = text, description] = splitOnFirst(text, ' - ');
+              if (!name?.trim()) {
+                throw new Error(
+                  `Invalid @csspart tag on component "${comp.tag}" is missing a name.`
+                );
+              }
+              return {
+                name: name.trim(),
+                description: description?.trim() || undefined,
+              };
+            })
+          : undefined;
+
+        const cssPropTags = comp.docsTags.filter(t => t.name === 'cssprop');
+        const cssProperties: schema.CssCustomProperty[] | undefined =
+          cssPropTags.length
+            ? cssPropTags.map(t => {
+                const text = t.text?.trim() ?? '';
+                const [name = text, description] = splitOnFirst(text, ' - ');
+                if (!name?.trim()) {
+                  throw new Error(
+                    `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
+                  );
+                }
+                return {
+                  name: name.trim(),
+                  description: description?.trim() || undefined,
+                };
+              })
+            : undefined;
+
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
           attributes,
+          cssParts,
+          cssProperties,
           requiredFeatures: jsonTagValue(comp, 'requiredFeatures'),
           featureTooltip: tagValue(comp.docsTags, 'featureTooltip'),
           exampleGroup: tagValue(comp.docsTags, 'exampleGroup'),
