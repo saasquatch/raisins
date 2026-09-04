@@ -15,38 +15,42 @@ export const DocumentCssMolecule = molecule(getMol => {
 /**
  * Keeps a local draft of the textarea value so the atom's parse/serialize
  * round-trip (which can reformat CSS) doesn't fight the user mid-keystroke.
- * Only re-syncs the draft from the atom when the change came from elsewhere
- * (e.g. undo/redo), not from this hook's own writes.
+ * External persisted changes re-sync the draft only while the textarea is
+ * unfocused, so typing is never interrupted by a parse/serialize round-trip.
  */
 function useDocumentCssEditor() {
   const { DocumentCssAtom } = useMolecule(DocumentCssMolecule);
   const [atomCss, setAtomCss] = useAtom(DocumentCssAtom);
-  const [draft, setDraft] = useState(atomCss);
-  const isSelfWrite = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [draft, setDraft] = useState(() => atomCss);
+  const persisted = atomCss;
 
+  // If the persisted CSS changes from outside (selection change handled by
+  // remount key; this covers a programmatic edit on the same element), only
+  // overwrite the draft when this section's own textarea is not focused —
+  // never yank text out from under the user mid-keystroke.
   useEffect(() => {
-    if (isSelfWrite.current) {
-      isSelfWrite.current = false;
-      return;
+    if (document.activeElement !== textareaRef.current) {
+      setDraft(persisted);
     }
-    setDraft(atomCss);
-  }, [atomCss]);
+  }, [persisted]);
 
   const onChange = (next: string) => {
-    isSelfWrite.current = true;
     setDraft(next);
     setAtomCss(next);
   };
 
-  return { value: draft, onChange };
+  return { textareaRef, value: draft, onChange };
 }
 
+// Example component for editing document-wide CSS
 export const DocumentCssEditor: React.FC = () => {
-  const { value, onChange } = useDocumentCssEditor();
+  const { textareaRef, value, onChange } = useDocumentCssEditor();
   return (
     <div>
       <h3>Document CSS</h3>
       <textarea
+        ref={textareaRef}
         aria-label="Document CSS"
         rows={10}
         style={{ width: '100%', fontFamily: 'monospace' }}
