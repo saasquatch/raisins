@@ -2,7 +2,7 @@ import { RaisinElementNode } from '@raisins/core';
 import { CssPart, CustomElement } from '@raisins/schema/schema';
 import { createScope, molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue, Atom, WritableAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ComponentModelMolecule } from '../component-metamodel';
 import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
 import { isElementNode } from '../util/isNode';
@@ -261,6 +261,7 @@ const SectionEditor: React.FC<{
   const { sectionReadAtom, sectionWriteAtom } = useMolecule(StyleMolecule);
   const read = useAtomValue(sectionReadAtom);
   const [, write] = useAtom(sectionWriteAtom);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Keep the textarea fully controlled by local state. If we drove `value`
   // from a parse-and-reformat of the stored CSS, every keystroke that produced
@@ -272,11 +273,12 @@ const SectionEditor: React.FC<{
 
   // If the persisted CSS changes from outside (selection change handled by
   // remount key; this covers a programmatic edit on the same element), only
-  // overwrite the draft when the field is not focused — never yank text out
-  // from under the user mid-keystroke.
+  // overwrite the draft when this section's own textarea is not focused —
+  // never yank text out from under the user mid-keystroke. Checked against
+  // this textarea specifically, so other sections' focus doesn't block sync.
   const persisted = read(section);
   useEffect(() => {
-    if (document.activeElement?.tagName !== 'TEXTAREA') {
+    if (document.activeElement !== textareaRef.current) {
       setDraft(persisted);
     }
   }, [persisted]);
@@ -291,6 +293,7 @@ const SectionEditor: React.FC<{
         <div style={{ fontSize: 11, color: '#666' }}>{description}</div>
       )}
       <textarea
+        ref={textareaRef}
         aria-label={`${title} CSS declarations`}
         rows={4}
         style={{ width: '100%', fontFamily: 'monospace', fontSize: 12 }}

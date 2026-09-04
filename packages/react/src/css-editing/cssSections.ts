@@ -147,7 +147,7 @@ export function writeSection(
   try {
     ast = css.trim() ? cssParser(css) : cssParser('');
   } catch {
-    ast = cssParser('');
+    return { css, conflict: false };
   }
   if (!Array.isArray(ast.children)) ast.children = [];
 

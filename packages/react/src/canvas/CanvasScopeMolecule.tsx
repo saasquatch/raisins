@@ -127,7 +127,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       (prev, renderer) => {
         return (c, n) => renderer(prev(c, n), n);
       },
-      (c, n) => c
+      (c, _) => c
     );
 
     const vnode = raisinToSnabbdom(

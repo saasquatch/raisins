@@ -85,7 +85,7 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   return (
     <select value={value} onChange={e => setValue(e.target.value)}>
       {schema.enum?.map((key, idx) => (
-        <option value={key}>{schema.enumNames?.[idx] ?? key}</option>
+        <option key={key} value={key}>{schema.enumNames?.[idx] ?? key}</option>
       ))}
     </select>
   );
