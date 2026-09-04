@@ -1,6 +1,7 @@
 import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { molecule } from 'bunshi/react';
 import { Atom, atom, WritableAtom } from 'jotai';
+import { h, VNodeChildElement, VNodeChildren } from 'snabbdom';
 import { ComponentModelMolecule } from '../component-metamodel';
 import {
   CoreMolecule,
@@ -41,6 +42,11 @@ type CanvasEventListener = WritableAtom<null, RichCanvasEvent[], void>;
  * An example during development was `sqm-text`, which threw and exception in snabbdom and caused infinite plop targets to show up.
  */
 let renderTick = 0;
+
+/**
+ * Stable key so snabbdom patches the managed stylesheet's text in place.
+ */
+const MANAGED_STYLE_KEY = 'raisin-managed-style';
 
 /**
  * A molecule used for tracking events and geometry for an iframe canvas.
@@ -87,6 +93,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const meta = get(ComponentModel.ComponentModelAtom);
     const rerender = get(rerenderNodeAtom);
     const picked = get(PloppingIsActive);
+    const managedCss = get(ManagedStyleSheetAtom);
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
@@ -123,12 +130,24 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const rootRenderers = Array.from(
       get(RootRendererProxy.atom).values
     ).map(r => get(r));
-    const rootRenderer = rootRenderers.reduce(
+    const composedRootRenderer = rootRenderers.reduce<RootRenderer>(
       (prev, renderer) => {
         return (c, n) => renderer(prev(c, n), n);
       },
-      (c, _) => c
+      c => c
     );
+
+    // Applied after plugin root renderers so the stylesheet can't be swallowed
+    // by a wrapping renderer (e.g. one that moves children into a shadow root).
+    const rootRenderer: RootRenderer = (c, n) => {
+      const inner = composedRootRenderer(c, n);
+      const managedStyle = h(
+        'style',
+        { key: MANAGED_STYLE_KEY, attrs: { 'data-raisin-managed': true } },
+        managedCss
+      );
+      return [managedStyle, ...toChildArray(inner)];
+    };
 
     const vnode = raisinToSnabbdom(
       node as RaisinDocumentNode,
@@ -158,7 +177,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     }
   });
 
-  const EventTypesAtom = atom(get => {
+  const EventTypesAtom = atom(() => {
     return new Set(ListenersMap.keys());
   });
 
@@ -214,12 +233,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const bonus = Array.from(HTMLSet.values())
       .map(a => get(a))
       .join('');
-    const managedCss = get(ManagedStyleSheetAtom);
-    const safeManagedCss = managedCss.replace(/<\s*\/\s*style/gi, '<\\/style');
-    const managedStyle = safeManagedCss
-      ? `<style data-raisin-managed>${safeManagedCss}</style>`
-      : '';
-    return script + extra + bonus + managedStyle;
+    return script + extra + bonus;
   });
 
   const selector = atom(get => `[${get(EventSelectorAtom)}]`);
@@ -249,3 +263,8 @@ export type RichCanvasEvent = RawCanvasEvent & {
   soul?: Soul;
   node?: RaisinNode;
 };
+
+function toChildArray(children: VNodeChildren): VNodeChildElement[] {
+  if (children === undefined || children === null) return [];
+  return Array.isArray(children) ? children : [children];
+}
