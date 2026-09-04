@@ -158,7 +158,7 @@ export const CssEditingMolecule = molecule(
           set(InsertNodeAtom, {
             node: styleNode,
             parent: root as RaisinNodeWithChildren,
-            idx: 0,
+            idx: (root as RaisinNodeWithChildren).children.length,
           });
         }
       }
