@@ -22,6 +22,7 @@ export const PartScope = createScope<SectionKey>({ type: "element" });
 
 export type StyleMoleculeType = {
   selectedElementAtom: Atom<RaisinElementNode | undefined>;
+  selectedElementKeyAtom: Atom<string | undefined>;
   componentMetaAtom: Atom<CustomElement | undefined>;
   partsAtom: Atom<CssPart[]>;
   customPropsAtom: Atom<
@@ -63,7 +64,7 @@ export type StyleMoleculeType = {
 export const StyleMolecule = molecule(
   (getMol, getScope): StyleMoleculeType => {
     getScope(PartScope);
-    const { SelectedNodeAtom } = getMol(SelectedNodeMolecule);
+    const { SelectedNodeAtom, SelectionAtom } = getMol(SelectedNodeMolecule);
     const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
     const { GetInstanceCssAtom, SetInstanceCssAtom } = getMol(
       CssEditingMolecule
@@ -73,6 +74,11 @@ export const StyleMolecule = molecule(
       const node = get(SelectedNodeAtom);
       if (!node || !isElementNode(node)) return undefined;
       return node;
+    });
+
+    const selectedElementKeyAtom = atom(get => {
+      if (!get(selectedElementAtom)) return undefined;
+      return get(SelectionAtom)?.path.join('/');
     });
 
     const componentMetaAtom = atom(get => {
@@ -172,6 +178,7 @@ export const StyleMolecule = molecule(
 
     return {
       selectedElementAtom,
+      selectedElementKeyAtom,
       componentMetaAtom,
       partsAtom,
       customPropsAtom,
@@ -197,6 +204,7 @@ export const StyleMolecule = molecule(
 export const StylePanel: React.FC = () => {
   const {
     selectedElementAtom,
+    selectedElementKeyAtom,
     partsAtom,
     customPropsAtom,
     cssAtom,
@@ -208,6 +216,7 @@ export const StylePanel: React.FC = () => {
   const parts = useAtomValue(partsAtom);
   const customProps = useAtomValue(customPropsAtom);
   const css = useAtomValue(cssAtom);
+  const selectedElementKey = useAtomValue(selectedElementKeyAtom);
 
   if (!selected) return null;
 
@@ -216,6 +225,7 @@ export const StylePanel: React.FC = () => {
       <h3>Style: {selected.tagName}</h3>
 
       <SectionEditor
+        key={`${selectedElementKey}:element`}
         section={{ type: 'element' }}
         title="Element"
         description={`Applies to the component itself (rendered as :host).`}
@@ -223,7 +233,7 @@ export const StylePanel: React.FC = () => {
 
       {parts.map(part => (
         <SectionEditor
-          key={`part-${part.name}`}
+          key={`${selectedElementKey}:part-${part.name}`}
           section={{ type: 'part', name: part.name }}
           title={`::part(${part.name})`}
           description={part.description}
