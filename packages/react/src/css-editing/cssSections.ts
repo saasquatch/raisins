@@ -232,21 +232,36 @@ export function writeSectionProperty(
     : parseDeclarationBlock('');
   if (!block) block = { type: 'Block', children: [] };
 
-  const declIdx = block.children.findIndex(
-    (d: any) => d.type === 'Declaration' && d.property === property
+  const matchingIndexes = block.children.reduce(
+    (indexes: number[], declaration: any, index: number) => {
+      if (declaration.type === 'Declaration' && declaration.property === property) {
+        indexes.push(index);
+      }
+      return indexes;
+    },
+    []
   );
+  const lastMatchingIndex = matchingIndexes[matchingIndexes.length - 1];
 
   if (value.trim().length === 0) {
-    // Remove property
-    if (declIdx >= 0) block.children.splice(declIdx, 1);
+    block.children = block.children.filter(
+      (declaration: any) =>
+        declaration.type !== 'Declaration' || declaration.property !== property
+    );
   } else {
-    // Parse a fresh declaration to get a proper AST node with correct .value
     const freshBlock = parseDeclarationBlock(`${property}: ${value}`);
     const freshDecl = freshBlock?.children?.[0];
     if (!freshDecl) return css;
 
-    if (declIdx >= 0) {
-      block.children[declIdx] = freshDecl;
+    if (lastMatchingIndex !== undefined) {
+      block.children = block.children.flatMap(
+        (declaration: any, index: number) => {
+          if (declaration.type !== 'Declaration' || declaration.property !== property) {
+            return declaration;
+          }
+          return index === lastMatchingIndex ? freshDecl : [];
+        }
+      );
     } else {
       block.children.push(freshDecl);
     }

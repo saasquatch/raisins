@@ -14,7 +14,7 @@ import {
 } from '../../css-editing/RaisinCssIds';
 import { RaisinIdsMolecule } from '../../css-editing/RaisinIdsMolecule';
 
-const { duplicate, insertAt, remove, replace, replacePath, visit } = htmlUtil;
+const { clone, duplicate, insertAt, remove, replace, replacePath, visit } = htmlUtil;
 
 function cloneWithFreshRaisinIds(node: RaisinNode, usedIds: Set<string>) {
   const nextId = () => {
@@ -24,7 +24,7 @@ function cloneWithFreshRaisinIds(node: RaisinNode, usedIds: Set<string>) {
     return id;
   };
 
-  return visit<RaisinNode>(node, {
+  return visit<RaisinNode>(clone(node), {
     onText: text => text,
     onDirective: directive => directive,
     onComment: comment => comment,
