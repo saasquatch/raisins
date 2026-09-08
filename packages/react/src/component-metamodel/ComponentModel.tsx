@@ -37,6 +37,7 @@ export type ComponentModelMoleculeType = {
   ModuleDetailsStateAtom: Atom<Loadable<Promise<ModuleDetails[]>>>;
   ModulesLoadingAtom: Atom<boolean>;
   ComponentsAtom: Atom<CustomElement[]>;
+  ComponentPackagesAtom: Atom<Map<string, string>>;
   LocalURLAtom: Atom<string | undefined>;
   BlocksAtom: Atom<Block[]>;
   AddModuleAtom: WritableAtom<null, Module[], void>;
@@ -50,6 +51,7 @@ export type ComponentModelMoleculeType = {
   IsInteractibleAtom: Atom<InteractibleProvider>;
   NonInteractibleTags: Set<string>;
   NPMRegistryAtom: Atom<NPMRegistry>;
+  GetComponentPackageAtom: Atom<(tagName: string) => string | undefined>;
 };
 
 export const ComponentModelMolecule = molecule(
@@ -164,6 +166,47 @@ export const ComponentModelMolecule = molecule(
       return getComponentMeta;
     });
     ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
+
+    /**
+     * Maps component tag names to their NPM package.
+     *
+     * Package order determines ownership when the same tag is declared more
+     * than once, matching the lookup behavior used by the component metadata.
+     */
+    const ComponentPackagesAtom = atom(get => {
+      const moduleDetails = get(ModuleDetailsAtom);
+      const componentPackages = new Map<string, string>();
+
+      for (const htmlComponent of Object.values(HTMLComponents)) {
+        if (!componentPackages.has(htmlComponent.tagName)) {
+          componentPackages.set(htmlComponent.tagName, 'html');
+        }
+      }
+
+      for (const module of moduleDetails) {
+        if (!module.package) continue;
+        for (const componentModule of module.raisins?.modules ?? []) {
+          for (const component of componentModule.tags ?? []) {
+            if (!componentPackages.has(component.tagName)) {
+              componentPackages.set(component.tagName, module.package);
+            }
+          }
+        }
+      }
+      return componentPackages;
+    });
+    ComponentPackagesAtom.debugLabel = 'ComponentPackagesAtom';
+
+    /**
+     * A function to get the NPM package for a component by its tag name
+     */
+    const GetComponentPackageAtom = atom<(tagName: string) => string | undefined>(
+      get => {
+        const componentPackages = get(ComponentPackagesAtom);
+        return tagName => componentPackages.get(tagName);
+      }
+    );
+    GetComponentPackageAtom.debugLabel = 'GetComponentPackageAtom';
 
     /**
      * A function to get a list of possible children for a node/slot combo
@@ -299,6 +342,7 @@ export const ComponentModelMolecule = molecule(
       ModuleDetailsStateAtom,
       ModulesLoadingAtom,
       ComponentsAtom,
+      ComponentPackagesAtom,
       LocalURLAtom,
       BlocksAtom,
       AddModuleAtom,
@@ -310,6 +354,7 @@ export const ComponentModelMolecule = molecule(
       IsInteractibleAtom,
       NonInteractibleTags,
       NPMRegistryAtom,
+      GetComponentPackageAtom,
     };
   }
 );
