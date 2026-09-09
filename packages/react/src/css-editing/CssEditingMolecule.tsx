@@ -117,6 +117,10 @@ export const CssEditingMolecule = molecule(
     );
     const { UsedRaisinIdsAtom } = getMol(RaisinIdsMolecule);
 
+    // Scoped CSS keyed by id + source css. Replaced wholesale on each pass so
+    // it can't outgrow the number of styled elements.
+    let scopedCssCache = new Map<string, string>();
+
     const DocumentCssAtom = atom(
       get => {
         const node = findDocumentCssNode(get(RootNodeAtom));
@@ -170,15 +174,28 @@ export const CssEditingMolecule = molecule(
       const documentCss = get(DocumentCssAtom);
       const instances = collectElementsWithInstanceCss(root);
 
+      // Every document edit recomputes this, so re-scoping the untouched
+      // elements would make each keystroke cost O(all styled elements).
+      const nextCache = new Map<string, string>();
       const scopedParts = instances
         .map(({ id, css }) => {
-          try {
-            return cssSerializer(scopeStylesheet(cssParser(css), id));
-          } catch {
-            return '';
+          const key = `${id}\u0000${css}`;
+          const cached = scopedCssCache.get(key);
+          if (cached !== undefined) {
+            nextCache.set(key, cached);
+            return cached;
           }
+          let scoped: string;
+          try {
+            scoped = cssSerializer(scopeStylesheet(cssParser(css), id));
+          } catch {
+            scoped = '';
+          }
+          nextCache.set(key, scoped);
+          return scoped;
         })
         .filter(part => part.length > 0);
+      scopedCssCache = nextCache;
 
       return [documentCss, ...scopedParts].filter(s => s.length > 0).join('\n');
     });
@@ -194,6 +211,15 @@ export const CssEditingMolecule = molecule(
     const SetInstanceCssAtom = atom(
       null,
       (get, set, { node, css }: { node: RaisinElementNode; css: string }) => {
+        // Every write re-serializes the whole document and re-renders the
+        // canvas, so a write that changes nothing is never worth doing.
+        const current = node.attribs[RAISIN_CSS_ATTR];
+        const unchanged =
+          css.length === 0
+            ? current === undefined
+            : current === css && Boolean(node.attribs[RAISIN_ID_ATTR]);
+        if (unchanged) return;
+
         const nextAttribs = { ...node.attribs };
         if (css.length === 0) {
           delete nextAttribs[RAISIN_CSS_ATTR];

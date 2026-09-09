@@ -152,6 +152,59 @@ describe('SetInstanceCssAtom', () => {
     expect(next.attribs[RAISIN_ID_ATTR]).toBeTruthy();
   });
 
+  // Each write re-serializes the whole document and re-renders the canvas, and
+  // widgets routinely rewrite unchanged sides (one box-model keystroke writes
+  // all four).
+  it('does not touch the document when the css is unchanged', () => {
+    const { result } = renderCssEditing('<div></div>');
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+
+    const before = result.current.root;
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+
+    expect(result.current.root).toBe(before);
+  });
+
+  it('does not touch the document when clearing css that was never set', () => {
+    const { result } = renderCssEditing('<div></div>');
+    const before = result.current.root;
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: '',
+      })
+    );
+
+    expect(result.current.root).toBe(before);
+  });
+
+  // Skipping unchanged writes must not skip assigning a missing id.
+  it('still assigns an id when the css matches but the id is absent', () => {
+    const { result } = renderCssEditing(
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}"></div>`
+    );
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+
+    expect(findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR]).toBeTruthy();
+  });
+
   it('round-trips css containing quotes and ampersands through the html', () => {
     const css = '::part(x){&:hover{content:"a"}}';
     const { result } = renderCssEditing('<div></div>');
@@ -237,6 +290,51 @@ describe('ManagedStyleSheetAtom', () => {
     );
 
     expect(result.current.managedCss).toBe('');
+  });
+
+  // Scoped output is memoized per id+css so a keystroke doesn't re-scope every
+  // styled element; these pin the ways that cache could serve the wrong thing.
+  it('scopes identical css separately for each element', () => {
+    const { result } = renderCssEditing(
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>` +
+        `<span ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="b"></span>`
+    );
+
+    expect(result.current.managedCss).toBe(
+      '[data-raisin-id="a"]{color:red}\n[data-raisin-id="b"]{color:red}'
+    );
+  });
+
+  it('re-scopes an element after its css changes', () => {
+    const { result } = renderCssEditing(
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>`
+    );
+    expect(result.current.managedCss).toBe('[data-raisin-id="a"]{color:red}');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+
+    expect(result.current.managedCss).toBe('[data-raisin-id="a"]{color:blue}');
+  });
+
+  it('drops an element from the sheet once its css is cleared', () => {
+    const { result } = renderCssEditing(
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>` +
+        `<span ${RAISIN_CSS_ATTR}=":host{color:blue}" ${RAISIN_ID_ATTR}="b"></span>`
+    );
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: '',
+      })
+    );
+
+    expect(result.current.managedCss).toBe('[data-raisin-id="b"]{color:blue}');
   });
 });
 
