@@ -63,16 +63,41 @@ describe('Stencil docs target', () => {
     if (!dataStr.includes('default'))
       throw new Error('undocumented prop found');
     // if (!dataStr.includes('ui:order')) throw new Error('No ui:order found');
-    if (!dataStr.includes('cssParts')) throw new Error('No cssParts found');
-    if (!dataStr.includes('greeting')) throw new Error('No cssPart name found');
-    if (!dataStr.includes('The greeting text container'))
-      throw new Error('No cssPart description found');
-    if (!dataStr.includes('cssProperties'))
-      throw new Error('No cssProperties found');
-    if (!dataStr.includes('--my-ui-component-color'))
-      throw new Error('No cssProperty name found');
-    if (!dataStr.includes('Controls the greeting text color'))
-      throw new Error('No cssProperty description found');
   });
 
+  it('contains css parts and properties for the annotated component', async () => {
+    const dataStr = await fs.readFile(
+      path.resolve(kitchenSinkPath, 'docs', 'raisins.json'),
+      { encoding: 'utf-8' }
+    );
+    const tags = JSON.parse(dataStr).modules.flatMap((m: any) => m.tags ?? []);
+    const component = tags.find((t: any) => t.tagName === 'my-ui-component');
+
+    expect(component.cssParts).toEqual([
+      { name: 'greeting', description: 'The greeting text container' },
+      { name: 'date', description: 'The formatted date text' },
+    ]);
+    expect(component.cssProperties).toEqual([
+      {
+        name: '--my-ui-component-color',
+        description: 'Controls the greeting text color',
+      },
+      {
+        name: '--my-ui-component-date-color',
+        description: 'Controls the date text color',
+      },
+    ]);
+  });
+
+  it('omits css parts and properties for components without them', async () => {
+    const dataStr = await fs.readFile(
+      path.resolve(kitchenSinkPath, 'docs', 'raisins.json'),
+      { encoding: 'utf-8' }
+    );
+    const tags = JSON.parse(dataStr).modules.flatMap((m: any) => m.tags ?? []);
+    const component = tags.find((t: any) => t.tagName === 'my-card');
+
+    expect(component.cssParts).toBeUndefined();
+    expect(component.cssProperties).toBeUndefined();
+  });
 });

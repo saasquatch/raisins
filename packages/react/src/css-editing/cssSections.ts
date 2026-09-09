@@ -53,7 +53,8 @@ export function readSection(
   if (!rule) return '';
   if (property) {
     const decl = findDeclaration(rule, property);
-    return decl && decl.value ? cssSerializer(decl.value) : '';
+    // Custom property values are kept verbatim by css-tree, whitespace included.
+    return decl && decl.value ? cssSerializer(decl.value).trim() : '';
   }
   return serializeDeclarations(rule.block, exclude);
 }
@@ -121,6 +122,8 @@ function nodeToDimension(node: any): CssDimension | null {
   if (!node) return null;
   if (node.type === 'Dimension') return { value: node.value, unit: node.unit };
   if (node.type === 'Percentage') return { value: node.value, unit: '%' };
+  // Unitless lengths (`padding: 0`) parse as Number, not Dimension.
+  if (node.type === 'Number') return { value: node.value, unit: '' };
   return null;
 }
 
@@ -151,9 +154,7 @@ export function writeSection(
   }
   if (!Array.isArray(ast.children)) ast.children = [];
 
-  const existingIdx = ast.children.findIndex(
-    (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
-  );
+  const existingIdx = detachSection(ast, section);
 
   if (trimmed.length === 0 && preserve.length === 0) {
     if (existingIdx >= 0) ast.children.splice(existingIdx, 1);
@@ -249,7 +250,8 @@ export function writeSectionProperty(
         declaration.type !== 'Declaration' || declaration.property !== property
     );
   } else {
-    const freshBlock = parseDeclarationBlock(`${property}: ${value}`);
+    // No space after the colon: custom property values keep it, and it compounds.
+    const freshBlock = parseDeclarationBlock(`${property}:${value}`);
     const freshDecl = freshBlock?.children?.[0];
     if (!freshDecl) return css;
 
@@ -276,6 +278,37 @@ function findMatchingRule(ast: any, section: SectionKey): any | undefined {
   return ast.children.find(
     (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
   );
+}
+
+/**
+ * Finds the rule for `section`, first splitting it out of any grouped selector
+ * (`:host, .foo`) so that rewriting the section can't rewrite the declarations
+ * of the selectors it was grouped with. Returns the index of the rule that now
+ * belongs to `section` alone, or -1.
+ */
+function detachSection(ast: any, section: SectionKey): number {
+  const idx = ast.children.findIndex(
+    (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
+  );
+  if (idx < 0) return idx;
+
+  const rule = ast.children[idx];
+  const selectors: any[] = rule.prelude?.children ?? [];
+  const mine = selectors.filter((sel: any) => selectorMatches(sel, section));
+  const others = selectors.filter((sel: any) => !selectorMatches(sel, section));
+  if (others.length === 0) return idx;
+
+  const remainder = {
+    ...rule,
+    prelude: { ...rule.prelude, children: others },
+    block: JSON.parse(JSON.stringify(rule.block)),
+  };
+  const dedicated = {
+    ...rule,
+    prelude: { ...rule.prelude, children: mine },
+  };
+  ast.children.splice(idx, 1, remainder, dedicated);
+  return idx + 1;
 }
 
 function findDeclaration(rule: any, property: string): any | undefined {

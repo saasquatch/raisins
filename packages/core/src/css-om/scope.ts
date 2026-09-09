@@ -25,6 +25,9 @@ export function scopeStylesheet(
   return clone;
 }
 
+/** Keyframe selectors (`from`, `to`, `0%`) are not style rules — scoping them breaks the animation. */
+const KEYFRAMES_AT_RULE = /^(-[a-z]+-)?keyframes$/i;
+
 function processChildren(node: any, scope: string): void {
   if (!node || !Array.isArray(node.children)) return;
   const result: any[] = [];
@@ -38,7 +41,11 @@ function processChildren(node: any, scope: string): void {
       }
       result.push(...lifted);
     } else {
-      if (child.block) processChildren(child.block, scope);
+      const isKeyframes =
+        child.type === "Atrule" &&
+        typeof child.name === "string" &&
+        KEYFRAMES_AT_RULE.test(child.name);
+      if (child.block && !isKeyframes) processChildren(child.block, scope);
       result.push(child);
     }
   }

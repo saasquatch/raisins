@@ -56,6 +56,42 @@ describe("scopeStylesheet", () => {
     ).toEqual('@media (min-width:100px){[data-raisin-id="abc"]{color:red}}');
   });
 
+  it("rewrites rules nested inside @supports", () => {
+    expect(scoped("@supports (display:grid) { .a { color: red } }")).toEqual(
+      '@supports (display:grid){[data-raisin-id="abc"] .a{color:red}}'
+    );
+  });
+
+  it("leaves @keyframes selectors alone", () => {
+    expect(
+      scoped("@keyframes spin { from { opacity: 0 } to { opacity: 1 } }")
+    ).toEqual("@keyframes spin{from{opacity:0}to{opacity:1}}");
+  });
+
+  it("leaves prefixed @keyframes selectors alone", () => {
+    expect(
+      scoped(
+        "@-webkit-keyframes spin { 0% { opacity: 0 } 100% { opacity: 1 } }"
+      )
+    ).toEqual("@-webkit-keyframes spin{0%{opacity:0}100%{opacity:1}}");
+  });
+
+  it("scopes rules alongside an untouched @keyframes", () => {
+    expect(
+      scoped(
+        "@keyframes spin { from { opacity: 0 } } :host { animation: spin 1s }"
+      )
+    ).toEqual(
+      '@keyframes spin{from{opacity:0}}[data-raisin-id="abc"]{animation:spin 1s}'
+    );
+  });
+
+  it("leaves @font-face alone", () => {
+    expect(scoped("@font-face { font-family: x; src: url(y) }")).toEqual(
+      "@font-face{font-family:x;src:url(y)}"
+    );
+  });
+
   it("handles multiple rules in a stylesheet", () => {
     const css = ":host { color: red } .bar { color: blue }";
     expect(scoped(css)).toEqual(
@@ -90,6 +126,14 @@ describe("scopeStylesheet", () => {
   it("expands nested & in :host rules", () => {
     expect(scoped(":host{&:hover{color:red}}")).toEqual(
       '[data-raisin-id="abc"]:hover{color:red}'
+    );
+  });
+
+  it("expands nested & inside an at-rule", () => {
+    expect(
+      scoped("@media (min-width:1px){ ::part(x){ &:hover{color:red} } }")
+    ).toEqual(
+      '@media (min-width:1px){[data-raisin-id="abc"]::part(x):hover{color:red}}'
     );
   });
 

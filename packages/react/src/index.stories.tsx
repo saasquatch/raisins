@@ -280,31 +280,19 @@ export const TemplatesExample = () => (
   />
 );
 
-const kitchenSinkHtml = `
-<my-card label="Edit me">
-  <span slot="title">Hello world</span>
-  <p>This card exposes <code>::part(header)</code> and <code>::part(body)</code>. Click it, then edit the Style panel on the right.</p>
-</my-card>
-`;
-
-const CssEditingStoryMolecule = molecule<Partial<RaisinConfig>>(() => ({
-  HTMLAtom: atom(kitchenSinkHtml),
-  PackagesAtom: atom([{ package: '@local', version: 'next' }] as Module[]),
-  uiWidgetsAtom: atom({}),
-  LocalURLAtom: atom('http://localhost:5000'),
-}));
+const cssEditingHtml = `<my-ui-component first="Ada" last="Lovelace"></my-ui-component>`;
 
 /**
- * Demonstrates the CSS editing surfaces against the kitchen-sink `<my-card>`
- * component (annotated with `@csspart header` and `@csspart body`).
+ * Demonstrates the CSS editing surfaces against the kitchen-sink
+ * `<my-ui-component>`, which declares `@csspart greeting` and `@csspart date`.
  *
  * Requires the kitchen-sink Stencil dev server to be running:
  *   cd examples/my-kitchen-sink && npm run start:raisins
  */
 export const CssEditing = () => (
   <BasicStory
-    startingHtml={kitchenSinkHtml}
-    Molecule={CssEditingStoryMolecule}
+    startingHtml={cssEditingHtml}
+    startingPackages={LocalBedrockComponents}
   />
 );
 
