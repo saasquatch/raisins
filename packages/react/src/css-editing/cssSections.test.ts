@@ -318,9 +318,9 @@ describe('writeSection', () => {
     ).toBe(':host{color:red}::part(hdr){color:blue}');
   });
 
-  // Reading and writing both target the FIRST matching rule, while the cascade
-  // applies the last. Pinned so a change here is a decision, not an accident.
-  it('reads and writes the first of several matching rules', () => {
+  // Reading and writing both target the LAST matching rule, matching the cascade.
+  // Pinned so a change here is a decision, not an accident.
+  it('reads and writes the last of several matching rules', () => {
     const css = ':host{color:red}:host{color:blue}';
     expect(readSection(css, section, { property: 'color' })).toBe('blue');
     expect(writeSection(css, section, 'color: green').css).toBe(
