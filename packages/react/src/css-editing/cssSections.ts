@@ -80,42 +80,54 @@ export function readSectionShorthandDimension(
   const rule = findMatchingRule(ast, section);
   if (!rule) return nil;
 
-  const shorthandDecl = findDeclaration(rule, property);
+  const sides = ['top', 'right', 'bottom', 'left'] as const;
+  const properties = [
+    property,
+    `${property}-top`,
+    `${property}-right`,
+    `${property}-bottom`,
+    `${property}-left`,
+  ];
+
+  const declarations = findDeclarations(rule, properties);
   const result = { ...nil };
 
-  if (shorthandDecl) {
-    const values = (shorthandDecl.value?.children ?? []).filter(
-      (n: any) => n.type !== 'WhiteSpace'
-    );
-    const dims = values.map(nodeToDimension);
+  for (const decl of declarations) {
+    if (decl.property === property) {
+      const values = nonWhitespaceChildren(decl.value);
+      const dims = values.map(nodeToDimension);
 
-    if (dims.length === 1) {
-      result.top = result.right = result.bottom = result.left = dims[0];
-    } else if (dims.length === 2) {
-      result.top = result.bottom = dims[0];
-      result.right = result.left = dims[1];
-    } else if (dims.length === 3) {
-      result.top = dims[0];
-      result.right = result.left = dims[1];
-      result.bottom = dims[2];
-    } else if (dims.length >= 4) {
-      result.top = dims[0];
-      result.right = dims[1];
-      result.bottom = dims[2];
-      result.left = dims[3];
-    }
-  }
-
-  const sides = ['top', 'right', 'bottom', 'left'] as const;
-  for (const side of sides) {
-    const longhand = findDeclaration(rule, `${property}-${side}`);
-    if (longhand) {
-      const val = nodeToDimension(longhand.value?.children?.[0]);
+      if (dims.length === 1) {
+        result.top = result.right = result.bottom = result.left = dims[0];
+      } else if (dims.length === 2) {
+        result.top = result.bottom = dims[0];
+        result.right = result.left = dims[1];
+      } else if (dims.length === 3) {
+        result.top = dims[0];
+        result.right = result.left = dims[1];
+        result.bottom = dims[2];
+      } else if (dims.length >= 4) {
+        result.top = dims[0];
+        result.right = dims[1];
+        result.bottom = dims[2];
+        result.left = dims[3];
+      }
+    } else {
+      const side: typeof sides[number] | undefined = decl.property
+        .split('-')
+        .at(-1);
+      if (!side || !sides.includes(side)) continue;
+      const val = nodeToDimension(nonWhitespaceChildren(decl.value)[0]);
       if (val) result[side] = val;
     }
   }
-
   return result;
+}
+
+function nonWhitespaceChildren(value: any): any[] {
+  return (value?.children ?? []).filter(
+    (node: any) => node.type !== 'WhiteSpace'
+  );
 }
 
 function nodeToDimension(node: any): CssDimension | null {
@@ -235,7 +247,10 @@ export function writeSectionProperty(
 
   const matchingIndexes = block.children.reduce(
     (indexes: number[], declaration: any, index: number) => {
-      if (declaration.type === 'Declaration' && declaration.property === property) {
+      if (
+        declaration.type === 'Declaration' &&
+        declaration.property === property
+      ) {
         indexes.push(index);
       }
       return indexes;
@@ -258,7 +273,10 @@ export function writeSectionProperty(
     if (lastMatchingIndex !== undefined) {
       block.children = block.children.flatMap(
         (declaration: any, index: number) => {
-          if (declaration.type !== 'Declaration' || declaration.property !== property) {
+          if (
+            declaration.type !== 'Declaration' ||
+            declaration.property !== property
+          ) {
             return declaration;
           }
           return index === lastMatchingIndex ? freshDecl : [];
@@ -275,7 +293,7 @@ export function writeSectionProperty(
 
 function findMatchingRule(ast: any, section: SectionKey): any | undefined {
   if (!Array.isArray(ast.children)) return undefined;
-  return ast.children.find(
+  return ast.children.findLast(
     (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
   );
 }
@@ -287,7 +305,7 @@ function findMatchingRule(ast: any, section: SectionKey): any | undefined {
  * belongs to `section` alone, or -1.
  */
 function detachSection(ast: any, section: SectionKey): number {
-  const idx = ast.children.findIndex(
+  const idx = ast.children.findLastIndex(
     (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
   );
   if (idx < 0) return idx;
@@ -312,9 +330,24 @@ function detachSection(ast: any, section: SectionKey): number {
 }
 
 function findDeclaration(rule: any, property: string): any | undefined {
-  return rule.block.children.find(
-    (d: any) => d.type === 'Declaration' && d.property === property
-  );
+  return findDeclarations(rule, [property])?.at(-1);
+}
+
+function findDeclarations(rule: any, properties: string[]): any[] {
+  const asSet = new Set(properties);
+  const important = [];
+  const notImportant = [];
+
+  for (const d of rule.block.children) {
+    if (d.type === 'Declaration' && asSet.has(d.property)) {
+      if (d.important) {
+        important.push(d);
+      } else {
+        notImportant.push(d);
+      }
+    }
+  }
+  return [...notImportant, ...important];
 }
 
 function ruleMatches(rule: any, section: SectionKey): boolean {

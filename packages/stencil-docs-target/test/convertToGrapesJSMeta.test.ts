@@ -85,5 +85,11 @@ describe('convertToGrapesJSMeta', () => {
     it('is undefined when the component declares none', () => {
       expect(tagFor([]).cssProperties).toBeUndefined();
     });
+
+    it('checks that props is valid and starts with "--"', () => {
+      expect(() => tagFor([{ name: 'cssprop', text: 'brand - The brand color' }])).toThrow(
+        `Invalid @cssprop tag on component "my-component" must start with "--".`
+      );
+    });
   });
 });

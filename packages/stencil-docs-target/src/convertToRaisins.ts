@@ -110,22 +110,29 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
           : undefined;
 
         const cssPropTags = comp.docsTags.filter(t => t.name === 'cssprop');
-        const cssProperties: schema.CssCustomProperty[] | undefined =
-          cssPropTags.length
-            ? cssPropTags.map(t => {
-                const text = t.text?.trim() ?? '';
-                const [name = text, description] = splitOnFirst(text, ' - ');
-                if (!name?.trim()) {
-                  throw new Error(
-                    `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
-                  );
-                }
-                return {
-                  name: name.trim(),
-                  description: description?.trim() || undefined,
-                };
-              })
-            : undefined;
+        const cssProperties:
+          | schema.CssCustomProperty[]
+          | undefined = cssPropTags.length
+          ? cssPropTags.map(t => {
+              const text = t.text?.trim() ?? '';
+              const [name = text, description] = splitOnFirst(text, ' - ');
+              const propertyName = name?.trim();
+              if (!propertyName) {
+                throw new Error(
+                  `Invalid @cssprop tag on component "${comp.tag}" is missing a name.`
+                );
+              }
+              if (!propertyName.startsWith('--')) {
+                throw new Error(
+                  `Invalid @cssprop tag on component "${comp.tag}" must start with "--".`
+                );
+              }
+              return {
+                name: propertyName,
+                description: description?.trim() || undefined,
+              };
+            })
+          : undefined;
 
         const elem: schema.CustomElement = {
           tagName: comp.tag,

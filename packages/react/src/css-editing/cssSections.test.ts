@@ -16,7 +16,8 @@ describe('selectorOf', () => {
 });
 
 describe('readSection', () => {
-  const css = ':host { color: red; padding: 10px; } ::part(label) { color: blue; }';
+  const css =
+    ':host { color: red; padding: 10px; } ::part(label) { color: blue; }';
 
   it.each([
     [{ type: 'element' } as const, 'color', 'red'],
@@ -31,10 +32,44 @@ describe('readSection', () => {
     ['color:red', ['padding', 'margin']],
   ])('excludes managed declarations', (expected, excludedProperties) => {
     expect(
-      readSection(css, { type: 'element' }, {
-        exclude: excludedProperties.map(property => new RegExp(`^${property}$`)),
-      })
+      readSection(
+        css,
+        { type: 'element' },
+        {
+          exclude: excludedProperties.map(
+            property => new RegExp(`^${property}$`)
+          ),
+        }
+      )
     ).toBe(expected);
+  });
+
+  it('returns last matching rule', () => {
+    const css = ':host { color: red; } :host { color: blue; }';
+    expect(readSection(css, { type: 'element' }, { property: 'color' })).toBe(
+      'blue'
+    );
+  });
+
+  it('returns the last declaration if no !important is present', () => {
+    const css = ':host { color: red; color: blue; }';
+    expect(readSection(css, { type: 'element' }, { property: 'color' })).toBe(
+      'blue'
+    );
+  });
+
+  it('returns the last important declaration', () => {
+    const css = ':host { color: red !important; color: blue !important; }';
+    expect(readSection(css, { type: 'element' }, { property: 'color' })).toBe(
+      'blue'
+    );
+  });
+
+  it('returns important declarations even if there are non-important declarations after them', () => {
+    const css = ':host { color: red !important; color: blue; }';
+    expect(readSection(css, { type: 'element' }, { property: 'color' })).toBe(
+      'red'
+    );
   });
 });
 
@@ -49,16 +84,39 @@ describe('readSectionShorthandDimension', () => {
           section,
           property
         )
-      ).map(([side, value]) => [side, value ? `${value.value}${value.unit}` : null])
+      ).map(([side, value]) => [
+        side,
+        value ? `${value.value}${value.unit}` : null,
+      ])
     );
 
   it.each([
     ['padding: 8px', { top: '8px', right: '8px', bottom: '8px', left: '8px' }],
-    ['padding: 8px 12px', { top: '8px', right: '12px', bottom: '8px', left: '12px' }],
-    ['padding: 8px 12px 16px', { top: '8px', right: '12px', bottom: '16px', left: '12px' }],
-    ['padding: 8px 12px 16px 20%', { top: '8px', right: '12px', bottom: '16px', left: '20%' }],
+    [
+      'padding: 8px 12px',
+      { top: '8px', right: '12px', bottom: '8px', left: '12px' },
+    ],
+    [
+      'padding: 8px 12px 16px',
+      { top: '8px', right: '12px', bottom: '16px', left: '12px' },
+    ],
+    [
+      'padding: 8px 12px 16px 20%',
+      { top: '8px', right: '12px', bottom: '16px', left: '20%' },
+    ],
   ])('expands %s', (declarations, expected) => {
     expect(dimensionsOf(declarations)).toEqual(expected);
+  });
+
+  it('expands a hyphenated base property', () => {
+    expect(
+      dimensionsOf('border-width: 1px 2px 3px 4px', 'border-width')
+    ).toEqual({
+      top: '1px',
+      right: '2px',
+      bottom: '3px',
+      left: '4px',
+    });
   });
 
   it.each([
@@ -107,6 +165,62 @@ describe('readSectionShorthandDimension', () => {
       left: '4px',
     });
   });
+
+  it('reads the first non-whitespace longhand value', () => {
+    expect(dimensionsOf('padding-left:   4px')).toEqual({
+      ...noDimensions,
+      left: '4px',
+    });
+  });
+
+  it('preserves shorthand when it is after longhand', () => {
+    expect(dimensionsOf('padding-left: 4px; padding: 8px')).toEqual({
+      top: '8px',
+      right: '8px',
+      bottom: '8px',
+      left: '8px',
+    });
+  });
+
+  it('preserves longhands when they are present after shorthand', () => {
+    expect(dimensionsOf('padding: 8px; padding-left: 4px')).toEqual({
+      top: '8px',
+      right: '8px',
+      bottom: '8px',
+      left: '4px',
+    });
+  });
+
+  it('preserves order with mixed shorthands and longhands', () => {
+    expect(
+      dimensionsOf('padding-left: 8px; padding: 4px; padding-right: 10px')
+    ).toEqual({
+      top: '4px',
+      right: '10px',
+      bottom: '4px',
+      left: '4px',
+    });
+  });
+
+  it('preserves !important property regardless of order', () => {
+    expect(dimensionsOf('padding-left: 4px !important; padding: 8px')).toEqual({
+      top: '8px',
+      right: '8px',
+      bottom: '8px',
+      left: '4px',
+    });
+  });
+
+  it('preserves order within important properties', () => {
+    expect(
+      dimensionsOf('padding-left: 4px !important; padding: 8px !important')
+    ).toEqual({
+      top: '8px',
+      right: '8px',
+      bottom: '8px',
+      left: '8px',
+    });
+  });
 });
 
 describe('writeSection', () => {
@@ -114,36 +228,61 @@ describe('writeSection', () => {
 
   it.each([
     ['', 'color: red', 'red'],
-    [':host { color: blue; } ::part(label) { color: green; }', 'color: red', 'red'],
-  ])('writes declarations into the selected section', (css, declarations, expected) => {
-    const result = writeSection(css, section, declarations);
+    [
+      ':host { color: blue; } ::part(label) { color: green; }',
+      'color: red',
+      'red',
+    ],
+  ])(
+    'writes declarations into the selected section',
+    (css, declarations, expected) => {
+      const result = writeSection(css, section, declarations);
 
-    expect(result.conflict).toBe(false);
-    expect(readSection(result.css, section, { property: 'color' })).toBe(expected);
-  });
+      expect(result.conflict).toBe(false);
+      expect(readSection(result.css, section, { property: 'color' })).toBe(
+        expected
+      );
+    }
+  );
 
   it.each([
     [':host { color: red; }', '', [], 'color', '', false],
-    [':host { color: red; padding: 8px; }', '', [/^padding$/], 'padding', '8px', false],
+    [
+      ':host { color: red; padding: 8px; }',
+      '',
+      [/^padding$/],
+      'padding',
+      '8px',
+      false,
+    ],
     [':host { color: red; }', 'color: blue', [/^color$/], 'color', 'red', true],
-  ])('removes or preserves declarations as requested', (css, declarations, preserve, property, expected, conflict) => {
-    const result = writeSection(css, section, declarations, preserve);
+  ])(
+    'removes or preserves declarations as requested',
+    (css, declarations, preserve, property, expected, conflict) => {
+      const result = writeSection(css, section, declarations, preserve);
 
-    expect(result.conflict).toBe(conflict);
-    expect(readSection(result.css, section, { property })).toBe(expected);
-  });
+      expect(result.conflict).toBe(conflict);
+      expect(readSection(result.css, section, { property })).toBe(expected);
+    }
+  );
 
   it.each([
     [':host,.foo{color:red}', '.foo{color:red}:host{color:blue}'],
     ['.a,:host,.b{color:red}', '.a,.b{color:red}:host{color:blue}'],
-  ])('splits %s out of its grouped selector before writing', (css, expected) => {
-    expect(writeSection(css, section, 'color: blue').css).toBe(expected);
-  });
+  ])(
+    'splits %s out of its grouped selector before writing',
+    (css, expected) => {
+      expect(writeSection(css, section, 'color: blue').css).toBe(expected);
+    }
+  );
 
   it('splits a grouped ::part selector before writing', () => {
     expect(
-      writeSection('::part(x),.foo{color:red}', { type: 'part', name: 'x' }, 'color: blue')
-        .css
+      writeSection(
+        '::part(x),.foo{color:red}',
+        { type: 'part', name: 'x' },
+        'color: blue'
+      ).css
     ).toBe('.foo{color:red}::part(x){color:blue}');
   });
 
@@ -154,21 +293,28 @@ describe('writeSection', () => {
   });
 
   it('is idempotent when splitting a grouped selector', () => {
-    const once = writeSection(':host,.foo{color:red}', section, 'color:red').css;
+    const once = writeSection(':host,.foo{color:red}', section, 'color:red')
+      .css;
     expect(writeSection(once, section, 'color:red').css).toBe(once);
   });
 
   it('leaves rules inside at-rules untouched', () => {
     expect(
-      writeSection('@media (min-width:1px){:host{color:red}}', section, 'color: blue')
-        .css
+      writeSection(
+        '@media (min-width:1px){:host{color:red}}',
+        section,
+        'color: blue'
+      ).css
     ).toBe('@media (min-width:1px){:host{color:red}}:host{color:blue}');
   });
 
   it('appends a new rule for a section that has none', () => {
     expect(
-      writeSection(':host{color:red}', { type: 'part', name: 'hdr' }, 'color: blue')
-        .css
+      writeSection(
+        ':host{color:red}',
+        { type: 'part', name: 'hdr' },
+        'color: blue'
+      ).css
     ).toBe(':host{color:red}::part(hdr){color:blue}');
   });
 
@@ -176,16 +322,19 @@ describe('writeSection', () => {
   // applies the last. Pinned so a change here is a decision, not an accident.
   it('reads and writes the first of several matching rules', () => {
     const css = ':host{color:red}:host{color:blue}';
-    expect(readSection(css, section, { property: 'color' })).toBe('red');
+    expect(readSection(css, section, { property: 'color' })).toBe('blue');
     expect(writeSection(css, section, 'color: green').css).toBe(
-      ':host{color:green}:host{color:blue}'
+      ':host{color:red}:host{color:green}'
     );
   });
 
   it('refuses to escape the section via a closing brace', () => {
     expect(
-      writeSection(':host{color:red}', section, 'color:red} .other{display:none}')
-        .css
+      writeSection(
+        ':host{color:red}',
+        section,
+        'color:red} .other{display:none}'
+      ).css
     ).toBe(':host{color:red}');
   });
 
@@ -230,7 +379,9 @@ describe('writeSectionProperty', () => {
     expect(result).toContain('display:grid');
     expect(result).not.toContain('-webkit-box');
     expect(result).not.toContain('display:flex');
-    expect(result.indexOf('margin:0')).toBeLessThan(result.indexOf('display:grid'));
+    expect(result.indexOf('margin:0')).toBeLessThan(
+      result.indexOf('display:grid')
+    );
   });
 
   it('splits a grouped selector before writing a property', () => {

@@ -13,7 +13,6 @@ import { Component, Prop, h } from '@stencil/core';
  * @canvasRenderer always-replace
  * @csspart greeting - The greeting text container
  * @csspart date - The formatted date text
- * @cssprop --my-ui-component-color - Controls the greeting text color
  * @cssprop --my-ui-component-date-color - Controls the date text color
  */
 @Component({
@@ -126,7 +125,9 @@ export class MyUiComponent {
     return (
       <div part="greeting" style={{ color: this.textColor }}>
         Hello, {this.myDemoProp?.person ?? this.anonymousLabel}! I'm {this.getText()}
-        <p part="date">Your date is: {this.getDate()}</p>
+        <p part="date" style={{ color: 'var(--my-ui-component-date-color)' }}>
+          Your date is: {this.getDate()}
+        </p>
       </div>
     );
   }
