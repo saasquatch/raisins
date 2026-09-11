@@ -138,15 +138,13 @@ describe("scopeStylesheet", () => {
   });
 
   it("does not rewrite ampersands inside declaration values", () => {
-    expect(
-      scoped(':host{&::before{content:"&"}}')
-    ).toEqual('[data-raisin-id="abc"]::before{content:"&"}');
+    expect(scoped(':host{&::before{content:"&"}}')).toEqual(
+      '[data-raisin-id="abc"]::before{content:"&"}'
+    );
   });
 
   it("does not rewrite ampersands inside a url() query string", () => {
-    expect(
-      scoped(":host{&:hover{background:url(a?x=1&y=2)}}")
-    ).toEqual(
+    expect(scoped(":host{&:hover{background:url(a?x=1&y=2)}}")).toEqual(
       '[data-raisin-id="abc"]:hover{background:url(a?x=1&y=2)}'
     );
   });

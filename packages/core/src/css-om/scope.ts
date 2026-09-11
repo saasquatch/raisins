@@ -88,7 +88,10 @@ function expandNesting(rule: any): { kept: any[]; lifted: any[] } {
  * (a String, Url, etc.), so scanning tokens and only replacing standalone
  * single-character `&` tokens rewrites just the nesting selector occurrences.
  */
-function replaceNestingSelectorTokens(raw: string, selectorStr: string): string {
+function replaceNestingSelectorTokens(
+  raw: string,
+  selectorStr: string
+): string {
   const csstreeAny = csstree as any;
   const tokenStream = new csstreeAny.TokenStream();
   csstreeAny.tokenize(raw, tokenStream);
