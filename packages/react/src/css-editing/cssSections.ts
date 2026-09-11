@@ -113,9 +113,9 @@ export function readSectionShorthandDimension(
         result.left = dims[3];
       }
     } else {
-      const side: typeof sides[number] | undefined = decl.property
-        .split('-')
-        .at(-1);
+      const propertyParts = decl.property.split('-');
+      const side: typeof sides[number] | undefined =
+        propertyParts[propertyParts.length - 1];
       if (!side || !sides.includes(side)) continue;
       const val = nodeToDimension(nonWhitespaceChildren(decl.value)[0]);
       if (val) result[side] = val;
@@ -292,10 +292,17 @@ export function writeSectionProperty(
 }
 
 function findMatchingRule(ast: any, section: SectionKey): any | undefined {
-  if (!Array.isArray(ast.children)) return undefined;
-  return ast.children.findLast(
-    (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
-  );
+  const index = findMatchingRuleIndex(ast, section);
+  return index >= 0 ? ast.children[index] : undefined;
+}
+
+function findMatchingRuleIndex(ast: any, section: SectionKey): number {
+  if (!Array.isArray(ast.children)) return -1;
+  for (let index = ast.children.length - 1; index >= 0; index--) {
+    const rule = ast.children[index];
+    if (rule.type === 'Rule' && ruleMatches(rule, section)) return index;
+  }
+  return -1;
 }
 
 /**
@@ -305,9 +312,7 @@ function findMatchingRule(ast: any, section: SectionKey): any | undefined {
  * belongs to `section` alone, or -1.
  */
 function detachSection(ast: any, section: SectionKey): number {
-  const idx = ast.children.findLastIndex(
-    (rule: any) => rule.type === 'Rule' && ruleMatches(rule, section)
-  );
+  const idx = findMatchingRuleIndex(ast, section);
   if (idx < 0) return idx;
 
   const rule = ast.children[idx];
@@ -330,7 +335,8 @@ function detachSection(ast: any, section: SectionKey): number {
 }
 
 function findDeclaration(rule: any, property: string): any | undefined {
-  return findDeclarations(rule, [property])?.at(-1);
+  const declarations = findDeclarations(rule, [property]);
+  return declarations[declarations.length - 1];
 }
 
 function findDeclarations(rule: any, properties: string[]): any[] {
