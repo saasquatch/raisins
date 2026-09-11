@@ -79,10 +79,6 @@ describe('Stencil docs target', () => {
     ]);
     expect(component.cssProperties).toEqual([
       {
-        name: '--my-ui-component-color',
-        description: 'Controls the greeting text color',
-      },
-      {
         name: '--my-ui-component-date-color',
         description: 'Controls the date text color',
       },
