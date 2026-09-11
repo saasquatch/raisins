@@ -114,8 +114,9 @@ export function readSectionShorthandDimension(
       }
     } else {
       const propertyParts = decl.property.split('-');
-      const side: typeof sides[number] | undefined =
-        propertyParts[propertyParts.length - 1];
+      const side = propertyParts[propertyParts.length - 1] as
+        | typeof sides[number]
+        | undefined;
       if (!side || !sides.includes(side)) continue;
       const val = nodeToDimension(nonWhitespaceChildren(decl.value)[0]);
       if (val) result[side] = val;
