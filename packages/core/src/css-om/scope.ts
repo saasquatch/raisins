@@ -66,7 +66,7 @@ function expandNesting(rule: any): { kept: any[]; lifted: any[] } {
       typeof child.value === "string" &&
       child.value.includes("&")
     ) {
-      const expanded = child.value.replace(/&/g, selectorStr);
+      const expanded = replaceNestingSelectorTokens(child.value, selectorStr);
       const parsed: any = toPlainObject(parse(expanded));
       if (parsed.type === "StyleSheet" && Array.isArray(parsed.children)) {
         lifted.push(...parsed.children);
@@ -77,6 +77,32 @@ function expandNesting(rule: any): { kept: any[]; lifted: any[] } {
   }
 
   return { kept, lifted };
+}
+
+/**
+ * Replaces only the CSS-nesting `&` selector tokens in a raw (unparsed) rule
+ * chunk with `selectorStr`.
+ *
+ * `&` is tokenized on its own (a Delim token) only when it stands alone as a
+ * nesting selector. Anywhere else it is swallowed as part of a larger token
+ * (a String, Url, etc.), so scanning tokens and only replacing standalone
+ * single-character `&` tokens rewrites just the nesting selector occurrences.
+ */
+function replaceNestingSelectorTokens(raw: string, selectorStr: string): string {
+  const csstreeAny = csstree as any;
+  const tokenStream = new csstreeAny.TokenStream();
+  csstreeAny.tokenize(raw, tokenStream);
+
+  let result = "";
+  let cursor = 0;
+  tokenStream.forEachToken((_type: number, start: number, end: number) => {
+    if (end - start === 1 && raw.charCodeAt(start) === 38 /* '&' */) {
+      result += raw.slice(cursor, start) + selectorStr;
+      cursor = end;
+    }
+  });
+  result += raw.slice(cursor);
+  return result;
 }
 
 function serializeNode(node: any): string {
