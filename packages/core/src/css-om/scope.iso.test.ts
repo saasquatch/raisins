@@ -123,6 +123,14 @@ describe("scopeStylesheet", () => {
     );
   });
 
+  it("expands nested & by more than one level", () => {
+    expect(
+      scoped("::part(btn){&:hover{background:blue;&>span{color:red;}}}")
+    ).toEqual(
+      '[data-raisin-id="abc"]::part(btn):hover{background:blue}[data-raisin-id="abc"]::part(btn):hover>span{color:red}'
+    );
+  });
+
   it("expands nested & in :host rules", () => {
     expect(scoped(":host{&:hover{color:red}}")).toEqual(
       '[data-raisin-id="abc"]:hover{color:red}'
@@ -140,6 +148,12 @@ describe("scopeStylesheet", () => {
   it("does not rewrite ampersands inside declaration values", () => {
     expect(scoped(':host{&::before{content:"&"}}')).toEqual(
       '[data-raisin-id="abc"]::before{content:"&"}'
+    );
+  });
+
+  it("does not rewrite ampersands in custom property values", () => {
+    expect(scoped(":host{--value:&}")).toEqual(
+      '[data-raisin-id="abc"]{--value:&}'
     );
   });
 
