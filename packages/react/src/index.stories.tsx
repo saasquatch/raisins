@@ -25,6 +25,8 @@ import { CoreMolecule, SelectedNodeMolecule } from './core';
 import { HistoryMolecule } from './core/editting/HistoryAtoms';
 import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
 import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
+import { DocumentCssEditor } from './css-editing/DocumentCssMolecule';
+import { StylePanel } from './css-editing/StyleMolecule';
 import {
   big,
   LocalBedrockComponents,
@@ -278,6 +280,22 @@ export const TemplatesExample = () => (
   />
 );
 
+const cssEditingHtml = `<my-ui-component first="Ada" last="Lovelace"></my-ui-component>`;
+
+/**
+ * Demonstrates the CSS editing surfaces against the kitchen-sink
+ * `<my-ui-component>`, which declares `@csspart greeting` and `@csspart date`.
+ *
+ * Requires the kitchen-sink Stencil dev server to be running:
+ *   cd examples/my-kitchen-sink && npm run start:raisins
+ */
+export const CssEditing = () => (
+  <BasicStory
+    startingHtml={cssEditingHtml}
+    startingPackages={LocalBedrockComponents}
+  />
+);
+
 const ToolbarMolecule = molecule(getMol => {
   return {
     ...getMol(HoveredNodeMolecule),
@@ -366,6 +384,10 @@ export function EditorView() {
 
         <div style={Edits}>
           <PackageEditor />
+          <hr />
+          <StylePanel />
+          <hr />
+          <DocumentCssEditor />
         </div>
       </div>
     </>

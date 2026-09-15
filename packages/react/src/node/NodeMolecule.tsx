@@ -1,7 +1,7 @@
 import { getSubErrors, RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
-import { atom, PrimitiveAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
+import { atom, PrimitiveAtom } from 'jotai';
 import { SelectionBookmark } from 'prosemirror-state';
 import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
 import { CoreMolecule } from '../core/CoreAtoms';
@@ -40,21 +40,25 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     SelectedNodeMolecule
   );
   const { DuplicateNodeAtom, RemoveNodeAtom } = getMol(EditMolecule);
-  const { ComponentMetaAtom, ComponentModelAtom } = getMol(
-    ComponentModelMolecule
+  const {
+    ComponentMetaAtom,
+    ComponentModelAtom,
+    GetComponentPackageAtom,
+  } = getMol(ComponentModelMolecule);
+  const { JsonPointersAtom, rerenderNodeAtom, ParseErrorsAtom } = getMol(
+    CoreMolecule
   );
-  const { JsonPointersAtom, rerenderNodeAtom, ParseErrorsAtom } = getMol(CoreMolecule);
 
   const { GetSoulAtom } = getMol(SoulsMolecule);
 
   const ValidationAtoms = getMol(ValidationMolecule);
 
-  const jsonPointerAtom = atom((get) => {
+  const jsonPointerAtom = atom(get => {
     const node = get(n);
     const map = get(JsonPointersAtom);
     return map.get(node)!;
   });
-  const errorsAtom = atom((get) => {
+  const errorsAtom = atom(get => {
     const jsonPointer = get(jsonPointerAtom);
     const validation = get(ValidationAtoms.errorsAtom);
     const parseErrors = get(ParseErrorsAtom);
@@ -63,30 +67,30 @@ export const NodeMolecule = molecule((getMol, getScope) => {
       ...getSubErrors(parseErrors, jsonPointer),
     ];
   });
-  const childrenErrorsAtom = atom((get) => {
+  const childrenErrorsAtom = atom(get => {
     const jsonPointer = get(jsonPointerAtom);
     const validation = get(ValidationAtoms.errorsAtom);
     return getSubErrors(validation, jsonPointer + '/children');
   });
-  const attributeErrorsAtom = atom((get) => {
+  const attributeErrorsAtom = atom(get => {
     const jsonPointer = get(jsonPointerAtom);
     const validation = get(ValidationAtoms.errorsAtom);
     return getSubErrors(validation, jsonPointer + '/attribs');
   });
-  const styleErrorsAtom = atom((get) => {
+  const styleErrorsAtom = atom(get => {
     const jsonPointer = get(jsonPointerAtom);
     const parseErrors = get(ParseErrorsAtom);
     return getSubErrors(parseErrors, jsonPointer + '/style');
   });
 
-  const hasErrors = atom((get) => get(errorsAtom).length > 0);
+  const hasErrors = atom(get => get(errorsAtom).length > 0);
 
   /**
    * Is the node in context currently selected?
    */
-  const isSelectedForNode = atom((get) => get(SelectedNodeAtom) === get(n));
+  const isSelectedForNode = atom(get => get(SelectedNodeAtom) === get(n));
 
-  const nodeSoul = atom((get) => {
+  const nodeSoul = atom(get => {
     const node = get(n);
     const getSoul = get(GetSoulAtom);
     const soul = getSoul(node);
@@ -94,7 +98,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   });
 
   const nodeHovered = atom(
-    (get) => get(HoveredNodeAtom) === get(n),
+    get => get(HoveredNodeAtom) === get(n),
     (get, set) => {
       const node = get(n);
       const getSoul = get(GetSoulAtom);
@@ -103,7 +107,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     }
   );
 
-  const isNodePicked = atom((get) => get(PickedNodeAtom) === get(n));
+  const isNodePicked = atom(get => get(PickedNodeAtom) === get(n));
 
   const togglePickNode = atom(null, (get, set) => {
     const node = get(n);
@@ -115,7 +119,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     }
   });
 
-  const canPlopHereAtom = atom((get) => {
+  const canPlopHereAtom = atom(get => {
     const node = get(n);
     if (!node || !isElementNode(node)) return () => false;
     // Plop candidate is whatever is being placed: dragged (DnD) or picked.
@@ -153,7 +157,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   /**
    * Gets details on the type of node
    */
-  const isNodeAnElement = atom((get) => isElementNode(get(n)));
+  const isNodeAnElement = atom(get => isElementNode(get(n)));
 
   /**
    * Attributes for node
@@ -163,7 +167,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   /**
    * Gets component meta for the node in context
    */
-  const componentMetaForNode = atom((get) => {
+  const componentMetaForNode = atom(get => {
     const comp = get(ComponentModelAtom);
     const tagName = get(tagNameAtom);
     if (!tagName) return undefined;
@@ -172,23 +176,23 @@ export const NodeMolecule = molecule((getMol, getScope) => {
 
   const tagNameAtom = atomForTagName(n);
 
-  const childSlotsAtom = atom((get) => {
+  const childSlotsAtom = atom(get => {
     // FIXME: This is updated too frequently, causing a new referentially unequal array and a rerender
     // return focusAtom(n, (o) => optic_().path('children.attribs.slot'));
     const children = get(atomForChildren(n));
 
-    const childSlots = children.map((child) => {
+    const childSlots = children.map(child => {
       const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
       return slotName;
     });
     return childSlots;
   });
 
-  const allSlotsForNode = atom((get) => {
+  const allSlotsForNode = atom(get => {
     const meta = get(componentMetaForNode);
     const childSlots = get(childSlotsAtom);
 
-    const definedSlots = meta?.slots?.map((s) => s.name) ?? [];
+    const definedSlots = meta?.slots?.map(s => s.name) ?? [];
 
     const allSlots = [...definedSlots, ...childSlots];
     const dedupedSet = Array.from(new Set<string>(allSlots));
@@ -198,11 +202,11 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   /**
    * Gets slots for the node in context
    */
-  const slotsForNode = atom((get) => {
+  const slotsForNode = atom(get => {
     const meta = get(componentMetaForNode);
     const allSlots = get(allSlotsForNode);
-    const allSlotsWithMeta = allSlots.map((k) => {
-      const slot: Slot = meta?.slots?.find((s) => s.name === k) ?? { name: k };
+    const allSlotsWithMeta = allSlots.map(k => {
+      const slot: Slot = meta?.slots?.find(s => s.name === k) ?? { name: k };
       return slot;
     });
     // TODO: Filter slots so they don't show text nodes?
@@ -231,7 +235,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   /**
    * Gets the human readable name for the next in context
    */
-  const nameForNode = atom((get) => {
+  const nameForNode = atom(get => {
     const tagName = get(atomForTagName(n));
     const getComponentMeta = get(ComponentMetaAtom);
     if (!tagName) return '';
@@ -240,12 +244,22 @@ export const NodeMolecule = molecule((getMol, getScope) => {
   });
 
   const bookmarkForNode: PrimitiveAtom<SelectionBookmark | undefined> = atom(
-    (get) => get(SelectedBookmark),
+    get => get(SelectedBookmark),
     (get, set, next) => {
       set(SelectedNodeAtom, get(n));
       set(SelectedBookmark, next);
     }
   );
+
+  /**
+   * Gets the NPM package that owns the node in context
+   */
+  const nodePackageAtom = atom(get => {
+    const tagName = get(tagNameAtom);
+    if (!tagName) return undefined;
+    const getComponentPackage = get(GetComponentPackageAtom);
+    return getComponentPackage(tagName);
+  });
 
   return {
     /*
@@ -268,6 +282,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     nameForNode,
     componentMetaForNode,
     tagNameAtom,
+    nodePackageAtom,
 
     /*
     Selection

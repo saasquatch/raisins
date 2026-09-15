@@ -103,6 +103,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
 
       if (picked.type === 'block') {
         // Clone before setting slot — block content is shared metamodel config.
+        // data-raisin-id is assigned lazily by SetInstanceCssAtom on first custom style, so the clone doesn't need one yet.
         const cloneOfPickedNode = clone(
           picked.block.content
         ) as RaisinElementNode;

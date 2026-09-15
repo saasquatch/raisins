@@ -22,6 +22,14 @@
 | `undocumentedField` | `undocumented-field` | A hidden field for internal use only                   | `number`              | `undefined` |
 
 
+## Shadow Parts
+
+| Part         | Description |
+| ------------ | ----------- |
+| `"date"`     |             |
+| `"greeting"` |             |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*
