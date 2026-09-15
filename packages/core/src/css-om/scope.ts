@@ -18,7 +18,7 @@ import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
  */
 export function scopeStylesheet(
   stylesheet: CssNodePlain,
-  scope: string,
+  scope: string
 ): CssNodePlain {
   const clone = JSON.parse(JSON.stringify(stylesheet));
   processChildren(clone, scope);
@@ -80,7 +80,7 @@ function expandRule(rule: CssNodePlain): CssNodePlain[] {
 }
 
 function expandNesting(
-  rule: RuleNode,
+  rule: RuleNode
 ): {
   kept: CssNodePlain[];
   lifted: CssNodePlain[];
@@ -126,7 +126,7 @@ function expandNesting(
  */
 function replaceNestingSelectorTokens(
   raw: string,
-  selectorStr: string,
+  selectorStr: string
 ): string {
   const csstreeAny = csstree as any;
   const tokenStream = new csstreeAny.TokenStream();
@@ -151,7 +151,7 @@ function replaceNestingSelectorTokens(
 
 function serializeNode(node: any): string {
   return csstree.generate(
-    csstree.fromPlainObject(JSON.parse(JSON.stringify(node))),
+    csstree.fromPlainObject(JSON.parse(JSON.stringify(node)))
   );
 }
 
@@ -160,7 +160,7 @@ function scopeRule(rule: any, scope: string): void {
   if (!prelude || prelude.type !== "SelectorList") return;
   if (!Array.isArray(prelude.children)) return;
   prelude.children = prelude.children.map((sel: any) =>
-    scopeSelector(sel, scope),
+    scopeSelector(sel, scope)
   );
 }
 
@@ -188,7 +188,7 @@ function scopeSelector(selector: any, scope: string): any {
 
   return {
     ...selector,
-    children: [attr, descendantCombinator(), ...children],
+    children: [attr, descendantCombinator(), ...children]
   };
 }
 
@@ -203,7 +203,7 @@ function extractHostInner(host: any): any[] {
   const innerText = inner[0]?.value;
   if (typeof innerText !== "string" || innerText.length === 0) return [];
   const parsedSelector: any = toPlainObject(
-    parse(innerText, { context: "selector" }),
+    parse(innerText, { context: "selector" })
   );
   if (
     parsedSelector.type !== "Selector" ||
@@ -220,7 +220,7 @@ function buildAttributeSelector(scope: string): any {
     name: { type: "Identifier", name: "data-raisin-id" },
     matcher: "=",
     value: { type: "String", value: `"${scope}"` },
-    flags: null,
+    flags: null
   };
 }
 
