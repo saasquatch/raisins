@@ -66,9 +66,10 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       }
 
       // Selects entire text block within prose on initial click.
-      // guarded when doc is unchanged so keystrokes don't trigger it
-      // (which caused reversed/deleted characters).
+      // Restricted to pointer-originated, doc-unchanged transactions so
+      // typing and arrow-key navigation don't trigger it.
       if (
+        trans.getMeta('pointer') === true &&
         nextState.state.doc === currentState.doc &&
         currentState.selection.$anchor.pos === 0 &&
         currentState.selection.$head.pos === 0
