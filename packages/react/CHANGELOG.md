@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1
+
+### Patch Changes
+
+- [#42](https://github.com/saasquatch/raisins/pull/42) [`57c9b2a`](https://github.com/saasquatch/raisins/commit/57c9b2a67e911ea7e2bbf9fba683e80d63809047) Thanks [@AndiLuo](https://github.com/AndiLuo)! - Fix ProseEditor selecting all text upon second keystroke
+
 ## 1.6.0
 
 ### Minor Changes
