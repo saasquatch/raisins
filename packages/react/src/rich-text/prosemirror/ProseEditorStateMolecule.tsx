@@ -65,18 +65,20 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
         set(get(scope).node, nextRaisinNode);
       }
 
-      const state = nextState.state;
-// selects entire text block within prose on initial click
+      // Selects entire text block within prose on initial click.
+      // guarded when doc is unchanged so keystrokes don't trigger it
+      // (which caused reversed/deleted characters).
       if (
+        nextState.state.doc === currentState.doc &&
         currentState.selection.$anchor.pos === 0 &&
         currentState.selection.$head.pos === 0
       ) {
         set(
           get(scope).selection,
           TextSelection.create(
-            state.doc,
+            nextState.state.doc,
             0,
-            state.doc.content.size
+            nextState.state.doc.content.size
           ).getBookmark()
         );
         return;
