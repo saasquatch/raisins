@@ -65,18 +65,21 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
         set(get(scope).node, nextRaisinNode);
       }
 
-      const state = nextState.state;
-// selects entire text block within prose on initial click
+      // Selects entire text block within prose on initial click.
+      // Restricted to pointer-originated, doc-unchanged transactions so
+      // typing and arrow-key navigation don't trigger it.
       if (
+        trans.getMeta('pointer') === true &&
+        nextState.state.doc === currentState.doc &&
         currentState.selection.$anchor.pos === 0 &&
         currentState.selection.$head.pos === 0
       ) {
         set(
           get(scope).selection,
           TextSelection.create(
-            state.doc,
+            nextState.state.doc,
             0,
-            state.doc.content.size
+            nextState.state.doc.content.size
           ).getBookmark()
         );
         return;
