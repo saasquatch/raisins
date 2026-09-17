@@ -64,7 +64,12 @@ function collectElementsWithInstanceCss(
     onElement(el) {
       const css = el.attribs[RAISIN_CSS_ATTR];
       const id = el.attribs[RAISIN_ID_ATTR];
-      if (typeof css === 'string' && css.length > 0 && typeof id === 'string') {
+      if (
+        typeof css === 'string' &&
+        css.length > 0 &&
+        typeof id === 'string' &&
+        id.length > 0
+      ) {
         collected.push({ id, css });
       }
       return el;

@@ -106,7 +106,7 @@ export function readSectionShorthandDimension(
         result.top = dims[0];
         result.right = result.left = dims[1];
         result.bottom = dims[2];
-      } else if (dims.length >= 4) {
+      } else if (dims.length === 4) {
         result.top = dims[0];
         result.right = dims[1];
         result.bottom = dims[2];
@@ -135,8 +135,11 @@ function nodeToDimension(node: any): CssDimension | null {
   if (!node) return null;
   if (node.type === 'Dimension') return { value: node.value, unit: node.unit };
   if (node.type === 'Percentage') return { value: node.value, unit: '%' };
-  // Unitless lengths (`padding: 0`) parse as Number, not Dimension.
-  if (node.type === 'Number') return { value: node.value, unit: '' };
+  // Only unitless zero is a valid CSS length; other numeric values are
+  // invalid lengths and should not be treated as shorthand dimensions.
+  if (node.type === 'Number' && node.value === '0') {
+    return { value: node.value, unit: '' };
+  }
   return null;
 }
 
