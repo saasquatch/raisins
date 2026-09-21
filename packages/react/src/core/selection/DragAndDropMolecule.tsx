@@ -152,6 +152,7 @@ export const DragAndDropMolecule = molecule(getMol => {
 
       if (dragged.type === 'block') {
         // Clone before setting slot — block content is shared metamodel config.
+        // data-raisin-id is assigned lazily by SetInstanceCssAtom on first custom style, so the clone doesn't need one yet.
         const cloneOfDraggedNode = clone(
           dragged.block.content
         ) as RaisinElementNode;
