@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0
+
+### Minor Changes
+
+- [#35](https://github.com/saasquatch/raisins/pull/35) [`ba862bb`](https://github.com/saasquatch/raisins/commit/ba862bbe2257ab5032e4c81a7bafeca5200a0e92) Thanks [@Locrian24](https://github.com/Locrian24)! - @raisins/schema: Add CustomElement.cssParts field and the CssPart type so components can declare the ::part(name) surfaces they expose for styling.
+
+  @raisins/stencil-docs-target: Emit cssParts and cssProperties from Stencil's @csspart / @cssprop JSDoc tags when converting component docs.
+
+  @raisins/core: Add scopeStylesheet(), which rewrites :host, :host(<sel>), ::part(name), bare selectors a stylesheet applies only to a scoped element. Also add an optional cloneNode argument to htmlUtil.duplicate() so callers can customize cloned nodes (e.g., assign new ids).
+
+  @raisins/react: Add CssEditingMolecule, StyleMolecule + StylePanel (per-:host and per-::part section editors), and DocumentCssMolecule + DocumentCssEditor for page-wide CSS.
+
 ## 1.3.0
 
 ### Minor Changes
