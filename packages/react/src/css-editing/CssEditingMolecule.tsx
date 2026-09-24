@@ -1,6 +1,7 @@
 import {
   cssParser,
   cssSerializer,
+  htmlSerializer,
   htmlUtil,
   RaisinElementNode,
   RaisinNode,
@@ -17,6 +18,7 @@ import {
   RAISIN_CSS_ATTR,
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_ID_ATTR,
+  RAISIN_MANAGED_CSS_ATTR,
 } from './RaisinCssIds';
 import { RaisinIdsMolecule } from './RaisinIdsMolecule';
 
@@ -26,24 +28,23 @@ import { RaisinIdsMolecule } from './RaisinIdsMolecule';
  */
 export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
 
-const { visit } = htmlUtil;
-
+const { visit, remove } = htmlUtil;
 
 function isElement(n: RaisinNode): n is RaisinElementNode {
   return n.type === 'tag';
 }
 
 /**
- * Finds the `<style>` node holding document-wide CSS, identified by
- * {@link RAISIN_DOCUMENT_CSS_ATTR}.
+ * Finds the first `<style>` node with the specified marker attribute.
  */
-function findDocumentCssNode(root: RaisinNode): RaisinStyleNode | undefined {
+function findStyleNode(
+  root: RaisinNode,
+  marker: string
+): RaisinStyleNode | undefined {
   let found: RaisinStyleNode | undefined;
   visit<undefined>(root, {
     onStyle(style) {
-      if (style.attribs[RAISIN_DOCUMENT_CSS_ATTR]) {
-        found = style;
-      }
+      if (!found && style.attribs[marker]) found = style;
       return undefined;
     },
     onElement(_) {
@@ -54,6 +55,19 @@ function findDocumentCssNode(root: RaisinNode): RaisinStyleNode | undefined {
     },
   });
   return found;
+}
+
+/**
+ * Returns `root` without any `<style>` node carrying the marker attribute.
+ */
+function withoutStyleNodes(root: RaisinNode, marker: string): RaisinNode {
+  let next = root;
+  let found = findStyleNode(next, marker);
+  while (found) {
+    next = remove(next, found);
+    found = findStyleNode(next, marker);
+  }
+  return next;
 }
 
 function collectElementsWithInstanceCss(
@@ -93,8 +107,8 @@ export type CssEditingMoleculeType = {
   /**
    * The full CSS the canvas should render: page-wide CSS followed by all
    * per-instance CSS, each scoped to the relevant `data-raisin-id`. The
-   * `<style data-raisin-document-css>` node itself is suppressed from canvas
-   * rendering (see `raisinToSnabdom`) so it isn't applied twice.
+   * persisted style nodes themselves are suppressed from canvas rendering (see
+   * `raisinToSnabdom`) so they aren't applied twice.
    */
   ManagedStyleSheetAtom: Atom<string>;
 
@@ -112,6 +126,15 @@ export type CssEditingMoleculeType = {
     [{ node: RaisinElementNode; css: string }],
     void
   >;
+
+  /**
+   * The HTML to save or export: the document with per-instance CSS appended as
+   * a `<style data-raisin-managed-css>` node. Per-instance CSS lives on
+   * `data-raisin-css` attributes, so that node is a projection rather than
+   * document state — read this instead of `HTMLAtom` anywhere HTML leaves the
+   * editor.
+   */
+  PersistedHtmlAtom: Atom<string>;
 };
 
 export const CssEditingMolecule = molecule(
@@ -128,7 +151,7 @@ export const CssEditingMolecule = molecule(
 
     const DocumentCssAtom = atom(
       get => {
-        const node = findDocumentCssNode(get(RootNodeAtom));
+        const node = findStyleNode(get(RootNodeAtom), RAISIN_DOCUMENT_CSS_ATTR);
         if (!node?.contents) return '';
         try {
           return cssSerializer(node.contents);
@@ -138,7 +161,7 @@ export const CssEditingMolecule = molecule(
       },
       (get, set, next: string) => {
         const root = get(RootNodeAtom);
-        const existing = findDocumentCssNode(root);
+        const existing = findStyleNode(root, RAISIN_DOCUMENT_CSS_ATTR);
 
         if (next.length === 0) {
           if (existing) set(RemoveNodeAtom, existing);
@@ -164,19 +187,19 @@ export const CssEditingMolecule = molecule(
             attribs: { [RAISIN_DOCUMENT_CSS_ATTR]: 'true' },
             contents,
           };
+          const rootWithChildren = root as RaisinNodeWithChildren;
           set(InsertNodeAtom, {
             node: styleNode,
-            parent: root as RaisinNodeWithChildren,
-            idx: (root as RaisinNodeWithChildren).children.length,
+            parent: rootWithChildren,
+            idx: rootWithChildren.children.length,
           });
         }
       }
     );
     DocumentCssAtom.debugLabel = 'DocumentCssAtom';
 
-    const ManagedStyleSheetAtom = atom(get => {
+    const InstanceStyleSheetAtom = atom(get => {
       const root = get(RootNodeAtom);
-      const documentCss = get(DocumentCssAtom);
       const instances = collectElementsWithInstanceCss(root);
 
       // Every document edit recomputes this, so re-scoping the untouched
@@ -202,9 +225,40 @@ export const CssEditingMolecule = molecule(
         .filter(part => part.length > 0);
       scopedCssCache = nextCache;
 
-      return [documentCss, ...scopedParts].filter(s => s.length > 0).join('\n');
+      return scopedParts.join('\n');
+    });
+
+    const ManagedStyleSheetAtom = atom(get => {
+      const documentCss = get(DocumentCssAtom);
+      const instanceCss = get(InstanceStyleSheetAtom);
+
+      return [documentCss, instanceCss].filter(s => s.length > 0).join('\n');
     });
     ManagedStyleSheetAtom.debugLabel = 'ManagedStyleSheetAtom';
+
+    const PersistedHtmlAtom = atom(get => {
+      const instanceCss = get(InstanceStyleSheetAtom);
+      // Re-serializing a document that was loaded from persisted html would
+      // otherwise stack a second copy of the managed node on every save.
+      const root = withoutStyleNodes(
+        get(RootNodeAtom),
+        RAISIN_MANAGED_CSS_ATTR
+      );
+      if (instanceCss.length === 0) return htmlSerializer(root);
+
+      const styleNode: RaisinStyleNode = {
+        type: 'style',
+        tagName: 'style',
+        attribs: { [RAISIN_MANAGED_CSS_ATTR]: 'true' },
+        contents: cssParser(instanceCss),
+      };
+      const rootWithChildren = root as RaisinNodeWithChildren;
+      return htmlSerializer({
+        ...rootWithChildren,
+        children: [...rootWithChildren.children, styleNode],
+      });
+    });
+    PersistedHtmlAtom.debugLabel = 'PersistedHtmlAtom';
 
     const GetInstanceCssAtom = atom(() => {
       return (node: RaisinElementNode): string => {
@@ -249,6 +303,7 @@ export const CssEditingMolecule = molecule(
       ManagedStyleSheetAtom,
       GetInstanceCssAtom,
       SetInstanceCssAtom,
+      PersistedHtmlAtom,
     };
   }
 );

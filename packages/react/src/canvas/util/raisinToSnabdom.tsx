@@ -7,7 +7,10 @@ import {
 } from '@raisins/core';
 import { h, VNode, VNodeData, fragment } from 'snabbdom';
 import styleToObject from 'style-to-object';
-import { RAISIN_DOCUMENT_CSS_ATTR } from '../../css-editing/RaisinCssIds';
+import {
+  RAISIN_DOCUMENT_CSS_ATTR,
+  RAISIN_MANAGED_CSS_ATTR,
+} from '../../css-editing/RaisinCssIds';
 import { RootRenderer } from '../types';
 const { visit } = htmlUtil;
 
@@ -65,6 +68,8 @@ export function raisinToSnabbdom(
       // Rendered via the managed stylesheet instead, to avoid applying it twice.
       if (el.attribs[RAISIN_DOCUMENT_CSS_ATTR]) {
         return h('!', 'raisin-document-css');
+      } else if (el.attribs[RAISIN_MANAGED_CSS_ATTR]) {
+        return h('!', 'raisin-managed-css');
       }
       return h(
         'style',
