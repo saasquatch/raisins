@@ -292,7 +292,7 @@ describe('PersistStyleSheetAtom', () => {
     expect(result.current.html).not.toContain(RAISIN_MANAGED_CSS_ATTR);
   });
 
-  it('persists managed css alongside document css', () => {
+  it('persists document css and scoped instance css in one stylesheet', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() => result.current.setDocumentCss('body { margin: 0 }'));
@@ -309,12 +309,11 @@ describe('PersistStyleSheetAtom', () => {
     expect(result.current.html).toContain('body{margin:0}');
     expect(result.current.html).toContain('[data-raisin-id=');
     expect(result.current.html).toContain('{color:blue}');
-    expect(result.current.managedCss).not.toContain('body{margin:0}');
   });
 });
 
 describe('ManagedStyleSheetAtom', () => {
-  it('contains only scoped instance css', () => {
+  it('puts document css before scoped instance css', () => {
     const { result } = renderCssEditing('<div></div>');
     act(() => result.current.setDocumentCss('div { color: red }'));
     act(() =>
@@ -326,7 +325,7 @@ describe('ManagedStyleSheetAtom', () => {
 
     const id = findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR];
     expect(result.current.managedCss).toBe(
-      `[data-raisin-id="${id}"]{color:blue}`
+      `div{color:red}\n[data-raisin-id="${id}"]{color:blue}`
     );
   });
 

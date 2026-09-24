@@ -181,7 +181,7 @@ export const CssEditingMolecule = molecule(
     );
     DocumentCssAtom.debugLabel = 'DocumentCssAtom';
 
-    const ManagedStyleSheetAtom = atom(get => {
+    const InstanceStyleSheetAtom = atom(get => {
       const root = get(RootNodeAtom);
       const instances = collectElementsWithInstanceCss(root);
 
@@ -208,13 +208,20 @@ export const CssEditingMolecule = molecule(
         .filter(part => part.length > 0);
       scopedCssCache = nextCache;
 
-      return [...scopedParts].filter(s => s.length > 0).join('\n');
+      return scopedParts.join('\n');
+    });
+
+    const ManagedStyleSheetAtom = atom(get => {
+      const documentCss = get(DocumentCssAtom);
+      const instanceCss = get(InstanceStyleSheetAtom);
+
+      return [documentCss, instanceCss].filter(s => s.length > 0).join('\n');
     });
     ManagedStyleSheetAtom.debugLabel = 'ManagedStyleSheetAtom';
 
     const PersistStyleSheetAtom = atom(null, (get, set) => {
       const root = get(RootNodeAtom);
-      const raisinsManagedStyle = get(ManagedStyleSheetAtom);
+      const raisinsManagedStyle = get(InstanceStyleSheetAtom);
       const existing = findStyleNode(root, RAISIN_MANAGED_CSS_ATTR);
 
       if (raisinsManagedStyle.length === 0) {
