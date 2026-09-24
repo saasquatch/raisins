@@ -310,6 +310,29 @@ describe('PersistStyleSheetAtom', () => {
     expect(result.current.html).toContain('[data-raisin-id=');
     expect(result.current.html).toContain('{color:blue}');
   });
+
+  it('inserts document css before a managed stylesheet persisted first', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+
+    const documentCssIndex = result.current.html.indexOf(
+      RAISIN_DOCUMENT_CSS_ATTR
+    );
+    const managedCssIndex = result.current.html.indexOf(
+      RAISIN_MANAGED_CSS_ATTR
+    );
+
+    expect(documentCssIndex).toBeGreaterThanOrEqual(0);
+    expect(managedCssIndex).toBeGreaterThan(documentCssIndex);
+  });
 });
 
 describe('ManagedStyleSheetAtom', () => {

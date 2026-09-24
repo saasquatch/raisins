@@ -171,10 +171,18 @@ export const CssEditingMolecule = molecule(
             attribs: { [RAISIN_DOCUMENT_CSS_ATTR]: 'true' },
             contents,
           };
+          const managed = findStyleNode(root, RAISIN_MANAGED_CSS_ATTR);
+          const rootWithChildren = root as RaisinNodeWithChildren;
+          const managedIndex = managed
+            ? rootWithChildren.children.indexOf(managed)
+            : -1;
           set(InsertNodeAtom, {
             node: styleNode,
-            parent: root as RaisinNodeWithChildren,
-            idx: (root as RaisinNodeWithChildren).children.length,
+            parent: rootWithChildren,
+            idx:
+              managedIndex >= 0
+                ? managedIndex
+                : rootWithChildren.children.length,
           });
         }
       }
