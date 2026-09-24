@@ -1,4 +1,4 @@
-import { RaisinElementNode, RaisinNode } from '@raisins/core';
+import { parseWithErrors, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { act, renderHook } from '@testing-library/react';
 import { molecule, useMolecule } from 'bunshi/react';
 import expect from 'expect';
@@ -245,6 +245,26 @@ describe('PersistStyleSheetAtom', () => {
     );
     expect(result.current.html).toContain('[data-raisin-id=');
     expect(result.current.html).toContain('{color:red}');
+  });
+
+  it('escapes raw-text closing sequences in persisted instance css', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{content:"</style><script>alert(1)</script>"}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    const managedStyle = result.current.html.match(
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+    )?.[1];
+
+    expect(managedStyle).toContain('<\\/style>');
+    expect(managedStyle).not.toContain('</style><script>');
+    expect(parseWithErrors(result.current.html).node.children).toHaveLength(2);
   });
 
   it('replaces the persisted stylesheet when the derived css changes', () => {

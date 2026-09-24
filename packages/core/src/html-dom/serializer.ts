@@ -13,6 +13,10 @@ import type {
 } from "./RaisinNode";
 import { getParents, visit } from "./util";
 
+function escapeStyleRawText(css: string): string {
+  return css.replace(/<\/style/gi, "<\\/style");
+}
+
 /**
  *
  *  Forked from: https://github.com/cheeriojs/dom-serializer
@@ -156,7 +160,9 @@ function renderNode(
       return children?.join("");
     },
     onStyle(n) {
-      const cssContents = n.contents ? cssSerializer(n.contents) : "";
+      const cssContents = n.contents
+        ? escapeStyleRawText(cssSerializer(n.contents))
+        : "";
       const attribs = formatAttributes(n.attribs, options);
       return `<style${attribs ? " " + attribs : ""}>${cssContents}</style>`;
     },

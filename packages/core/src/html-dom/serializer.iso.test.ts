@@ -1,7 +1,8 @@
+import cssParser from "../css-om/parser";
 import { ElementType } from "domelementtype";
 import expect from "expect";
 import parse from "./parser";
-import { RaisinElementNode } from "./RaisinNode";
+import { RaisinElementNode, RaisinStyleNode } from "./RaisinNode";
 import serializer from "./serializer";
 
 describe("Boolean attributes", () => {
@@ -131,5 +132,20 @@ describe("Attribute escaping", () => {
         throw new Error(`${char} (charcode ${charCode}) is being escaped`);
       }
     }
+  });
+});
+
+describe("Style raw-text escaping", () => {
+  it("escapes style closing sequences without escaping other css", () => {
+    const node: RaisinStyleNode = {
+      type: "style",
+      tagName: "style",
+      attribs: {},
+      contents: cssParser('.x{content:"</style><script>"}')
+    };
+
+    expect(serializer(node)).toBe(
+      '<style>.x{content:"<\\/style><script>"}</style>'
+    );
   });
 });
