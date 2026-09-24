@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1
+
+### Patch Changes
+
+- [#45](https://github.com/saasquatch/raisins/pull/45) [`0167164`](https://github.com/saasquatch/raisins/commit/0167164563a9045e7e116b109123d4dc61f0d0f1) Thanks [@00salmon](https://github.com/00salmon)! - fix missing export
+
 ## 1.7.0
 
 ### Minor Changes
