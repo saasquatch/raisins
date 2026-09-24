@@ -34,8 +34,7 @@ function isElement(n: RaisinNode): n is RaisinElementNode {
 }
 
 /**
- * Finds the `<style>` node holding document-wide CSS, identified by
- * {@link RAISIN_DOCUMENT_CSS_ATTR}.
+ * Finds the `<style>` node with the specified marker attribute.
  */
 function findStyleNode(
   root: RaisinNode,
