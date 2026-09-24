@@ -13,6 +13,15 @@ import type {
 } from "./RaisinNode";
 import { getParents, visit } from "./util";
 
+/**
+ * `\/` is a valid CSS escape for `/`, so this is safe anywhere `</style` can
+ * legally appear in CSS (strings, `url()`) and is idempotent.
+ *
+ * Only `<style>` is handled: CSS reaches the serializer from a CSS-only editor,
+ * so escaping HTML structure is a privilege boundary. The other members of
+ * `unencodedElements` are authored as HTML, and `<noscript>`/`<xmp>` have no
+ * escape sequence at all — they need rejection, not escaping.
+ */
 function escapeStyleRawText(css: string): string {
   return css.replace(/<\/style/gi, "<\\/style");
 }

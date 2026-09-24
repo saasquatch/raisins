@@ -31,7 +31,7 @@ function useCssEditing() {
     ManagedStyleSheetAtom,
     GetInstanceCssAtom,
     SetInstanceCssAtom,
-    PersistStyleSheetAtom,
+    PersistedHtmlAtom,
   } = useMolecule(CssEditingMolecule);
 
   const [documentCss, setDocumentCss] = useAtom(DocumentCssAtom);
@@ -41,7 +41,7 @@ function useCssEditing() {
     documentCss,
     setDocumentCss,
     managedCss: useAtomValue(ManagedStyleSheetAtom),
-    persistStyleSheet: useSetAtom(PersistStyleSheetAtom),
+    persistedHtml: useAtomValue(PersistedHtmlAtom),
     getInstanceCss: useAtomValue(GetInstanceCssAtom),
     setInstanceCss: useSetAtom(SetInstanceCssAtom),
     usedIds: useAtomValue(UsedRaisinIdsAtom),
@@ -228,8 +228,8 @@ describe('SetInstanceCssAtom', () => {
   });
 });
 
-describe('PersistStyleSheetAtom', () => {
-  it('inserts the managed stylesheet into serialized html', () => {
+describe('PersistedHtmlAtom', () => {
+  it('appends the managed stylesheet to the serialized html', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() =>
@@ -238,16 +238,33 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:red}',
       })
     );
-    act(() => result.current.persistStyleSheet());
 
-    expect(result.current.html).toContain(
+    expect(result.current.persistedHtml).toContain(
       `${RAISIN_MANAGED_CSS_ATTR}="true"`
     );
-    expect(result.current.html).toContain('[data-raisin-id=');
-    expect(result.current.html).toContain('{color:red}');
+    expect(result.current.persistedHtml).toContain('[data-raisin-id=');
+    expect(result.current.persistedHtml).toContain('{color:red}');
   });
 
-  it('escapes raw-text closing sequences in persisted instance css', () => {
+  it('leaves the document untouched', () => {
+    const { result } = renderCssEditing('<div></div>');
+    const htmlBefore = result.current.html;
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    const htmlAfterEdit = result.current.html;
+
+    expect(result.current.persistedHtml).toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(htmlBefore).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(htmlAfterEdit).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(result.current.html).toBe(htmlAfterEdit);
+  });
+
+  it('escapes raw-text closing sequences in the managed stylesheet', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() =>
@@ -256,18 +273,19 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{content:"</style><script>alert(1)</script>"}',
       })
     );
-    act(() => result.current.persistStyleSheet());
 
-    const managedStyle = result.current.html.match(
+    const managedStyle = result.current.persistedHtml.match(
       /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
     )?.[1];
 
     expect(managedStyle).toContain('<\\/style>');
     expect(managedStyle).not.toContain('</style><script>');
-    expect(parseWithErrors(result.current.html).node.children).toHaveLength(2);
+    expect(
+      parseWithErrors(result.current.persistedHtml).node.children
+    ).toHaveLength(2);
   });
 
-  it('replaces the persisted stylesheet when the derived css changes', () => {
+  it('reflects the current css without a sync step', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() =>
@@ -276,7 +294,7 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:red}',
       })
     );
-    act(() => result.current.persistStyleSheet());
+    expect(result.current.persistedHtml).toContain('{color:red}');
 
     act(() =>
       result.current.setInstanceCss({
@@ -284,13 +302,12 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:blue}',
       })
     );
-    act(() => result.current.persistStyleSheet());
 
-    expect(result.current.html).toContain('{color:blue}');
-    expect(result.current.html).not.toContain('{color:red}');
+    expect(result.current.persistedHtml).toContain('{color:blue}');
+    expect(result.current.persistedHtml).not.toContain('{color:red}');
   });
 
-  it('removes the persisted stylesheet when the derived css is empty', () => {
+  it('omits the managed stylesheet when there is no instance css', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() =>
@@ -299,20 +316,54 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:red}',
       })
     );
-    act(() => result.current.persistStyleSheet());
-
     act(() =>
       result.current.setInstanceCss({
         node: findTag(result.current.root, 'div'),
         css: '',
       })
     );
-    act(() => result.current.persistStyleSheet());
 
-    expect(result.current.html).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(result.current.persistedHtml).not.toContain(RAISIN_MANAGED_CSS_ATTR);
   });
 
-  it('persists document css and scoped instance css in one stylesheet', () => {
+  it('round-trips without stacking managed stylesheets', () => {
+    const first = renderCssEditing('<div></div>');
+
+    act(() =>
+      first.result.current.setInstanceCss({
+        node: findTag(first.result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    const savedHtml = first.result.current.persistedHtml;
+
+    const reloaded = renderCssEditing(savedHtml);
+
+    expect(reloaded.result.current.persistedHtml).toBe(savedHtml);
+    expect(
+      reloaded.result.current.persistedHtml.match(
+        new RegExp(RAISIN_MANAGED_CSS_ATTR, 'g')
+      )
+    ).toHaveLength(1);
+  });
+
+  it('does not re-escape an already escaped closing sequence', () => {
+    const first = renderCssEditing('<div></div>');
+
+    act(() =>
+      first.result.current.setInstanceCss({
+        node: findTag(first.result.current.root, 'div'),
+        css: ':host{content:"</style>"}',
+      })
+    );
+    const savedHtml = first.result.current.persistedHtml;
+    const reloaded = renderCssEditing(savedHtml);
+
+    expect(reloaded.result.current.persistedHtml).toContain('<\\/style>');
+    expect(reloaded.result.current.persistedHtml).not.toContain('<\\\\/style>');
+  });
+
+  it('keeps document css out of the managed stylesheet', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() => result.current.setDocumentCss('body { margin: 0 }'));
@@ -322,16 +373,19 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:blue}',
       })
     );
-    act(() => result.current.persistStyleSheet());
 
-    expect(result.current.html).toContain(RAISIN_DOCUMENT_CSS_ATTR);
-    expect(result.current.html).toContain(RAISIN_MANAGED_CSS_ATTR);
-    expect(result.current.html).toContain('body{margin:0}');
-    expect(result.current.html).toContain('[data-raisin-id=');
-    expect(result.current.html).toContain('{color:blue}');
+    const managedStyle = result.current.persistedHtml.match(
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+    )?.[1];
+
+    expect(result.current.persistedHtml).toContain(RAISIN_DOCUMENT_CSS_ATTR);
+    expect(result.current.persistedHtml).toContain('body{margin:0}');
+    expect(managedStyle).toContain('[data-raisin-id=');
+    expect(managedStyle).toContain('{color:blue}');
+    expect(managedStyle).not.toContain('body{margin:0}');
   });
 
-  it('inserts document css before a managed stylesheet persisted first', () => {
+  it('puts document css before the managed stylesheet', () => {
     const { result } = renderCssEditing('<div></div>');
 
     act(() =>
@@ -340,13 +394,12 @@ describe('PersistStyleSheetAtom', () => {
         css: ':host{color:blue}',
       })
     );
-    act(() => result.current.persistStyleSheet());
     act(() => result.current.setDocumentCss('body { margin: 0 }'));
 
-    const documentCssIndex = result.current.html.indexOf(
+    const documentCssIndex = result.current.persistedHtml.indexOf(
       RAISIN_DOCUMENT_CSS_ATTR
     );
-    const managedCssIndex = result.current.html.indexOf(
+    const managedCssIndex = result.current.persistedHtml.indexOf(
       RAISIN_MANAGED_CSS_ATTR
     );
 
