@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.2
+
+### Patch Changes
+
+- [#47](https://github.com/saasquatch/raisins/pull/47) [`4fdc5de`](https://github.com/saasquatch/raisins/commit/4fdc5de4577dbee3ac01bb36f6829de71ef5c82e) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - @raisins/react: Adds `PersistedHtmlAtom`, the html to save or export — the document with per-instance CSS appended as a managed `<style>` node. Read it instead of `HTMLAtom` anywhere html leaves the editor.
+  @raisins/core: Escape early `</style>` sequences when serializing `<style>` contents to prevent raw-text HTML injection during HTML round-tripping.
+- Updated dependencies [[`4fdc5de`](https://github.com/saasquatch/raisins/commit/4fdc5de4577dbee3ac01bb36f6829de71ef5c82e)]:
+  - @raisins/core@1.4.1
+
 ## 1.7.1
 
 ### Patch Changes
