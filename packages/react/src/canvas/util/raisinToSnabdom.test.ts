@@ -1,7 +1,10 @@
 import { cssParser, RaisinDocumentNode, RaisinStyleNode } from '@raisins/core';
 import expect from 'expect';
 import { VNode } from 'snabbdom';
-import { RAISIN_DOCUMENT_CSS_ATTR } from '../../css-editing/RaisinCssIds';
+import {
+  RAISIN_DOCUMENT_CSS_ATTR,
+  RAISIN_MANAGED_CSS_ATTR,
+} from '../../css-editing/RaisinCssIds';
 import { raisinToSnabbdom } from './raisinToSnabdom';
 
 const styleNode = (
@@ -41,6 +44,15 @@ describe('raisinToSnabbdom style nodes', () => {
 
     expect(style.sel).toBe('!');
     expect(style.text).toBe('raisin-document-css');
+  });
+
+  it('replaces the managed css node with a comment', () => {
+    const [style] = childrenOf(
+      raisinToSnabbdom(documentOf(styleNode({ [RAISIN_MANAGED_CSS_ATTR]: 'true' })))
+    );
+
+    expect(style.sel).toBe('!');
+    expect(style.text).toBe('raisin-managed-css');
   });
 
   it('renders a style node with no contents', () => {

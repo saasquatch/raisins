@@ -29,7 +29,6 @@ export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
 
 const { visit } = htmlUtil;
 
-
 function isElement(n: RaisinNode): n is RaisinElementNode {
   return n.type === 'tag';
 }
@@ -95,8 +94,8 @@ export type CssEditingMoleculeType = {
   /**
    * The full CSS the canvas should render: page-wide CSS followed by all
    * per-instance CSS, each scoped to the relevant `data-raisin-id`. The
-    * persisted style nodes themselves are suppressed from canvas rendering (see
-    * `raisinToSnabdom`) so they aren't applied twice.
+   * persisted style nodes themselves are suppressed from canvas rendering (see
+   * `raisinToSnabdom`) so they aren't applied twice.
    */
   ManagedStyleSheetAtom: Atom<string>;
 
@@ -136,10 +135,7 @@ export const CssEditingMolecule = molecule(
 
     const DocumentCssAtom = atom(
       get => {
-        const node = findStyleNode(
-          get(RootNodeAtom),
-          RAISIN_DOCUMENT_CSS_ATTR
-        );
+        const node = findStyleNode(get(RootNodeAtom), RAISIN_DOCUMENT_CSS_ATTR);
         if (!node?.contents) return '';
         try {
           return cssSerializer(node.contents);
@@ -185,11 +181,9 @@ export const CssEditingMolecule = molecule(
     );
     DocumentCssAtom.debugLabel = 'DocumentCssAtom';
 
-    const ManagedStyleSheetAtom = atom(
-      get => {
-        const root = get(RootNodeAtom);
-        const documentCss = get(DocumentCssAtom);
-        const instances = collectElementsWithInstanceCss(root);
+    const ManagedStyleSheetAtom = atom(get => {
+      const root = get(RootNodeAtom);
+      const instances = collectElementsWithInstanceCss(root);
 
       // Every document edit recomputes this, so re-scoping the untouched
       // elements would make each keystroke cost O(all styled elements).
@@ -214,53 +208,47 @@ export const CssEditingMolecule = molecule(
         .filter(part => part.length > 0);
       scopedCssCache = nextCache;
 
-        return [documentCss, ...scopedParts]
-          .filter(s => s.length > 0)
-          .join('\n');
-      }
-    );
+      return [...scopedParts].filter(s => s.length > 0).join('\n');
+    });
     ManagedStyleSheetAtom.debugLabel = 'ManagedStyleSheetAtom';
 
-    const PersistStyleSheetAtom = atom(
-      null,
-      (get, set) => {
-        const root = get(RootNodeAtom);
-        const raisinsManagedStyle = get(ManagedStyleSheetAtom);
-        const existing = findStyleNode(root, RAISIN_MANAGED_CSS_ATTR);
+    const PersistStyleSheetAtom = atom(null, (get, set) => {
+      const root = get(RootNodeAtom);
+      const raisinsManagedStyle = get(ManagedStyleSheetAtom);
+      const existing = findStyleNode(root, RAISIN_MANAGED_CSS_ATTR);
 
-        if (raisinsManagedStyle.length === 0) {
-          if (existing) set(RemoveNodeAtom, existing);
-          return;
-        }
-
-        let contents;
-        try {
-          contents = cssParser(raisinsManagedStyle);
-        } catch {
-          return;
-        }
-
-        if (existing) {
-          set(ReplaceNodeAtom, {
-            prev: existing,
-            next: { ...existing, contents },
-          });
-          return;
-        }
-
-        const styleNode: RaisinStyleNode = {
-          type: 'style',
-          tagName: 'style',
-          attribs: { [RAISIN_MANAGED_CSS_ATTR]: 'true' },
-          contents,
-        };
-        set(InsertNodeAtom, {
-          node: styleNode,
-          parent: root as RaisinNodeWithChildren,
-          idx: (root as RaisinNodeWithChildren).children.length,
-        });
+      if (raisinsManagedStyle.length === 0) {
+        if (existing) set(RemoveNodeAtom, existing);
+        return;
       }
-    );
+
+      let contents;
+      try {
+        contents = cssParser(raisinsManagedStyle);
+      } catch {
+        return;
+      }
+
+      if (existing) {
+        set(ReplaceNodeAtom, {
+          prev: existing,
+          next: { ...existing, contents },
+        });
+        return;
+      }
+
+      const styleNode: RaisinStyleNode = {
+        type: 'style',
+        tagName: 'style',
+        attribs: { [RAISIN_MANAGED_CSS_ATTR]: 'true' },
+        contents,
+      };
+      set(InsertNodeAtom, {
+        node: styleNode,
+        parent: root as RaisinNodeWithChildren,
+        idx: (root as RaisinNodeWithChildren).children.length,
+      });
+    });
     PersistStyleSheetAtom.debugLabel = 'PersistStyleSheetAtom';
 
     const GetInstanceCssAtom = atom(() => {

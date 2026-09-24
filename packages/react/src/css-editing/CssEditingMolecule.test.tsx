@@ -13,7 +13,12 @@ import {
   RaisinsProvider,
 } from '../core/RaisinConfigScope';
 import { CssEditingMolecule } from './CssEditingMolecule';
-import { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
+import {
+  RAISIN_CSS_ATTR,
+  RAISIN_DOCUMENT_CSS_ATTR,
+  RAISIN_ID_ATTR,
+  RAISIN_MANAGED_CSS_ATTR,
+} from './RaisinCssIds';
 import { RaisinIdsMolecule } from './RaisinIdsMolecule';
 
 function useCssEditing() {
@@ -26,6 +31,7 @@ function useCssEditing() {
     ManagedStyleSheetAtom,
     GetInstanceCssAtom,
     SetInstanceCssAtom,
+    PersistStyleSheetAtom,
   } = useMolecule(CssEditingMolecule);
 
   const [documentCss, setDocumentCss] = useAtom(DocumentCssAtom);
@@ -35,6 +41,7 @@ function useCssEditing() {
     documentCss,
     setDocumentCss,
     managedCss: useAtomValue(ManagedStyleSheetAtom),
+    persistStyleSheet: useSetAtom(PersistStyleSheetAtom),
     getInstanceCss: useAtomValue(GetInstanceCssAtom),
     setInstanceCss: useSetAtom(SetInstanceCssAtom),
     usedIds: useAtomValue(UsedRaisinIdsAtom),
@@ -221,8 +228,93 @@ describe('SetInstanceCssAtom', () => {
   });
 });
 
+describe('PersistStyleSheetAtom', () => {
+  it('inserts the managed stylesheet into serialized html', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    expect(result.current.html).toContain(
+      `${RAISIN_MANAGED_CSS_ATTR}="true"`
+    );
+    expect(result.current.html).toContain('[data-raisin-id=');
+    expect(result.current.html).toContain('{color:red}');
+  });
+
+  it('replaces the persisted stylesheet when the derived css changes', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    expect(result.current.html).toContain('{color:blue}');
+    expect(result.current.html).not.toContain('{color:red}');
+  });
+
+  it('removes the persisted stylesheet when the derived css is empty', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: '',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    expect(result.current.html).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+  });
+
+  it('persists managed css alongside document css', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+    act(() => result.current.persistStyleSheet());
+
+    expect(result.current.html).toContain(RAISIN_DOCUMENT_CSS_ATTR);
+    expect(result.current.html).toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(result.current.html).toContain('body{margin:0}');
+    expect(result.current.html).toContain('[data-raisin-id=');
+    expect(result.current.html).toContain('{color:blue}');
+    expect(result.current.managedCss).not.toContain('body{margin:0}');
+  });
+});
+
 describe('ManagedStyleSheetAtom', () => {
-  it('puts document css before scoped instance css', () => {
+  it('contains only scoped instance css', () => {
     const { result } = renderCssEditing('<div></div>');
     act(() => result.current.setDocumentCss('div { color: red }'));
     act(() =>
@@ -234,7 +326,7 @@ describe('ManagedStyleSheetAtom', () => {
 
     const id = findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR];
     expect(result.current.managedCss).toBe(
-      `div{color:red}\n[data-raisin-id="${id}"]{color:blue}`
+      `[data-raisin-id="${id}"]{color:blue}`
     );
   });
 
