@@ -1,4 +1,4 @@
-import { RaisinElementNode, RaisinNode } from '@raisins/core';
+import { parseWithErrors, RaisinElementNode, RaisinNode } from '@raisins/core';
 import { act, renderHook } from '@testing-library/react';
 import { molecule, useMolecule } from 'bunshi/react';
 import expect from 'expect';
@@ -13,7 +13,12 @@ import {
   RaisinsProvider,
 } from '../core/RaisinConfigScope';
 import { CssEditingMolecule } from './CssEditingMolecule';
-import { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
+import {
+  RAISIN_CSS_ATTR,
+  RAISIN_DOCUMENT_CSS_ATTR,
+  RAISIN_ID_ATTR,
+  RAISIN_MANAGED_CSS_ATTR,
+} from './RaisinCssIds';
 import { RaisinIdsMolecule } from './RaisinIdsMolecule';
 
 function useCssEditing() {
@@ -26,6 +31,7 @@ function useCssEditing() {
     ManagedStyleSheetAtom,
     GetInstanceCssAtom,
     SetInstanceCssAtom,
+    PersistedHtmlAtom,
   } = useMolecule(CssEditingMolecule);
 
   const [documentCss, setDocumentCss] = useAtom(DocumentCssAtom);
@@ -35,6 +41,7 @@ function useCssEditing() {
     documentCss,
     setDocumentCss,
     managedCss: useAtomValue(ManagedStyleSheetAtom),
+    persistedHtml: useAtomValue(PersistedHtmlAtom),
     getInstanceCss: useAtomValue(GetInstanceCssAtom),
     setInstanceCss: useSetAtom(SetInstanceCssAtom),
     usedIds: useAtomValue(UsedRaisinIdsAtom),
@@ -218,6 +225,186 @@ describe('SetInstanceCssAtom', () => {
 
     expect(result.current.html).toContain('&amp;:hover');
     expect(findTag(result.current.root, 'div').attribs[RAISIN_CSS_ATTR]).toBe(css);
+  });
+});
+
+describe('PersistedHtmlAtom', () => {
+  it('appends the managed stylesheet to the serialized html', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+
+    expect(result.current.persistedHtml).toContain(
+      `${RAISIN_MANAGED_CSS_ATTR}="true"`
+    );
+    expect(result.current.persistedHtml).toContain('[data-raisin-id=');
+    expect(result.current.persistedHtml).toContain('{color:red}');
+  });
+
+  it('leaves the document untouched', () => {
+    const { result } = renderCssEditing('<div></div>');
+    const htmlBefore = result.current.html;
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    const htmlAfterEdit = result.current.html;
+
+    expect(result.current.persistedHtml).toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(htmlBefore).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(htmlAfterEdit).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+    expect(result.current.html).toBe(htmlAfterEdit);
+  });
+
+  it('escapes raw-text closing sequences in the managed stylesheet', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{content:"</style><script>alert(1)</script>"}',
+      })
+    );
+
+    const managedStyle = result.current.persistedHtml.match(
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+    )?.[1];
+
+    expect(managedStyle).toContain('<\\/style>');
+    expect(managedStyle).not.toContain('</style><script>');
+    expect(
+      parseWithErrors(result.current.persistedHtml).node.children
+    ).toHaveLength(2);
+  });
+
+  it('reflects the current css without a sync step', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    expect(result.current.persistedHtml).toContain('{color:red}');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+
+    expect(result.current.persistedHtml).toContain('{color:blue}');
+    expect(result.current.persistedHtml).not.toContain('{color:red}');
+  });
+
+  it('omits the managed stylesheet when there is no instance css', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: '',
+      })
+    );
+
+    expect(result.current.persistedHtml).not.toContain(RAISIN_MANAGED_CSS_ATTR);
+  });
+
+  it('round-trips without stacking managed stylesheets', () => {
+    const first = renderCssEditing('<div></div>');
+
+    act(() =>
+      first.result.current.setInstanceCss({
+        node: findTag(first.result.current.root, 'div'),
+        css: ':host{color:red}',
+      })
+    );
+    const savedHtml = first.result.current.persistedHtml;
+
+    const reloaded = renderCssEditing(savedHtml);
+
+    expect(reloaded.result.current.persistedHtml).toBe(savedHtml);
+    expect(
+      reloaded.result.current.persistedHtml.match(
+        new RegExp(RAISIN_MANAGED_CSS_ATTR, 'g')
+      )
+    ).toHaveLength(1);
+  });
+
+  it('does not re-escape an already escaped closing sequence', () => {
+    const first = renderCssEditing('<div></div>');
+
+    act(() =>
+      first.result.current.setInstanceCss({
+        node: findTag(first.result.current.root, 'div'),
+        css: ':host{content:"</style>"}',
+      })
+    );
+    const savedHtml = first.result.current.persistedHtml;
+    const reloaded = renderCssEditing(savedHtml);
+
+    expect(reloaded.result.current.persistedHtml).toContain('<\\/style>');
+    expect(reloaded.result.current.persistedHtml).not.toContain('<\\\\/style>');
+  });
+
+  it('keeps document css out of the managed stylesheet', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+
+    const managedStyle = result.current.persistedHtml.match(
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+    )?.[1];
+
+    expect(result.current.persistedHtml).toContain(RAISIN_DOCUMENT_CSS_ATTR);
+    expect(result.current.persistedHtml).toContain('body{margin:0}');
+    expect(managedStyle).toContain('[data-raisin-id=');
+    expect(managedStyle).toContain('{color:blue}');
+    expect(managedStyle).not.toContain('body{margin:0}');
+  });
+
+  it('puts document css before the managed stylesheet', () => {
+    const { result } = renderCssEditing('<div></div>');
+
+    act(() =>
+      result.current.setInstanceCss({
+        node: findTag(result.current.root, 'div'),
+        css: ':host{color:blue}',
+      })
+    );
+    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+
+    const documentCssIndex = result.current.persistedHtml.indexOf(
+      RAISIN_DOCUMENT_CSS_ATTR
+    );
+    const managedCssIndex = result.current.persistedHtml.indexOf(
+      RAISIN_MANAGED_CSS_ATTR
+    );
+
+    expect(documentCssIndex).toBeGreaterThanOrEqual(0);
+    expect(managedCssIndex).toBeGreaterThan(documentCssIndex);
   });
 });
 
