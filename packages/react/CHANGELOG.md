@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.3
+
+### Patch Changes
+
+- [#49](https://github.com/saasquatch/raisins/pull/49) [`da67ce9`](https://github.com/saasquatch/raisins/commit/da67ce9420f499a36f908c57e085a26aceea26a7) Thanks [@00salmon](https://github.com/00salmon)! - Remove `@storybook/cli` from runtime `dependencies` (it remains a devDependency). It was never imported at runtime and pulled ~270 packages, including vulnerable `tar`, into every consumer.
+
 ## 1.7.2
 
 ### Patch Changes
@@ -11,9 +17,9 @@
 
 ### Patch Changes
 
-* [#45](https://github.com/saasquatch/raisins/pull/45) [`0167164`](https://github.com/saasquatch/raisins/commit/0167164563a9045e7e116b109123d4dc61f0d0f1) Thanks [@00salmon](https://github.com/00salmon)! - fix missing export
+- [#45](https://github.com/saasquatch/raisins/pull/45) [`0167164`](https://github.com/saasquatch/raisins/commit/0167164563a9045e7e116b109123d4dc61f0d0f1) Thanks [@00salmon](https://github.com/00salmon)! - fix missing export
 
-* Updated dependencies [[`4fdc5de`](https://github.com/saasquatch/raisins/commit/4fdc5de4577dbee3ac01bb36f6829de71ef5c82e)]:
+- Updated dependencies [[`4fdc5de`](https://github.com/saasquatch/raisins/commit/4fdc5de4577dbee3ac01bb36f6829de71ef5c82e)]:
   - @raisins/core@1.4.1
 
 ## 1.7.0
