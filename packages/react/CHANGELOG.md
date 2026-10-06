@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.8.0
+
+### Minor Changes
+
+- [#51](https://github.com/saasquatch/raisins/pull/51) [`7d51120`](https://github.com/saasquatch/raisins/commit/7d51120f73dd1a3323ef2d9e39f62ba80215a220) Thanks [@00salmon](https://github.com/00salmon)! - Add `registerOnce(owner, register)` to `CanvasScopeMolecule` and use it in the built-in canvas plugins. bunshi re-runs molecule bodies on every lookup, so registering renderers, appenders, HTML and listeners with plain `add` calls stacked a duplicate on every render. Plugins that register from a molecule body should wrap their `add` calls in `registerOnce`, keyed by their own molecule.
+
 ## 1.7.3
 
 ### Patch Changes
