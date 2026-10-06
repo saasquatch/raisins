@@ -31,7 +31,6 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
     }
   );
   CanvasHoveredListenerAtom.debugLabel = 'CanvasHoveredListenerAtom';
-  CanvasAtoms.addEventListener('mouseover', CanvasHoveredListenerAtom);
 
   const RendererAtom = atom(get => {
     const hovered = get(HoveredNodeAtom);
@@ -56,7 +55,10 @@ export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
     };
     return renderer;
   });
-  CanvasAtoms.RendererSet.add(RendererAtom);
+  CanvasAtoms.registerOnce(CanvasHoveredMolecule, () => {
+    CanvasAtoms.addEventListener('mouseover', CanvasHoveredListenerAtom);
+    CanvasAtoms.RendererSet.add(RendererAtom);
+  });
 
   return {
     HoveredRectAtom: defaultRectAtom(
