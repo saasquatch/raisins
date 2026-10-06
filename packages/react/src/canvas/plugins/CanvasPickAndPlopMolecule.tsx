@@ -47,15 +47,12 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
    * Listens for double click events, marks double clicked elements as selected
    * Only triggers with NODE_ENV=development
    */
-  if (process.env.NODE_ENV === 'development') {
-    const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-      if (e.type === 'dblclick') {
-        set(PickedNodeAtom, e.node);
-      }
-    });
-    DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-    CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
-  }
+  const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
+    if (e.type === 'dblclick') {
+      set(PickedNodeAtom, e.node);
+    }
+  });
+  DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
 
   const PickAndPlopStyleAtom = atom(
     `<style>
@@ -92,7 +89,6 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
 
     </style>`
   );
-  CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);
 
   const PickAndPlopListenerAtom = atom(
     null,
@@ -119,7 +115,6 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       }
     }
   );
-  CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
 
   const AppenderAtom = atom(get => {
     const souls = get(GetSoulAtom);
@@ -221,7 +216,6 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     };
     return appender;
   });
-  CanvasAtoms.AppendersSet.add(AppenderAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom(get => {
     const picked = get(PickedNodeAtom);
@@ -245,8 +239,15 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     return renderer;
   });
 
-  // Registers this renderer
-  CanvasAtoms.RendererSet.add(Renderer);
+  CanvasAtoms.registerOnce(CanvasPickAndPlopMolecule, () => {
+    if (process.env.NODE_ENV === 'development') {
+      CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
+    }
+    CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);
+    CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
+    CanvasAtoms.AppendersSet.add(AppenderAtom);
+    CanvasAtoms.RendererSet.add(Renderer);
+  });
 
   return {
     PickedRectAtom: defaultRectAtom(

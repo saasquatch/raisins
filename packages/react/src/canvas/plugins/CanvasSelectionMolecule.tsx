@@ -24,7 +24,6 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
     }
   });
   SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.addEventListener('click', SelectedClickedAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
@@ -47,8 +46,10 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
     return renderer;
   });
 
-  // Registers this renderer
-  CanvasAtoms.RendererSet.add(Renderer);
+  CanvasAtoms.registerOnce(CanvasSelectionMolecule, () => {
+    CanvasAtoms.addEventListener('click', SelectedClickedAtom);
+    CanvasAtoms.RendererSet.add(Renderer);
+  });
 
   return {
     SelectedRectAtom: defaultRectAtom(

@@ -75,6 +75,16 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const RendererSet = new Set<Atom<SnabbdomRenderer>>([]);
   const RootRendererProxy = createProxy<Atom<RootRenderer>>();
   const ListenersMap = new Map<string, Set<CanvasEventListener>>([]);
+  const registeredOwners = new WeakSet<object>();
+  /**
+   * Runs `register` once per `owner` (usually the calling molecule) for this canvas.
+   * bunshi re-runs molecule bodies on every lookup, so plain `add` calls in a body accumulate.
+   */
+  const registerOnce = (owner: object, register: () => void) => {
+    if (registeredOwners.has(owner)) return;
+    registeredOwners.add(owner);
+    register();
+  };
   const addEventListener = (type: string, listener: CanvasEventListener) => {
     let set = ListenersMap.get(type);
     if (!set) {
@@ -251,6 +261,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     HTMLSet,
     ListenersMap,
     addEventListener,
+    registerOnce,
     GeometryAtom,
     IframeAtom,
     AppendersSet,

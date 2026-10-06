@@ -108,7 +108,9 @@ const CanvasStyleMolecule = molecule((getMol, getScope) => {
     };
     return renderer;
   });
-  CanvasAtoms.RendererSet.add(Renderer);
+  CanvasAtoms.registerOnce(CanvasStyleMolecule, () =>
+    CanvasAtoms.RendererSet.add(Renderer)
+  );
 
   return {
     OutlineAtom,
