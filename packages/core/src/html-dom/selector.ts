@@ -1,22 +1,29 @@
-import { is, selectAll } from "css-select";
-import { Adapter, Predicate, Query } from "css-select/lib/types";
-import { DefaultTextMarks } from "./DefaultTextMarks";
-import {
+import { is, selectAll, type Options } from "css-select";
+import { DefaultTextMarks } from "./DefaultTextMarks.ts";
+import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
-  RaisinNodeWithChildren
-} from "./RaisinNode";
-import { getAncestry, getParents, visit } from "./util";
+  RaisinNodeWithChildren,
+} from "./RaisinNode.ts";
+import { getAncestry, getParents, visit } from "./util.ts";
 
 type Node = RaisinNode;
 type ElementNode = RaisinElementNode;
 
-class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
-  _parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
+// css-select v5 doesn't export `lib/types`, so derive these from its public API
+type Adapter = NonNullable<Options<RaisinNode, RaisinElementNode>["adapter"]>;
+type Predicate<V> = (v: V) => boolean;
+type Query = Parameters<typeof selectAll<RaisinNode, RaisinElementNode>>[0];
 
-  constructor(private root: RaisinDocumentNode) {
-    this._parents = getParents(root);
+class RaisinAdapter implements Adapter {
+  parentMap: WeakMap<RaisinNode, RaisinNodeWithChildren>;
+
+  private root: RaisinDocumentNode;
+
+  constructor(root: RaisinDocumentNode) {
+    this.root = root;
+    this.parentMap = getParents(root);
   }
 
   /**
@@ -36,6 +43,7 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
   /**
    * Get the node's children
    */
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- css-select only calls this for nodes it treats as parents; non-parents yield undefined
   getChildren = (node: Node) => (node as RaisinNodeWithChildren).children;
   /**
    * Get the name of the tag
@@ -45,13 +53,15 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    * Get the parent of the node
    */
   getParent = (node: ElementNode) =>
-    (this._parents.get(node) as RaisinElementNode) || null;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Adapter requires ElementNode | null; the root parent is passed through as before
+    (this.parentMap.get(node) as RaisinElementNode) || null;
   /**
    * Get the siblings of the node. Note that unlike jQuery's `siblings` method,
    * this is expected to include the current node as well
    */
   getSiblings(node: Node) {
-    const parent = this._parents.get(node) as RaisinElementNode;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- Adapter requires Node[]; a missing parent still yields undefined at runtime as before
+    const parent = this.parentMap.get(node) as RaisinElementNode;
     return parent?.children;
   }
   /**
@@ -60,12 +70,12 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
   getText(node: Node) {
     return (
       visit<string>(node, {
-        onComment: _ => "",
-        onDirective: _ => "",
+        onComment: () => "",
+        onDirective: () => "",
         onElement: (_, c) => c.join(""),
         onRoot: (_, c) => c.join(""),
         onStyle: () => "",
-        onText: e => e.data
+        onText: (e) => e.data,
       }) ?? ""
     );
   }
@@ -81,10 +91,10 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    */
   removeSubsets(nodes: Node[]) {
     const removable = nodes.reduce((acc, node) => {
-      const ancestors = getAncestry(this.root, node, this._parents);
+      const ancestors = getAncestry(this.root, node, this.parentMap);
       return [...acc, ...ancestors];
     }, [] as Node[]);
-    return nodes.filter(n => removable.includes(n));
+    return nodes.filter((n) => removable.includes(n));
   }
 
   /**
@@ -92,18 +102,17 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    * as well as any of their children that match it.
    */
   findAll(test: Predicate<ElementNode>, nodes: Node[]) {
-    return (nodes.filter(n => n.type === "tag") as ElementNode[]).reduce(
-      (arr, n) => {
-        const matchingChildren = (n.children.filter(
-          n => n.type === "tag"
-        ) as ElementNode[]).filter(test);
+    return nodes
+      .filter((n) => n.type === "tag")
+      .reduce((arr, n) => {
+        const matchingChildren = n.children
+          .filter((child) => child.type === "tag")
+          .filter(test);
         if (test(n)) {
           return [...arr, n, ...matchingChildren];
         }
         return [...arr, ...matchingChildren];
-      },
-      [] as ElementNode[]
-    );
+      }, [] as ElementNode[]);
   }
 
   /**
@@ -119,7 +128,7 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    * Does at least one of passed element nodes pass the test predicate?
    */
   existsOne(test: Predicate<ElementNode>, elems: Node[]) {
-    return this.findOne(test, elems) ? true : false;
+    return !!this.findOne(test, elems);
   }
 
   /**
@@ -147,7 +156,7 @@ export default function select(node: RaisinDocumentNode, query: string) {
   return selectAll(query, node, {
     adapter: new RaisinAdapter(node),
     cacheResults: false,
-    context: node
+    context: node,
   });
 }
 
@@ -155,7 +164,7 @@ const textMarksSet = new Set<string>(DefaultTextMarks);
 export const matches = (
   root: RaisinDocumentNode,
   elem: RaisinElementNode,
-  query: Query<RaisinElementNode>
+  query: Query,
 ) =>
   is(elem, query, {
     adapter: new RaisinAdapter(root),
@@ -166,6 +175,6 @@ export const matches = (
           return textMarksSet.has(el.tagName);
         }
         return false;
-      }
-    }
+      },
+    },
   });

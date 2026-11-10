@@ -1,7 +1,7 @@
-import expect from "expect";
-import { getNode, getPath, RaisinDocumentNode } from "../../src";
-import parse from "../../src/html-dom/parser";
-import selector from "../../src/html-dom/selector";
+import { expect } from "expect";
+import parse from "../../src/html-dom/parser.ts";
+import selector from "../../src/html-dom/selector.ts";
+import { getNode, getPath, type RaisinDocumentNode } from "../../src/index.ts";
 
 describe("Paths", () => {
   test("In matches out", () => {
@@ -18,7 +18,7 @@ describe("Paths", () => {
 function expectSelectorToBePath(
   input: RaisinDocumentNode,
   slt: string,
-  path: number[]
+  path: number[],
 ) {
   const sub = selector(input, slt)[0];
   const foundNode = getNode(input, path);

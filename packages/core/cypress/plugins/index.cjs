@@ -34,7 +34,7 @@ const jsonata = require("jsonata");
 module.exports = (on, config) => {
   const options = {
     ...browserify.defaultOptions,
-    typescript: resolve.sync("typescript", { baseDir: config.projectRoot })
+    typescript: resolve.sync("typescript", { baseDir: config.projectRoot }),
   };
 
   on("file:preprocessor", cucumber(options));
@@ -49,14 +49,14 @@ module.exports = (on, config) => {
           resolve(files);
         });
       });
-    }
+    },
   });
 
   on("task", {
     getJsonata({ jsSelector, node, found }) {
       let expected = jsonata(jsSelector).evaluate({
         node,
-        undefined: undefined
+        undefined: undefined,
       });
       if (!Array.isArray(expected)) {
         expected = [expected];
@@ -68,6 +68,6 @@ module.exports = (on, config) => {
         expected_array.push(expected[idx]);
       });
       return { f_array, expected_array };
-    }
+    },
   });
 };

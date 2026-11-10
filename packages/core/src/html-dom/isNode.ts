@@ -1,19 +1,24 @@
 import {
+  COMMENT,
+  DIRECTIVE,
+  ROOT,
+  STYLE,
+  TAG,
+  TEXT,
+} from "./domElementType.ts";
+import type {
   RaisinCommentNode,
   RaisinProcessingInstructionNode,
-  RaisinStyleNode
-} from "..";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
-import {
+  RaisinStyleNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
-  RaisinTextNode
-} from "./RaisinNode";
+  RaisinTextNode,
+} from "./RaisinNode.ts";
 
 export function isNodeWithChildren(
-  node?: RaisinNode
+  node?: RaisinNode,
 ): node is RaisinNodeWithChildren {
   return isElementNode(node) || isRoot(node);
 }
@@ -39,7 +44,7 @@ export function isCommentNode(node?: RaisinNode): node is RaisinCommentNode {
 }
 
 export function isDirectiveNode(
-  node?: RaisinNode
+  node?: RaisinNode,
 ): node is RaisinProcessingInstructionNode {
   return nodeIsType(DIRECTIVE, node);
 }

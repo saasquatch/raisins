@@ -1,9 +1,9 @@
-import cssParser from "../css-om/parser";
 import { ElementType } from "domelementtype";
-import expect from "expect";
-import parse from "./parser";
-import { RaisinElementNode, RaisinStyleNode } from "./RaisinNode";
-import serializer from "./serializer";
+import { expect } from "expect";
+import cssParser from "../css-om/parser.ts";
+import parse from "./parser.ts";
+import type { RaisinElementNode, RaisinStyleNode } from "./RaisinNode.ts";
+import serializer from "./serializer.ts";
 
 describe("Boolean attributes", () => {
   /*
@@ -25,10 +25,10 @@ describe("Boolean attributes", () => {
       type: ElementType.Tag,
       tagName: "details",
       attribs: {
-        open: value
+        open: value,
       },
       children: [],
-      style: undefined
+      style: undefined,
     };
     expect(serializer(node)).toEqual(`<details open></details>`);
   }
@@ -36,7 +36,7 @@ describe("Boolean attributes", () => {
   function testBooleanAttribute(
     input: string,
     attrValue: any,
-    out: string = input
+    out: string = input,
   ) {
     const node = parse(input);
     expect(node).toEqual({
@@ -46,12 +46,12 @@ describe("Boolean attributes", () => {
           type: "tag",
           tagName: "details",
           attribs: {
-            open: attrValue
+            open: attrValue,
           },
           children: [],
-          style: undefined
-        }
-      ]
+          style: undefined,
+        },
+      ],
     });
     expect(serializer(node)).toEqual(out);
   }
@@ -83,10 +83,10 @@ describe("Attribute escaping", () => {
       type: ElementType.Tag,
       tagName: "div",
       attribs: {
-        "my-attribute": jsValue
+        "my-attribute": jsValue,
       },
       children: [],
-      style: undefined
+      style: undefined,
     };
     expect(serializer(node)).toEqual(`<div my-attribute="${htmlValue}"></div>`);
   }
@@ -94,13 +94,13 @@ describe("Attribute escaping", () => {
   it(`1. Replace any occurrence of the "&" character by the string "&amp;".`, () => {
     testAttribute(
       `There is an & in this string`,
-      `There is an &amp; in this string`
+      `There is an &amp; in this string`,
     );
   });
   it(`2. Replace any occurrences of the U+00A0 NO-BREAK SPACE character by the string "&nbsp;".`, () => {
     testAttribute(
       `Non breaking space -->${String.fromCharCode(160)}<--`,
-      `Non breaking space -->&nbsp;<--`
+      `Non breaking space -->&nbsp;<--`,
     );
   });
 
@@ -129,7 +129,9 @@ describe("Attribute escaping", () => {
       try {
         testAttribute(`Unescaped ${char}`, `Unescaped ${char}`);
       } catch (e) {
-        throw new Error(`${char} (charcode ${charCode}) is being escaped`);
+        throw new Error(`${char} (charcode ${charCode}) is being escaped`, {
+          cause: e,
+        });
       }
     }
   });
@@ -141,11 +143,11 @@ describe("Style raw-text escaping", () => {
       type: "style",
       tagName: "style",
       attribs: {},
-      contents: cssParser('.x{content:"</style><script>"}')
+      contents: cssParser('.x{content:"</style><script>"}'),
     };
 
     expect(serializer(node)).toBe(
-      '<style>.x{content:"<\\/style><script>"}</style>'
+      '<style>.x{content:"<\\/style><script>"}</style>',
     );
   });
 
@@ -154,9 +156,10 @@ describe("Style raw-text escaping", () => {
       type: "style",
       tagName: "style",
       attribs: {},
-      contents: cssParser('.x{content:"</style>"}')
-    } as RaisinStyleNode);
+      contents: cssParser('.x{content:"</style>"}'),
+    });
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: first child is the parsed <style> node
     const reparsed = parse(once).children[0] as RaisinStyleNode;
 
     expect(serializer(reparsed)).toBe(once);

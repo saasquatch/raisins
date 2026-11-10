@@ -1,19 +1,22 @@
 import {
-  Given as given,
-  Then as then,
-  When as when
+  Given as cypressGiven,
+  Then as cypressThen,
+  When as cypressWhen,
 } from "cypress-cucumber-preprocessor/steps";
-import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
-import parse from "../html-dom/parser";
-import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
-import selector, { matches } from "../html-dom/selector";
-import isJest from "../testing/isJest";
+import { expect } from "expect";
+import type { StepDefinitions } from "jest-cucumber";
+import parse from "../html-dom/parser.ts";
+import type {
+  RaisinDocumentNode,
+  RaisinElementNode,
+} from "../html-dom/RaisinNode.ts";
+import selector, { matches } from "../html-dom/selector.ts";
+import isJest from "../testing/isJest.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   when: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   let source: string;
   let found: RaisinElementNode[];
@@ -53,7 +56,7 @@ const cucumber = (
       let jsonata = require("jsonata");
       let expected = jsonata(jsSelector).evaluate({
         node,
-        undefined: undefined
+        undefined: undefined,
       });
       if (!Array.isArray(expected)) {
         expected = [expected];
@@ -68,12 +71,12 @@ const cucumber = (
 let selectorSteps: StepDefinitions = () => {};
 
 if (!isJest()) {
-  cucumber(given, when, then);
+  cucumber(cypressGiven, cypressWhen, cypressThen);
 } else {
   const jest_cucumber = require("jest-cucumber");
 
   const feature = jest_cucumber.loadFeature("../html-dom/selector.feature", {
-    loadRelativePath: true
+    loadRelativePath: true,
   });
 
   selectorSteps = ({ given, when, then }) => {

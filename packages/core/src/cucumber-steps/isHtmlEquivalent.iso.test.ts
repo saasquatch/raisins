@@ -1,11 +1,11 @@
-import expect from "expect";
-import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+import { expect } from "expect";
+import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   var html_a: string;
   var html_b: string;
@@ -30,7 +30,7 @@ const cucumber = (
   then(/^they will not be equivalent$/, () => {
     expect(() => {
       isHtmlEquivalent(html_a, html_b);
-    }).toThrowError();
+    }).toThrow();
   });
 };
 

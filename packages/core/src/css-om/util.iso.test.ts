@@ -1,20 +1,21 @@
-import { CssNodePlain } from "css-tree";
-import expect from "expect";
-import { StateUpdater } from "../util/NewState";
-import { StyleNodeWithChildren } from "./Types";
-import { createChildUpdater, createUpdater } from "./util";
+import type { CssNodePlain } from "css-tree";
+import { expect } from "expect";
+import type { StateUpdater } from "../util/NewState.ts";
+import type { StyleNodeWithChildren } from "./Types.ts";
+import { createChildUpdater, createUpdater } from "./util.ts";
 
 describe("createChildUpdater", () => {
   it("With function", () => {
     const node: any = {
       type: "Brackets",
-      children: [{ type: "Comment", value: "hello world" }]
+      children: [{ type: "Comment", value: "hello world" }],
     };
 
     let updatedNode: any;
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
     const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
     ) => {
       updatedNode = reducer(node);
     }) as StateUpdater<StyleNodeWithChildren>;
@@ -39,11 +40,12 @@ describe("createChildUpdater", () => {
   it("With function mutating node", () => {
     let node: any = {
       type: "Brackets",
-      children: [{ type: "Comment", value: "hello world" }]
+      children: [{ type: "Comment", value: "hello world" }],
     };
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
     const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
     ) => {
       node = reducer(node);
     }) as StateUpdater<StyleNodeWithChildren>;
@@ -73,14 +75,15 @@ describe("createChildUpdater", () => {
   it("Without function", () => {
     const node1: any = {
       type: "Brackets",
-      children: [{ type: "Comment", value: "hello world" }]
+      children: [{ type: "Comment", value: "hello world" }],
     };
 
     const node2: any = { type: "Comment", value: "hello world!" };
 
     let updatedNode: any;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
     const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
     ) => {
       updatedNode = reducer(node1);
     }) as StateUpdater<StyleNodeWithChildren>;
@@ -97,14 +100,14 @@ describe("createUpdater", () => {
   it("With function", () => {
     let node: any = {
       type: "Brackets",
-      children: [{ type: "Comment", value: "hello world" }]
+      children: [{ type: "Comment", value: "hello world" }],
     };
 
     const selector = (prev: any) => prev.children[0];
 
     const updater = (
       clonedNode: StyleNodeWithChildren,
-      child: CssNodePlain
+      child: CssNodePlain,
     ) => {
       clonedNode.children[0] = child;
       return clonedNode;
@@ -112,11 +115,12 @@ describe("createUpdater", () => {
 
     const props = {
       node,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
       setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
       ) => {
         node = reducer(node);
-      }) as StateUpdater<StyleNodeWithChildren>
+      }) as StateUpdater<StyleNodeWithChildren>,
     };
 
     const stateUpdater = createUpdater(props, selector, updater);
@@ -141,14 +145,14 @@ describe("createUpdater", () => {
   it("With function mutability", () => {
     let node: any = {
       type: "Brackets",
-      children: [{ type: "Comment", value: "hello world" }]
+      children: [{ type: "Comment", value: "hello world" }],
     };
 
     const selector = (prev: any) => prev.children[0];
 
     const updater = (
       clonedNode: StyleNodeWithChildren,
-      child: CssNodePlain
+      child: CssNodePlain,
     ) => {
       clonedNode.children[0] = child;
       return clonedNode;
@@ -156,11 +160,12 @@ describe("createUpdater", () => {
 
     const props = {
       node,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
       setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
       ) => {
         node = reducer(node);
-      }) as StateUpdater<StyleNodeWithChildren>
+      }) as StateUpdater<StyleNodeWithChildren>,
     };
 
     const stateUpdater = createUpdater(props, selector, updater);
@@ -187,12 +192,13 @@ describe("createUpdater", () => {
 
     const props = {
       node,
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test mock setter typed as StateUpdater
       setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
+        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren,
       ) => {
         updatedNode = reducer(node);
         return updatedNode;
-      }) as StateUpdater<StyleNodeWithChildren>
+      }) as StateUpdater<StyleNodeWithChildren>,
     };
 
     const stateUpdater = createUpdater(props, selector, updater);

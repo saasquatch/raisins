@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
-import { RaisinNode } from "./RaisinNode";
-import { visit, visitAll } from "./util";
+import type { RaisinNode } from "./RaisinNode.ts";
+import { visit, visitAll } from "./util.ts";
 
 it("Visitor skip node", () => {
   const node: RaisinNode = {
@@ -13,15 +13,15 @@ it("Visitor skip node", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
   const visitor = {
-    skipNode: (_skipNode: any) => false
+    skipNode: (_skipNode: any) => false,
   };
 
   const spySkip = cy.spy(visitor, "skipNode");
@@ -43,16 +43,16 @@ it("Visit all", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
 
   const callback = {
-    callbackCounter: (_callback: any) => false
+    callbackCounter: (_callback: any) => false,
   };
 
   const callbackSpy = cy.spy(callback, "callbackCounter");

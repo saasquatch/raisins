@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import { RaisinElementNode } from "../../html-dom/RaisinNode";
-import { isNodeAllowed } from "./isNodeAllowed";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { expect } from "expect";
+import type { RaisinElementNode } from "../../html-dom/RaisinNode.ts";
+import { isNodeAllowed } from "./isNodeAllowed.ts";
 
 describe("isNodeAllowed", () => {
   it("Node is allowed", () => {
@@ -9,28 +9,28 @@ describe("isNodeAllowed", () => {
       type: "tag",
       tagName: "div",
       attribs: {},
-      children: []
+      children: [],
     };
 
     const childMeta: CustomElement = {
       tagName: "",
-      validParents: ["*"]
+      validParents: ["*"],
     };
 
     const parent: RaisinElementNode = {
       type: "tag",
       tagName: "div",
       attribs: {},
-      children: []
+      children: [],
     };
 
     const parentMeta: CustomElement = {
       tagName: "",
-      slots: [{ name: "slot", validChildren: ["*"] }]
+      slots: [{ name: "slot", validChildren: ["*"] }],
     };
 
     expect(isNodeAllowed(child, childMeta, parent, parentMeta, "slot")).toBe(
-      true
+      true,
     );
   });
   it("Node is not allowed", () => {
@@ -38,28 +38,28 @@ describe("isNodeAllowed", () => {
       type: "tag",
       tagName: "div",
       attribs: {},
-      children: []
+      children: [],
     };
 
     const childMeta: CustomElement = {
       tagName: "",
-      validParents: ["h3"]
+      validParents: ["h3"],
     };
 
     const parent: RaisinElementNode = {
       type: "tag",
       tagName: "div",
       attribs: {},
-      children: []
+      children: [],
     };
 
     const parentMeta: CustomElement = {
       tagName: "",
-      slots: [{ name: "slot", validChildren: ["*"] }]
+      slots: [{ name: "slot", validChildren: ["*"] }],
     };
 
     expect(isNodeAllowed(child, childMeta, parent, parentMeta, "child")).toBe(
-      false
+      false,
     );
   });
 });

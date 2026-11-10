@@ -1,5 +1,5 @@
-import { isNodeWithChildren } from "../html-dom/isNode";
-import { RaisinNode } from "../html-dom/RaisinNode";
+import { isNodeWithChildren } from "../html-dom/isNode.ts";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
 
 export type NodePath = number[];
 
@@ -10,7 +10,7 @@ export type NodeSelection = {
 
 export function getPath(
   root: RaisinNode,
-  node: RaisinNode
+  node: RaisinNode,
 ): NodePath | undefined {
   if (root === node) {
     // Empty array means this node
@@ -25,15 +25,15 @@ export function getPath(
         }
         return undefined;
       })
-      .find(c => c !== undefined);
+      .find((c) => c !== undefined);
   }
   return undefined;
 }
 
 export function getNode(root: RaisinNode, path: NodePath): RaisinNode {
-  return path.reduce((node: RaisinNode, path) => {
+  return path.reduce((node: RaisinNode, childIdx) => {
     if (isNodeWithChildren(node)) {
-      return node.children[path];
+      return node.children[childIdx];
     }
     throw new Error("Node type" + node.type + "doesn't have children");
   }, root);

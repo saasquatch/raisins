@@ -1,6 +1,6 @@
-import * as Css from "css-tree";
-import { StateUpdater } from "../util/NewState";
-import { StyleNodeProps, StyleNodeWithChildren } from "./Types";
+import type * as Css from "css-tree";
+import type { StateUpdater } from "../util/NewState.ts";
+import type { StyleNodeProps, StyleNodeWithChildren } from "./Types.ts";
 
 /**
  * Creates an immutable state updater for child editors
@@ -11,17 +11,17 @@ import { StyleNodeProps, StyleNodeWithChildren } from "./Types";
  */
 export function createUpdater<
   Node extends Css.CssNodePlain,
-  Child extends Css.CssNodePlain
+  Child extends Css.CssNodePlain,
 >(
   props: StyleNodeProps<Node>,
   selector: (prev: Node) => Child,
-  updater: (node: Node, prev: Child) => Child
+  updater: (node: Node, prev: Child) => Child,
 ): StateUpdater<Child> {
-  return next => {
+  return (next) => {
     const reducer = (prev: Node): Node => {
       const prevChild = selector(prev);
       const nextVal = typeof next === "function" ? next(prevChild) : next;
-      const clone = { ...prev } as Node;
+      const clone = { ...prev };
       updater(clone, nextVal);
       return clone;
     };
@@ -37,16 +37,16 @@ export function createUpdater<
  */
 export function createChildUpdater(
   setNode: StateUpdater<StyleNodeWithChildren>,
-  idx: number
+  idx: number,
 ): StateUpdater<Css.CssNodePlain> {
-  return next => {
+  return (next) => {
     const reducer = (current: StyleNodeWithChildren): StyleNodeWithChildren => {
       const currentAtIdx = current.children[idx];
       const nextVal = typeof next === "function" ? next(currentAtIdx) : next;
       return {
         ...current,
         // https://stackoverflow.com/questions/38060705/replace-element-at-specific-position-in-an-array-without-mutating-it
-        children: Object.assign([], current.children, { [idx]: nextVal })
+        children: Object.assign([], current.children, { [idx]: nextVal }),
       };
     };
 

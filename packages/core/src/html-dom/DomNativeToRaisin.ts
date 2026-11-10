@@ -1,7 +1,7 @@
-import cssParser from "../css-om/parser";
-import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
+import cssParser from "../css-om/parser.ts";
+import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode, RaisinNode } from "./RaisinNode.ts";
 
 export type DomNativeToRaisinOptions = {
   onParseError?: (error: ParseError, jsonPointer: string) => void;
@@ -22,7 +22,7 @@ export type DomNativeToRaisinResult = {
 export function domNativeToRaisin(
   Dom: DocumentFragment | Document,
   isHtml: boolean = false,
-  options: DomNativeToRaisinOptions = {}
+  options: DomNativeToRaisinOptions = {},
 ): DomNativeToRaisinResult {
   const errors: ParseErrorStack = [];
   const report = (error: ParseError, jsonPointer: string) => {
@@ -36,8 +36,8 @@ export function domNativeToRaisin(
       Dom.childNodes,
       isHtml && Dom instanceof Document,
       "",
-      report
-    )
+      report,
+    ),
   };
   return { node, errors };
 }
@@ -46,7 +46,7 @@ function nodeListToRaisin(
   nodes: NodeList,
   isHtml: boolean,
   pointer: string,
-  report: (error: ParseError, jsonPointer: string) => void
+  report: (error: ParseError, jsonPointer: string) => void,
 ): RaisinNode[] {
   var nodesArray = Array.from(nodes);
   if (isHtml) {
@@ -57,7 +57,7 @@ function nodeListToRaisin(
     }
   }
   return nodesArray.map((n, idx) =>
-    nodeToRaisin(n, `${pointer}/children/${idx}`, report)
+    nodeToRaisin(n, `${pointer}/children/${idx}`, report),
   );
 }
 
@@ -70,7 +70,7 @@ function nodeListToRaisin(
  */
 function cssErrorReporter(
   report: (error: ParseError, jsonPointer: string) => void,
-  jsonPointer: string
+  jsonPointer: string,
 ) {
   return (error: { message: string; source?: string }) => {
     const sourceSuffix = error.source ? ` at "${error.source}"` : "";
@@ -78,9 +78,9 @@ function cssErrorReporter(
       {
         type: "css",
         rule: "css",
-        message: `${error.message}${sourceSuffix}`
+        message: `${error.message}${sourceSuffix}`,
       },
-      jsonPointer
+      jsonPointer,
     );
   };
 }
@@ -88,15 +88,17 @@ function cssErrorReporter(
 function nodeToRaisin(
   node: Node,
   pointer: string,
-  report: (error: ParseError, jsonPointer: string) => void
+  report: (error: ParseError, jsonPointer: string) => void,
 ): RaisinNode {
   switch (node.nodeType) {
     case Node.ELEMENT_NODE:
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- narrowed by nodeType === ELEMENT_NODE
       const element = node as HTMLElement;
       const attribs = getAttribues(element);
       const { style, ...otherAttribs } = attribs;
 
       if (element.nodeName === "TEMPLATE") {
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- narrowed by nodeName === "TEMPLATE"
         const template = element as HTMLTemplateElement;
         return {
           type: TAG,
@@ -106,8 +108,8 @@ function nodeToRaisin(
             template.content.childNodes,
             false,
             pointer,
-            report
-          )
+            report,
+          ),
         };
       }
       if (element.nodeName === "STYLE") {
@@ -117,10 +119,10 @@ function nodeToRaisin(
           tagName: "style",
           contents: textContent
             ? cssParser(textContent, {
-                onParseError: cssErrorReporter(report, pointer)
+                onParseError: cssErrorReporter(report, pointer),
               })
             : undefined,
-          attribs: getAttribues(element)
+          attribs: getAttribues(element),
         };
       }
       return {
@@ -132,30 +134,33 @@ function nodeToRaisin(
           style !== undefined
             ? cssParser(style, {
                 context: "declarationList",
-                onParseError: cssErrorReporter(report, `${pointer}/style`)
+                onParseError: cssErrorReporter(report, `${pointer}/style`),
               })
-            : undefined
+            : undefined,
       };
     case Node.TEXT_NODE:
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- narrowed by nodeType === TEXT_NODE
       const textNode = node as Text;
       return {
         type: TEXT,
         // TODO: Should we convert null to empty string? Or not return a text node? Or change the raisin node interface?
-        data: textNode.textContent ?? ""
+        data: textNode.textContent ?? "",
       };
     case Node.COMMENT_NODE:
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- narrowed by nodeType === COMMENT_NODE
       const comment = node as Comment;
       return {
         type: COMMENT,
         // TODO: Should we convert null to empty string? Or not return a comment node? Or change the raisin node interface?
-        data: comment.textContent ?? ""
+        data: comment.textContent ?? "",
       };
     case Node.DOCUMENT_TYPE_NODE:
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- narrowed by nodeType === DOCUMENT_TYPE_NODE; only nodeName is read
       const documentNode = node as Document;
       return {
         type: DIRECTIVE,
         data: "!DOCTYPE " + documentNode.nodeName,
-        name: "!doctype"
+        name: "!doctype",
       };
     default:
       throw new Error("Unhandled node type " + node.nodeType);
@@ -165,14 +170,17 @@ function nodeToRaisin(
 function getAttribues(element: HTMLElement): Record<string, string> {
   const names = element.getAttributeNames();
 
-  return names.reduce((acc, key) => {
-    const hasAttribute = element.hasAttribute(key);
-    if (!hasAttribute) return acc;
-    const value = element.getAttribute(key);
-    return {
-      ...acc,
-      // At this point value should never be null, but we're including default just in case
-      [key]: value ?? ""
-    };
-  }, {} as Record<string, string>);
+  return names.reduce(
+    (acc, key) => {
+      const hasAttribute = element.hasAttribute(key);
+      if (!hasAttribute) return acc;
+      const value = element.getAttribute(key);
+      return {
+        ...acc,
+        // At this point value should never be null, but we're including default just in case
+        [key]: value ?? "",
+      };
+    },
+    {} as Record<string, string>,
+  );
 }

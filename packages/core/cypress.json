@@ -4,5 +4,6 @@
     "./src/**/*.@(iso|web).test.@(ts|tsx|js|jsx)",
     "./src/**/*.feature"
   ],
-  "ignoreTestFiles": "**/cucumber-steps/*"
+  "ignoreTestFiles": "**/cucumber-steps/*",
+  "pluginsFile": "cypress/plugins/index.cjs"
 }

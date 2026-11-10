@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { RaisinNode } from "../../html-dom/RaisinNode";
-import { doesChildAllowParent } from "./doesChildAllowParent";
-import { doesParentAllowChild } from "./doesParentAllowChild";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
+import { doesChildAllowParent } from "./doesChildAllowParent.ts";
+import { doesParentAllowChild } from "./doesParentAllowChild.ts";
 
 /**
  * Given two nodes and their metadata
@@ -15,13 +15,13 @@ export function isNodeAllowed(
   childMeta: CustomElement,
   parent: RaisinNode,
   parentMeta: CustomElement,
-  slot: string
+  slot: string,
 ) {
   const parentAllowsChild = doesParentAllowChild(
     child,
     parentMeta,
     slot,
-    parent
+    parent,
   );
   const childAllowsParents = doesChildAllowParent(childMeta, parent);
   return parentAllowsChild && childAllowsParents;

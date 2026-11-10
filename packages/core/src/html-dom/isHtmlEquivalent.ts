@@ -1,6 +1,6 @@
 import * as css5 from "css";
+import { expect } from "expect";
 import * as parse5 from "parse5";
-import expect from "expect";
 
 /**
  * Validates CSS
@@ -14,10 +14,10 @@ function parseCSS(input: string, options?: css5Options): string {
   if (options?.inline) input = "*{" + input + "}";
   try {
     input = css5.stringify(css5.parse(input), {
-      compress: true
+      compress: true,
     });
     input = css5.stringify(css5.parse(input), {
-      compress: true
+      compress: true,
     });
   } catch {
     return "";
@@ -32,12 +32,12 @@ function parseCSS(input: string, options?: css5Options): string {
  */
 function cleanUpCSS(html: string) {
   html = html
-    .replace(/(?<=style=(["']))(?:(?=(\\?))\2.)*?(?=\1)/gs, input =>
-      parseCSS(input, { inline: true })
+    .replace(/(?<=style=(["']))(?:(?=(\\?))\2.)*?(?=\1)/gs, (input) =>
+      parseCSS(input, { inline: true }),
     )
     .replace(
       /(<style.*?>)(.*?)(<\/style>)/gs,
-      (_, start, input, end) => start + parseCSS(input) + end
+      (_, start, input, end) => start + parseCSS(input) + end,
     );
   return html;
 }
@@ -53,7 +53,7 @@ export function isHtmlEquivalent(
   expected: string,
   received: string,
   purifyOptions?: PurifyOptions,
-  parseOptions?: parse5.ParserOptions
+  parseOptions?: parse5.ParserOptions,
 ): true | never {
   /*
    * Initial pass through parse5
@@ -97,7 +97,7 @@ interface PurifyOptions {
     - removing text nodes caused by whitespaces between elements
       or containing html elements
 */
-function purify(node: any, options?: PurifyOptions | undefined) {
+function purify(node: any, options?: PurifyOptions) {
   for (var i = 0; i < node.childNodes.length; i++) {
     var child = node.childNodes[i];
     if (child.hasOwnProperty("parentNode")) {

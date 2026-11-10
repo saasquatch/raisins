@@ -1,15 +1,15 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
-import expect from "expect";
-import { RaisinDocumentNode, RaisinNode } from "../index";
-import { ComponentMetaProvider, getSlots } from "./getSlots";
-import * as HTMLComponents from "./HTMLComponents";
-import { DefaultSlot, DefaultSlotMeta, NamedSlot } from "./SlotModel";
+import type { CustomElement, Slot } from "@raisins/schema/schema.js";
+import { expect } from "expect";
+import type { RaisinDocumentNode, RaisinNode } from "../index.ts";
+import { type ComponentMetaProvider, getSlots } from "./getSlots.ts";
+import * as HTMLComponents from "./HTMLComponents.ts";
+import { DefaultSlot, DefaultSlotMeta, type NamedSlot } from "./SlotModel.ts";
 
 describe("Slot Model", () => {
   it("Default slot types use slot interfaces", () => {
     const slot: Slot = { name: "" };
     const namedSlot: NamedSlot = {
-      slot: slot
+      slot: slot,
     };
 
     expect(typeof DefaultSlot).toBe(typeof namedSlot);
@@ -23,10 +23,10 @@ describe("Get Slots", () => {
       type: "tag",
       tagName: "div",
       children: [],
-      attribs: {}
+      attribs: {},
     };
     const meta: CustomElement = {
-      tagName: ""
+      tagName: "",
     };
     const getComponentMeta: ComponentMetaProvider = () => meta;
 
@@ -39,16 +39,16 @@ describe("Get Slots", () => {
       tagName: "div",
       children: [
         { type: "tag", tagName: "div", children: [], attribs: {} },
-        { type: "tag", tagName: "div", children: [], attribs: {} }
+        { type: "tag", tagName: "div", children: [], attribs: {} },
       ],
-      attribs: {}
+      attribs: {},
     };
     const parentMeta: CustomElement = {
       tagName: "div",
       slots: [
         { name: "slot1", validChildren: ["*"] },
-        { name: "slot2", validChildren: ["div"] }
-      ]
+        { name: "slot2", validChildren: ["div"] },
+      ],
     };
     const meta: ComponentMetaProvider = () => parentMeta;
 
@@ -58,11 +58,11 @@ describe("Get Slots", () => {
   it("Root as slot", () => {
     const root: RaisinDocumentNode = {
       type: "root",
-      children: []
+      children: [],
     };
     const parentMeta: CustomElement = {
       tagName: "div",
-      slots: [{ name: "slot", validChildren: ["*"] }]
+      slots: [{ name: "slot", validChildren: ["*"] }],
     };
     const meta: ComponentMetaProvider = () => parentMeta;
 
@@ -73,7 +73,7 @@ describe("Get Slots", () => {
 describe("HTML Components", () => {
   it("Element types use custom element interfaces", () => {
     const CustomElement: CustomElement = {
-      tagName: ""
+      tagName: "",
     };
     expect(typeof HTMLComponents.A).toBe(typeof CustomElement);
     expect(typeof HTMLComponents.BR).toBe(typeof CustomElement);

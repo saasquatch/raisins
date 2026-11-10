@@ -1,26 +1,26 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
-import { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode";
-import { visit } from "../html-dom/util";
-import { DefaultSlot, NodeWithSlots } from "./SlotModel";
+import type { CustomElement, Slot } from "@raisins/schema/schema.js";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import { visit } from "../html-dom/util.ts";
+import { DefaultSlot, type NodeWithSlots } from "./SlotModel.ts";
 
 export type ComponentMetaProvider = (tagName: string) => CustomElement;
 
 export function getSlots(
   node: RaisinNode,
-  getComponentMeta: ComponentMetaProvider
+  getComponentMeta: ComponentMetaProvider,
 ): NodeWithSlots | undefined {
-  const noSlots = (_: RaisinNode): undefined => undefined;
+  const noSlots = (): undefined => undefined;
   const noSlotsWChildren = (
-    node: RaisinNode,
-    children: NodeWithSlots[]
+    slotNode: RaisinNode,
+    children: NodeWithSlots[],
   ): NodeWithSlots => ({
-    node,
+    node: slotNode,
     slots: [
       {
         ...DefaultSlot,
-        children
-      }
-    ]
+        children,
+      },
+    ],
   });
 
   return visit<NodeWithSlots>(node, {
@@ -37,26 +37,31 @@ export function getSlots(
         meta.slots?.reduce((acc, s) => {
           return {
             ...acc,
-            [s.name]: []
+            [s.name]: [],
           };
         }, {} as Reduced) ?? {};
       const allSlots = children.reduce((acc, child) => {
-        const slotName = (child.node as RaisinElementNode)?.attribs?.slot ?? "";
+        const slotName =
+          ("attribs" in child.node
+            ? child.node.attribs?.["slot"]
+            : undefined) ?? "";
         const previous = acc[slotName] ?? [];
 
         return {
           ...acc,
-          [slotName]: [...previous, child]
+          [slotName]: [...previous, child],
         };
       }, definedSlots);
 
       const allSlotsWithMeta = Object.keys(allSlots)
         .sort()
-        .map(k => {
-          const slot: Slot = meta.slots?.find(s => s.name === k) ?? { name: k };
+        .map((k) => {
+          const slot: Slot = meta.slots?.find((s) => s.name === k) ?? {
+            name: k,
+          };
           return {
             slot,
-            children: allSlots[k]
+            children: allSlots[k],
           };
         });
       // TODO: Filter slots so they don't show text nodes?
@@ -65,8 +70,8 @@ export function getSlots(
       //    - show RED validation?
       return {
         node: el,
-        slots: allSlotsWithMeta
+        slots: allSlotsWithMeta,
       };
-    }
+    },
   })!;
 }

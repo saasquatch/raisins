@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../html-dom/isNode";
-import { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode";
-import { isNodeAllowed } from "./rules/isNodeAllowed";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { isElementNode, isRoot } from "../html-dom/isNode.ts";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import { isNodeAllowed } from "./rules/isNodeAllowed.ts";
 
 export type PlopTarget = {
   idx: number;
@@ -14,7 +14,7 @@ export function calculatePlopTargets(
     parentMeta: CustomElement;
     possiblePlopMeta: CustomElement;
   },
-  parents: WeakMap<RaisinNode, RaisinNode>
+  parents: WeakMap<RaisinNode, RaisinNode>,
 ): PlopTarget[] {
   if (isRoot(parent)) {
     const hasElementChildren = parent.children?.some(isElementNode);
@@ -26,7 +26,7 @@ export function calculatePlopTargets(
         schema.possiblePlopMeta,
         parent,
         schema.parentMeta,
-        ""
+        "",
       );
       return isValid ? [{ idx: 0, slot: "" }] : [];
     }
@@ -50,31 +50,30 @@ export function calculatePlopTargets(
   // Filter out text node children and save the original index
   const raisinChildren = parent.children
     .map((child, idx) => ({ child, idx }))
-    .filter(
-      ({ child }) =>
-        !(child as RaisinTextNode).data ||
-        (child as RaisinTextNode).data?.trim()?.replace(/\\n/g, "")
-    );
+    .filter(({ child }) => {
+      const data = "data" in child ? child.data : undefined;
+      return !data || data?.trim()?.replace(/\\n/g, "");
+    });
   const seenSlots = new Set();
   const remainingSlots = new Set(
-    schema.parentMeta.slots?.map(e => e.name) ?? []
+    schema.parentMeta.slots?.map((e) => e.name) ?? [],
   );
 
   if (parent.children.length <= 0) {
     const plops: PlopTarget[] = [];
     // Slot plop targets when there are no children
-    schema.parentMeta.slots?.forEach(s => {
+    schema.parentMeta.slots?.forEach((s) => {
       const isValid = isNodeAllowed(
         possiblePlop,
         schema.possiblePlopMeta,
         parent,
         schema.parentMeta,
-        s.name
+        s.name,
       );
       if (!isValid) return;
       plops.push({
         slot: s.name,
-        idx: 0
+        idx: 0,
       });
     });
     return plops;
@@ -93,13 +92,13 @@ export function calculatePlopTargets(
         return acc;
       }
 
-      const slot = child.attribs.slot ?? "";
+      const slot = child.attribs["slot"] ?? "";
       const isValid = isNodeAllowed(
         possiblePlop,
         schema.possiblePlopMeta,
         parent,
         schema.parentMeta,
-        slot
+        slot,
       );
 
       if (!isValid) return acc;
@@ -111,7 +110,7 @@ export function calculatePlopTargets(
       if (!seenSlots.has(slot)) {
         plopTargets.push({
           idx: childIdx,
-          slot
+          slot,
         });
       }
       if (
@@ -121,12 +120,12 @@ export function calculatePlopTargets(
       ) {
         plopTargets.push({
           idx: childIdx,
-          slot
+          slot,
         });
       } else {
         plopTargets.push({
           idx: childIdx + 1,
-          slot
+          slot,
         });
       }
 
@@ -145,28 +144,28 @@ export function calculatePlopTargets(
       return [...acc, ...plopTargets];
     }, [] as PlopTarget[]) ?? [];
 
-  remainingSlots.forEach(slot => {
+  remainingSlots.forEach((slot) => {
     const isValid = isNodeAllowed(
       possiblePlop,
       schema.possiblePlopMeta,
       parent,
       schema.parentMeta,
-      slot
+      slot,
     );
     if (isValid)
       newChildren.push({
         idx: lastIdx,
-        slot
+        slot,
       });
   });
 
   return newChildren
-    .filter(x => {
+    .filter((x) => {
       if (removeIDs[x.slot] && removeIDs[x.slot].includes(x.idx)) return false;
       return true;
     })
     .filter(
       (v, i, a) =>
-        a.findIndex(t => JSON.stringify(t) === JSON.stringify(v)) === i
+        a.findIndex((t) => JSON.stringify(t) === JSON.stringify(v)) === i,
     );
 }

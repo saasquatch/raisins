@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Parse + serialize Can parse simple HTML 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "attribs": Object {},
-      "children": Array [
-        Object {
+{
+  "children": [
+    {
+      "attribs": {},
+      "children": [
+        {
           "data": "Example",
           "type": "text",
         },

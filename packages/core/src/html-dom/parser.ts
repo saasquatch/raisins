@@ -1,7 +1,7 @@
-import { domNativeToRaisin } from "./DomNativeToRaisin";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode } from "./RaisinNode";
-import { removeWhitespace } from "./util";
+import { domNativeToRaisin } from "./DomNativeToRaisin.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode } from "./RaisinNode.ts";
+import { removeWhitespace } from "./util.ts";
 
 type Options = {
   cleanWhitespace?: boolean;
@@ -16,7 +16,7 @@ type Options = {
  */
 export default function parse(
   html: string,
-  options: Options = {}
+  options: Options = {},
 ): RaisinDocumentNode {
   return parseWithErrors(html, options).node;
 }
@@ -29,11 +29,12 @@ export default function parse(
  */
 export function parseWithErrors(
   html: string,
-  { cleanWhitespace = false, onParseError }: Options = {}
+  { cleanWhitespace = false, onParseError }: Options = {},
 ): { node: RaisinDocumentNode; errors: ParseErrorStack } {
   const { node, errors } = parseDomParser(html, onParseError);
   const clean = cleanWhitespace
-    ? (removeWhitespace(node) as RaisinDocumentNode)
+    ? // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- removeWhitespace preserves the root node type
+      (removeWhitespace(node) as RaisinDocumentNode)
     : node;
   return { node: clean, errors };
 }
@@ -48,7 +49,7 @@ export function parseWithErrors(
  */
 function parseDomParser(
   html: string,
-  onParseError?: (error: ParseError, jsonPointer: string) => void
+  onParseError?: (error: ParseError, jsonPointer: string) => void,
 ) {
   const isDoctype = /<!doctype[\s/>]/i.test(html);
   const isHtml = /<\/?html[\s/>]/i.test(html);

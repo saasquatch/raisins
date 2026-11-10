@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
+import csstree, { type CssNodePlain } from "css-tree";
 
 /**
  * Rewrites every selector in a stylesheet AST so that the rules apply only to
@@ -18,7 +18,7 @@ import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
  */
 export function scopeStylesheet(
   stylesheet: CssNodePlain,
-  scope: string
+  scope: string,
 ): CssNodePlain {
   const clone = JSON.parse(JSON.stringify(stylesheet));
   processChildren(clone, scope);
@@ -79,9 +79,7 @@ function expandRule(rule: CssNodePlain): CssNodePlain[] {
   return result;
 }
 
-function expandNesting(
-  rule: RuleNode
-): {
+function expandNesting(rule: RuleNode): {
   kept: CssNodePlain[];
   lifted: CssNodePlain[];
 } {
@@ -101,7 +99,10 @@ function expandNesting(
       child.value.includes("&")
     ) {
       const expanded = replaceNestingSelectorTokens(child.value, selectorStr);
-      const parsed = toPlainObject(parse(expanded)) as CssNodePlain & {
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- csstree.toPlainObject returns the generic CssNodePlain union; a parsed StyleSheet carries children
+      const parsed = csstree.toPlainObject(
+        csstree.parse(expanded),
+      ) as CssNodePlain & {
         children?: CssNodePlain[];
       };
       if (parsed.type === "StyleSheet" && Array.isArray(parsed.children)) {
@@ -126,8 +127,9 @@ function expandNesting(
  */
 function replaceNestingSelectorTokens(
   raw: string,
-  selectorStr: string
+  selectorStr: string,
 ): string {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- TokenStream/tokenize are not exposed in css-tree's type definitions
   const csstreeAny = csstree as any;
   const tokenStream = new csstreeAny.TokenStream();
   csstreeAny.tokenize(raw, tokenStream);
@@ -151,7 +153,7 @@ function replaceNestingSelectorTokens(
 
 function serializeNode(node: any): string {
   return csstree.generate(
-    csstree.fromPlainObject(JSON.parse(JSON.stringify(node)))
+    csstree.fromPlainObject(JSON.parse(JSON.stringify(node))),
   );
 }
 
@@ -160,7 +162,7 @@ function scopeRule(rule: any, scope: string): void {
   if (!prelude || prelude.type !== "SelectorList") return;
   if (!Array.isArray(prelude.children)) return;
   prelude.children = prelude.children.map((sel: any) =>
-    scopeSelector(sel, scope)
+    scopeSelector(sel, scope),
   );
 }
 
@@ -188,7 +190,7 @@ function scopeSelector(selector: any, scope: string): any {
 
   return {
     ...selector,
-    children: [attr, descendantCombinator(), ...children]
+    children: [attr, descendantCombinator(), ...children],
   };
 }
 
@@ -202,8 +204,8 @@ function extractHostInner(host: any): any[] {
   if (!Array.isArray(inner) || inner.length === 0) return [];
   const innerText = inner[0]?.value;
   if (typeof innerText !== "string" || innerText.length === 0) return [];
-  const parsedSelector: any = toPlainObject(
-    parse(innerText, { context: "selector" })
+  const parsedSelector: any = csstree.toPlainObject(
+    csstree.parse(innerText, { context: "selector" }),
   );
   if (
     parsedSelector.type !== "Selector" ||
@@ -220,7 +222,7 @@ function buildAttributeSelector(scope: string): any {
     name: { type: "Identifier", name: "data-raisin-id" },
     matcher: "=",
     value: { type: "String", value: `"${scope}"` },
-    flags: null
+    flags: null,
   };
 }
 

@@ -1,4 +1,4 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
+import type { CustomElement, Slot } from "@raisins/schema/schema.js";
 
 /**
  * Standard HTML library of components
@@ -17,18 +17,18 @@ import { CustomElement, Slot } from "@raisins/schema/schema";
 
 const DefaultSlot: Slot = {
   name: "",
-  title: "Content"
+  title: "Content",
 };
 
 const COMMON_HTML_ATTRS_SCHEMA = [
   {
     name: "id",
-    type: "string"
+    type: "string",
   },
   {
     name: "title",
-    type: "string"
-  }
+    type: "string",
+  },
 ];
 
 // 'a',
@@ -39,10 +39,10 @@ export const A: CustomElement = {
   attributes: [
     {
       name: "href",
-      type: "string"
-    }
+      type: "string",
+    },
   ],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 
 // 'abbr',
@@ -52,10 +52,10 @@ export const ABBR: CustomElement = {
   attributes: [
     {
       name: "title",
-      type: "string"
-    }
+      type: "string",
+    },
   ],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'address',
 export const ADDR: CustomElement = {
@@ -64,28 +64,28 @@ export const ADDR: CustomElement = {
   attributes: [
     {
       name: "href",
-      type: "string"
-    }
+      type: "string",
+    },
   ],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'area',
 export const AREA: CustomElement = {
   title: "Area",
   tagName: "area",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'article',
 export const ARTICLE: CustomElement = {
   title: "Article",
   tagName: "article",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'aside',
 export const ASIDE: CustomElement = {
   title: "Aside",
   tagName: "aside",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'audio',
 export const AUDIO: CustomElement = {
@@ -94,40 +94,40 @@ export const AUDIO: CustomElement = {
   attributes: [
     {
       name: "src",
-      type: "string"
-    }
+      type: "string",
+    },
   ],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'b',
 export const B: CustomElement = {
   title: "Bold Text",
   tagName: "b",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'base',
 export const BASE: CustomElement = {
   title: "Base",
   tagName: "base",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'bdi',
 export const BDI: CustomElement = {
   title: "Bidirectional Isolate",
   tagName: "bdi",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'bdo',
 export const BDO: CustomElement = {
   title: "Bidirectional Override",
   tagName: "bdo",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'big',
 export const Big: CustomElement = {
   title: "Big Text",
   tagName: "big",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'blockquote',
 export const BLOCKQUOTE: CustomElement = {
@@ -136,34 +136,34 @@ export const BLOCKQUOTE: CustomElement = {
   attributes: [
     {
       name: "cite",
-      type: "string"
-    }
+      type: "string",
+    },
   ],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'body',
 export const BODY: CustomElement = {
   title: "Body",
   tagName: "body",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'br',
 export const BR: CustomElement = {
   title: "Line Break",
   tagName: "br",
-  slots: [{ ...DefaultSlot }]
+  slots: [{ ...DefaultSlot }],
 };
 // 'button',
 export const BUTTON: CustomElement = {
   title: "Button",
   tagName: "button",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'canvas',
 export const CANVAS: CustomElement = {
   title: "Canvas",
-  tagName: "canvas"
+  tagName: "canvas",
 };
 // 'caption',
 export const CAPTION: CustomElement = {
@@ -171,19 +171,19 @@ export const CAPTION: CustomElement = {
   tagName: "caption",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
   validParents: ["table"],
-  slots: [{ ...DefaultSlot }]
+  slots: [{ ...DefaultSlot }],
 };
 // 'cite',
 export const CITE: CustomElement = {
   title: "Citation",
   tagName: "cite",
-  slots: [{ ...DefaultSlot }]
+  slots: [{ ...DefaultSlot }],
 };
 // 'code',
 export const CODE: CustomElement = {
   title: "Code",
   tagName: "code",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'col',
 export const COL: CustomElement = {
@@ -191,7 +191,7 @@ export const COL: CustomElement = {
   tagName: "col",
   // Could use `span` property
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  validParents: ["colgroup"]
+  validParents: ["colgroup"],
 };
 // 'colgroup',
 export const COLGROUP: CustomElement = {
@@ -199,115 +199,115 @@ export const COLGROUP: CustomElement = {
   tagName: "colgroup",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
   validParents: ["table"],
-  slots: [{ ...DefaultSlot, validChildren: ["col"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["col"] }],
 };
 // 'data',
 export const DATA: CustomElement = {
   title: "Data",
   tagName: "data",
-  slots: [{ ...DefaultSlot }]
+  slots: [{ ...DefaultSlot }],
 };
 // 'datalist',
 export const DATALIST: CustomElement = {
   title: "Data List",
   tagName: "datalist",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot, validChildren: ["option"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["option"] }],
 };
 // 'dd',
 export const DD: CustomElement = {
   title: "Description Definition",
   tagName: "dd",
   validParents: ["dl"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'del',
 export const DEL: CustomElement = {
   title: "Deleted Text",
   tagName: "del",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'details',
 export const DETAILS: CustomElement = {
   title: "Details",
   tagName: "details",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'dfn',
 export const DFN: CustomElement = {
   title: "Definition",
   tagName: "dfn",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'dialog',
 export const DIALOG: CustomElement = {
   title: "Dialog",
   tagName: "dialog",
-  slots: [{ ...DefaultSlot, validChildren: ["*"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["*"] }],
 };
 // 'div',
 export const DIV: CustomElement = {
   title: "Block",
   tagName: "div",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot, validChildren: ["*"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["*"] }],
 };
 // 'dl',
 export const DL: CustomElement = {
   title: "Description List",
   tagName: "dl",
-  slots: [{ ...DefaultSlot, validChildren: ["dd", "dt"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["dd", "dt"] }],
 };
 // 'dt',
 export const DT: CustomElement = {
   title: "Description Term",
   tagName: "dt",
   validParents: ["dl"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'em',
 export const EM: CustomElement = {
   title: "Emphasized Text",
   tagName: "em",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'embed',
 export const EMBED: CustomElement = {
   title: "Embed",
-  tagName: "embed"
+  tagName: "embed",
 };
 // 'fieldset',
 export const FIELDSET: CustomElement = {
   title: "Field Set",
   tagName: "fieldset",
   validParents: ["form"],
-  slots: [{ ...DefaultSlot, validChildren: ["input", "label", "legend"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["input", "label", "legend"] }],
 };
 // 'figcaption',
 export const FIGCAPTION: CustomElement = {
   title: "Figure Caption",
   tagName: "figcaption",
   validParents: ["figure"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'figure',
 export const figure: CustomElement = {
   title: "Figure",
   tagName: "figure",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'footer',
 export const FOOTER: CustomElement = {
   title: "Footer",
   tagName: "footer",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'form',
 export const FORM: CustomElement = {
   title: "Form",
   tagName: "form",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'h1',
 export const H1: CustomElement = {
@@ -320,10 +320,10 @@ export const H1: CustomElement = {
   examples: [
     {
       title: "H1",
-      content: "<h1>H1 Header Text</h1>"
-    }
+      content: "<h1>H1 Header Text</h1>",
+    },
   ],
-  canvasRenderer: "always-replace"
+  canvasRenderer: "always-replace",
 };
 // 'h2',
 export const H2: CustomElement = {
@@ -335,10 +335,10 @@ export const H2: CustomElement = {
   examples: [
     {
       title: "H2",
-      content: "<h2>H2 Header Text</h2>"
-    }
+      content: "<h2>H2 Header Text</h2>",
+    },
   ],
-  canvasRenderer: "always-replace"
+  canvasRenderer: "always-replace",
 };
 // 'h3',
 export const H3: CustomElement = {
@@ -350,10 +350,10 @@ export const H3: CustomElement = {
   examples: [
     {
       title: "H3",
-      content: "<h3>H3 Header Text</h3>"
-    }
+      content: "<h3>H3 Header Text</h3>",
+    },
   ],
-  canvasRenderer: "always-replace"
+  canvasRenderer: "always-replace",
 };
 // 'h4',
 export const H4: CustomElement = {
@@ -365,61 +365,61 @@ export const H4: CustomElement = {
   examples: [
     {
       title: "H4",
-      content: "<h4>H4 Header Text</h4>"
-    }
+      content: "<h4>H4 Header Text</h4>",
+    },
   ],
-  canvasRenderer: "always-replace"
+  canvasRenderer: "always-replace",
 };
 // 'h5',
 export const H5: CustomElement = {
   title: "Heading 5",
   tagName: "h5",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'h6',
 export const H6: CustomElement = {
   title: "Heading 6",
   tagName: "h6",
   slotEditor: "richText",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'head',
 export const HEAD: CustomElement = {
   title: "Head",
   tagName: "head",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'header',
 export const HEADER: CustomElement = {
   title: "Header",
   tagName: "header",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'hgroup',
 export const HGROUP: CustomElement = {
   title: "Header Group",
   tagName: "hgroup",
   slots: [
-    { ...DefaultSlot, validChildren: ["h1", "h2", "h3", "h4", "h5", "h6"] }
-  ]
+    { ...DefaultSlot, validChildren: ["h1", "h2", "h3", "h4", "h5", "h6"] },
+  ],
 };
 // 'hr',
 export const HR: CustomElement = {
   title: "Thematic Break",
-  tagName: "hr"
+  tagName: "hr",
 };
 // 'html',
 export const HTML: CustomElement = {
   title: "HTML",
   tagName: "html",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'i',
 export const I: CustomElement = {
   title: "Italic Text",
   tagName: "i",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'iframe',
 export const IFRAME: CustomElement = {
@@ -429,9 +429,9 @@ export const IFRAME: CustomElement = {
     ...COMMON_HTML_ATTRS_SCHEMA,
     {
       name: "src",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 };
 // 'img',
 export const IMG: CustomElement = {
@@ -440,47 +440,47 @@ export const IMG: CustomElement = {
   attributes: [
     {
       name: "src",
-      type: "string"
+      type: "string",
     },
     {
       name: "alt",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 };
 // 'input',
 export const INPUT: CustomElement = {
   title: "Input",
-  tagName: "input"
+  tagName: "input",
 };
 // 'ins',
 export const INS: CustomElement = {
   title: "Inserted Text",
-  tagName: "ins"
+  tagName: "ins",
 };
 // 'kbd',
 export const KBD: CustomElement = {
   title: "Keyboard Input",
   tagName: "kbd",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'keygen',
 export const KEYGEN: CustomElement = {
   title: "Key Generator",
-  tagName: "keygen"
+  tagName: "keygen",
 };
 // 'label',
 export const LABEL: CustomElement = {
   title: "Label",
   tagName: "label",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'legend',
 export const LEGEND: CustomElement = {
   title: "Legend",
   tagName: "legend",
   validParents: ["fieldset"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'li',
 export const LI: CustomElement = {
@@ -488,103 +488,103 @@ export const LI: CustomElement = {
   tagName: "li",
   slotEditor: "richText",
   validParents: ["ul", "ol", "menu", "dir"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'link',
 export const LINK: CustomElement = {
   title: "Link",
-  tagName: "link"
+  tagName: "link",
 };
 // 'main',
 export const MAIN: CustomElement = {
   title: "Main",
   tagName: "main",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'map',
 export const MAP: CustomElement = {
   title: "Map",
   tagName: "map",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'mark',
 export const MARK: CustomElement = {
   title: "Mark",
   tagName: "mark",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'marquee',
 export const MARQUEE: CustomElement = {
   title: "Marquee",
   tagName: "marquee",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'menu',
 export const MENU: CustomElement = {
   title: "Menu",
   tagName: "menu",
-  slots: [{ ...DefaultSlot, validChildren: ["li", "menuitem"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["li", "menuitem"] }],
 };
 // 'menuitem',
 export const MENUITEM: CustomElement = {
   title: "Menu Item",
   tagName: "menuitem",
-  validParents: ["menu"]
+  validParents: ["menu"],
 };
 // 'meta',
 export const META: CustomElement = {
   title: "Meta",
-  tagName: "meta"
+  tagName: "meta",
 };
 // 'meter',
 export const METER: CustomElement = {
   title: "Meter",
   tagName: "meter",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'nav',
 export const Nav: CustomElement = {
   title: "Navigation",
   tagName: "nav",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'noscript',
 export const NOSCRIPT: CustomElement = {
   title: "Noscript",
   tagName: "noscript",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'object',
 export const OBJECT: CustomElement = {
   title: "Object",
   tagName: "object",
-  slots: [{ ...DefaultSlot, validChildren: ["param"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["param"] }],
 };
 // 'ol',
 export const OL: CustomElement = {
   title: "Ordered List",
   tagName: "ol",
-  slots: [{ ...DefaultSlot, validChildren: ["li", "script", "template"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["li", "script", "template"] }],
 };
 // 'optgroup',
 export const OPTGROUP: CustomElement = {
   title: "Option Group",
   tagName: "optgroup",
   validParents: ["select"],
-  slots: [{ ...DefaultSlot, validChildren: ["option"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["option"] }],
 };
 // 'option',
 export const OPTION: CustomElement = {
   title: "Option",
   tagName: "option",
   validParents: ["select", "optgroup", "datalist"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'output',
 export const OUTPUT: CustomElement = {
   title: "Output",
   tagName: "output",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'p',
 export const P: CustomElement = {
@@ -596,110 +596,110 @@ export const P: CustomElement = {
   examples: [
     {
       title: "Paragraph",
-      content: "<p>Paragraph Text</p>"
-    }
+      content: "<p>Paragraph Text</p>",
+    },
   ],
-  canvasRenderer: "always-replace"
+  canvasRenderer: "always-replace",
   // TODO: shouldn't be able to add a <p> tag inside of another <p> - need invalidChildren: ["p"]
 };
 // 'param',
 export const PARAM: CustomElement = {
   title: "Parameter",
   tagName: "param",
-  validParents: ["object"]
+  validParents: ["object"],
 };
 // 'picture',
 export const PICTURE: CustomElement = {
   title: "Picture",
   tagName: "picture",
-  slots: [{ ...DefaultSlot, validChildren: ["source", "img"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["source", "img"] }],
 };
 // 'pre',
 export const PRE: CustomElement = {
   title: "Preformatted Text",
   tagName: "pre",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'progress',
 export const PROGRESS: CustomElement = {
   title: "Progress",
   tagName: "progress",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'q',
 export const Q: CustomElement = {
   title: "Quote",
   tagName: "q",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'rp',
 export const RP: CustomElement = {
   title: "Ruby Fallback Parenthesis",
   tagName: "rp",
   validParents: ["ruby"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'rt',
 export const RT: CustomElement = {
   title: "Ruby Text",
   tagName: "rt",
   validParents: ["ruby"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'rtc,
 export const RTC: CustomElement = {
   title: "Ruby Text",
   tagName: "rtc",
   validParents: ["ruby"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'ruby',
 export const RUBY: CustomElement = {
   title: "Ruby Annotation",
   tagName: "ruby",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 's',
 export const S: CustomElement = {
   title: "Strike Through",
   tagName: "s",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'samp',
 export const SAMP: CustomElement = {
   title: "Sample Output",
   tagName: "samp",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'script',
 export const SCRIPT: CustomElement = {
   title: "Script",
   tagName: "script",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'section',
 export const SECTION: CustomElement = {
   title: "Section",
   tagName: "section",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'select',
 export const SELECT: CustomElement = {
   title: "Select",
   tagName: "select",
-  slots: [{ ...DefaultSlot, validChildren: ["option", "optgroup"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["option", "optgroup"] }],
 };
 // 'small',
 export const SMALL: CustomElement = {
   title: "Small Text",
   tagName: "small",
   attributes: COMMON_HTML_ATTRS_SCHEMA,
-  slots: [{ ...DefaultSlot }]
+  slots: [{ ...DefaultSlot }],
 };
 // 'source',
 export const SOURCE: CustomElement = {
   title: "Source",
-  tagName: "source"
+  tagName: "source",
 };
 // 'span',
 export const SPAN: CustomElement = {
@@ -708,9 +708,9 @@ export const SPAN: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      editor: "inline"
-    }
-  ]
+      editor: "inline",
+    },
+  ],
 };
 // 'strong',
 export const STRONG: CustomElement = {
@@ -718,34 +718,34 @@ export const STRONG: CustomElement = {
   tagName: "strong",
   slots: [
     {
-      ...DefaultSlot
-    }
-  ]
+      ...DefaultSlot,
+    },
+  ],
 };
 // 'style',
 export const STYLE: CustomElement = {
   title: "Style",
   tagName: "style",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'sub',
 export const SUB: CustomElement = {
   title: "Subscript Text",
   tagName: "sub",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'summary',
 export const SUMMARY: CustomElement = {
   title: "Summary",
   tagName: "summary",
   validParents: ["details"],
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'sup',
 export const SUP: CustomElement = {
   title: "Superscript Text",
   tagName: "sup",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'table',
 export const TABLE: CustomElement = {
@@ -754,9 +754,9 @@ export const TABLE: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["caption", "colgroup", "thead", "tbody", "tr", "tfoot"]
-    }
-  ]
+      validChildren: ["caption", "colgroup", "thead", "tbody", "tr", "tfoot"],
+    },
+  ],
 };
 // 'tbody',
 export const TBODY: CustomElement = {
@@ -766,9 +766,9 @@ export const TBODY: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["tr"]
-    }
-  ]
+      validChildren: ["tr"],
+    },
+  ],
 };
 // 'td',
 export const TD: CustomElement = {
@@ -778,15 +778,15 @@ export const TD: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["*"]
-    }
-  ]
+      validChildren: ["*"],
+    },
+  ],
 };
 // 'textarea',
 export const TEXTAREA: CustomElement = {
   title: "Text Area",
   tagName: "textarea",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'tfoot',
 export const TFOOT: CustomElement = {
@@ -796,9 +796,9 @@ export const TFOOT: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["tr"]
-    }
-  ]
+      validChildren: ["tr"],
+    },
+  ],
 };
 // 'th',
 export const TH: CustomElement = {
@@ -808,9 +808,9 @@ export const TH: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["*"]
-    }
-  ]
+      validChildren: ["*"],
+    },
+  ],
 };
 // 'thead',
 export const THEAD: CustomElement = {
@@ -820,21 +820,21 @@ export const THEAD: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["tr"]
-    }
-  ]
+      validChildren: ["tr"],
+    },
+  ],
 };
 // 'time',
 export const TIME: CustomElement = {
   title: "Time",
   tagName: "time",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'title',
 export const TITLE: CustomElement = {
   title: "Document Title",
   tagName: "title",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'tr',
 export const TR: CustomElement = {
@@ -844,43 +844,43 @@ export const TR: CustomElement = {
   slots: [
     {
       ...DefaultSlot,
-      validChildren: ["td", "th"]
-    }
-  ]
+      validChildren: ["td", "th"],
+    },
+  ],
 };
 // 'track',
 export const TRACK: CustomElement = {
   title: "Track",
-  tagName: "track"
+  tagName: "track",
 };
 // 'u',
 export const U: CustomElement = {
   title: "Underlined Text",
   tagName: "u",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'ul',
 export const UL: CustomElement = {
   title: "Unordered List",
   tagName: "ul",
-  slots: [{ ...DefaultSlot, validChildren: ["li", "script", "template"] }]
+  slots: [{ ...DefaultSlot, validChildren: ["li", "script", "template"] }],
 };
 // 'var',
 export const VAR: CustomElement = {
   title: "Variable",
   tagName: "var",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'video',
 export const VIDEO: CustomElement = {
   title: "Video",
   tagName: "video",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'wbr',
 export const WBR: CustomElement = {
   title: "Line Break Opportunity",
-  tagName: "wbr"
+  tagName: "wbr",
 };
 
 // // SVG
@@ -888,119 +888,119 @@ export const WBR: CustomElement = {
 export const CIRCLE: CustomElement = {
   title: "Circle",
   tagName: "circle",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'clippath',
 export const clipPath: CustomElement = {
   title: "Clipping Path",
   tagName: "clippath",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'defs',
 export const DEFS: CustomElement = {
   title: "Definitions",
   tagName: "defs",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'ellipse',
 export const ELLIPSE: CustomElement = {
   title: "Ellipse",
   tagName: "video",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'foreignobject',
 export const FOREIGNOBJECT: CustomElement = {
   title: "Foreign Object",
   tagName: "foreignobject",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'g',
 export const G: CustomElement = {
   title: "SVG Group",
   tagName: "g",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'image',
 export const IMAGE: CustomElement = {
   title: "Image",
   tagName: "image",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'line',
 export const LINE: CustomElement = {
   title: "Line",
   tagName: "line",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'lineargradient',
 export const LINEARGRADIENT: CustomElement = {
   title: "Linear Gradient",
   tagName: "lineargradient",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'mask',
 export const MASK: CustomElement = {
   title: "Mask",
   tagName: "mask",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'path',
 export const PATH: CustomElement = {
   title: "Path",
   tagName: "path",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'pattern',
 export const PATTERN: CustomElement = {
   title: "Pattern",
   tagName: "pattern",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'polygon',
 export const POLYGON: CustomElement = {
   title: "Polygon",
   tagName: "polygon",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'polyline',
 export const POLYLINE: CustomElement = {
   title: "Polyline",
   tagName: "polyline",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'radialgradient',
 export const RADIALGRADIENT: CustomElement = {
   title: "Radial Gradient",
   tagName: "radialgradient",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'rect',
 export const RECT: CustomElement = {
   title: "Rectangle",
   tagName: "rect",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'stop',
 export const STOP: CustomElement = {
   title: "Stop",
   tagName: "stop",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'svg',
 export const SVG: CustomElement = {
   title: "SVG",
   tagName: "svg",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'text',
 export const TEXT: CustomElement = {
   title: "Text",
   tagName: "text",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };
 // 'tspan'
 export const TSPAN: CustomElement = {
   title: "T Span",
   tagName: "tspan",
-  slots: [DefaultSlot]
+  slots: [DefaultSlot],
 };

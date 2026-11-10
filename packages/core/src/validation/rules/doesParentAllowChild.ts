@@ -1,6 +1,6 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinNode } from "../../html-dom/RaisinNode";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
 
 /**
  * Given a child and it's parent's metadata
@@ -12,13 +12,13 @@ export function doesParentAllowChild(
   child: RaisinNode,
   parentMeta: CustomElement,
   slot: string | undefined = "",
-  parent?: RaisinNode
+  parent?: RaisinNode,
 ): boolean {
   // Root element is always allowed.
   // This allows editing for fragments, since Root !== body
   if (isRoot(parent)) return true;
   const slots = parentMeta.slots;
-  const slotMeta = slots?.find(s => s.name === slot);
+  const slotMeta = slots?.find((s) => s.name === slot);
 
   if (!slotMeta && !slots?.length) return false;
 

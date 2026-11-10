@@ -1,7 +1,8 @@
-import { CssNodePlain } from "css-tree";
+import type { CssNodePlain } from "css-tree";
 import { encodeXML, escapeAttribute } from "entities";
-import cssSerializer from "../css-om/serializer";
-import foreignNames from "./foreignNames";
+import cssSerializer from "../css-om/serializer.ts";
+import foreignNames from "./foreignNames.ts";
+import { isElementNode } from "./isNode.ts";
 // eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
@@ -9,9 +10,9 @@ import type {
   RaisinNode,
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
-  RaisinTextNode
-} from "./RaisinNode";
-import { getParents, visit } from "./util";
+  RaisinTextNode,
+} from "./RaisinNode.ts";
+import { getParents, visit } from "./util.ts";
 
 /**
  * `\/` is a valid CSS escape for `/`, so this is safe anywhere `</style` can
@@ -75,9 +76,9 @@ const unencodedElements = new Set([
  */
 function formatAttributes(
   attributes: Record<string, string | null> | undefined,
-  opts: DomSerializerOptions
+  opts: DomSerializerOptions,
 ) {
-  if (!attributes) return;
+  if (!attributes) return undefined;
 
   return Object.keys(attributes)
     .map((key) => {
@@ -85,7 +86,8 @@ function formatAttributes(
 
       if (opts.xmlMode === "foreign") {
         /* Fix up mixed-case attribute names */
-        key = (attributeNames[key as keyof typeof attributeNames]) ?? key;
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- lookup of arbitrary key; missing keys fall back via ??
+        key = attributeNames[key as keyof typeof attributeNames] ?? key;
       }
 
       if (!opts.emptyAttrs && !opts.xmlMode && value === "") {
@@ -93,7 +95,7 @@ function formatAttributes(
         // See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
         return key;
       }
-      
+
       /**
        * Encodes all characters that have to be escaped in HTML attributes,
        * following {@link https://html.spec.whatwg.org/multipage/parsing.html#escapingString}.
@@ -140,18 +142,16 @@ const singleTag = new Set([
  */
 export default function serializer(
   node: RaisinNode | RaisinNode[],
-  options: DomSerializerOptions = {}
+  options: DomSerializerOptions = {},
 ): string {
-  const nodes: RaisinNode[] = Array.isArray(node)
-    ? (node as RaisinNode[])
-    : [node];
+  const nodes: RaisinNode[] = Array.isArray(node) ? node : [node];
 
   let output = "";
 
   for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
-    const parents = getParents(node);
-    output += renderNode(node, options, parents);
+    const currentNode = nodes[i];
+    const parents = getParents(currentNode);
+    output += renderNode(currentNode, options, parents);
   }
 
   return output;
@@ -160,24 +160,26 @@ export default function serializer(
 function renderNode(
   node: RaisinNode,
   options: DomSerializerOptions,
-  parents: Parents
+  parents: Parents,
 ): string {
-  return visit(node, {
-    onText: (n) => renderText(n, options, parents),
-    onElement: (n, children) => renderTag(n, options, parents, children),
-    onRoot(_, children?: string[]) {
-      return children?.join("");
-    },
-    onStyle(n) {
-      const cssContents = n.contents
-        ? escapeStyleRawText(cssSerializer(n.contents))
-        : "";
-      const attribs = formatAttributes(n.attribs, options);
-      return `<style${attribs ? " " + attribs : ""}>${cssContents}</style>`;
-    },
-    onDirective: renderDirective,
-    onComment: renderComment,
-  }) ?? "";
+  return (
+    visit(node, {
+      onText: (n) => renderText(n, options, parents),
+      onElement: (n, children) => renderTag(n, options, parents, children),
+      onRoot(_, children?: string[]) {
+        return children?.join("");
+      },
+      onStyle(n) {
+        const cssContents = n.contents
+          ? escapeStyleRawText(cssSerializer(n.contents))
+          : "";
+        const attribs = formatAttributes(n.attribs, options);
+        return `<style${attribs ? " " + attribs : ""}>${cssContents}</style>`;
+      },
+      onDirective: renderDirective,
+      onComment: renderComment,
+    }) ?? ""
+  );
 }
 
 const foreignModeIntegrationPoints = new Set([
@@ -198,18 +200,20 @@ function renderTag(
   elem: RaisinElementNode,
   opts: DomSerializerOptions,
   parents: Parents,
-  children?: string[]
+  children?: string[],
 ) {
   const parent = parents.get(elem);
   let { tagName } = elem;
   // Handle SVG / MathML in HTML
   if (opts.xmlMode === "foreign") {
     /* Fix up mixed-case element names */
-    tagName = elementNames[elem.tagName as keyof typeof elementNames] ?? elem.tagName;
+    tagName =
+      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- lookup of arbitrary tag name; missing keys fall back via ??
+      elementNames[elem.tagName as keyof typeof elementNames] ?? elem.tagName;
     /* Exit foreign mode at integration points */
     if (
-      parent &&
-      foreignModeIntegrationPoints.has((parent as RaisinElementNode).tagName)
+      isElementNode(parent) &&
+      foreignModeIntegrationPoints.has(parent.tagName)
     ) {
       opts = { ...opts, xmlMode: false };
     }
@@ -261,7 +265,7 @@ function renderDirective(elem: RaisinProcessingInstructionNode) {
 function renderText(
   elem: RaisinTextNode,
   opts: DomSerializerOptions,
-  parents: Parents
+  parents: Parents,
 ) {
   let data = elem.data || "";
   const parent = parents.get(elem);
@@ -269,8 +273,8 @@ function renderText(
   if (
     !(
       !opts.xmlMode &&
-      parent &&
-      unencodedElements.has((parent as RaisinElementNode).tagName)
+      isElementNode(parent) &&
+      unencodedElements.has(parent.tagName)
     )
   ) {
     data = encodeXML(data);
@@ -284,7 +288,7 @@ function renderComment(elem: RaisinCommentNode) {
 }
 
 function formatStyle(style: CssNodePlain): string | undefined {
-  if (!style) return;
+  if (!style) return undefined;
   const content = cssSerializer(style);
   return `style="${content.replace(/"/g, "&quot;")}"`;
 }

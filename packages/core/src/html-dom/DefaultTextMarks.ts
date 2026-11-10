@@ -30,5 +30,5 @@ export const DefaultTextMarks = [
   "time",
   "u",
   "var",
-  "wbr"
+  "wbr",
 ] as const;

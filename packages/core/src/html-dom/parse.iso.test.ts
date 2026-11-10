@@ -1,10 +1,10 @@
 import { ElementType } from "domelementtype";
-import expect from "expect";
+import { expect } from "expect";
 // eslint-disable-next-line prettier/prettier
-import type { ParseError, ParseErrorStack } from "./ParseError";
-import parse, { parseWithErrors } from "./parser";
-import { RaisinNode } from "./RaisinNode";
-import serializer from "./serializer";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import parse, { parseWithErrors } from "./parser.ts";
+import type { RaisinNode } from "./RaisinNode.ts";
+import serializer from "./serializer.ts";
 
 describe("Parse simple nodes", () => {
   function parseElement(src: string, tagName: string, attribs: any = {}) {
@@ -17,9 +17,9 @@ describe("Parse simple nodes", () => {
             tagName: tagName,
             attribs: attribs,
             children: [],
-            style: undefined
-          }
-        ]
+            style: undefined,
+          },
+        ],
       };
       expect(parse(src)).toStrictEqual(node);
     });
@@ -36,12 +36,12 @@ describe("Parse simple nodes", () => {
   parseElement("<p></p>", "p");
 
   parseElement('<img src="www.example.com"></img>', "img", {
-    src: "www.example.com"
+    src: "www.example.com",
   });
 
   parseElement('<div center class="my-class"></div>', "div", {
     center: "",
-    class: "my-class"
+    class: "my-class",
   });
 
   // Guards against the regex matching <htmlfoo> as an html tag, for example.
@@ -70,7 +70,7 @@ describe("Parse + serialize edge cases", () => {
   parseSimpleNodes("<head></head><body><div>hello world</div></body>");
 
   parseSimpleNodes(
-    "<html><head></head><body><div>hello world</div></body></html>"
+    "<html><head></head><body><div>hello world</div></body></html>",
   );
 
   parseSimpleNodes("<!DOCTYPE html><html><div>hello world</div></html>");
@@ -80,11 +80,11 @@ describe("Parse + serialize edge cases", () => {
   parseSimpleNodes("<!DOCTYPE html><head></head><div>hello world</div>");
 
   parseSimpleNodes(
-    "<!DOCTYPE html><head></head><body><div>hello world</div></body>"
+    "<!DOCTYPE html><head></head><body><div>hello world</div></body>",
   );
 
   parseSimpleNodes(
-    "<!DOCTYPE html><html><head></head><body><div>hello world</div></body></html>"
+    "<!DOCTYPE html><html><head></head><body><div>hello world</div></body></html>",
   );
 
   // Whitespace delimiter after tagname
@@ -92,7 +92,7 @@ describe("Parse + serialize edge cases", () => {
   parseSimpleNodes('<body class="page"><div>hello world</div></body>');
   parseSimpleNodes('<head lang="en"></head><div>hello world</div>');
   parseSimpleNodes(
-    '<!DOCTYPE html><html lang="en"><body class="page"><div>hi</div></body></html>'
+    '<!DOCTYPE html><html lang="en"><body class="page"><div>hi</div></body></html>',
   );
 });
 
@@ -124,13 +124,14 @@ describe("parseWithErrors", () => {
       { html: "<style>.a { color: red; }</style>", childField: "contents" },
       {
         html: '<div style="background-color blue"></div>',
-        childField: "style"
+        childField: "style",
       },
-      { html: "<style>.foo { color }</style>", childField: "contents" }
+      { html: "<style>.foo { color }</style>", childField: "contents" },
     ];
     cases.forEach(({ html, childField }) => {
       it(`${html} → child.${childField} is defined`, () => {
         const result = parseWithErrors(html);
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test indexes child by dynamic field name
         const child = result.node.children[0] as any;
         expect(child[childField]).toBeDefined();
       });
@@ -147,33 +148,33 @@ describe("parseWithErrors", () => {
       {
         name: "malformed style attribute",
         html: '<div style="background-color blue"></div>',
-        pointers: ["/children/0/style"]
+        pointers: ["/children/0/style"],
       },
       {
         name: "malformed <style> element",
         html: "<style>.foo { color }</style>",
-        pointers: ["/children/0"]
+        pointers: ["/children/0"],
       },
       {
         name: "attribute + element in document order",
         html: '<div style="x y"></div><style>.a { color }</style>',
-        pointers: ["/children/0/style", "/children/1"]
+        pointers: ["/children/0/style", "/children/1"],
       },
       {
         name: "sibling malformed style attributes",
         html: '<div style="a b"></div><div style="c d"></div>',
-        pointers: ["/children/0/style", "/children/1/style"]
+        pointers: ["/children/0/style", "/children/1/style"],
       },
       {
         name: "nested malformed style attribute",
         html: '<section><div style="bad val"></div></section>',
-        pointers: ["/children/0/children/0/style"]
+        pointers: ["/children/0/children/0/style"],
       },
       {
         name: "valid sibling does not produce an error",
         html: '<div style="color: red"></div><div style="bad val"></div>',
-        pointers: ["/children/1/style"]
-      }
+        pointers: ["/children/1/style"],
+      },
     ];
 
     cases.forEach(({ name, html, pointers }) => {
@@ -195,16 +196,16 @@ describe("parseWithErrors", () => {
     const inputs = [
       '<div style="bad val"></div>',
       '<div style="x y"></div><style>.a { color }</style>',
-      '<section><div style="bad val"></div></section>'
+      '<section><div style="bad val"></div></section>',
     ];
 
-    inputs.forEach(html => {
+    inputs.forEach((html) => {
       it(`callback receives the same entries as returned errors: ${html}`, () => {
         const collected: ParseErrorStack = [];
         const result = parseWithErrors(html, {
           onParseError: (error: ParseError, jsonPointer: string) => {
             collected.push({ jsonPointer, error });
-          }
+          },
         });
         expect(collected).toEqual(result.errors);
       });
@@ -221,17 +222,16 @@ describe("parseWithErrors", () => {
       {
         name: "cleanWhitespace: true",
         html: "  <div style='bad val'></div>  ",
-        options: { cleanWhitespace: true }
+        options: { cleanWhitespace: true },
       },
       {
         name: "full-document with malformed <style> in <head>",
-        html:
-          "<!DOCTYPE html><html><head><style>.a { color }</style></head><body></body></html>"
+        html: "<!DOCTYPE html><html><head><style>.a { color }</style></head><body></body></html>",
       },
       {
         name: "full-document with malformed style attribute in <body>",
-        html: '<body><div style="bad val"></div></body>'
-      }
+        html: '<body><div style="bad val"></div></body>',
+      },
     ];
 
     inputs.forEach(({ name, html, options }) => {
@@ -248,10 +248,10 @@ describe("parseWithErrors", () => {
       "<div></div>",
       '<div style="bad val"></div>',
       "<style>.a { color }</style>",
-      '<div style="x y"></div><style>.a { color }</style>'
+      '<div style="x y"></div><style>.a { color }</style>',
     ];
 
-    inputs.forEach(html => {
+    inputs.forEach((html) => {
       it(`parse(html) deep-equals parseWithErrors(html).node: ${html}`, () => {
         const node = parse(html);
         const { node: nodeWithErrors } = parseWithErrors(html);

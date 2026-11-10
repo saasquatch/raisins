@@ -2,10 +2,10 @@
 
 /// <reference types="cypress" />
 
-import expect from "expect";
-import isHtmlEquivalent from "./isHtmlEquivalent";
-import parse from "./parser";
-import serializer from "./serializer";
+import { expect } from "expect";
+import isHtmlEquivalent from "./isHtmlEquivalent.ts";
+import parse from "./parser.ts";
+import serializer from "./serializer.ts";
 
 describe("Parse + serialize", () => {
   it("Can parse simple HTML", () => {
@@ -17,10 +17,10 @@ describe("Parse + serialize", () => {
   });
 
   it("Can parse Email Benchmark cases", () => {
-    cy.task("getFiles", "benchmark-emails").each(file => {
-      cy.readFile("./benchmark-emails/" + file).then(source => {
+    cy.task("getFiles", "benchmark-emails").each((file) => {
+      cy.readFile("./benchmark-emails/" + file).then((source) => {
         const raisinNode = parse(source, {
-          cleanWhitespace: false
+          cleanWhitespace: false,
         });
         const raisinString = serializer(raisinNode);
         expect(isHtmlEquivalent(source, raisinString)).toBe(true);
@@ -52,11 +52,11 @@ describe("Parse + serialize", () => {
       "cd65a11a9c7c6a3deac05443833a7097578ee6d5538479408dc0bbdbae438fcc.html",
       "e1e4dba652a78f4d1af52f5a7f4ac247c83070220a0e6fbad0bb26b6742dfcee.html",
       "fc5a55c65ef9b22d7309cdb4d9a6efe319baeda10190547b3e49dc9152e92f14.html",
-      "fff65493446424d4b8d49bd1027a851bdd685a75bd11a324897ebe836b3ebb85.html"
+      "fff65493446424d4b8d49bd1027a851bdd685a75bd11a324897ebe836b3ebb85.html",
     ];
 
-    cy.task("getFiles", "benchmark-files").each(file => {
-      cy.readFile("./benchmark-files/" + file).then(source => {
+    cy.task("getFiles", "benchmark-files").each((file) => {
+      cy.readFile("./benchmark-files/" + file).then((source) => {
         const raisinNode = parse(source, { cleanWhitespace: false });
         const raisinString = serializer(raisinNode);
 
@@ -68,8 +68,8 @@ describe("Parse + serialize", () => {
             source,
             raisinString,
             { ignoreComments },
-            { scriptingEnabled: false }
-          )
+            { scriptingEnabled: false },
+          ),
         ).toBe(true);
       });
     });

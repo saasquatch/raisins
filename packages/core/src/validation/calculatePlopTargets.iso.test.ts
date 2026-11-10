@@ -1,9 +1,9 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import parse from "../html-dom/parser";
-import { RaisinElementNode } from "../html-dom/RaisinNode";
-import { getParents } from "../html-dom/util";
-import { calculatePlopTargets } from "./calculatePlopTargets";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { expect } from "expect";
+import parse from "../html-dom/parser.ts";
+import type { RaisinElementNode } from "../html-dom/RaisinNode.ts";
+import { getParents } from "../html-dom/util.ts";
+import { calculatePlopTargets } from "./calculatePlopTargets.ts";
 
 /**
  * Regression tests for the "global top-level drop target" bug: a component
@@ -15,24 +15,24 @@ const restrictedPlop: RaisinElementNode = {
   type: "tag",
   tagName: "sqm-stat",
   attribs: {},
-  children: []
+  children: [],
 };
 const restrictedMeta: CustomElement = {
   tagName: "sqm-stat",
-  validParents: ["sqm-stat-container"]
+  validParents: ["sqm-stat-container"],
 };
 
 const unrestrictedPlop: RaisinElementNode = {
   type: "tag",
   tagName: "sqm-text",
   attribs: {},
-  children: []
+  children: [],
 };
 const unrestrictedMeta: CustomElement = { tagName: "sqm-text" };
 
 const rootMeta: CustomElement = {
   tagName: "",
-  slots: [{ name: "", title: "Content" }]
+  slots: [{ name: "", title: "Content" }],
 };
 
 function rootFor(html: string) {
@@ -47,7 +47,7 @@ describe("calculatePlopTargets — root parent validation", () => {
       root,
       restrictedPlop,
       { parentMeta: rootMeta, possiblePlopMeta: restrictedMeta },
-      parents
+      parents,
     );
     expect(targets).toEqual([]);
   });
@@ -59,7 +59,7 @@ describe("calculatePlopTargets — root parent validation", () => {
       root,
       restrictedPlop,
       { parentMeta: rootMeta, possiblePlopMeta: restrictedMeta },
-      parents
+      parents,
     );
     expect(targets).toEqual([]);
   });
@@ -70,20 +70,20 @@ describe("calculatePlopTargets — root parent validation", () => {
       root,
       unrestrictedPlop,
       { parentMeta: rootMeta, possiblePlopMeta: unrestrictedMeta },
-      parents
+      parents,
     );
     expect(targets).toEqual([{ idx: 0, slot: "" }]);
   });
 
   it("offers per-child targets (not a single global one) when root has element children", () => {
     const { root, parents } = rootFor(
-      "\n<sqm-text></sqm-text><sqm-text></sqm-text>"
+      "\n<sqm-text></sqm-text><sqm-text></sqm-text>",
     );
     const targets = calculatePlopTargets(
       root,
       unrestrictedPlop,
       { parentMeta: rootMeta, possiblePlopMeta: unrestrictedMeta },
-      parents
+      parents,
     );
     // General per-child logic runs instead of the empty-root short-circuit,
     // so there is more than one candidate position.

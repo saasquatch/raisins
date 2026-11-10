@@ -1,15 +1,15 @@
-import expect from "expect";
-import { NodePath } from "../paths/Paths";
-import { calculatePlopTargets } from "../validation/calculatePlopTargets";
-import {
+import { expect } from "expect";
+import type { NodePath } from "../paths/Paths.ts";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode
-} from "./RaisinNode";
+  RaisinTextNode,
+} from "./RaisinNode.ts";
 import {
   clone,
   duplicate,
@@ -20,23 +20,23 @@ import {
   moveToPath,
   remove,
   replace,
-  replacePath
-} from "./util";
+  replacePath,
+} from "./util.ts";
 
 it("Remove node", () => {
   const node: RaisinNode = {
     type: "tag",
     tagName: "div",
     children: [],
-    attribs: {}
+    attribs: {},
   };
   const root: RaisinNode = {
     type: "root",
-    children: [node]
+    children: [node],
   };
   expect(remove(root, node)).toStrictEqual({
     type: "root",
-    children: []
+    children: [],
   });
 });
 
@@ -44,7 +44,7 @@ it("Replace node", () => {
   const root = (child: RaisinNode): RaisinNode => {
     return {
       type: "root",
-      children: [child]
+      children: [child],
     };
   };
 
@@ -52,36 +52,36 @@ it("Replace node", () => {
     type: "tag",
     tagName: "span",
     children: [],
-    attribs: {}
+    attribs: {},
   };
 
   const div: RaisinNode = {
     type: "tag",
     tagName: "div",
     children: [],
-    attribs: {}
+    attribs: {},
   };
 
   const text: RaisinTextNode = {
     type: "text",
-    data: ""
+    data: "",
   };
 
   const style: RaisinStyleNode = {
     type: "style",
     attribs: {},
-    tagName: "style"
+    tagName: "style",
   };
 
   const comment: RaisinCommentNode = {
     type: "comment",
-    data: ""
+    data: "",
   };
 
   const code: RaisinProcessingInstructionNode = {
     type: "directive",
     name: "",
-    data: ""
+    data: "",
   };
 
   expect(replace(root(div), div, span)).toStrictEqual(root(span));
@@ -94,33 +94,33 @@ it("Replace node", () => {
 it("Duplicate node", () => {
   const text: RaisinTextNode = {
     type: "text",
-    data: "hello world"
+    data: "hello world",
   };
   const node: RaisinNode = {
     type: "tag",
     tagName: "div",
     children: [text, text, text],
-    attribs: { open: "true" }
+    attribs: { open: "true" },
   };
   const root: RaisinNode = {
     type: "root",
-    children: [node]
+    children: [node],
   };
   expect(duplicate(root, node)).toStrictEqual({
     type: "root",
-    children: [node, node]
+    children: [node, node],
   });
   expect(
-    duplicate(root, node, undefined, original => ({
+    duplicate(root, node, undefined, (original) => ({
       ...clone(original),
-      attribs: { open: "false" }
-    }))
+      attribs: { open: "false" },
+    })),
   ).toStrictEqual({
     type: "root",
-    children: [node, { ...node, attribs: { open: "false" } }]
+    children: [node, { ...node, attribs: { open: "false" } }],
   });
-  expect(() => duplicate(root, root)).toThrowError();
-  expect(() => duplicate(node, node)).toThrowError();
+  expect(() => duplicate(root, root)).toThrow();
+  expect(() => duplicate(node, node)).toThrow();
 });
 
 it("Clone node", () => {
@@ -128,7 +128,7 @@ it("Clone node", () => {
     type: "tag",
     tagName: "div",
     children: [],
-    attribs: {}
+    attribs: {},
   };
   expect(clone(node)).toStrictEqual(node);
 });
@@ -136,14 +136,14 @@ it("Clone node", () => {
 it("Get ancestry", () => {
   const root: RaisinNode = {
     type: "root",
-    children: []
+    children: [],
   };
 
   const node: RaisinNode = {
     type: "tag",
     tagName: "div",
     children: [],
-    attribs: {}
+    attribs: {},
   };
   expect(getAncestry(root, node)).toStrictEqual([]);
 });
@@ -153,22 +153,22 @@ it("Move", () => {
     type: "tag",
     tagName: "span",
     children: [],
-    attribs: {}
+    attribs: {},
   };
   const newParent: RaisinNode = {
     type: "tag",
     tagName: "div",
     children: [node],
-    attribs: {}
+    attribs: {},
   };
   const root: RaisinNode = {
     type: "root",
-    children: [newParent]
+    children: [newParent],
   };
 
   expect(move(root, node, newParent, 0)).toStrictEqual(root);
-  expect(() => move(root, root, newParent, 0)).toThrowError();
-  expect(() => move(root, node, node, 0)).toThrowError();
+  expect(() => move(root, root, newParent, 0)).toThrow();
+  expect(() => move(root, node, node, 0)).toThrow();
 });
 
 it("Move path", () => {
@@ -179,16 +179,16 @@ it("Move path", () => {
         type: "tag",
         tagName: "div",
         children: [{ type: "tag", tagName: "span", children: [], attribs: {} }],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
 
-  expect(() => moveToPath(root, [0], [0], 0)).toThrowError();
-  expect(() => moveToPath(root, [1], [1], 0)).toThrowError();
+  expect(() => moveToPath(root, [0], [0], 0)).toThrow();
+  expect(() => moveToPath(root, [1], [1], 0)).toThrow();
   expect(moveToPath(root, [0], [1], 2)).toStrictEqual({
     type: "root",
-    children: []
+    children: [],
   });
 });
 
@@ -197,29 +197,30 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: { slot: "children", id: "node1" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const node2: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "children", id: "node2" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const root: RaisinDocumentNode = {
     type: "root",
-    children: [node1, node2]
+    children: [node1, node2],
   };
 
   it("Move node at the same level", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       root,
       node2,
       "children",
       nodepath,
-      0
+      0,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(2);
@@ -229,21 +230,21 @@ describe("Move nodes", () => {
 
   const emptyRoot: RaisinDocumentNode = {
     type: "root",
-    children: []
+    children: [],
   };
 
   const possiblePlopMeta = {
     title: "Div",
     tagName: "div",
     attributes: [],
-    slots: []
+    slots: [],
   };
 
   const newNode: RaisinElementNode = {
     tagName: "div",
     attribs: { id: "newNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   it("Adding a slot to root", () => {
@@ -254,23 +255,24 @@ describe("Move nodes", () => {
         // @ts-ignore
         tagName: undefined,
         title: undefined,
-        slots: []
+        slots: [],
       },
       {
         pickedNode: newNode,
-        possiblePlopMeta
+        possiblePlopMeta,
       },
-      {}
+      {},
     );
 
     expect(plopTargets.length).toBe(1);
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       emptyRoot,
       newNode,
       "",
       nodepath,
-      1
+      1,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(1);
@@ -279,14 +281,14 @@ describe("Move nodes", () => {
 
   const slotRoot: RaisinDocumentNode = {
     type: "root",
-    children: [node2]
+    children: [node2],
   };
 
   const node2Moved: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "formData", id: "node2" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   // Moving a component with no slot name attached into a named slot
@@ -302,12 +304,13 @@ describe("Move nodes", () => {
    */
   it("Move an existing node into a slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       slotRoot,
       node2,
       "formData",
       nodepath,
-      0
+      0,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(1);
@@ -327,12 +330,13 @@ describe("Move nodes", () => {
    */
   it("Move an existing node into a slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       slotRoot,
       node2,
       "formData",
       nodepath,
-      0
+      0,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(1);
@@ -343,19 +347,19 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: {},
     children: [node2Moved],
-    type: "tag"
+    type: "tag",
   };
 
   const node2Removed: RaisinElementNode = {
     tagName: "div",
     attribs: { id: "node2" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const slottedRoot: RaisinDocumentNode = {
     type: "root",
-    children: [container]
+    children: [container],
   };
 
   // Moving a component with a slot name into a section with no slots
@@ -372,12 +376,13 @@ describe("Move nodes", () => {
   it("Move a node with a slot name into a node without named slots", () => {
     const nodepath: NodePath = [];
     expect(slottedRoot.children.length).toBe(1);
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       slottedRoot,
       node2Moved,
       "",
       nodepath,
-      0
+      0,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(2);
@@ -388,19 +393,19 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: { slot: "otherChildren", id: "existingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const movedExistingNode: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "children", id: "existingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const multiSlotRoot: RaisinDocumentNode = {
     type: "root",
-    children: [existingNode]
+    children: [existingNode],
   };
 
   // Moving a component with a slot name into a new slot within the same component
@@ -417,12 +422,13 @@ describe("Move nodes", () => {
    */
   it("Move node at the same level with new slot to a specific index of an empty slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       multiSlotRoot,
       existingNode,
       "children",
       nodepath,
-      1
+      1,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(1);
@@ -433,14 +439,14 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: { id: "movingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const addedNode: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "otherChildren", id: "movingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   // Moving a new component without a slot name into the same slot as an existing component
@@ -460,12 +466,13 @@ describe("Move nodes", () => {
    */
   it("Move a new node as a sibling with a different slot to a specific index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       multiSlotRoot,
       addingNoSlotNode,
       "otherChildren",
       nodepath,
-      1
+      1,
     ) as RaisinDocumentNode;
     expect(res.children.length).toBe(2);
     expect(res.children[0]).toStrictEqual(existingNode);
@@ -476,14 +483,14 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: { slot: "children", id: "movingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const movedNode: RaisinElementNode = {
     tagName: "div",
     attribs: { slot: "otherChildren", id: "movingNode" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   // Moving a new component with a slot name into a slot within the same component as an existing component
@@ -503,12 +510,13 @@ describe("Move nodes", () => {
    */
   it("Move a new node as a sibling with a different slot to a specific index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       multiSlotRoot,
       movingNode,
       "otherChildren",
       nodepath,
-      1
+      1,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(2);
@@ -520,24 +528,24 @@ describe("Move nodes", () => {
     tagName: "div",
     attribs: { id: "node1" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
   const node2NoSlot: RaisinElementNode = {
     tagName: "div",
     attribs: { id: "node2" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
   const node3NoSlot: RaisinElementNode = {
     tagName: "div",
     attribs: { id: "node2" },
     children: [],
-    type: "tag"
+    type: "tag",
   };
 
   const slotlessRoot: RaisinDocumentNode = {
     type: "root",
-    children: [node1NoSlot, node2NoSlot, node3NoSlot]
+    children: [node1NoSlot, node2NoSlot, node3NoSlot],
   };
 
   // Moving a child component to a new index within a parent component
@@ -560,12 +568,13 @@ describe("Move nodes", () => {
    */
   it("Move node with no slot to a new index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test fixture: moveNode on a document root returns a document
     const res = moveNode(
       slotlessRoot,
       node1NoSlot,
       "",
       nodepath,
-      2
+      2,
     ) as RaisinDocumentNode;
 
     expect(res.children.length).toBe(3);
@@ -575,12 +584,14 @@ describe("Move nodes", () => {
   });
 
   it("Move sibling into another sibling, then back again", () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test inspects untyped node internals
     const res = moveNode(root, node2, "children", [0], 0) as any;
 
     const newNode2 = res.children[0].children[0];
     expect(res.children.length).toBe(1);
     expect(newNode2).toStrictEqual(node2);
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- test inspects untyped node internals
     const newOriginal = moveNode(res, newNode2, "children", [], 0) as any;
 
     expect(newOriginal.children.length).toBe(2);
@@ -594,16 +605,16 @@ it("Insert at path", () => {
     type: "tag",
     tagName: "span",
     children: [],
-    attribs: {}
+    attribs: {},
   };
 
   const root: RaisinNode = {
     type: "root",
-    children: [node]
+    children: [node],
   };
 
-  expect(() => insertAtPath(root, root, [0], 0)).toThrowError();
-  expect(() => insertAtPath(root, node, [0], 0)).toThrowError();
+  expect(() => insertAtPath(root, root, [0], 0)).toThrow();
+  expect(() => insertAtPath(root, node, [0], 0)).toThrow();
 
   const rootNode = (num: number): RaisinNode => {
     return {
@@ -613,9 +624,9 @@ it("Insert at path", () => {
           type: "tag",
           tagName: "div",
           children: Array(num).fill(node),
-          attribs: {}
-        }
-      ]
+          attribs: {},
+        },
+      ],
     };
   };
 
@@ -627,16 +638,16 @@ it("Replace path", () => {
     type: "tag",
     tagName: "div",
     children: [],
-    attribs: {}
+    attribs: {},
   };
 
   const root: RaisinNode = {
     type: "root",
-    children: [node]
+    children: [node],
   };
 
   expect(replacePath(root, [], node)).toStrictEqual(node);
   expect(replacePath(root, [0], node)).toStrictEqual(root);
   expect(replacePath(root, [0, 1], node)).toStrictEqual(root);
-  expect(() => replacePath(root, [0, 1, 2], node)).toThrowError();
+  expect(() => replacePath(root, [0, 1, 2], node)).toThrow();
 });

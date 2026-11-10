@@ -1,14 +1,14 @@
-import { Attribute, CustomElement } from "@raisins/schema/schema";
+import type { Attribute, CustomElement } from "@raisins/schema/schema.js";
 import { parseToRgba } from "color2k";
 import { Interval } from "luxon";
-import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinNode } from "../../html-dom/RaisinNode";
-import { doesChildAllowParent } from "../rules/doesChildAllowParent";
-import { doesParentAllowChild } from "../rules/doesParentAllowChild";
-import {
+import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
+import { doesChildAllowParent } from "../rules/doesChildAllowParent.ts";
+import { doesParentAllowChild } from "../rules/doesParentAllowChild.ts";
+import type {
   ErrorEntry as BaseErrorEntry,
-  ErrorStack as BaseErrorStack
-} from "./types";
+  ErrorStack as BaseErrorStack,
+} from "./types.ts";
 
 export type AttributeError = {
   type: "attribute";
@@ -19,7 +19,6 @@ export type AttributeError = {
     | "minimum"
     | "required"
     | `enum/string`
-    | `enum/number`
     | `enum/boolean`
     | "minLength"
     | "maxLength"
@@ -44,7 +43,7 @@ type ErrorStack = BaseErrorStack<ErrorType>;
 
 export function validateNode(
   node: RaisinNode,
-  meta: CustomElement[]
+  meta: CustomElement[],
 ): ErrorStack {
   const childErrors = validateChildNodes(node, meta);
   const childConstraintErrors = validateChildConstraints(node, meta);
@@ -54,67 +53,67 @@ export function validateNode(
 
 export function validateChildConstraints(
   node: RaisinNode,
-  meta: CustomElement[]
+  meta: CustomElement[],
 ): ErrorStack {
   // No constraints apply when when node isn't an element node
   if (!isElementNode(node)) return [];
 
-  const errorsOrUndefined = node.children.map((child, idx):
-    | ErrorEntry
-    | undefined => {
-    if (isElementNode(child)) {
-      const childMeta = meta.find(m => m.tagName === child.tagName);
-      const parentMeta = meta.find(m => m.tagName === node.tagName);
+  const errorsOrUndefined = node.children.map(
+    (child, idx): ErrorEntry | undefined => {
+      if (isElementNode(child)) {
+        const childMeta = meta.find((m) => m.tagName === child.tagName);
+        const parentMeta = meta.find((m) => m.tagName === node.tagName);
 
-      if (childMeta && !doesChildAllowParent(childMeta, node)) {
-        return {
-          jsonPointer: `/children/${idx}`,
-          error: {
-            type: "ancestry",
-            rule: "doesChildAllowParent",
-            parent: node,
-            parentMeta,
-            child,
-            childMeta
-          }
-        };
+        if (childMeta && !doesChildAllowParent(childMeta, node)) {
+          return {
+            jsonPointer: `/children/${idx}`,
+            error: {
+              type: "ancestry",
+              rule: "doesChildAllowParent",
+              parent: node,
+              parentMeta,
+              child,
+              childMeta,
+            },
+          };
+        }
+        if (
+          parentMeta &&
+          !doesParentAllowChild(child, parentMeta, child.attribs["slot"], node)
+        ) {
+          return {
+            jsonPointer: `/children/${idx}`,
+            error: {
+              type: "ancestry",
+              rule: "doesParentAllowChild",
+              parent: node,
+              parentMeta,
+              child,
+              childMeta,
+            },
+          };
+        }
       }
-      if (
-        parentMeta &&
-        !doesParentAllowChild(child, parentMeta, child.attribs.slot, node)
-      ) {
-        return {
-          jsonPointer: `/children/${idx}`,
-          error: {
-            type: "ancestry",
-            rule: "doesParentAllowChild",
-            parent: node,
-            parentMeta,
-            child,
-            childMeta
-          }
-        };
-      }
-    }
-    return undefined;
-  });
+      return undefined;
+    },
+  );
 
-  return errorsOrUndefined.filter(x => typeof x !== "undefined") as ErrorStack;
+  return errorsOrUndefined.filter((x) => typeof x !== "undefined");
 }
 
 function validateChildNodes(
   node: RaisinNode,
-  meta: CustomElement[]
+  meta: CustomElement[],
 ): ErrorStack {
   // No validation when node doesn't have children
   if (!(isElementNode(node) || isRoot(node))) return [];
 
   const childErrors = node.children
     .map((child, childIdx) =>
-      validateNode(child, meta).map(error => ({
+      validateNode(child, meta).map((error) => ({
         jsonPointer: `/children/${childIdx}${error.jsonPointer}`,
-        error: error.error
-      }))
+        error: error.error,
+      })),
     )
     .reduce((acc, curr) => [...acc, ...curr], []);
   return childErrors;
@@ -126,13 +125,13 @@ function validateChildNodes(
 export function generateJsonPointers(
   node: RaisinNode,
   path = "",
-  map = new WeakMap()
+  map: WeakMap<RaisinNode, string> = new WeakMap(),
 ): WeakMap<RaisinNode, string> {
   map.set(node, path);
   if (isElementNode(node) || isRoot(node)) {
     return node.children.reduce(
       (acc, c, idx) => generateJsonPointers(c, `${path}/children/${idx}`, acc),
-      map
+      map,
     );
   }
   return map;
@@ -140,12 +139,12 @@ export function generateJsonPointers(
 
 export function validateAttributes(
   node: RaisinNode,
-  meta: CustomElement[]
+  meta: CustomElement[],
 ): ErrorStack {
   // Only validate attributes for element nodes
   if (!isElementNode(node)) return [];
 
-  const nodeMeta = meta.find(m => m.tagName === node.tagName);
+  const nodeMeta = meta.find((m) => m.tagName === node.tagName);
 
   // If meta for node or the attributes do not exist then validation cannot be done
   if (nodeMeta === undefined || nodeMeta.attributes === undefined) return [];
@@ -153,7 +152,7 @@ export function validateAttributes(
   const errorStack: ErrorEntry[] = [];
 
   // For each attribute, check validation rules
-  nodeMeta.attributes.forEach(a => {
+  nodeMeta.attributes.forEach((a) => {
     // check if attribute exists on the node
     if (node.attribs[a.name] === undefined) {
       if (a.required === true && a.type !== "boolean")
@@ -163,8 +162,8 @@ export function validateAttributes(
             type: "attribute",
             node,
             rule: "required",
-            attribute: a
-          }
+            attribute: a,
+          },
         });
       // skip validation if does not exist and not required
       return;
@@ -184,8 +183,8 @@ export function validateAttributes(
               type: "attribute",
               node,
               rule: `type/number`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
         if (a.enum !== undefined && !a.enum.includes(Number(value)))
           errorStack.push({
@@ -195,10 +194,10 @@ export function validateAttributes(
               node,
 
               rule: `enum/number`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
-        if (a.maximum !== undefined && Number(value) > Number(a.maximum))
+        if (a.maximum !== undefined && Number(value) > a.maximum)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -206,10 +205,10 @@ export function validateAttributes(
               node,
 
               rule: `maximum`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
-        if (a.minimum !== undefined && Number(value) < Number(a.minimum))
+        if (a.minimum !== undefined && Number(value) < a.minimum)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -217,8 +216,8 @@ export function validateAttributes(
               node,
 
               rule: `minimum`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
         break;
       case "string":
@@ -230,10 +229,10 @@ export function validateAttributes(
               node,
 
               rule: `enum/string`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
-        if (a.maxLength !== undefined && value.length > Number(a.maxLength))
+        if (a.maxLength !== undefined && value.length > a.maxLength)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -241,10 +240,10 @@ export function validateAttributes(
               node,
 
               rule: `maxLength`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
-        if (a.minLength !== undefined && value.length < Number(a.minLength))
+        if (a.minLength !== undefined && value.length < a.minLength)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -252,45 +251,45 @@ export function validateAttributes(
               node,
 
               rule: `minLength`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
         if (a.format !== undefined) {
           switch (a.format) {
             case "color":
-              if (isValidColor(value) === false)
+              if (!isValidColor(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
                     type: "attribute",
                     node,
                     rule: `format/color`,
-                    attribute: a
-                  }
+                    attribute: a,
+                  },
                 });
               break;
             case "date-interval":
-              if (isValidDateInterval(value) === false)
+              if (!isValidDateInterval(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
                     type: "attribute",
                     node,
                     rule: `format/date-interval`,
-                    attribute: a
-                  }
+                    attribute: a,
+                  },
                 });
               break;
             case "url":
-              if (isValidURL(value) === false)
+              if (!isValidURL(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
                     type: "attribute",
                     node,
                     rule: `format/url`,
-                    attribute: a
-                  }
+                    attribute: a,
+                  },
                 });
               break;
           }
@@ -304,14 +303,14 @@ export function validateAttributes(
               type: "attribute",
               node,
               rule: `enum/boolean`,
-              attribute: a
-            }
+              attribute: a,
+            },
           });
         break;
     }
   });
 
-  return errorStack as ErrorStack;
+  return errorStack;
 }
 
 export function isValidColor(value: string): boolean {

@@ -1,6 +1,9 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinElementNode, RaisinNode } from "../../html-dom/RaisinNode";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
+import type {
+  RaisinElementNode,
+  RaisinNode,
+} from "../../html-dom/RaisinNode.ts";
 
 /**
  * Given a tag's metadata, checks if it allows children.
@@ -10,7 +13,7 @@ import { RaisinElementNode, RaisinNode } from "../../html-dom/RaisinNode";
  */
 export function doesChildAllowParent(
   childMeta: CustomElement,
-  parent: RaisinNode
+  parent: RaisinNode,
 ): boolean {
   let tagName: string | undefined = undefined;
 
@@ -20,6 +23,7 @@ export function doesChildAllowParent(
     return true;
   }
 
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- parent may also be a root here; kept to preserve existing tagName handling
   let elementParent = parent as RaisinElementNode;
 
   tagName = elementParent.tagName;

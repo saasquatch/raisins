@@ -1,4 +1,4 @@
-import expect from "expect";
+import { expect } from "expect";
 import {
   isCommentNode,
   isDirectiveNode,
@@ -6,9 +6,9 @@ import {
   isNodeWithChildren,
   isRoot,
   isStyleNode,
-  isTextNode
-} from "./isNode";
-import parse from "./parser";
+  isTextNode,
+} from "./isNode.ts";
+import parse from "./parser.ts";
 
 describe("isNode utility", () => {
   function isNode(src: string, ...fns: any[]) {
@@ -16,7 +16,7 @@ describe("isNode utility", () => {
       const doc = parse(src);
       expect(doc.children.length).toBe(1);
       const child = doc.children[0];
-      fns.forEach(fn => {
+      fns.forEach((fn) => {
         expect(fn(child)).toBe(true);
       });
     });
