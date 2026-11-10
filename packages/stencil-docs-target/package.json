@@ -1,71 +1,63 @@
 {
   "name": "@raisins/stencil-docs-target",
-  "description": "A custom docs target for Stencil components. Edit in Raisins.",
   "version": "1.4.0",
+  "description": "A custom docs target for Stencil components. Edit in Raisins.",
+  "homepage": "https://github.com/saasquatch/raisins",
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  },
   "license": "MIT",
   "author": "ReferralSaaSquatch.com, Inc.",
-  "module": "dist/stencil-docs-target.esm.js",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/stencil-docs-target"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist",
     "src"
   ],
-  "engines": {
-    "node": ">=10"
+  "type": "module",
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "echo 'Tested in examples/my-kitchen-sink'",
-    "lint": "eslint src",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "build": "tsdown",
+    "test": "node --test test/convertToGrapesJSMeta.test.ts",
+    "lint": "oxlint",
+    "format": "oxfmt"
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "size-limit": [
-    {
-      "path": "dist/stencil.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/stencil.esm.js",
-      "limit": "10 KB"
-    }
-  ],
-  "devDependencies": {
-    "@eslint/js": "^8.57.0",
-    "@size-limit/preset-small-lib": "^5.0.4",
-    "@stencil/core": "^2.8.1",
-    "@types/jest": "^27.0.2",
-    "ajv": "^6",
-    "eslint": "^8.57.0",
-    "globals": "^15.2.0",
-    "size-limit": "^5.0.4",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.7.2",
-    "typescript-eslint": "^7.8.0"
-  },
-  "bugs": {
-    "url": "https://github.com/saasquatch/raisins/issues"
-  },
-  "homepage": "https://github.com/saasquatch/raisins",
   "dependencies": {
     "@raisins/schema": "^1.4.0"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.45.2",
+    "@types/node": "^24.19.2",
+    "ajv": "^6.14.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2006",
+    "tsdown": "^0.23.7",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@stencil/core": "^2 || ^4"
+  },
+  "engines": {
+    "node": "^24 || ^26"
   }
 }

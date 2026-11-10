@@ -1,7 +1,7 @@
-import * as schema from '@raisins/schema/schema';
-import { JsonDocs, OutputTargetDocsCustom } from '@stencil/core/internal';
-import { convertToGrapesJSMeta } from './convertToRaisins';
-import { writeFile } from './writeFile';
+import type * as schema from "@raisins/schema/schema.js";
+import type { JsonDocs, OutputTargetDocsCustom } from "@stencil/core/internal";
+import { convertToGrapesJSMeta } from "./convertToRaisins.ts";
+import { writeFile } from "./writeFile.ts";
 
 export type Config = {
   /**
@@ -30,11 +30,11 @@ export type Config = {
  *
  * @param config
  */
-export function raisinsDocsTarget({
-  outDir = process.env.PWD ?? process.cwd(),
-  outFile = 'raisins.json',
+export default function raisinsDocsTarget({
+  outDir = process.env["PWD"] ?? process.cwd(),
+  outFile = "raisins.json",
   extraModules: extraPackages = [],
-  postProcess = m => m,
+  postProcess = (m) => m,
 }: Partial<Config> = {}): OutputTargetDocsCustom {
   async function generator(docsJson: JsonDocs) {
     try {
@@ -50,21 +50,20 @@ export function raisinsDocsTarget({
       // Post-processing (someone will want this)
       const postProcessed = postProcess(allComponents, docsJson);
       const pkg: schema.Package = {
-        schemaVersion: '1.0.0',
+        schemaVersion: "1.0.0",
         modules: postProcessed,
       };
 
       const stringifiedFile = JSON.stringify(pkg);
       await writeFile(outDir, outFile, stringifiedFile);
     } catch (e) {
-      console.error('Error in raisins docs target for stencil', e);
+      console.error("Error in raisins docs target for stencil", e);
       throw e;
     }
   }
 
   return {
-    type: 'docs-custom',
+    type: "docs-custom",
     generator,
   };
 }
-export default raisinsDocsTarget;

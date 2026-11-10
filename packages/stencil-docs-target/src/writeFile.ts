@@ -1,5 +1,5 @@
-import path from 'path';
 import fsSync from "fs";
+import path from "path";
 export const fs = fsSync.promises;
 
 /**
@@ -14,6 +14,6 @@ export async function writeFile(outDir: string, file: string, content: string) {
     await fs.mkdir(outDir, { recursive: true });
   }
   await fs.writeFile(path.resolve(outDir, file), content, {
-    encoding: 'utf-8',
+    encoding: "utf-8",
   });
 }
