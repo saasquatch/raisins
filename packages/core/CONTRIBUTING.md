@@ -6,10 +6,16 @@ Source lives in `/src`.
 
 - `npm start` — builds to `/dist` with [tsdown](https://tsdown.dev) in watch mode, rebuilding on every change in `src`.
 - `npm run build` — one-off build to `/dist` (CJS + ESM, with type declarations and sourcemaps).
-- `npm test` — runs the Jest suite (`*.iso.test.ts` and `*.node.test.ts`). Use `npm run test:watch` or `npm run test:coverage` as needed.
+- `npm test` — runs the [Vitest](https://vitest.dev) `node` project (`*.iso.test.ts` and `*.node.test.ts`, in jsdom).
+- `npm run test:browser` — runs the Vitest `browser` project (`*.iso.test.ts` and `*.web.test.ts`) in headless Chromium via Playwright. Run `npx playwright install --only-shell chromium` once first.
+- `npm run test:watch` — runs both projects in watch mode; `npm run test:coverage` collects coverage for the `node` project.
 - `npm run lint` — lints with [oxlint](https://oxc.rs/docs/guide/usage/linter) (type-aware, using `tsconfig.json`).
 - `npm run format` — formats with [oxfmt](https://oxc.rs/docs/guide/usage/formatter).
-- `npm run cypress:open` — runs the browser (`*.web.test.ts` and `.feature`) specs in Cypress.
+
+### Tests
+
+- `*.iso.test.ts` run in both projects, `*.node.test.ts` only in jsdom, and `*.web.test.ts` only in the browser.
+- Gherkin `.feature` files are bound to step definitions in `src/cucumber-steps` with `bindIsomorphicCucumberSteps`, which takes the feature text from a `?raw` import so it works in both projects.
 
 ### TypeScript
 

@@ -1,5 +1,4 @@
 import type { CssNodePlain } from "css-tree";
-import { expect } from "expect";
 import type { StateUpdater } from "../util/NewState.ts";
 import type { StyleNodeWithChildren } from "./Types.ts";
 import { createChildUpdater, createUpdater } from "./util.ts";

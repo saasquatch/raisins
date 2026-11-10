@@ -1,5 +1,4 @@
 import type { CustomElement } from "@raisins/schema/schema.js";
-import { expect } from "expect";
 import type { RaisinElementNode } from "../../html-dom/RaisinNode.ts";
 import { isNodeAllowed } from "./isNodeAllowed.ts";
 

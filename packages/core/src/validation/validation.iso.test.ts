@@ -1,5 +1,4 @@
 import type { CustomElement, Slot } from "@raisins/schema/schema.js";
-import { expect } from "expect";
 import type { RaisinDocumentNode, RaisinNode } from "../index.ts";
 import { type ComponentMetaProvider, getSlots } from "./getSlots.ts";
 import * as HTMLComponents from "./HTMLComponents.ts";

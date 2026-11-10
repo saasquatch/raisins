@@ -1,6 +1,6 @@
 import * as css5 from "css";
-import { expect } from "expect";
 import * as parse5 from "parse5";
+import { expect } from "vitest";
 
 /**
  * Validates CSS

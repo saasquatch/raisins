@@ -1,9 +1,0 @@
-{
-  "integrationFolder": ".",
-  "testFiles": [
-    "./src/**/*.@(iso|web).test.@(ts|tsx|js|jsx)",
-    "./src/**/*.feature"
-  ],
-  "ignoreTestFiles": "**/cucumber-steps/*",
-  "pluginsFile": "cypress/plugins/index.cjs"
-}

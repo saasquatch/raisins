@@ -1,4 +1,3 @@
-import { expect } from "expect";
 import parser from "./parser.ts";
 import { scopeStylesheet } from "./scope.ts";
 import serializer from "./serializer.ts";

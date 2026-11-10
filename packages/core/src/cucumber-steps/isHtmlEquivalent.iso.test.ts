@@ -1,4 +1,4 @@
-import { expect } from "expect";
+import feature from "../html-dom/isHtmlEquivalent.feature?raw";
 import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
@@ -34,4 +34,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/isHtmlEquivalent.feature");
+bindIsomorphicCucumberSteps(cucumber, feature);

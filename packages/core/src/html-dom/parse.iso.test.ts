@@ -1,5 +1,4 @@
 import { ElementType } from "domelementtype";
-import { expect } from "expect";
 // eslint-disable-next-line prettier/prettier
 import type { ParseError, ParseErrorStack } from "./ParseError.ts";
 import parse, { parseWithErrors } from "./parser.ts";

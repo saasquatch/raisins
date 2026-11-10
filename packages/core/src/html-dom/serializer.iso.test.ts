@@ -1,5 +1,4 @@
 import { ElementType } from "domelementtype";
-import { expect } from "expect";
 import cssParser from "../css-om/parser.ts";
 import parse from "./parser.ts";
 import type { RaisinElementNode, RaisinStyleNode } from "./RaisinNode.ts";
@@ -119,7 +118,7 @@ describe("Attribute escaping", () => {
     testAttribute(`Greater than >`, `Greater than >`);
   });
 
-  describe("Does not escape other charaters", () => {
+  test("Does not escape other charaters", () => {
     for (let charCode = 0; charCode < 65536; charCode++) {
       const char = String.fromCharCode(charCode);
 

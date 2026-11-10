@@ -1,8 +1,8 @@
 import { ElementType } from "domelementtype";
-import { expect } from "expect";
+import type { MockInstance } from "vitest";
 import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import feature from "../html-dom/util.feature?raw";
 import { removeWhitespace, visit } from "../html-dom/util.ts";
-import isJest from "../testing/isJest.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
@@ -144,7 +144,7 @@ const cucumber = (
     | "r_style"
     | "r_root";
 
-  let callbackSpy: jest.SpyInstance;
+  let callbackSpy: MockInstance;
   let callbackResult: string | undefined;
 
   given(/^the node is (.*)$/, (type: any) => {
@@ -152,10 +152,8 @@ const cucumber = (
   });
 
   and(/^the visitor has a (.*) function defined$/, (callback: any) => {
-    if (isJest()) {
-      callbacks = callback;
-      callbackSpy = jest.spyOn(visitor, callbacks);
-    }
+    callbacks = callback;
+    callbackSpy = vi.spyOn(visitor, callbacks);
   });
 
   when("visit is called", () => {
@@ -163,9 +161,7 @@ const cucumber = (
   });
 
   then("the callback is called with the node", () => {
-    if (isJest()) {
-      expect(callbackSpy).toHaveBeenCalledTimes(1);
-    }
+    expect(callbackSpy).toHaveBeenCalledTimes(1);
   });
 
   and(/^the (.*) of the callback is returned$/, (result: any) => {
@@ -174,4 +170,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/util.feature");
+bindIsomorphicCucumberSteps(cucumber, feature);

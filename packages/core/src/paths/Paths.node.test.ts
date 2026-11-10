@@ -1,4 +1,3 @@
-import { expect } from "expect";
 import parse from "../../src/html-dom/parser.ts";
 import selector from "../../src/html-dom/selector.ts";
 import { getNode, getPath, type RaisinDocumentNode } from "../../src/index.ts";

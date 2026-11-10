@@ -2,8 +2,6 @@
   "$schema": "https://www.schemastore.org/tsconfig",
 
   "include": ["src/**/*.ts"],
-  // Cypress-only specs use Cypress/Chai globals and are compiled by Cypress
-  "exclude": ["src/**/*.web.test.ts"],
 
   "compilerOptions": {
     "lib": [
@@ -22,7 +20,7 @@
     "module": "nodenext",
     "moduleResolution": "node16",
     "target": "esnext",
-    "types": ["node", "jest"],
+    "types": ["node", "vitest/globals", "vite/client"],
 
     // Best practices
     "allowJs": false,

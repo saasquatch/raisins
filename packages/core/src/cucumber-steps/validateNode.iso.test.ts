@@ -1,4 +1,3 @@
-import { expect } from "expect";
 import parse from "../html-dom/parser.ts";
 import type {
   RaisinCommentNode,
@@ -8,6 +7,7 @@ import type {
   RaisinStyleNode,
   RaisinTextNode,
 } from "../html-dom/RaisinNode.ts";
+import feature from "../validation/validateNode/validateNode.feature?raw";
 import {
   isValidColor,
   isValidDateInterval,
@@ -198,7 +198,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/validateNode/validateNode.feature",
-);
+bindIsomorphicCucumberSteps(cucumber, feature);

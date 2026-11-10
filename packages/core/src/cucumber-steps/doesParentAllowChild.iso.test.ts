@@ -1,5 +1,4 @@
 import type { CustomElement } from "@raisins/schema/schema.js";
-import { expect } from "expect";
 import type {
   RaisinCommentNode,
   RaisinDocumentNode,
@@ -8,6 +7,7 @@ import type {
   RaisinStyleNode,
   RaisinTextNode,
 } from "../html-dom/RaisinNode.ts";
+import feature from "../validation/rules/doesParentAllowChild.feature?raw";
 import { doesParentAllowChild } from "../validation/rules/doesParentAllowChild.ts";
 import {
   bindIsomorphicCucumberSteps,
@@ -107,7 +107,4 @@ const cucumber: IsoStepDefs = (
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/rules/doesParentAllowChild.feature",
-);
+bindIsomorphicCucumberSteps(cucumber, feature);

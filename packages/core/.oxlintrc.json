@@ -10,11 +10,11 @@
     "typeCheck": true
   },
   "rules": {},
-  "ignorePatterns": ["dist", "cypress", "src/**/*.web.test.ts"],
+  "ignorePatterns": ["dist"],
   "env": {
     "builtin": true,
     "browser": true,
     "node": true,
-    "jest": true
+    "vitest": true
   }
 }

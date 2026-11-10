@@ -1,27 +1,21 @@
 import { autoBindSteps } from "@saasquatch/scoped-autobindsteps";
-import { defineStep } from "cypress-cucumber-preprocessor/steps";
-import type { StepDefinitions } from "jest-cucumber";
-import isJest from "../testing/isJest.ts";
+import { parseFeature, type StepDefinitions } from "jest-cucumber";
 
+/**
+ * Binds step definitions to a Gherkin feature. Takes the feature's text (e.g. a `?raw` import)
+ * rather than a path so it works in both the Node and browser test projects.
+ */
 export function bindIsomorphicCucumberSteps(
   stepDefs: IsoStepDefs,
-  file: string,
+  featureText: string,
 ) {
-  if (!isJest()) {
+  const feature = parseFeature(featureText);
+
+  const steps: StepDefinitions = ({ defineStep }) => {
     stepDefs(defineStep, defineStep, defineStep, defineStep);
-  } else {
-    const jest_cucumber = require("jest-cucumber");
+  };
 
-    const feature = jest_cucumber.loadFeature(file, {
-      loadRelativePath: true,
-    });
-
-    var jestSteps: StepDefinitions = ({ defineStep: jestDefineStep }) => {
-      stepDefs(jestDefineStep, jestDefineStep, jestDefineStep, jestDefineStep);
-    };
-
-    autoBindSteps([feature], [jestSteps]);
-  }
+  autoBindSteps([feature], [steps]);
 }
 export type DefineIsoStepDef = (...args: any[]) => void;
 export type IsoStepDefs = (...args: DefineIsoStepDef[]) => unknown;

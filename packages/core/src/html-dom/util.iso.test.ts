@@ -1,4 +1,3 @@
-import { expect } from "expect";
 import type { NodePath } from "../paths/Paths.ts";
 import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
 import type {
@@ -21,6 +20,8 @@ import {
   remove,
   replace,
   replacePath,
+  visit,
+  visitAll,
 } from "./util.ts";
 
 it("Remove node", () => {
@@ -650,4 +651,65 @@ it("Replace path", () => {
   expect(replacePath(root, [0], node)).toStrictEqual(root);
   expect(replacePath(root, [0, 1], node)).toStrictEqual(root);
   expect(() => replacePath(root, [0, 1, 2], node)).toThrow();
+});
+
+test("Visitor skip node", () => {
+  const node: RaisinNode = {
+    type: "root",
+    children: [
+      {
+        type: "tag",
+        tagName: "div",
+        children: [
+          {
+            type: "text",
+            data: "hello world",
+          },
+        ],
+        attribs: {},
+      },
+    ],
+  };
+  const visitor = {
+    skipNode: (_skipNode: any) => false,
+  };
+
+  const spySkip = vi.spyOn(visitor, "skipNode");
+
+  visit(node, visitor, true);
+  visit(node, visitor, false);
+
+  expect(spySkip).toHaveBeenCalledTimes(2);
+});
+
+test("Visit all", () => {
+  const node: RaisinNode = {
+    type: "root",
+    children: [
+      {
+        type: "tag",
+        tagName: "div",
+        children: [
+          {
+            type: "text",
+            data: "hello world",
+          },
+        ],
+        attribs: {},
+      },
+    ],
+  };
+
+  const callback = {
+    callbackCounter: (_callback: any) => false,
+  };
+
+  const callbackSpy = vi.spyOn(callback, "callbackCounter");
+
+  visitAll(node, (n: RaisinNode) => {
+    callback.callbackCounter(0);
+    return n;
+  });
+
+  expect(callbackSpy).toHaveBeenCalledTimes(3);
 });
