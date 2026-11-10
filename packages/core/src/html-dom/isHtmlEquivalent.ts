@@ -1,4 +1,4 @@
-import * as css5 from "css";
+import * as csstree from "css-tree";
 import * as parse5 from "parse5";
 import { expect } from "vitest";
 
@@ -10,21 +10,16 @@ interface css5Options {
 }
 
 function parseCSS(input: string, options?: css5Options): string {
-  input = input.toLowerCase();
-  if (options?.inline) input = "*{" + input + "}";
-  try {
-    input = css5.stringify(css5.parse(input), {
-      compress: true,
-    });
-    input = css5.stringify(css5.parse(input), {
-      compress: true,
-    });
-  } catch {
-    return "";
-  }
-  input = input.replace(/\s+/g, "");
-  if (options?.inline) input = input.slice(2, -1);
-  return input;
+  let invalid = false;
+  const ast = csstree.parse(input.toLowerCase(), {
+    // Inline `style` values are declaration lists, so no `*{…}` wrapper is needed
+    context: options?.inline ? "declarationList" : "stylesheet",
+    onParseError: () => {
+      invalid = true;
+    },
+  });
+  if (invalid) return "";
+  return csstree.generate(ast).replace(/\s+/g, "");
 }
 
 /**
