@@ -18,6 +18,7 @@
     "schema.d.ts"
   ],
   "main": "schema.json",
+  "types": "./schema.d.ts",
   "publishConfig": {
     "access": "public"
   },
