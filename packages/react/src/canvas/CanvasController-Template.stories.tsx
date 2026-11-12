@@ -1,25 +1,25 @@
-import type { Meta } from '@storybook/react';
-import { atom, useAtom } from 'jotai';
-import { molecule, useMolecule } from 'bunshi/react';
-import React from 'react';
-import { h } from 'snabbdom';
-import { big, MintComponents, mintMono } from '../examples/MintComponents.tsx';
-import { useHotkeys } from '../hotkeys/index.ts';
-import { BasicStory } from '../index.stories.tsx';
-import { Toolbars } from './CanvasController.stories.tsx';
-import { CanvasProvider } from './CanvasScope.tsx';
-import { CanvasScopeMolecule } from './CanvasScopeMolecule.tsx';
-import { BasicCanvasController } from './index.ts';
+import type { Meta } from "@storybook/react";
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtom } from "jotai";
+import React from "react";
+import { h } from "snabbdom";
+import { big, MintComponents, mintMono } from "../examples/MintComponents.tsx";
+import { useHotkeys } from "../hotkeys/index.ts";
+import { BasicStory } from "../index.stories.tsx";
+import { Toolbars } from "./CanvasController.stories.tsx";
+import { CanvasProvider } from "./CanvasScope.tsx";
+import { CanvasScopeMolecule } from "./CanvasScopeMolecule.tsx";
+import { BasicCanvasController } from "./index.ts";
 import {
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasSelectionMolecule,
-} from './plugins/index.ts';
-import type { RootRenderer } from './types.tsx';
+} from "./plugins/index.ts";
+import type { RootRenderer } from "./types.tsx";
 
 const meta: Meta = {
-  title: 'Canvas Templates',
-  excludeStories: ['CanvasFull'],
+  title: "Canvas Templates",
+  excludeStories: ["CanvasFull"],
 };
 export default meta;
 
@@ -35,25 +35,25 @@ const CanvasWithSelection = () => {
 const PaintItRedMolecule = molecule((getMol, getScope) => {
   const CanvasScope = getMol(CanvasScopeMolecule);
 
-  const ColorAtom = atom('pink');
-  const TextAtom = atom('I am magic');
-  const PaintItRed = atom<RootRenderer>(get => {
+  const ColorAtom = atom("pink");
+  const TextAtom = atom("I am magic");
+  const PaintItRed = atom<RootRenderer>((get) => {
     const color = get(ColorAtom);
     const text = get(TextAtom);
     return (n, d) => {
-      if(!Array.isArray(n)) return n;
+      if (!Array.isArray(n)) return n;
       return h(
-        'div',
+        "div",
         {
           style: {
-            display: 'block',
-            padding: '20px',
-            background: 'green',
-            '--favorite-color': color,
+            display: "block",
+            padding: "20px",
+            background: "green",
+            "--favorite-color": color,
           },
           shadowContent: `<div>${text}<hr/><slot></slot><hr/>${text}</div>`,
         },
-        n
+        n,
       );
     };
   });
@@ -68,7 +68,7 @@ const ShadowPicker = () => {
   const [text, setText] = useAtom(atoms.TextAtom);
   return (
     <>
-      {['pink', 'red', 'green'].map(c => (
+      {["pink", "red", "green"].map((c) => (
         <button onClick={() => setColor(c)}>{c}</button>
       ))}
 
@@ -76,7 +76,7 @@ const ShadowPicker = () => {
       <input
         type="text"
         value={text}
-        onInput={e => setText((e.target as HTMLInputElement).value)}
+        onInput={(e) => setText((e.target as HTMLInputElement).value)}
       />
     </>
   );
@@ -91,7 +91,7 @@ export const CanvasFull = () => {
   return (
     <>
       <ShadowPicker />
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: "relative" }}>
         <Toolbars />
         <BasicCanvasController />
       </div>
@@ -109,8 +109,8 @@ export const BigCanvasWithSelection = () => (
 );
 export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: "flex" }}>
+      <div style={{ width: "50%" }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -126,13 +126,13 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
 
 export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex' }}>
-      <div style={{ width: '50%' }}>
+    <div style={{ display: "flex" }}>
+      <div style={{ width: "50%" }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ width: "50%" }}>
         <CanvasProvider>
           <Component />
         </CanvasProvider>

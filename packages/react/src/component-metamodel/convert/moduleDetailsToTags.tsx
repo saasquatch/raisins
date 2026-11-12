@@ -1,6 +1,6 @@
-import type * as schema from '@raisins/schema/schema';
-import type { CustomElement } from '../Component.ts';
-import type { ModuleDetails } from '../types.ts';
+import type * as schema from "@raisins/schema/schema";
+import type { CustomElement } from "../Component.ts";
+import type { ModuleDetails } from "../types.ts";
 
 /**
  * Reduces a set of ModuleDetails into a set of CustomElement definitions.
@@ -8,13 +8,13 @@ import type { ModuleDetails } from '../types.ts';
  */
 export function moduleDetailsToTags(
   acc: schema.CustomElement[],
-  c: ModuleDetails
+  c: ModuleDetails,
 ): schema.CustomElement[] {
   // A raisins package can have multiple "modules", each with their own tags
   const tags =
     c.raisins?.modules.reduce(
       (acc1, curr) => [...acc1, ...(curr.tags ?? [])],
-      [] as CustomElement[]
+      [] as CustomElement[],
     ) ?? [];
 
   return [...acc, ...tags];

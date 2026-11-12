@@ -1,8 +1,8 @@
-import { DefaultTextMarks, HTMLComponents } from '@raisins/core';
-import type { CustomElement } from '@raisins/schema/schema.js';
-import type { AttributeSpec, MarkSpec } from 'prosemirror-model';
-import { Schema } from 'prosemirror-model';
-import { nodes } from 'prosemirror-schema-basic';
+import { DefaultTextMarks, HTMLComponents } from "@raisins/core";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import type { AttributeSpec, MarkSpec } from "prosemirror-model";
+import { Schema } from "prosemirror-model";
+import { nodes } from "prosemirror-schema-basic";
 
 const { text, hard_break } = nodes;
 
@@ -15,10 +15,10 @@ const MarkMap = new Map<string, CustomElement>();
 (Object.keys(HTMLComponents) as (keyof typeof HTMLComponents)[]).forEach(
   (k) => {
     MarkMap.set(k, HTMLComponents[k]);
-  }
+  },
 );
 
-const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== 'a').reduce(
+const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== "a").reduce(
   (marks: MarkObject, mark: string): MarkObject => {
     const component = MarkMap.get(mark);
 
@@ -40,9 +40,16 @@ const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== 'a').reduce(
             tag: mark,
             getAttrs(dom) {
               const link = dom as HTMLElement;
-              const fromDom = component?.attributes?.reduce((attrs, attr) => {
-                return { ...attrs, [attr.name]: link.getAttribute(attr.name) };
-              }, {} as Record<string, string | null>) || {};
+              const fromDom =
+                component?.attributes?.reduce(
+                  (attrs, attr) => {
+                    return {
+                      ...attrs,
+                      [attr.name]: link.getAttribute(attr.name),
+                    };
+                  },
+                  {} as Record<string, string | null>,
+                ) || {};
               return fromDom;
             },
           },
@@ -53,7 +60,7 @@ const defaultMarkSpecs = DefaultTextMarks.filter((m) => m !== 'a').reduce(
       },
     };
   },
-  {} as MarkObject
+  {} as MarkObject,
 );
 
 export const DefaultProseSchema = new Schema({
@@ -67,12 +74,12 @@ export const DefaultProseSchema = new Schema({
       inclusive: false,
       parseDOM: [
         {
-          tag: 'a',
+          tag: "a",
           getAttrs(dom) {
             const link = dom as HTMLAnchorElement;
             return {
-              href: link.getAttribute('href'),
-              title: link.getAttribute('title'),
+              href: link.getAttribute("href"),
+              title: link.getAttribute("title"),
             };
           },
         },
@@ -80,12 +87,12 @@ export const DefaultProseSchema = new Schema({
       toDOM(node) {
         const { href, title } = node.attrs;
         return [
-          'a',
+          "a",
           {
             href,
             title,
             // Links will always target top
-            target: 'top',
+            target: "top",
           },
           0,
         ];
@@ -94,7 +101,7 @@ export const DefaultProseSchema = new Schema({
   },
   nodes: {
     doc: {
-      content: 'inline+',
+      content: "inline+",
     },
     text,
     hard_break,

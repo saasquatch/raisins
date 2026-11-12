@@ -1,27 +1,25 @@
-import type { RaisinElementNode } from '@raisins/core';
-import type { CssPart, CustomElement } from '@raisins/schema/schema.js';
-import { createScope, molecule, useMolecule } from 'bunshi/react';
-import type { Atom, WritableAtom } from 'jotai';
-import { atom, useAtom, useAtomValue } from 'jotai';
-import React, { useEffect, useRef, useState } from 'react';
-import { ComponentModelMolecule } from '../component-metamodel/index.ts';
-import {
-  SelectedNodeMolecule,
-} from '../core/selection/SelectedNodeMolecule.tsx';
-import { isElementNode } from '../util/isNode.tsx';
-import { CssEditingMolecule } from './CssEditingMolecule.tsx';
+import type { RaisinElementNode } from "@raisins/core";
+import type { CssPart, CustomElement } from "@raisins/schema/schema.js";
+import { createScope, molecule, useMolecule } from "bunshi/react";
+import type { Atom, WritableAtom } from "jotai";
+import { atom, useAtom, useAtomValue } from "jotai";
+import React, { useEffect, useRef, useState } from "react";
+import { ComponentModelMolecule } from "../component-metamodel/index.ts";
+import { SelectedNodeMolecule } from "../core/selection/SelectedNodeMolecule.tsx";
+import { isElementNode } from "../util/isNode.tsx";
+import { CssEditingMolecule } from "./CssEditingMolecule.tsx";
 import type {
   ReadSectionOptions,
   SectionKey,
   ShorthandDimensions,
-} from './cssSections.ts';
+} from "./cssSections.ts";
 import {
   readSection,
   readSectionShorthandDimension,
   selectorOf,
   writeSection,
   writeSectionProperty,
-} from './cssSections.ts';
+} from "./cssSections.ts";
 
 export const PartScope = createScope<SectionKey>({ type: "element" });
 
@@ -66,136 +64,137 @@ export type StyleMoleculeType = {
  * molecule deliberately stops at the source-of-truth string so widgets can
  * be composed freely.
  */
-export const StyleMolecule = molecule(
-  (getMol, getScope): StyleMoleculeType => {
-    getScope(PartScope);
-    const { SelectedNodeAtom, SelectionAtom } = getMol(SelectedNodeMolecule);
-    const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
-    const { GetInstanceCssAtom, SetInstanceCssAtom } = getMol(
-      CssEditingMolecule
-    );
+export const StyleMolecule = molecule((getMol, getScope): StyleMoleculeType => {
+  getScope(PartScope);
+  const { SelectedNodeAtom, SelectionAtom } = getMol(SelectedNodeMolecule);
+  const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
+  const { GetInstanceCssAtom, SetInstanceCssAtom } = getMol(CssEditingMolecule);
 
-    const selectedElementAtom = atom(get => {
-      const node = get(SelectedNodeAtom);
-      if (!node || !isElementNode(node)) return undefined;
-      return node;
-    });
+  const selectedElementAtom = atom((get) => {
+    const node = get(SelectedNodeAtom);
+    if (!node || !isElementNode(node)) return undefined;
+    return node;
+  });
 
-    const selectedElementKeyAtom = atom(get => {
-      if (!get(selectedElementAtom)) return undefined;
-      return get(SelectionAtom)?.path.join('/');
-    });
+  const selectedElementKeyAtom = atom((get) => {
+    if (!get(selectedElementAtom)) return undefined;
+    return get(SelectionAtom)?.path.join("/");
+  });
 
-    const componentMetaAtom = atom(get => {
+  const componentMetaAtom = atom((get) => {
+    const node = get(selectedElementAtom);
+    if (!node) return undefined;
+    return get(ComponentMetaAtom)(node.tagName) as CustomElement;
+  });
+
+  const partsAtom = atom<CssPart[]>(
+    (get) => get(componentMetaAtom)?.cssParts ?? [],
+  );
+
+  const customPropsAtom = atom(
+    (get) => get(componentMetaAtom)?.cssProperties ?? [],
+  );
+
+  const cssAtom = atom(
+    (get) => {
       const node = get(selectedElementAtom);
-      if (!node) return undefined;
-      return get(ComponentMetaAtom)(node.tagName) as CustomElement;
-    });
+      if (!node) return "";
+      return get(GetInstanceCssAtom)(node);
+    },
+    (get, set, next: string) => {
+      const node = get(selectedElementAtom);
+      if (!node) return;
+      set(SetInstanceCssAtom, { node, css: next });
+    },
+  );
 
-    const partsAtom = atom<CssPart[]>(
-      get => get(componentMetaAtom)?.cssParts ?? []
-    );
+  /**
+   * Returns the declarations text for a specific editable section
+   * (e.g. `:host` or `::part(header)`) of the currently selected element's
+   * per-instance CSS.
+   */
+  const sectionReadAtom = atom((get) => {
+    const css = get(cssAtom);
+    return (section: SectionKey, options?: ReadSectionOptions) =>
+      readSection(css, section, options);
+  });
 
-    const customPropsAtom = atom(
-      get => get(componentMetaAtom)?.cssProperties ?? []
-    );
+  /**
+   * Returns the values of the `top`/`right`/`bottom`/`left` dimensions for a single section and property, if that property is a valid CSS shorthand for 1-4 directional values. Otherwise returns null for all directions.
+   */
+  const sectionReadShorthandDimensionAtom = atom((get) => {
+    const css = get(cssAtom);
+    return (section: SectionKey, property: string) =>
+      readSectionShorthandDimension(css, section, property);
+  });
 
-    const cssAtom = atom(
-      get => {
-        const node = get(selectedElementAtom);
-        if (!node) return '';
-        return get(GetInstanceCssAtom)(node);
-      },
-      (get, set, next: string) => {
-        const node = get(selectedElementAtom);
-        if (!node) return;
-        set(SetInstanceCssAtom, { node, css: next });
-      }
-    );
+  const conflictsAtom = atom(false);
 
-    /**
-     * Returns the declarations text for a specific editable section
-     * (e.g. `:host` or `::part(header)`) of the currently selected element's
-     * per-instance CSS.
-     */
-    const sectionReadAtom = atom(get => {
-      const css = get(cssAtom);
-      return (section: SectionKey, options?: ReadSectionOptions) =>
-        readSection(css, section, options);
-    });
+  /**
+   * Writes new declarations for a single section. Other sections (and any
+   * unrecognised rules) in the per-instance CSS are preserved untouched.
+   */
+  const sectionWriteAtom = atom(
+    null,
+    (
+      get,
+      set,
+      {
+        section,
+        declarations,
+        preserve,
+      }: { section: SectionKey; declarations: string; preserve?: RegExp[] },
+    ) => {
+      const node = get(selectedElementAtom);
+      if (!node) return;
+      const prev = get(GetInstanceCssAtom)(node);
+      const { css, conflict } = writeSection(
+        prev,
+        section,
+        declarations,
+        preserve,
+      );
+      set(conflictsAtom, conflict);
+      set(SetInstanceCssAtom, { node, css });
+    },
+  );
 
-    /**
-     * Returns the values of the `top`/`right`/`bottom`/`left` dimensions for a single section and property, if that property is a valid CSS shorthand for 1-4 directional values. Otherwise returns null for all directions.
-     */
-    const sectionReadShorthandDimensionAtom = atom(get => {
-      const css = get(cssAtom);
-      return (section: SectionKey, property: string) =>
-        readSectionShorthandDimension(css, section, property);
-    });
+  /**
+   * Writes a single property within a section, other properties in that section and other sections in the per-instance CSS are preserved untouched.
+   */
+  const sectionPropertyWriteAtom = atom(
+    null,
+    (
+      get,
+      set,
+      {
+        section,
+        property,
+        value,
+      }: { section: SectionKey; property: string; value: string },
+    ) => {
+      const node = get(selectedElementAtom);
+      if (!node) return;
+      const prev = get(GetInstanceCssAtom)(node);
+      const next = writeSectionProperty(prev, section, property, value);
+      set(SetInstanceCssAtom, { node, css: next });
+    },
+  );
 
-    const conflictsAtom = atom(false);
-
-    /**
-     * Writes new declarations for a single section. Other sections (and any
-     * unrecognised rules) in the per-instance CSS are preserved untouched.
-     */
-    const sectionWriteAtom = atom(
-      null,
-      (
-        get,
-        set,
-        {
-          section,
-          declarations,
-          preserve,
-        }: { section: SectionKey; declarations: string; preserve?: RegExp[] }
-      ) => {
-        const node = get(selectedElementAtom);
-        if (!node) return;
-        const prev = get(GetInstanceCssAtom)(node);
-        const {css, conflict} = writeSection(prev, section, declarations, preserve);
-        set(conflictsAtom, conflict);
-        set(SetInstanceCssAtom, { node, css });
-      }
-    );
-
-    /**
-     * Writes a single property within a section, other properties in that section and other sections in the per-instance CSS are preserved untouched.
-     */
-    const sectionPropertyWriteAtom = atom(
-      null,
-      (
-        get,
-        set,
-        {
-          section,
-          property,
-          value,
-        }: { section: SectionKey; property: string; value: string }
-      ) => {
-        const node = get(selectedElementAtom);
-        if (!node) return;
-        const prev = get(GetInstanceCssAtom)(node);
-        const next = writeSectionProperty(prev, section, property, value);
-        set(SetInstanceCssAtom, { node, css: next });
-      }
-    );
-
-    return {
-      selectedElementAtom,
-      selectedElementKeyAtom,
-      componentMetaAtom,
-      partsAtom,
-      customPropsAtom,
-      cssAtom,
-      sectionReadAtom,
-      sectionReadShorthandDimensionAtom,
-      sectionWriteAtom,
-      sectionPropertyWriteAtom,
-      conflictsAtom,
-    };
-  }
-);
+  return {
+    selectedElementAtom,
+    selectedElementKeyAtom,
+    componentMetaAtom,
+    partsAtom,
+    customPropsAtom,
+    cssAtom,
+    sectionReadAtom,
+    sectionReadShorthandDimensionAtom,
+    sectionWriteAtom,
+    sectionPropertyWriteAtom,
+    conflictsAtom,
+  };
+});
 
 /**
  * Per-instance CSS editor. Renders one editable section for the element
@@ -231,15 +230,15 @@ export const StylePanel: React.FC = () => {
 
       <SectionEditor
         key={`${selectedElementKey}:element`}
-        section={{ type: 'element' }}
+        section={{ type: "element" }}
         title="Element"
         description={`Applies to the component itself (rendered as :host).`}
       />
 
-      {parts.map(part => (
+      {parts.map((part) => (
         <SectionEditor
           key={`${selectedElementKey}:part-${part.name}`}
-          section={{ type: 'part', name: part.name }}
+          section={{ type: "part", name: part.name }}
           title={`::part(${part.name})`}
           description={part.description}
         />
@@ -249,11 +248,11 @@ export const StylePanel: React.FC = () => {
         <details>
           <summary>CSS custom properties</summary>
           <ul>
-            {customProps.map(p => (
+            {customProps.map((p) => (
               <li key={p.name}>
                 <code>{p.name}</code>
-                {p.syntax ? ` (${p.syntax})` : ''}
-                {p.description ? ` — ${p.description}` : ''}
+                {p.syntax ? ` (${p.syntax})` : ""}
+                {p.description ? ` — ${p.description}` : ""}
               </li>
             ))}
           </ul>
@@ -262,7 +261,7 @@ export const StylePanel: React.FC = () => {
 
       <details>
         <summary>Raw CSS (data-raisin-css)</summary>
-        <pre style={{ fontSize: 11, whiteSpace: 'pre-wrap' }}>{css}</pre>
+        <pre style={{ fontSize: 11, whiteSpace: "pre-wrap" }}>{css}</pre>
       </details>
     </div>
   );
@@ -302,21 +301,21 @@ const SectionEditor: React.FC<{
     <div style={SectionStyle}>
       <div style={SectionHeaderStyle}>
         <code>{selectorOf(section)}</code>
-        <span style={{ marginLeft: 6, color: '#888' }}>{title}</span>
+        <span style={{ marginLeft: 6, color: "#888" }}>{title}</span>
       </div>
       {description && (
-        <div style={{ fontSize: 11, color: '#666' }}>{description}</div>
+        <div style={{ fontSize: 11, color: "#666" }}>{description}</div>
       )}
       <textarea
         ref={textareaRef}
         aria-label={`${title} CSS declarations`}
         rows={4}
-        style={{ width: '100%', fontFamily: 'monospace', fontSize: 12 }}
+        style={{ width: "100%", fontFamily: "monospace", fontSize: 12 }}
         value={draft}
         placeholder={
-          section.type === 'element' ? ELEMENT_PLACEHOLDER : PART_PLACEHOLDER
+          section.type === "element" ? ELEMENT_PLACEHOLDER : PART_PLACEHOLDER
         }
-        onChange={e => {
+        onChange={(e) => {
           const next = (e.target as HTMLTextAreaElement).value;
           setDraft(next);
           write({ section, declarations: next });
@@ -328,7 +327,7 @@ const SectionEditor: React.FC<{
 };
 
 const SectionStyle: React.CSSProperties = {
-  border: '1px solid #ddd',
+  border: "1px solid #ddd",
   borderRadius: 4,
   padding: 8,
   marginBottom: 8,

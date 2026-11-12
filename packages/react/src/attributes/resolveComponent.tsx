@@ -1,25 +1,25 @@
-import { DefaultAttributeComponent } from './AttributeThemeMolecule.tsx';
-import type { Attribute } from '@raisins/schema/schema.js';
+import type { Attribute } from "@raisins/schema/schema.js";
+import { DefaultAttributeComponent } from "./AttributeThemeMolecule.tsx";
 
 const FormatToComponent: Record<string, string> = {
-  color: 'text',
-  email: 'text',
-  'date-time': 'text',
-  date: 'text',
-  time: 'text',
-  duration: 'text',
+  color: "text",
+  email: "text",
+  "date-time": "text",
+  date: "text",
+  time: "text",
+  duration: "text",
 };
 const TypeToComponent: Record<string, string> = {
-  string: 'text',
-  boolean: 'boolean',
-  number: 'number',
+  string: "text",
+  boolean: "boolean",
+  number: "number",
 };
 
-const DEFAULT_ENUM = 'select';
+const DEFAULT_ENUM = "select";
 
 export function resolveComponent<T>(
   attribute: Attribute,
-  components: Record<string, T>
+  components: Record<string, T>,
 ): T {
   if (attribute.uiWidget) {
     const found = components[attribute.uiWidget];

@@ -1,6 +1,6 @@
-import { useAtomValue } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import { HotkeysMolecule } from './HotkeysMolecule.ts';
+import { useMolecule } from "bunshi/react";
+import { useAtomValue } from "jotai";
+import { HotkeysMolecule } from "./HotkeysMolecule.ts";
 
 export function useHotkeys() {
   const { HotKeysAtom } = useMolecule(HotkeysMolecule);

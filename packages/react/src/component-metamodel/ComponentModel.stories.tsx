@@ -1,44 +1,44 @@
-import type { RaisinElementNode } from '@raisins/core';
-import { htmlParser } from '@raisins/core';
-import type { Meta } from '@storybook/react';
-import { useMolecule } from 'bunshi/react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import React from 'react';
-import type { AttributesControllerProps } from '../attributes/index.ts';
-import { AttributeProvider, AttributesMolecule } from '../attributes/index.ts';
-import { CanvasFull } from '../canvas/CanvasController.stories.tsx';
-import { CanvasProvider } from '../canvas/CanvasScope.tsx';
+import type { RaisinElementNode } from "@raisins/core";
+import { htmlParser } from "@raisins/core";
+import type { Meta } from "@storybook/react";
+import { useMolecule } from "bunshi/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import React from "react";
+import type { AttributesControllerProps } from "../attributes/index.ts";
+import { AttributeProvider, AttributesMolecule } from "../attributes/index.ts";
+import { CanvasFull } from "../canvas/CanvasController.stories.tsx";
+import { CanvasProvider } from "../canvas/CanvasScope.tsx";
 import {
   ConfigMolecule,
   PickAndPlopMolecule,
   SelectedNodeController,
-} from '../core/index.ts';
+} from "../core/index.ts";
 import {
   AttributeEditor,
   DefaultAttributeComponent,
-} from '../core/selection/SelectedNodeController.stories.tsx';
+} from "../core/selection/SelectedNodeController.stories.tsx";
 import {
   big,
   MintComponents,
   mintMono,
   mintTimelineNewlines,
   mintTitledSection,
-} from '../examples/MintComponents.tsx';
+} from "../examples/MintComponents.tsx";
 import {
   referrerWidget,
   VanillaComponents,
-} from '../examples/VanillaComponents.tsx';
-import { useHotkeys } from '../hotkeys/index.ts';
-import { BasicStory } from '../index.stories.tsx';
-import { JsonPointers } from '../node/NodeChildrenEditor.stories.tsx';
-import type { Block } from './ComponentModel.tsx';
-import { ComponentModelMolecule } from './ComponentModel.tsx';
-import type { Module, ModuleDetails } from './types.ts';
+} from "../examples/VanillaComponents.tsx";
+import { useHotkeys } from "../hotkeys/index.ts";
+import { BasicStory } from "../index.stories.tsx";
+import { JsonPointers } from "../node/NodeChildrenEditor.stories.tsx";
+import type { Block } from "./ComponentModel.tsx";
+import { ComponentModelMolecule } from "./ComponentModel.tsx";
+import type { Module, ModuleDetails } from "./types.ts";
 
 const meta: Meta = {
-  title: 'Component Metamodel',
+  title: "Component Metamodel",
   component: PackageEditorController,
-  excludeStories: ['PackageEditor'],
+  excludeStories: ["PackageEditor"],
 };
 export default meta;
 
@@ -48,34 +48,34 @@ export function PackageEditor() {
 
 const fakeBlocks: Block[] = [
   {
-    title: 'div',
-    content: htmlParser('<div>I am a div</div>')
+    title: "div",
+    content: htmlParser("<div>I am a div</div>")
       .children[0] as RaisinElementNode,
   },
   {
-    title: 'tr',
+    title: "tr",
     content: htmlParser(
-      '<tr><td style="border: 1px solid black">test</td></tr>'
+      '<tr><td style="border: 1px solid black">test</td></tr>',
     ).children[0] as RaisinElementNode,
   },
   {
-    title: 'td',
+    title: "td",
     content: htmlParser('<td style="border: 1px solid black">I am a td</td>')
       .children[0] as RaisinElementNode,
   },
   {
-    title: 'table',
+    title: "table",
     content: htmlParser(
-      '<table><thead></thead><tbody><tr ><td style="border: 1px solid black">1</td><td style="border: 1px solid black">2</td><td style="border: 1px solid black">3</td><tr /></tbody></table>'
+      '<table><thead></thead><tbody><tr ><td style="border: 1px solid black">1</td><td style="border: 1px solid black">2</td><td style="border: 1px solid black">3</td><tr /></tbody></table>',
     ).children[0] as RaisinElementNode,
   },
   {
-    title: 'thead',
-    content: htmlParser('<thead></thead>').children[0] as RaisinElementNode,
+    title: "thead",
+    content: htmlParser("<thead></thead>").children[0] as RaisinElementNode,
   },
   {
-    title: 'tbody',
-    content: htmlParser('<tbody></tbody>').children[0] as RaisinElementNode,
+    title: "tbody",
+    content: htmlParser("<tbody></tbody>").children[0] as RaisinElementNode,
   },
 ];
 
@@ -86,30 +86,30 @@ const BlocksController = () => {
   const { blocks, groupedBlocks } = useAtomValue(ComponentModelAtom);
   const [picked, pick] = useAtom(PickedAtom);
 
-  const pickedBlock = picked?.type === 'block' ? picked.block : undefined;
+  const pickedBlock = picked?.type === "block" ? picked.block : undefined;
   return (
     <div
       style={{
-        overflowY: 'auto',
-        padding: '12px',
+        overflowY: "auto",
+        padding: "12px",
       }}
     >
-      <h3 style={{ margin: '0 0 8px' }}>Blocks</h3>
-      {(blocks.length ? blocks : fakeBlocks).map(block => {
+      <h3 style={{ margin: "0 0 8px" }}>Blocks</h3>
+      {(blocks.length ? blocks : fakeBlocks).map((block) => {
         return (
           <div
             key={block.title}
             style={{
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              padding: '8px 12px',
-              marginBottom: '6px',
-              cursor: 'pointer',
-              background: pickedBlock === block ? '#bbdefb' : '#fff',
+              border: "1px solid #e0e0e0",
+              borderRadius: "4px",
+              padding: "8px 12px",
+              marginBottom: "6px",
+              cursor: "pointer",
+              background: pickedBlock === block ? "#bbdefb" : "#fff",
             }}
             onClick={() =>
               pick({
-                type: 'block',
+                type: "block",
                 block,
               })
             }
@@ -122,7 +122,9 @@ const BlocksController = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = props => {
+export const CustomAttributesController: React.FC<AttributesControllerProps> = (
+  props,
+) => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
@@ -134,7 +136,7 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = p
       {Object.keys(groupedSchema).map((key, idx) => {
         return (
           <>
-            {groupedSchema[key].map(attribute => {
+            {groupedSchema[key].map((attribute) => {
               return (
                 <AttributeProvider
                   attributeName={attribute.name}
@@ -155,8 +157,23 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = p
 const EditorWithProps = () => {
   return (
     <CanvasProvider>
-      <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
-        <div style={{ flex: '0 0 260px', borderRight: '1px solid #e0e0e0', overflowY: 'auto', padding: '12px' }}>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: "13px",
+        }}
+      >
+        <div
+          style={{
+            flex: "0 0 260px",
+            borderRight: "1px solid #e0e0e0",
+            overflowY: "auto",
+            padding: "12px",
+          }}
+        >
           <details open>
             <summary>Blocks</summary>
             <BlocksController />
@@ -170,7 +187,7 @@ const EditorWithProps = () => {
             )}
           />
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           <CanvasFull />
         </div>
       </div>
@@ -181,11 +198,25 @@ const EditorWithProps = () => {
 const Editor = () => {
   useHotkeys();
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
-      <div style={{ flex: '0 0 260px', borderRight: '1px solid #e0e0e0', overflowY: 'auto' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: "13px",
+      }}
+    >
+      <div
+        style={{
+          flex: "0 0 260px",
+          borderRight: "1px solid #e0e0e0",
+          overflowY: "auto",
+        }}
+      >
         <BlocksController />
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
@@ -254,11 +285,11 @@ export function MintPackageEditor() {
 export const LocalBlocks = () => {
   return (
     <BasicStory
-      startingHtml={''}
+      startingHtml={""}
       startingPackages={[
         {
-          package: '@local',
-          version: 'next',
+          package: "@local",
+          version: "next",
         },
       ]}
     >
@@ -280,8 +311,8 @@ export const LocalBlocksAndProps = () => {
       `}
       startingPackages={[
         {
-          package: '@local',
-          version: 'next',
+          package: "@local",
+          version: "next",
         },
       ]}
     >
@@ -307,9 +338,9 @@ const CustomThemeTest = () => {
     <>
       <textarea
         value={html}
-        onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
+        onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
         rows={6}
-        style={{ width: '300px' }}
+        style={{ width: "300px" }}
       />
       <JsonPointers />
 
@@ -319,25 +350,25 @@ const CustomThemeTest = () => {
 };
 
 const PACKAGES = [
-  '@local',
-  '@saasquatch/component-boilerplate',
-  '@saasquatch/mint-components',
-  '@saasquatch/vanilla-components',
-  '@saasquatch/bedrock-components',
-  '@shoelace-style/shoelace', //@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js
+  "@local",
+  "@saasquatch/component-boilerplate",
+  "@saasquatch/mint-components",
+  "@saasquatch/vanilla-components",
+  "@saasquatch/bedrock-components",
+  "@shoelace-style/shoelace", //@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js
 ];
 
 const setOfThings: Module[] = [
   {
-    package: '@shoelace-style/shoelace',
+    package: "@shoelace-style/shoelace",
   },
   //   {
   //     package: '@shoelace-style/shoelace',
   //     filePath: 'dist/shoelace/shoelace.css',
   //   },
   {
-    package: '@shoelace-style/shoelace',
-    filePath: 'dist/themes/light.css',
+    package: "@shoelace-style/shoelace",
+    filePath: "dist/themes/light.css",
   },
 ];
 
@@ -379,8 +410,8 @@ function PackageEditorView(props: ModuleManagement) {
       <div>Loading: {props.loadingModules}</div>
       Modules:
       <ul>
-        {props.modules.map(m => (
-          <li key={m.package + '@' + m.version + '/' + m.filePath}>
+        {props.modules.map((m) => (
+          <li key={m.package + "@" + m.version + "/" + m.filePath}>
             {m.package} @ {m.version} for {m.filePath}
           </li>
         ))}
@@ -389,10 +420,10 @@ function PackageEditorView(props: ModuleManagement) {
       <ul>
         {props.moduleDetails?.map((m, i) => (
           <li key={`${m.package}@${m.version}-${i}`}>
-            <b>{m['package.json'].description}</b>
+            <b>{m["package.json"].description}</b>
             <br />
-            <div style={{ fontSize: '0.8em', color: 'grey' }}>
-              {m['package.json'].name} @ {m['package.json'].version}
+            <div style={{ fontSize: "0.8em", color: "grey" }}>
+              {m["package.json"].name} @ {m["package.json"].version}
             </div>
             <button
               onClick={() =>
@@ -411,7 +442,7 @@ function PackageEditorView(props: ModuleManagement) {
       <h2>Add</h2>
       <button
         onClick={() => {
-          setOfThings.map(m => props.addModule(m));
+          setOfThings.map((m) => props.addModule(m));
         }}
       >
         Shoelace + theme
@@ -420,20 +451,20 @@ function PackageEditorView(props: ModuleManagement) {
         onClick={() => {
           [
             {
-              package: '@saasquatch/mint-components',
-              filePath: '/dist/mint-components/mint-components.css',
-              version: '1.5.0-116',
+              package: "@saasquatch/mint-components",
+              filePath: "/dist/mint-components/mint-components.css",
+              version: "1.5.0-116",
             },
             {
-              package: '@saasquatch/bedrock-components',
-              filePath: '/dist/bedrock-components/bedrock-components.js',
-              version: '1.3.1-7',
+              package: "@saasquatch/bedrock-components",
+              filePath: "/dist/bedrock-components/bedrock-components.js",
+              version: "1.3.1-7",
             },
 
             {
-              package: '@saasquatch/mint-components',
-              filePath: '/dist/mint-components/mint-components.js',
-              version: '1.5.0-116',
+              package: "@saasquatch/mint-components",
+              filePath: "/dist/mint-components/mint-components.js",
+              version: "1.5.0-116",
             },
           ].forEach(props.addModule);
         }}
@@ -441,11 +472,11 @@ function PackageEditorView(props: ModuleManagement) {
         Mint (alpha)
       </button>
       <ul>
-        {PACKAGES.map(m => {
+        {PACKAGES.map((m) => {
           return (
             <li key={m}>
               <button
-                onClick={e => {
+                onClick={(e) => {
                   props.addModule({
                     package: m,
                   });
@@ -459,7 +490,7 @@ function PackageEditorView(props: ModuleManagement) {
       </ul>
       <h2>Remove</h2>
       <ul>
-        {PACKAGES.map(m => {
+        {PACKAGES.map((m) => {
           return (
             <li key={m}>
               <button onClick={() => props.removeModuleByName(m)}>{m}</button>

@@ -1,6 +1,6 @@
-import React from 'react';
-import type { Atom } from 'jotai';
-import type { Molecule } from 'bunshi/react';
+import type { Molecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import React from "react";
 
 export type AttributeThemeMoleculeValue = {
   widgets: Atom<Record<string, AttributeWidget>>;
@@ -13,7 +13,7 @@ export type AttributeThemeMoleculeValue = {
  */
 export type AttributeThemeMolecule = Molecule<AttributeThemeMoleculeValue>;
 
-export const DefaultAttributeComponent = 'default';
+export const DefaultAttributeComponent = "default";
 
 export type AttributeTemplateProps = { children: React.ReactNode };
 export type AttributeTemplate = React.ComponentType<AttributeTemplateProps>;

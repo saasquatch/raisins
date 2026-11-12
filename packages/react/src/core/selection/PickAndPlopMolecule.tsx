@@ -1,19 +1,19 @@
-import type { RaisinElementNode } from '@raisins/core';
+import type { RaisinElementNode } from "@raisins/core";
 import type {
   NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { getPath, htmlUtil } from '@raisins/core';
-import type { PrimitiveAtom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import type { Block } from '../../component-metamodel/ComponentModel.tsx';
-import { isFunction } from '../../util/isFunction.ts';
-import { tryGetNode } from '../../util/tryGetNode.ts';
-import { waitForUpdate } from '../../util/waitForUpdate.ts';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import { SelectedNodeMolecule } from './SelectedNodeMolecule.tsx';
+} from "@raisins/core";
+import { getPath, htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { PrimitiveAtom } from "jotai";
+import { atom } from "jotai";
+import type { Block } from "../../component-metamodel/ComponentModel.tsx";
+import { isFunction } from "../../util/isFunction.ts";
+import { tryGetNode } from "../../util/tryGetNode.ts";
+import { waitForUpdate } from "../../util/waitForUpdate.ts";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import { SelectedNodeMolecule } from "./SelectedNodeMolecule.tsx";
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 
@@ -24,11 +24,11 @@ export type PlopDestination = {
 };
 
 export type PickedOption =
-  | { type: 'element'; path: NodePath }
-  | { type: 'block'; block: Block }
+  | { type: "element"; path: NodePath }
+  | { type: "block"; block: Block }
   | undefined;
 
-export const PickAndPlopMolecule = molecule(getMol => {
+export const PickAndPlopMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SelectedAtom } = getMol(SelectedNodeMolecule);
 
@@ -38,11 +38,11 @@ export const PickAndPlopMolecule = molecule(getMol => {
   const PickedAtom = atom<PickedOption>(undefined);
 
   const PickedNodeAtom: PrimitiveAtom<RaisinNode | undefined> = atom(
-    get => {
+    (get) => {
       const currentDoc = get(RootNodeAtom);
       const picked = get(PickedAtom);
       if (!picked) return undefined;
-      if (picked.type !== 'element') return undefined;
+      if (picked.type !== "element") return undefined;
 
       // Dangling path (doc changed since pick) resolves to undefined.
       return tryGetNode(currentDoc, picked.path);
@@ -62,28 +62,28 @@ export const PickAndPlopMolecule = molecule(getMol => {
         set(PickedAtom, undefined);
       } else {
         set(PickedAtom, {
-          type: 'element',
+          type: "element",
           path,
         });
       }
-    }
+    },
   );
 
   /**
    * For tracking if a node can be plopped
    */
   const PloppingIsActive = atom(
-    get => (get(PickedAtom) !== undefined) as boolean
+    (get) => (get(PickedAtom) !== undefined) as boolean,
   );
 
   /**
    * Content being picked (block content for adds, resolved node for moves).
    * The pick half of the plop candidate.
    */
-  const PickedContentAtom = atom<RaisinElementNode | undefined>(get => {
+  const PickedContentAtom = atom<RaisinElementNode | undefined>((get) => {
     const picked = get(PickedAtom);
     if (!picked) return undefined;
-    if (picked.type === 'block') return picked.block.content;
+    if (picked.type === "block") return picked.block.content;
     return get(PickedNodeAtom) as RaisinElementNode | undefined;
   });
 
@@ -101,11 +101,11 @@ export const PickAndPlopMolecule = molecule(getMol => {
         return;
       }
 
-      if (picked.type === 'block') {
+      if (picked.type === "block") {
         // Clone before setting slot — block content is shared metamodel config.
         // data-raisin-id is assigned lazily by SetInstanceCssAtom on first custom style, so the clone doesn't need one yet.
         const cloneOfPickedNode = clone(
-          picked.block.content
+          picked.block.content,
         ) as RaisinElementNode;
         cloneOfPickedNode.attribs.slot = slot;
 
@@ -113,7 +113,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
           currentDoc,
           cloneOfPickedNode,
           parentPath,
-          idx
+          idx,
         );
         set(RootNodeAtom, newDocument);
         await waitForUpdate();
@@ -130,14 +130,14 @@ export const PickAndPlopMolecule = molecule(getMol => {
           pickedNode,
           slot,
           parentPath,
-          idx
+          idx,
         );
 
         set(RootNodeAtom, newDocument);
       }
       // Don't allow re-plop
       set(PickedAtom, undefined);
-    }
+    },
   );
 
   return {

@@ -1,17 +1,16 @@
-import type { RaisinNode } from '@raisins/core';
-import { htmlUtil } from '@raisins/core';
-import type { SetStateAction } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { isFunction } from '../../util/isFunction.ts';
-import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule.tsx';
-import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule.tsx';
-import { EditMolecule } from './EditAtoms.ts';
+import type { RaisinNode } from "@raisins/core";
+import { htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { SetStateAction } from "jotai";
+import { atom } from "jotai";
+import { isFunction } from "../../util/isFunction.ts";
+import { PickAndPlopMolecule } from "../selection/PickAndPlopMolecule.tsx";
+import { SelectedNodeMolecule } from "../selection/SelectedNodeMolecule.tsx";
+import { EditMolecule } from "./EditAtoms.ts";
 
-export const EditSelectedMolecule = molecule(getMol => {
-  const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } = getMol(
-    EditMolecule
-  );
+export const EditSelectedMolecule = molecule((getMol) => {
+  const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } =
+    getMol(EditMolecule);
   const { SelectedAtom, SelectedNodeAtom } = getMol(SelectedNodeMolecule);
 
   const { PickedAtom } = getMol(PickAndPlopMolecule);
@@ -36,11 +35,11 @@ export const EditSelectedMolecule = molecule(getMol => {
 
   const PickSelectedAtom = atom(null, (get, set) => {
     const selected = get(SelectedAtom);
-    selected && set(PickedAtom, { type: 'element', path: selected.path });
+    selected && set(PickedAtom, { type: "element", path: selected.path });
   });
 
   const EditSelectedNodeAtom = atom(
-    get => get(SelectedNodeAtom)!,
+    (get) => get(SelectedNodeAtom)!,
     (get, set, next: SetStateAction<RaisinNode>) => {
       const selected = get(SelectedNodeAtom);
       if (!selected) return; // Don't allow editing if nothing selected
@@ -49,7 +48,7 @@ export const EditSelectedMolecule = molecule(getMol => {
         prev: selected,
         next: nextValue,
       });
-    }
+    },
   );
 
   return {

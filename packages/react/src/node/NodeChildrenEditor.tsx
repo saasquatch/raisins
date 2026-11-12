@@ -1,8 +1,8 @@
-import type { RaisinNode } from '@raisins/core';
-import type { PrimitiveAtom } from 'jotai';
-import React, { useContext } from 'react';
-import { useChildAtomsForked } from './children/childAtomRouter.tsx';
-import { NodeScopeProvider, useNodeAtom } from './NodeScope.tsx';
+import type { RaisinNode } from "@raisins/core";
+import type { PrimitiveAtom } from "jotai";
+import React, { useContext } from "react";
+import { useChildAtomsForked } from "./children/childAtomRouter.tsx";
+import { NodeScopeProvider, useNodeAtom } from "./NodeScope.tsx";
 
 const useChildAtoms = useChildAtomsForked;
 

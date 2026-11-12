@@ -1,10 +1,10 @@
-import type { RaisinNode } from '@raisins/core';
-import { htmlUtil } from '@raisins/core';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import type { Soul } from './Soul.ts';
-import { SoulsMolecule, soulToString } from './Soul.ts';
+import type { RaisinNode } from "@raisins/core";
+import { htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import type { Soul } from "./Soul.ts";
+import { SoulsMolecule, soulToString } from "./Soul.ts";
 
 const { visitAll } = htmlUtil;
 
@@ -35,7 +35,7 @@ export const SoulsInDocMolecule = molecule((getMol) => {
     });
     return (id: string) => soulIdToNode.get(id);
   });
-  IdToSoulAtom.debugLabel = 'IdToSoulAtom';
+  IdToSoulAtom.debugLabel = "IdToSoulAtom";
 
   /**
    * Soul Object --> RaisinNode
@@ -57,7 +57,7 @@ export const SoulsInDocMolecule = molecule((getMol) => {
     });
     return (soul: Soul) => soulToNode.get(soul);
   });
-  SoulToNodeAtom.debugLabel = 'SoulToNodeAtom';
+  SoulToNodeAtom.debugLabel = "SoulToNodeAtom";
 
   /**
    * Soul ID --> RaisinNode
@@ -78,7 +78,7 @@ export const SoulsInDocMolecule = molecule((getMol) => {
     });
     return (id: string) => soulIdToNode.get(id);
   });
-  SoulIdToNodeAtom.debugLabel = 'SoulIdToNodeAtom';
+  SoulIdToNodeAtom.debugLabel = "SoulIdToNodeAtom";
 
   return {
     SoulToNodeAtom,

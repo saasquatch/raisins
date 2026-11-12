@@ -1,35 +1,33 @@
-import { atom, useAtomValue } from 'jotai';
-import { molecule, useMolecule } from 'bunshi/react';
-import React from 'react';
-import type { RaisinConfig } from '../index.ts';
-import type { AttributesControllerProps } from '../../attributes/index.ts';
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtomValue } from "jotai";
+import React from "react";
+import type { AttributesControllerProps } from "../../attributes/index.ts";
 import {
   AttributeMolecule,
   AttributeProvider,
   AttributesController,
   AttributesMolecule,
-} from '../../attributes/index.ts';
-import { BasicCanvasController } from '../../canvas/CanvasController.tsx';
-import { CanvasProvider } from '../../canvas/CanvasScope.tsx';
-import {
-  CanvasSelectionMolecule,
-} from '../../canvas/plugins/CanvasSelectionMolecule.tsx';
+} from "../../attributes/index.ts";
+import { BasicCanvasController } from "../../canvas/CanvasController.tsx";
+import { CanvasProvider } from "../../canvas/CanvasScope.tsx";
+import { CanvasSelectionMolecule } from "../../canvas/plugins/CanvasSelectionMolecule.tsx";
 import {
   mintMono,
   MintComponents,
   mintReferralTable,
   mintBigStat,
-} from '../../examples/MintComponents.tsx';
-import { widgets } from '../../examples/MockWidgets.tsx';
+} from "../../examples/MintComponents.tsx";
+import { widgets } from "../../examples/MockWidgets.tsx";
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents.tsx';
-import { BasicStory, StoryConfigMolecule } from '../../index.stories.tsx';
-import { SelectedNodeController } from './SelectedNodeController.tsx';
+} from "../../examples/VanillaComponents.tsx";
+import { BasicStory, StoryConfigMolecule } from "../../index.stories.tsx";
+import type { RaisinConfig } from "../index.ts";
+import { SelectedNodeController } from "./SelectedNodeController.tsx";
 
 export default {
-  title: 'Selected Node Controller',
+  title: "Selected Node Controller",
 };
 
 const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
@@ -50,13 +48,21 @@ export const AttributeEditor = ({
 }) => {
   useMolecule(CanvasSelectionMolecule);
   return (
-    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: "13px",
+      }}
+    >
       <div
         style={{
-          flex: '0 0 320px',
-          overflowY: 'auto',
-          padding: '12px',
-          borderRight: '1px solid #e0e0e0',
+          flex: "0 0 320px",
+          overflowY: "auto",
+          padding: "12px",
+          borderRight: "1px solid #e0e0e0",
         }}
       >
         <Controller />
@@ -64,8 +70,8 @@ export const AttributeEditor = ({
       <div
         style={{
           flex: 1,
-          overflowY: 'auto',
-          padding: '12px',
+          overflowY: "auto",
+          padding: "12px",
         }}
       >
         <BasicCanvasController />
@@ -194,7 +200,7 @@ export const CustomSelectedComponentVanilla = () => {
 };
 
 export const CustomAttributesController: React.FC<AttributesControllerProps> = (
-  props
+  props,
 ) => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);

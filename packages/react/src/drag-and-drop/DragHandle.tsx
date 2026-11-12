@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export type DragHandleProps = {
   /** Spread the return value of `useDragNode`/`useDragSelectedNode`/`useDragBlock`. */
@@ -44,9 +44,9 @@ export function DragHandle({
       onDragEnd={onDragEnd}
       title={title}
       className={className}
-      style={{ display: 'inline-flex', cursor: 'grab', ...style }}
+      style={{ display: "inline-flex", cursor: "grab", ...style }}
     >
-      <span style={{ display: 'inline-flex', pointerEvents: 'none' }}>
+      <span style={{ display: "inline-flex", pointerEvents: "none" }}>
         {children}
       </span>
     </span>

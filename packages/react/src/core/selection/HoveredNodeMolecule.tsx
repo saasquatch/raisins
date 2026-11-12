@@ -1,13 +1,11 @@
-import type { RaisinNode } from '@raisins/core';
-import { isElementNode } from '@raisins/core';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import {
-  ComponentModelMolecule,
-} from '../../component-metamodel/ComponentModel.tsx';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import type { Soul } from '../souls/Soul.ts';
-import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms.tsx';
+import type { RaisinNode } from "@raisins/core";
+import { isElementNode } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { ComponentModelMolecule } from "../../component-metamodel/ComponentModel.tsx";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import type { Soul } from "../souls/Soul.ts";
+import { SoulsInDocMolecule } from "../souls/SoulsInDocumentAtoms.tsx";
 
 export const HoveredNodeMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);
@@ -15,7 +13,7 @@ export const HoveredNodeMolecule = molecule((getMol) => {
   const { ComponentMetaAtom } = getMol(ComponentModelMolecule);
 
   const HoveredSoulAtom = atom<Soul | undefined>(undefined);
-  HoveredSoulAtom.debugLabel = 'HoveredSoulAtom';
+  HoveredSoulAtom.debugLabel = "HoveredSoulAtom";
 
   const HoveredNodeAtom = atom<RaisinNode | undefined>((get) => {
     const hoveredSoul = get(HoveredSoulAtom);
@@ -23,11 +21,11 @@ export const HoveredNodeMolecule = molecule((getMol) => {
     const getNode = get(SoulToNodeAtom);
     return getNode(hoveredSoul);
   });
-  HoveredNodeAtom.debugLabel = 'HoveredNodeAtom';
+  HoveredNodeAtom.debugLabel = "HoveredNodeAtom";
 
   const HoveredBreadcrumbsAtom = atom((get) => {
     const node = get(HoveredNodeAtom);
-    if (!node) return '';
+    if (!node) return "";
     const parents = get(ParentsAtom);
     const metamodel = get(ComponentMetaAtom);
     const tagNames = isElementNode(node)
@@ -41,9 +39,9 @@ export const HoveredNodeMolecule = molecule((getMol) => {
       }
       current = parent;
     }
-    return tagNames.reverse().join(' > ');
+    return tagNames.reverse().join(" > ");
   });
-  HoveredBreadcrumbsAtom.debugLabel = 'HoveredBreadcrumbsAtom';
+  HoveredBreadcrumbsAtom.debugLabel = "HoveredBreadcrumbsAtom";
 
   return {
     HoveredSoulAtom,

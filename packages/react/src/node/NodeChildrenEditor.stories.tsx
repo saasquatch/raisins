@@ -1,23 +1,23 @@
-import type { RaisinNode } from '@raisins/core';
-import { isElementNode, isRoot } from '@raisins/core';
-import { useAtom, useAtomValue } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import React, { useContext } from 'react';
-import { ConfigMolecule } from '../core/index.ts';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
-import { invalidTBody } from '../examples/HTMLComponents.tsx';
-import { BasicStory } from '../index.stories.tsx';
-import { example } from './children/LoadTest.example.ts';
+import type { RaisinNode } from "@raisins/core";
+import { isElementNode, isRoot } from "@raisins/core";
+import { useMolecule } from "bunshi/react";
+import { useAtom, useAtomValue } from "jotai";
+import React, { useContext } from "react";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { ConfigMolecule } from "../core/index.ts";
+import { invalidTBody } from "../examples/HTMLComponents.tsx";
+import { BasicStory } from "../index.stories.tsx";
+import { example } from "./children/LoadTest.example.ts";
 import {
   ForkedChildrenEditor,
   ForkedContext,
   NodeChildrenEditor,
-} from './NodeChildrenEditor.tsx';
-import { NodeMolecule } from './NodeMolecule.tsx';
-import { NodeScopeMolecule } from './NodeScope.tsx';
+} from "./NodeChildrenEditor.tsx";
+import { NodeMolecule } from "./NodeMolecule.tsx";
+import { NodeScopeMolecule } from "./NodeScope.tsx";
 
 export default {
-  title: 'Children Editor',
+  title: "Children Editor",
 };
 
 export const LoadTest = () => {
@@ -61,7 +61,7 @@ const ValidationTest = () => {
         value={html}
         onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
         rows={6}
-        style={{ width: '300px' }}
+        style={{ width: "300px" }}
       />
       <JsonPointers />
     </>
@@ -86,7 +86,7 @@ const ForkedTestEditor = () => {
   return (
     <div>
       {tagName}
-      <div style={{ borderLeft: '4px solid #CCC' }}>
+      <div style={{ borderLeft: "4px solid #CCC" }}>
         <ForkedChildrenEditor Component={ForkedTestEditor} />
       </div>
     </div>
@@ -102,7 +102,7 @@ export const JsonPointers = () => {
   const name = useAtomValue(nodeAtoms.nameForNode);
   return (
     <div>
-      {name ?? tagName ?? 'Root'}
+      {name ?? tagName ?? "Root"}
       {errors.length > 0 && (
         <>
           <p>Errors for this node</p>
@@ -118,7 +118,7 @@ export const JsonPointers = () => {
       <details>
         <summary>Children ({allErrors.length} errors)</summary>
 
-        <div style={{ borderLeft: '4px solid #CCC' }}>
+        <div style={{ borderLeft: "4px solid #CCC" }}>
           <NodeChildrenEditor Component={JsonPointers} />
         </div>
       </details>
@@ -132,7 +132,7 @@ const TestEditor = () => {
   return (
     <div>
       {tagName}
-      <div style={{ borderLeft: '4px solid #CCC' }}>
+      <div style={{ borderLeft: "4px solid #CCC" }}>
         <NodeChildrenEditor Component={TestEditor} />
       </div>
     </div>
@@ -162,7 +162,7 @@ const DumbCase = ({ node }: { node: RaisinNode }) => {
   return (
     <div>
       {tagName}
-      <div style={{ borderLeft: '4px solid #CCC' }}>
+      <div style={{ borderLeft: "4px solid #CCC" }}>
         {children.map((c) => (
           <DumbCase node={c} />
         ))}

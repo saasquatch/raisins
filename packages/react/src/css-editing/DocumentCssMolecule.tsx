@@ -1,13 +1,13 @@
-import { molecule, useMolecule } from 'bunshi/react';
-import { useAtom } from 'jotai';
-import React, { useEffect, useRef, useState } from 'react';
-import { CssEditingMolecule } from './CssEditingMolecule.tsx';
+import { molecule, useMolecule } from "bunshi/react";
+import { useAtom } from "jotai";
+import React, { useEffect, useRef, useState } from "react";
+import { CssEditingMolecule } from "./CssEditingMolecule.tsx";
 
 /**
  * Document-wide CSS editor. Reads and writes the same atom that drives the
  * managed `<style>` block injected into the canvas iframe head.
  */
-export const DocumentCssMolecule = molecule(getMol => {
+export const DocumentCssMolecule = molecule((getMol) => {
   const { DocumentCssAtom } = getMol(CssEditingMolecule);
   return { DocumentCssAtom };
 });
@@ -53,10 +53,10 @@ export const DocumentCssEditor: React.FC = () => {
         ref={textareaRef}
         aria-label="Document CSS"
         rows={10}
-        style={{ width: '100%', fontFamily: 'monospace' }}
+        style={{ width: "100%", fontFamily: "monospace" }}
         value={value}
-        placeholder={'sqm-hero { display: none; }'}
-        onChange={e => onChange(e.target.value)}
+        placeholder={"sqm-hero { display: none; }"}
+        onChange={(e) => onChange(e.target.value)}
       />
     </div>
   );

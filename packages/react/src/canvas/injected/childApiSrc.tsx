@@ -1,5 +1,5 @@
-import type { NPMRegistry } from '../../util/NPMRegistry.ts';
-import { ChildAPIModule } from './RaisinsChildAPI.tsx';
+import type { NPMRegistry } from "../../util/NPMRegistry.ts";
+import { ChildAPIModule } from "./RaisinsChildAPI.tsx";
 
 export type Props = {
   selector: string;
@@ -8,7 +8,7 @@ export type Props = {
 export const childApiSrc = (
   registry: NPMRegistry,
   selector: string,
-  events: Set<string>
+  events: Set<string>,
 ) => {
   const props: Props = { selector, events: Array.from(events.values()) };
   return `<style>
@@ -16,18 +16,18 @@ export const childApiSrc = (
   </style>
   <script src="${registry.resolvePath(
     {
-      package: 'penpal',
-      version: '6.2.2',
+      package: "penpal",
+      version: "6.2.2",
     },
-    'dist/penpal.min.js'
+    "dist/penpal.min.js",
   )}"></script>
   <script type="module">
   import * as snabbdom from "${registry.resolvePath(
     {
-      package: 'snabbdom',
-      version: '3.6.2',
+      package: "snabbdom",
+      version: "3.6.2",
     },
-    '+esm'
+    "+esm",
   )}"
   const props = ${JSON.stringify(props)};
   (${ChildAPIModule})();

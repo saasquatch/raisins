@@ -1,5 +1,5 @@
-import type { RaisinNode } from '@raisins/core';
-import { isElementNode } from '../../util/isNode.tsx';
+import type { RaisinNode } from "@raisins/core";
+import { isElementNode } from "../../util/isNode.tsx";
 
 // TODO: Remove raisinnode to improve performance?
 export function isInSlot(c: RaisinNode, slotName: string): boolean {

@@ -1,8 +1,7 @@
-import type * as schema from '@raisins/schema/schema';
-import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry.ts';
-
-import type { Module, ModuleDetails } from '../types.ts';
-import { LOCAL_REPO } from './LOCAL_REPO.tsx';
+import type * as schema from "@raisins/schema/schema";
+import { makeLocalRegistry, unpkgNpmRegistry } from "../../util/NPMRegistry.ts";
+import type { Module, ModuleDetails } from "../types.ts";
+import { LOCAL_REPO } from "./LOCAL_REPO.tsx";
 
 /**
  * Downloads module details from an NPM registry
@@ -11,7 +10,7 @@ import { LOCAL_REPO } from './LOCAL_REPO.tsx';
  */
 export async function modulesToDetails(
   next: Module[],
-  localUrl: string | undefined = undefined
+  localUrl: string | undefined = undefined,
 ): Promise<ModuleDetails[]> {
   const details: ModuleDetails[] = [];
   for (const module of next) {
@@ -27,7 +26,7 @@ export async function modulesToDetails(
     }
     details.push({
       ...module,
-      'package.json': detail,
+      "package.json": detail,
       raisins: raisinPkg,
     });
   }

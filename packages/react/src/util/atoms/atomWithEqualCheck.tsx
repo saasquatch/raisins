@@ -1,6 +1,6 @@
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
-import { createMemoizeAtom } from '../weakCache.ts';
+import type { Atom } from "jotai";
+import { atom } from "jotai";
+import { createMemoizeAtom } from "../weakCache.ts";
 
 const memoized = createMemoizeAtom();
 const strictIsEqual = <T,>(a: T, b: T) => a === b;
@@ -12,7 +12,7 @@ const strictIsEqual = <T,>(a: T, b: T) => a === b;
  */
 export function atomWithEqualCheck<T>(
   baseAtom: Atom<T>,
-  isEqual: (prev: T, next: T) => boolean = strictIsEqual
+  isEqual: (prev: T, next: T) => boolean = strictIsEqual,
 ) {
   return memoized(() => {
     const refAtom = atom({ current: undefined as T | undefined });

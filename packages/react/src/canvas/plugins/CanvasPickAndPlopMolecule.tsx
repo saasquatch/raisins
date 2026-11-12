@@ -2,65 +2,58 @@ import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { calculatePlopTargets, isElementNode, isRoot } from '@raisins/core';
-import type { CustomElement } from '@raisins/schema/schema.js';
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import type { VNode, VNodeStyle } from 'snabbdom';
-import { h } from 'snabbdom';
-import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
+} from "@raisins/core";
+import { calculatePlopTargets, isElementNode, isRoot } from "@raisins/core";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { molecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom } from "jotai";
+import type { VNode, VNodeStyle } from "snabbdom";
+import { h } from "snabbdom";
+import { ComponentModelMolecule } from "../../component-metamodel/index.ts";
 import {
   CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../../core/index.ts';
-import {
-  DragAndDropMolecule,
-} from '../../core/selection/DragAndDropMolecule.tsx';
-import type { RawCanvasEvent } from '../api/_CanvasRPCContract.tsx';
-import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
-import type { RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
-import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
-import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
+} from "../../core/index.ts";
+import { DragAndDropMolecule } from "../../core/selection/DragAndDropMolecule.tsx";
+import type { RawCanvasEvent } from "../api/_CanvasRPCContract.tsx";
+import { CanvasConfigMolecule } from "../CanvasConfig.tsx";
+import type { RichCanvasEvent } from "../CanvasScopeMolecule.tsx";
+import { CanvasScopeMolecule } from "../CanvasScopeMolecule.tsx";
+import { defaultRectAtom } from "../util/defaultRectAtom.tsx";
 import type {
   SnabbdomAppender,
   SnabbdomRenderer,
-} from '../util/raisinToSnabdom.tsx';
+} from "../util/raisinToSnabdom.tsx";
 
-export const CanvasPickAndPlopMolecule = molecule(getMol => {
+export const CanvasPickAndPlopMolecule = molecule((getMol) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { ParentsAtom } = getMol(CoreMolecule);
-  const {
-    PlopNodeInSlotAtom,
-    PickedAtom,
-    PickedNodeAtom,
-    PloppingIsActive,
-  } = getMol(PickAndPlopMolecule);
+  const { PlopNodeInSlotAtom, PickedAtom, PickedNodeAtom, PloppingIsActive } =
+    getMol(PickAndPlopMolecule);
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ComponentModelAtom, IsInteractibleAtom } = getMol(
-    ComponentModelMolecule
+    ComponentModelMolecule,
   );
   const { GetSoulAtom } = getMol(SoulsMolecule);
-  const { DraggingIsActive, DraggedAtom, DraggedContentAtom } = getMol(
-    DragAndDropMolecule
-  );
+  const { DraggingIsActive, DraggedAtom, DraggedContentAtom } =
+    getMol(DragAndDropMolecule);
 
   /**
    * Listens for double click events, marks double clicked elements as selected
    * Only triggers with NODE_ENV=development
    */
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     const DoubleClickAtom = atom(null, (_, set, e: RichCanvasEvent) => {
-      if (e.type === 'dblclick') {
+      if (e.type === "dblclick") {
         set(PickedNodeAtom, e.node);
       }
     });
-    DoubleClickAtom.debugLabel = 'SelectedClickedAtom';
-    CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
+    DoubleClickAtom.debugLabel = "SelectedClickedAtom";
+    CanvasAtoms.addEventListener("dblclick", DoubleClickAtom);
   }
 
   const PickAndPlopStyleAtom = atom(
@@ -96,7 +89,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       height: 4px;
     }
 
-    </style>`
+    </style>`,
   );
   CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);
 
@@ -104,8 +97,8 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
     null,
     (get, set, { type, target }: RawCanvasEvent) => {
       const idToSoul = get(IdToSoulAtom);
-      if (type === 'click') {
-        const plopParentSoulId = target?.attributes['raisin-plop-parent'];
+      if (type === "click") {
+        const plopParentSoulId = target?.attributes["raisin-plop-parent"];
         if (plopParentSoulId) {
           const parentSoul = plopParentSoulId
             ? idToSoul(plopParentSoulId)
@@ -116,18 +109,18 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
             | RaisinElementNode
             | RaisinDocumentNode;
           if (!parentNode) return;
-          const idx = Number(target?.attributes['raisin-plop-idx']);
-          const slot = target?.attributes['raisin-plop-slot'] ?? '';
+          const idx = Number(target?.attributes["raisin-plop-idx"]);
+          const slot = target?.attributes["raisin-plop-slot"] ?? "";
           set(PlopNodeInSlotAtom, { parent: parentNode, idx, slot });
           // If plop, don't do select logic
           return;
         }
       }
-    }
+    },
   );
-  CanvasAtoms.addEventListener('click', PickAndPlopListenerAtom);
+  CanvasAtoms.addEventListener("click", PickAndPlopListenerAtom);
 
-  const AppenderAtom = atom(get => {
+  const AppenderAtom = atom((get) => {
     const souls = get(GetSoulAtom);
     const isPloppingActive = get(PloppingIsActive);
     const picked = get(PickedAtom);
@@ -143,18 +136,18 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
 
     const active = isDragging ? dragged : picked;
     const addOrMove =
-      active?.type === 'block' ? 'add' : ('move' as 'add' | 'move');
+      active?.type === "block" ? "add" : ("move" as "add" | "move");
     const candidate = isDragging
       ? draggedContent
-      : picked?.type === 'block'
-      ? picked.block.content
-      : pickedForMove;
+      : picked?.type === "block"
+        ? picked.block.content
+        : pickedForMove;
     const appender: SnabbdomAppender = (vnodeChildren, n) => {
       // Drags resolve via parent-side gap geometry, except custom-layout
       // containers (config predicate) which need real injected targets.
       if (
         isDragging &&
-        !isCustomPlopContainer((n as RaisinElementNode).tagName ?? '')
+        !isCustomPlopContainer((n as RaisinElementNode).tagName ?? "")
       )
         return vnodeChildren;
       if (!candidate || !isElementNode(candidate)) return vnodeChildren;
@@ -165,9 +158,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       // if (!isElementNode(n)) return vnodeChildren;
 
       const slot =
-        (n as RaisinElementNode).attribs?.slot ??
-        candidate.attribs?.slot ??
-        '';
+        (n as RaisinElementNode).attribs?.slot ?? candidate.attribs?.slot ?? "";
       const isValid = metamodel.isValidChild(candidate, n, slot);
       if (!isValid) return vnodeChildren;
       const parent = n as RaisinElementNode & RaisinNodeWithChildren;
@@ -181,12 +172,12 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
           parentMeta,
           possiblePlopMeta,
         },
-        parents
+        parents,
       );
 
       const plopsForZeroIndex = plopTargets
-        .filter(plop => plop.idx === 0)
-        .map(plop => {
+        .filter((plop) => plop.idx === 0)
+        .map((plop) => {
           return PlopTargetView({
             idx: plop.idx,
             slot: plop.slot,
@@ -199,29 +190,32 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
         });
 
       const filteredChildren = (vnodeChildren as VNode[])?.filter(
-        (node: VNode) => node.sel !== 'raisins-plop-target'
+        (node: VNode) => node.sel !== "raisins-plop-target",
       );
 
       const newChildren =
-        filteredChildren?.reduce((acc, vnodeChild, idx) => {
-          const plopsForNextIndex = plopTargets.filter(
-            plop => plop.idx === idx + 1
-          );
+        filteredChildren?.reduce(
+          (acc, vnodeChild, idx) => {
+            const plopsForNextIndex = plopTargets.filter(
+              (plop) => plop.idx === idx + 1,
+            );
 
-          const plopViews = plopsForNextIndex.map(plop => {
-            return PlopTargetView({
-              idx: plop.idx,
-              slot: plop.slot,
-              soulId,
-              eventsAttribute,
-              parent,
-              parentSchema: parentMeta,
-              addOrMove,
+            const plopViews = plopsForNextIndex.map((plop) => {
+              return PlopTargetView({
+                idx: plop.idx,
+                slot: plop.slot,
+                soulId,
+                eventsAttribute,
+                parent,
+                parentSchema: parentMeta,
+                addOrMove,
+              });
             });
-          });
 
-          return [...acc, vnodeChild, ...plopViews];
-        }, plopsForZeroIndex as Array<string | VNode>) ?? [];
+            return [...acc, vnodeChild, ...plopViews];
+          },
+          plopsForZeroIndex as Array<string | VNode>,
+        ) ?? [];
 
       return newChildren;
     };
@@ -229,7 +223,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
   });
   CanvasAtoms.AppendersSet.add(AppenderAtom);
 
-  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
+  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const picked = get(PickedNodeAtom);
     const renderer: SnabbdomRenderer = (d, n) => {
       const isPicked = picked === n;
@@ -238,9 +232,9 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       const { delayed, remove, ...rest } = d.style || {};
       const style = {
         ...rest,
-        cursor: 'pointer',
-        outline: isPicked ? '2px dashed #0077DB' : rest.outline ?? '',
-        outlineOffset: isPicked ? '-2px' : '',
+        cursor: "pointer",
+        outline: isPicked ? "2px dashed #0077DB" : (rest.outline ?? ""),
+        outlineOffset: isPicked ? "-2px" : "",
       } as VNodeStyle;
 
       return {
@@ -259,7 +253,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       CanvasAtoms.GeometryAtom,
       PickedNodeAtom,
       GetSoulAtom,
-      CanvasConfig.SoulAttributeAtom
+      CanvasConfig.SoulAttributeAtom,
     ),
   };
 });
@@ -273,7 +267,7 @@ type PlopTargetViewProps = {
   eventsAttribute: string;
   parent: RaisinElementNode | RaisinDocumentNode;
   parentSchema: CustomElement;
-  addOrMove: 'add' | 'move';
+  addOrMove: "add" | "move";
 };
 const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   soulId,
@@ -285,9 +279,9 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   addOrMove,
 }) => {
   const slotTitle =
-    parentSchema?.slots?.find(foundSlot => slot === foundSlot.name)?.title ||
+    parentSchema?.slots?.find((foundSlot) => slot === foundSlot.name)?.title ||
     parentSchema.title ||
-    'Content';
+    "Content";
 
   // Root-edge targets (the first couple and the last child of root) would
   // otherwise be drawn right at the canvas top/bottom and get clipped. We nudge
@@ -299,50 +293,50 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
   const isPaddedEdge =
     isRoot(parent) && (idx <= 1 || idx === parent.children.length - 1);
   const innerTransform = isPaddedEdge
-    ? 'translateY(calc(-50% + 33px))'
-    : 'translateY(-50%)';
+    ? "translateY(calc(-50% + 33px))"
+    : "translateY(-50%)";
 
   const key = `${soulId}/${idx}/${slot}`;
 
   const defaultAttrs = {
     slot,
-    'raisin-plop-target': true,
-    'raisin-plop-parent': soulId,
-    'raisin-plop-slot': slot,
-    'raisin-plop-idx': idx,
+    "raisin-plop-target": true,
+    "raisin-plop-parent": soulId,
+    "raisin-plop-slot": slot,
+    "raisin-plop-idx": idx,
     [eventsAttribute]: true,
   };
 
   const PlopLabel = h(
-    'div',
+    "div",
     {
       style: {
-        color: '#fff',
-        fontSize: '12px',
-        lineHeight: '16px',
-        margin: 'auto',
-        zIndex: '999',
-        position: 'relative',
-        borderRadius: '100px',
-        textTransform: 'none',
+        color: "#fff",
+        fontSize: "12px",
+        lineHeight: "16px",
+        margin: "auto",
+        zIndex: "999",
+        position: "relative",
+        borderRadius: "100px",
+        textTransform: "none",
       },
-      attrs: { targettype: 'label' },
+      attrs: { targettype: "label" },
     },
-    `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`
+    `${addOrMove === "add" ? "Add" : "Move"} to ${slotTitle}`,
   );
 
-  const targetBar = h('div', {
+  const targetBar = h("div", {
     style: {
-      width: '100%',
-      margin: 'auto',
-      zIndex: '999',
-      position: 'relative',
+      width: "100%",
+      margin: "auto",
+      zIndex: "999",
+      position: "relative",
     },
-    attrs: { targettype: 'bar' },
+    attrs: { targettype: "bar" },
   });
 
   return h(
-    'raisins-plop-target',
+    "raisins-plop-target",
     {
       // Helps snabbdom know how to remove nodes
       key,
@@ -354,35 +348,35 @@ const PlopTargetView: SnabdomComponent<PlopTargetViewProps> = ({
       // box (`overflow: visible`) and any root-edge nudge is applied on the
       // inner element's transform.
       style: {
-        height: '0px',
-        minHeight: '0',
-        minWidth: '0',
-        margin: '0',
-        overflow: 'visible',
-        position: 'relative',
-        display: 'block',
-        marginTop: '0',
+        height: "0px",
+        minHeight: "0",
+        minWidth: "0",
+        margin: "0",
+        overflow: "visible",
+        position: "relative",
+        display: "block",
+        marginTop: "0",
       },
     },
     h(
-      'div',
+      "div",
       {
         style: {
-          width: '100%',
-          height: 'auto',
-          display: 'grid',
-          gridRow: '1',
-          gridTemplateColumns: '1fr max-content 1fr',
-          cursor: 'pointer',
+          width: "100%",
+          height: "auto",
+          display: "grid",
+          gridRow: "1",
+          gridTemplateColumns: "1fr max-content 1fr",
+          cursor: "pointer",
           transform: innerTransform,
         },
-        attrs: { ...defaultAttrs, class: 'plop-target-container' },
+        attrs: { ...defaultAttrs, class: "plop-target-container" },
         // Track plop target geometry so parent-side drag handlers can
         // hit-test the cursor against plop targets when the iframe has
         // `pointer-events: none` during a drag (see CanvasDragAndDropMolecule).
         resizeObserver: true,
       },
-      [targetBar, PlopLabel, targetBar]
-    )
+      [targetBar, PlopLabel, targetBar],
+    ),
   );
 };

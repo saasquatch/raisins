@@ -1,19 +1,19 @@
-import type { RaisinElementNode } from '@raisins/core';
+import type { RaisinElementNode } from "@raisins/core";
 import type {
   NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { getPath, htmlUtil } from '@raisins/core';
-import type { PrimitiveAtom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import type { Block } from '../../component-metamodel/ComponentModel.tsx';
-import { isFunction } from '../../util/isFunction.ts';
-import { tryGetNode } from '../../util/tryGetNode.ts';
-import { waitForUpdate } from '../../util/waitForUpdate.ts';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import { SelectedNodeMolecule } from './SelectedNodeMolecule.tsx';
+} from "@raisins/core";
+import { getPath, htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { PrimitiveAtom } from "jotai";
+import { atom } from "jotai";
+import type { Block } from "../../component-metamodel/ComponentModel.tsx";
+import { isFunction } from "../../util/isFunction.ts";
+import { tryGetNode } from "../../util/tryGetNode.ts";
+import { waitForUpdate } from "../../util/waitForUpdate.ts";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import { SelectedNodeMolecule } from "./SelectedNodeMolecule.tsx";
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 
@@ -25,7 +25,7 @@ const { moveNode, insertAtPath, clone } = htmlUtil;
  */
 function findNodeByChildrenRef(
   root: RaisinNode,
-  childrenRef: RaisinNode[] | undefined
+  childrenRef: RaisinNode[] | undefined,
 ): RaisinNode | undefined {
   if (!childrenRef) return undefined;
   const children = (root as RaisinNodeWithChildren).children;
@@ -45,8 +45,8 @@ export type DragPlopDestination = {
 };
 
 export type DraggedOption =
-  | { type: 'element'; path: NodePath }
-  | { type: 'block'; block: Block }
+  | { type: "element"; path: NodePath }
+  | { type: "block"; block: Block }
   | undefined;
 
 /**
@@ -54,7 +54,7 @@ export type DraggedOption =
  * the existing PickAndPlopMolecule but uses the HTML Drag and Drop API instead of
  * click-based pick/plop interactions.
  */
-export const DragAndDropMolecule = molecule(getMol => {
+export const DragAndDropMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { SelectedAtom } = getMol(SelectedNodeMolecule);
 
@@ -64,11 +64,11 @@ export const DragAndDropMolecule = molecule(getMol => {
   const DraggedAtom = atom<DraggedOption>(undefined);
 
   const DraggedNodeAtom: PrimitiveAtom<RaisinNode | undefined> = atom(
-    get => {
+    (get) => {
       const currentDoc = get(RootNodeAtom);
       const dragged = get(DraggedAtom);
       if (!dragged) return undefined;
-      if (dragged.type !== 'element') return undefined;
+      if (dragged.type !== "element") return undefined;
 
       // Dangling path (doc changed since drag start) resolves to undefined.
       return tryGetNode(currentDoc, dragged.path);
@@ -88,28 +88,28 @@ export const DragAndDropMolecule = molecule(getMol => {
         set(DraggedAtom, undefined);
       } else {
         set(DraggedAtom, {
-          type: 'element',
+          type: "element",
           path,
         });
       }
-    }
+    },
   );
 
   /**
    * Whether a drag operation is currently active
    */
   const DraggingIsActive = atom(
-    get => (get(DraggedAtom) !== undefined) as boolean
+    (get) => (get(DraggedAtom) !== undefined) as boolean,
   );
 
   /**
    * Content being dragged (block content for adds, resolved node for moves).
    * The drag half of the plop candidate; plop validation reads dragged ?? picked.
    */
-  const DraggedContentAtom = atom<RaisinElementNode | undefined>(get => {
+  const DraggedContentAtom = atom<RaisinElementNode | undefined>((get) => {
     const dragged = get(DraggedAtom);
     if (!dragged) return undefined;
-    if (dragged.type === 'block') return dragged.block.content;
+    if (dragged.type === "block") return dragged.block.content;
     return get(DraggedNodeAtom) as RaisinElementNode | undefined;
   });
 
@@ -150,11 +150,11 @@ export const DragAndDropMolecule = molecule(getMol => {
         set(RootNodeAtom, newDocument);
       };
 
-      if (dragged.type === 'block') {
+      if (dragged.type === "block") {
         // Clone before setting slot — block content is shared metamodel config.
         // data-raisin-id is assigned lazily by SetInstanceCssAtom on first custom style, so the clone doesn't need one yet.
         const cloneOfDraggedNode = clone(
-          dragged.block.content
+          dragged.block.content,
         ) as RaisinElementNode;
         cloneOfDraggedNode.attribs.slot = slot;
 
@@ -162,7 +162,7 @@ export const DragAndDropMolecule = molecule(getMol => {
           currentDoc,
           cloneOfDraggedNode,
           parentPath,
-          idx
+          idx,
         );
         commit(newDocument);
         await waitForUpdate();
@@ -178,7 +178,7 @@ export const DragAndDropMolecule = molecule(getMol => {
           draggedNode,
           slot,
           parentPath,
-          idx
+          idx,
         );
 
         // `moveNode` shallow-clones the dragged node to apply the new slot, so
@@ -188,7 +188,7 @@ export const DragAndDropMolecule = molecule(getMol => {
         // identity and select it once the new document is committed.
         const movedNode = findNodeByChildrenRef(
           newDocument,
-          draggedNode.children
+          draggedNode.children,
         );
 
         commit(newDocument);
@@ -198,7 +198,7 @@ export const DragAndDropMolecule = molecule(getMol => {
           set(SelectedAtom, movedNode);
         }
       }
-    }
+    },
   );
 
   /**

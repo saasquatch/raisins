@@ -1,59 +1,40 @@
 {
   "name": "@raisins/react",
-  "author": "ReferralSaaSquatch.com, Inc.",
-  "description": "React package with tools for building a Raisins editor",
   "version": "1.7.2",
+  "description": "React package with tools for building a Raisins editor",
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  },
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/react.esm.js",
-  "typings": "dist/index.d.ts",
-  "type": "module",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "repository": {
     "type": "git",
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/react"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist",
     "src"
   ],
-  "engines": {
-    "node": "^24 || ^26"
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/react.esm.js",
+  "typings": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "tsdown --watch",
     "build": "tsdown",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src",
+    "lint": "oxlint",
+    "format": "oxfmt",
     "size": "size-limit",
     "analyze": "size-limit --why",
     "storybook": "storybook dev -p 6007 -c .storybook",
     "storybook:build": "storybook build -c .storybook -o .out"
   },
-  "peerDependencies": {
-    "jotai": "^2.0.0",
-    "react": "^17.0.0 || ^18.0.0"
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "size-limit": [
-    {
-      "path": "dist/react.cjs.production.min.js",
-      "limit": "150 KB"
-    },
-    {
-      "path": "dist/react.esm.js",
-      "limit": "150 KB"
-    }
-  ],
   "dependencies": {
     "@raisins/core": "^1.4.1",
     "@raisins/schema": "^1.4.0",
@@ -77,7 +58,6 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
-    "@eslint/js": "^8.57.0",
     "@size-limit/preset-small-lib": "^5.0.4",
     "@storybook/react": "^10.6.7",
     "@storybook/react-vite": "^10.6.7",
@@ -87,21 +67,34 @@
     "@types/react-dom": "^18.3.0",
     "@types/throttle-debounce": "^5.0.0",
     "cypress": "^12.12.0",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
-    "globals": "^15.2.0",
     "jsdom": "^31.0.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2006",
     "react": "*",
     "react-dom": "^18.3.1",
     "size-limit": "^5.0.4",
     "storybook": "^10.6.7",
     "tsdown": "^0.23.7",
     "typescript": "^7.0.2",
-    "typescript-eslint": "^7.8.0",
     "vite": "^8.3.7",
     "vitest": "^5.1.0"
   },
-  "bugs": {
-    "url": "https://github.com/saasquatch/raisins/issues"
+  "peerDependencies": {
+    "jotai": "^2.0.0",
+    "react": "^17.0.0 || ^18.0.0"
+  },
+  "size-limit": [
+    {
+      "path": "dist/react.cjs.production.min.js",
+      "limit": "150 KB"
+    },
+    {
+      "path": "dist/react.esm.js",
+      "limit": "150 KB"
+    }
+  ],
+  "engines": {
+    "node": "^24 || ^26"
   }
 }

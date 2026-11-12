@@ -1,22 +1,22 @@
-import type { RaisinElementNode, RaisinNode } from '@raisins/core';
-import { parseWithErrors } from '@raisins/core';
-import { act, renderHook } from '@testing-library/react';
-import { molecule, useMolecule } from 'bunshi/react';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import React from 'react';
-import type { Module } from '../component-metamodel/types.ts';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
-import { EditMolecule } from '../core/editting/EditAtoms.ts';
-import type { RaisinConfig } from '../core/RaisinConfigScope.tsx';
-import { ConfigMolecule, RaisinsProvider } from '../core/RaisinConfigScope.tsx';
-import { CssEditingMolecule } from './CssEditingMolecule.tsx';
+import type { RaisinElementNode, RaisinNode } from "@raisins/core";
+import { parseWithErrors } from "@raisins/core";
+import { act, renderHook } from "@testing-library/react";
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import React from "react";
+import type { Module } from "../component-metamodel/types.ts";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { EditMolecule } from "../core/editting/EditAtoms.ts";
+import type { RaisinConfig } from "../core/RaisinConfigScope.tsx";
+import { ConfigMolecule, RaisinsProvider } from "../core/RaisinConfigScope.tsx";
+import { CssEditingMolecule } from "./CssEditingMolecule.tsx";
 import {
   RAISIN_CSS_ATTR,
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_ID_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from './RaisinCssIds.ts';
-import { RaisinIdsMolecule } from './RaisinIdsMolecule.ts';
+} from "./RaisinCssIds.ts";
+import { RaisinIdsMolecule } from "./RaisinIdsMolecule.ts";
 
 function useCssEditing() {
   const { HTMLAtom } = useMolecule(ConfigMolecule);
@@ -60,8 +60,8 @@ function renderCssEditing(startingHtml: string) {
 function findTags(node: RaisinNode, tagName: string): RaisinElementNode[] {
   const found: RaisinElementNode[] = [];
   const walk = (n: RaisinNode) => {
-    if (n.type === 'tag' && n.tagName === tagName) found.push(n);
-    if ('children' in n) n.children.forEach(walk);
+    if (n.type === "tag" && n.tagName === tagName) found.push(n);
+    if ("children" in n) n.children.forEach(walk);
   };
   walk(node);
   return found;
@@ -70,88 +70,90 @@ function findTags(node: RaisinNode, tagName: string): RaisinElementNode[] {
 const findTag = (node: RaisinNode, tagName: string) =>
   findTags(node, tagName)[0];
 
-describe('DocumentCssAtom', () => {
-  it('round-trips through a marked style node in the document', () => {
-    const { result } = renderCssEditing('<div></div>');
-    expect(result.current.documentCss).toBe('');
+describe("DocumentCssAtom", () => {
+  it("round-trips through a marked style node in the document", () => {
+    const { result } = renderCssEditing("<div></div>");
+    expect(result.current.documentCss).toBe("");
 
-    act(() => result.current.setDocumentCss('div { color: red }'));
+    act(() => result.current.setDocumentCss("div { color: red }"));
 
-    expect(result.current.documentCss).toBe('div{color:red}');
-    expect(result.current.html).toContain('data-raisin-document-css');
-    expect(result.current.html).toContain('div{color:red}');
+    expect(result.current.documentCss).toBe("div{color:red}");
+    expect(result.current.html).toContain("data-raisin-document-css");
+    expect(result.current.html).toContain("div{color:red}");
   });
 
-  it('removes the style node when cleared', () => {
-    const { result } = renderCssEditing('<div></div>');
-    act(() => result.current.setDocumentCss('div { color: red }'));
-    act(() => result.current.setDocumentCss(''));
+  it("removes the style node when cleared", () => {
+    const { result } = renderCssEditing("<div></div>");
+    act(() => result.current.setDocumentCss("div { color: red }"));
+    act(() => result.current.setDocumentCss(""));
 
-    expect(result.current.documentCss).toBe('');
-    expect(result.current.html).not.toContain('data-raisin-document-css');
+    expect(result.current.documentCss).toBe("");
+    expect(result.current.html).not.toContain("data-raisin-document-css");
   });
 
   // css-tree recovers from malformed input rather than throwing, so partial
   // css is persisted in normalized form — it is never rejected.
-  it('normalizes incomplete css instead of rejecting it', () => {
-    const { result } = renderCssEditing('<div></div>');
-    act(() => result.current.setDocumentCss('div { color:'));
+  it("normalizes incomplete css instead of rejecting it", () => {
+    const { result } = renderCssEditing("<div></div>");
+    act(() => result.current.setDocumentCss("div { color:"));
 
-    expect(result.current.documentCss).toBe('div{color:}');
+    expect(result.current.documentCss).toBe("div{color:}");
   });
 });
 
-describe('SetInstanceCssAtom', () => {
-  it('assigns a raisin id alongside the css', () => {
-    const { result } = renderCssEditing('<div></div>');
-    const div = findTag(result.current.root, 'div');
+describe("SetInstanceCssAtom", () => {
+  it("assigns a raisin id alongside the css", () => {
+    const { result } = renderCssEditing("<div></div>");
+    const div = findTag(result.current.root, "div");
 
-    act(() => result.current.setInstanceCss({ node: div, css: ':host{color:red}' }));
+    act(() =>
+      result.current.setInstanceCss({ node: div, css: ":host{color:red}" }),
+    );
 
-    const next = findTag(result.current.root, 'div');
-    expect(next.attribs[RAISIN_CSS_ATTR]).toBe(':host{color:red}');
+    const next = findTag(result.current.root, "div");
+    expect(next.attribs[RAISIN_CSS_ATTR]).toBe(":host{color:red}");
     expect(next.attribs[RAISIN_ID_ATTR]).toBeTruthy();
     expect(result.current.usedIds.size).toBe(1);
   });
 
-  it('reuses the existing id when the css changes', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("reuses the existing id when the css changes", () => {
+    const { result } = renderCssEditing("<div></div>");
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
-    const firstId = findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR];
+    const firstId = findTag(result.current.root, "div").attribs[RAISIN_ID_ATTR];
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
 
-    expect(findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR]).toBe(
-      firstId
+    expect(findTag(result.current.root, "div").attribs[RAISIN_ID_ATTR]).toBe(
+      firstId,
     );
   });
 
-  it('removes the css attribute but keeps the id when cleared', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("removes the css attribute but keeps the id when cleared", () => {
+    const { result } = renderCssEditing("<div></div>");
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: '',
-      })
+        node: findTag(result.current.root, "div"),
+        css: "",
+      }),
     );
 
-    const next = findTag(result.current.root, 'div');
+    const next = findTag(result.current.root, "div");
     expect(next.attribs[RAISIN_CSS_ATTR]).toBeUndefined();
     expect(next.attribs[RAISIN_ID_ATTR]).toBeTruthy();
   });
@@ -159,99 +161,103 @@ describe('SetInstanceCssAtom', () => {
   // Each write re-serializes the whole document and re-renders the canvas, and
   // widgets routinely rewrite unchanged sides (one box-model keystroke writes
   // all four).
-  it('does not touch the document when the css is unchanged', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("does not touch the document when the css is unchanged", () => {
+    const { result } = renderCssEditing("<div></div>");
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
 
     const before = result.current.root;
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
 
     expect(result.current.root).toBe(before);
   });
 
-  it('does not touch the document when clearing css that was never set', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("does not touch the document when clearing css that was never set", () => {
+    const { result } = renderCssEditing("<div></div>");
     const before = result.current.root;
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: '',
-      })
+        node: findTag(result.current.root, "div"),
+        css: "",
+      }),
     );
 
     expect(result.current.root).toBe(before);
   });
 
   // Skipping unchanged writes must not skip assigning a missing id.
-  it('still assigns an id when the css matches but the id is absent', () => {
+  it("still assigns an id when the css matches but the id is absent", () => {
     const { result } = renderCssEditing(
-      `<div ${RAISIN_CSS_ATTR}=":host{color:red}"></div>`
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}"></div>`,
     );
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
 
-    expect(findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR]).toBeTruthy();
+    expect(
+      findTag(result.current.root, "div").attribs[RAISIN_ID_ATTR],
+    ).toBeTruthy();
   });
 
-  it('round-trips css containing quotes and ampersands through the html', () => {
+  it("round-trips css containing quotes and ampersands through the html", () => {
     const css = '::part(x){&:hover{content:"a"}}';
-    const { result } = renderCssEditing('<div></div>');
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
+        node: findTag(result.current.root, "div"),
         css,
-      })
+      }),
     );
 
-    expect(result.current.html).toContain('&amp;:hover');
-    expect(findTag(result.current.root, 'div').attribs[RAISIN_CSS_ATTR]).toBe(css);
+    expect(result.current.html).toContain("&amp;:hover");
+    expect(findTag(result.current.root, "div").attribs[RAISIN_CSS_ATTR]).toBe(
+      css,
+    );
   });
 });
 
-describe('PersistedHtmlAtom', () => {
-  it('appends the managed stylesheet to the serialized html', () => {
-    const { result } = renderCssEditing('<div></div>');
+describe("PersistedHtmlAtom", () => {
+  it("appends the managed stylesheet to the serialized html", () => {
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
 
     expect(result.current.persistedHtml).toContain(
-      `${RAISIN_MANAGED_CSS_ATTR}="true"`
+      `${RAISIN_MANAGED_CSS_ATTR}="true"`,
     );
-    expect(result.current.persistedHtml).toContain('[data-raisin-id=');
-    expect(result.current.persistedHtml).toContain('{color:red}');
+    expect(result.current.persistedHtml).toContain("[data-raisin-id=");
+    expect(result.current.persistedHtml).toContain("{color:red}");
   });
 
-  it('leaves the document untouched', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("leaves the document untouched", () => {
+    const { result } = renderCssEditing("<div></div>");
     const htmlBefore = result.current.html;
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
     const htmlAfterEdit = result.current.html;
 
@@ -261,76 +267,76 @@ describe('PersistedHtmlAtom', () => {
     expect(result.current.html).toBe(htmlAfterEdit);
   });
 
-  it('escapes raw-text closing sequences in the managed stylesheet', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("escapes raw-text closing sequences in the managed stylesheet", () => {
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
+        node: findTag(result.current.root, "div"),
         css: ':host{content:"</style><script>alert(1)</script>"}',
-      })
+      }),
     );
 
     const managedStyle = result.current.persistedHtml.match(
-      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/,
     )?.[1];
 
-    expect(managedStyle).toContain('<\\/style>');
-    expect(managedStyle).not.toContain('</style><script>');
+    expect(managedStyle).toContain("<\\/style>");
+    expect(managedStyle).not.toContain("</style><script>");
     expect(
-      parseWithErrors(result.current.persistedHtml).node.children
+      parseWithErrors(result.current.persistedHtml).node.children,
     ).toHaveLength(2);
   });
 
-  it('reflects the current css without a sync step', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("reflects the current css without a sync step", () => {
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
-    expect(result.current.persistedHtml).toContain('{color:red}');
+    expect(result.current.persistedHtml).toContain("{color:red}");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
 
-    expect(result.current.persistedHtml).toContain('{color:blue}');
-    expect(result.current.persistedHtml).not.toContain('{color:red}');
+    expect(result.current.persistedHtml).toContain("{color:blue}");
+    expect(result.current.persistedHtml).not.toContain("{color:red}");
   });
 
-  it('omits the managed stylesheet when there is no instance css', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("omits the managed stylesheet when there is no instance css", () => {
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: '',
-      })
+        node: findTag(result.current.root, "div"),
+        css: "",
+      }),
     );
 
     expect(result.current.persistedHtml).not.toContain(RAISIN_MANAGED_CSS_ATTR);
   });
 
-  it('round-trips without stacking managed stylesheets', () => {
-    const first = renderCssEditing('<div></div>');
+  it("round-trips without stacking managed stylesheets", () => {
+    const first = renderCssEditing("<div></div>");
 
     act(() =>
       first.result.current.setInstanceCss({
-        node: findTag(first.result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(first.result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
     const savedHtml = first.result.current.persistedHtml;
 
@@ -339,65 +345,65 @@ describe('PersistedHtmlAtom', () => {
     expect(reloaded.result.current.persistedHtml).toBe(savedHtml);
     expect(
       reloaded.result.current.persistedHtml.match(
-        new RegExp(RAISIN_MANAGED_CSS_ATTR, 'g')
-      )
+        new RegExp(RAISIN_MANAGED_CSS_ATTR, "g"),
+      ),
     ).toHaveLength(1);
   });
 
-  it('does not re-escape an already escaped closing sequence', () => {
-    const first = renderCssEditing('<div></div>');
+  it("does not re-escape an already escaped closing sequence", () => {
+    const first = renderCssEditing("<div></div>");
 
     act(() =>
       first.result.current.setInstanceCss({
-        node: findTag(first.result.current.root, 'div'),
+        node: findTag(first.result.current.root, "div"),
         css: ':host{content:"</style>"}',
-      })
+      }),
     );
     const savedHtml = first.result.current.persistedHtml;
     const reloaded = renderCssEditing(savedHtml);
 
-    expect(reloaded.result.current.persistedHtml).toContain('<\\/style>');
-    expect(reloaded.result.current.persistedHtml).not.toContain('<\\\\/style>');
+    expect(reloaded.result.current.persistedHtml).toContain("<\\/style>");
+    expect(reloaded.result.current.persistedHtml).not.toContain("<\\\\/style>");
   });
 
-  it('keeps document css out of the managed stylesheet', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("keeps document css out of the managed stylesheet", () => {
+    const { result } = renderCssEditing("<div></div>");
 
-    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+    act(() => result.current.setDocumentCss("body { margin: 0 }"));
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
 
     const managedStyle = result.current.persistedHtml.match(
-      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/
+      /<style data-raisin-managed-css="true">([\s\S]*?)<\/style>/,
     )?.[1];
 
     expect(result.current.persistedHtml).toContain(RAISIN_DOCUMENT_CSS_ATTR);
-    expect(result.current.persistedHtml).toContain('body{margin:0}');
-    expect(managedStyle).toContain('[data-raisin-id=');
-    expect(managedStyle).toContain('{color:blue}');
-    expect(managedStyle).not.toContain('body{margin:0}');
+    expect(result.current.persistedHtml).toContain("body{margin:0}");
+    expect(managedStyle).toContain("[data-raisin-id=");
+    expect(managedStyle).toContain("{color:blue}");
+    expect(managedStyle).not.toContain("body{margin:0}");
   });
 
-  it('puts document css before the managed stylesheet', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("puts document css before the managed stylesheet", () => {
+    const { result } = renderCssEditing("<div></div>");
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
-    act(() => result.current.setDocumentCss('body { margin: 0 }'));
+    act(() => result.current.setDocumentCss("body { margin: 0 }"));
 
     const documentCssIndex = result.current.persistedHtml.indexOf(
-      RAISIN_DOCUMENT_CSS_ATTR
+      RAISIN_DOCUMENT_CSS_ATTR,
     );
     const managedCssIndex = result.current.persistedHtml.indexOf(
-      RAISIN_MANAGED_CSS_ATTR
+      RAISIN_MANAGED_CSS_ATTR,
     );
 
     expect(documentCssIndex).toBeGreaterThanOrEqual(0);
@@ -405,178 +411,180 @@ describe('PersistedHtmlAtom', () => {
   });
 });
 
-describe('ManagedStyleSheetAtom', () => {
-  it('puts document css before scoped instance css', () => {
-    const { result } = renderCssEditing('<div></div>');
-    act(() => result.current.setDocumentCss('div { color: red }'));
+describe("ManagedStyleSheetAtom", () => {
+  it("puts document css before scoped instance css", () => {
+    const { result } = renderCssEditing("<div></div>");
+    act(() => result.current.setDocumentCss("div { color: red }"));
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
 
-    const id = findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR];
+    const id = findTag(result.current.root, "div").attribs[RAISIN_ID_ATTR];
     expect(result.current.managedCss).toBe(
-      `div{color:red}\n[data-raisin-id="${id}"]{color:blue}`
+      `div{color:red}\n[data-raisin-id="${id}"]{color:blue}`,
     );
   });
 
-  it('scopes each instance to its own id', () => {
-    const { result } = renderCssEditing('<div></div><span></span>');
+  it("scopes each instance to its own id", () => {
+    const { result } = renderCssEditing("<div></div><span></span>");
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:red}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:red}",
+      }),
     );
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'span'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "span"),
+        css: ":host{color:blue}",
+      }),
     );
 
-    const divId = findTag(result.current.root, 'div').attribs[RAISIN_ID_ATTR];
-    const spanId = findTag(result.current.root, 'span').attribs[RAISIN_ID_ATTR];
+    const divId = findTag(result.current.root, "div").attribs[RAISIN_ID_ATTR];
+    const spanId = findTag(result.current.root, "span").attribs[RAISIN_ID_ATTR];
     expect(divId).not.toBe(spanId);
     expect(result.current.managedCss).toContain(
-      `[data-raisin-id="${divId}"]{color:red}`
+      `[data-raisin-id="${divId}"]{color:red}`,
     );
     expect(result.current.managedCss).toContain(
-      `[data-raisin-id="${spanId}"]{color:blue}`
+      `[data-raisin-id="${spanId}"]{color:blue}`,
     );
   });
 
   // Malformed css is re-balanced by the serializer, so one bad instance cannot
   // swallow the rules of the instances concatenated after it.
   it.each([
-    ['an unterminated comment', ':host{color:red} /*'],
-    ['an unterminated at-rule', ':host{color:red} @media (min-width:1px){'],
-    ['a stray closing brace', ':host{color:red}}'],
-    ['text that is not css', 'not css at all'],
-  ])('contains %s within its own instance', (_label, css) => {
+    ["an unterminated comment", ":host{color:red} /*"],
+    ["an unterminated at-rule", ":host{color:red} @media (min-width:1px){"],
+    ["a stray closing brace", ":host{color:red}}"],
+    ["text that is not css", "not css at all"],
+  ])("contains %s within its own instance", (_label, css) => {
     const { result } = renderCssEditing(
       `<div ${RAISIN_CSS_ATTR}="${css}" ${RAISIN_ID_ATTR}="bad"></div>` +
-        `<span ${RAISIN_CSS_ATTR}=":host{color:blue}" ${RAISIN_ID_ATTR}="good"></span>`
+        `<span ${RAISIN_CSS_ATTR}=":host{color:blue}" ${RAISIN_ID_ATTR}="good"></span>`,
     );
 
     expect(result.current.managedCss).toContain(
-      '[data-raisin-id="good"]{color:blue}'
+      '[data-raisin-id="good"]{color:blue}',
     );
   });
 
   // An id is only assigned alongside css by SetInstanceCssAtom, but authored
   // html can carry css without one — those instances are silently skipped.
-  it('skips instance css on an element with no id', () => {
+  it("skips instance css on an element with no id", () => {
     const { result } = renderCssEditing(
-      `<div ${RAISIN_CSS_ATTR}=":host{color:red}"></div>`
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}"></div>`,
     );
 
-    expect(result.current.managedCss).toBe('');
+    expect(result.current.managedCss).toBe("");
   });
 
   // Scoped output is memoized per id+css so a keystroke doesn't re-scope every
   // styled element; these pin the ways that cache could serve the wrong thing.
-  it('scopes identical css separately for each element', () => {
+  it("scopes identical css separately for each element", () => {
     const { result } = renderCssEditing(
       `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>` +
-        `<span ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="b"></span>`
+        `<span ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="b"></span>`,
     );
 
     expect(result.current.managedCss).toBe(
-      '[data-raisin-id="a"]{color:red}\n[data-raisin-id="b"]{color:red}'
+      '[data-raisin-id="a"]{color:red}\n[data-raisin-id="b"]{color:red}',
     );
   });
 
-  it('re-scopes an element after its css changes', () => {
+  it("re-scopes an element after its css changes", () => {
     const { result } = renderCssEditing(
-      `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>`
+      `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>`,
     );
     expect(result.current.managedCss).toBe('[data-raisin-id="a"]{color:red}');
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: ':host{color:blue}',
-      })
+        node: findTag(result.current.root, "div"),
+        css: ":host{color:blue}",
+      }),
     );
 
     expect(result.current.managedCss).toBe('[data-raisin-id="a"]{color:blue}');
   });
 
-  it('drops an element from the sheet once its css is cleared', () => {
+  it("drops an element from the sheet once its css is cleared", () => {
     const { result } = renderCssEditing(
       `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="a"></div>` +
-        `<span ${RAISIN_CSS_ATTR}=":host{color:blue}" ${RAISIN_ID_ATTR}="b"></span>`
+        `<span ${RAISIN_CSS_ATTR}=":host{color:blue}" ${RAISIN_ID_ATTR}="b"></span>`,
     );
 
     act(() =>
       result.current.setInstanceCss({
-        node: findTag(result.current.root, 'div'),
-        css: '',
-      })
+        node: findTag(result.current.root, "div"),
+        css: "",
+      }),
     );
 
     expect(result.current.managedCss).toBe('[data-raisin-id="b"]{color:blue}');
   });
 });
 
-describe('DuplicateNodeAtom', () => {
+describe("DuplicateNodeAtom", () => {
   const withCss = `<div ${RAISIN_CSS_ATTR}=":host{color:red}" ${RAISIN_ID_ATTR}="r1"></div>`;
 
-  it('gives the copy a fresh id and keeps its css', () => {
+  it("gives the copy a fresh id and keeps its css", () => {
     const { result } = renderCssEditing(withCss);
 
-    act(() => result.current.duplicate(findTag(result.current.root, 'div')));
+    act(() => result.current.duplicate(findTag(result.current.root, "div")));
 
-    const divs = findTags(result.current.root, 'div');
+    const divs = findTags(result.current.root, "div");
     expect(divs).toHaveLength(2);
-    expect(divs[0].attribs[RAISIN_ID_ATTR]).toBe('r1');
-    expect(divs[1].attribs[RAISIN_ID_ATTR]).not.toBe('r1');
-    expect(divs[1].attribs[RAISIN_CSS_ATTR]).toBe(':host{color:red}');
+    expect(divs[0].attribs[RAISIN_ID_ATTR]).toBe("r1");
+    expect(divs[1].attribs[RAISIN_ID_ATTR]).not.toBe("r1");
+    expect(divs[1].attribs[RAISIN_CSS_ATTR]).toBe(":host{color:red}");
     expect(result.current.usedIds.size).toBe(2);
   });
 
-  it('emits a separately scoped block for the copy', () => {
+  it("emits a separately scoped block for the copy", () => {
     const { result } = renderCssEditing(withCss);
-    act(() => result.current.duplicate(findTag(result.current.root, 'div')));
+    act(() => result.current.duplicate(findTag(result.current.root, "div")));
 
-    const [first, second] = findTags(result.current.root, 'div');
+    const [first, second] = findTags(result.current.root, "div");
     expect(result.current.managedCss).toBe(
       `[data-raisin-id="${first.attribs[RAISIN_ID_ATTR]}"]{color:red}\n` +
-        `[data-raisin-id="${second.attribs[RAISIN_ID_ATTR]}"]{color:red}`
+        `[data-raisin-id="${second.attribs[RAISIN_ID_ATTR]}"]{color:red}`,
     );
   });
 
-  it('reassigns ids throughout a duplicated subtree', () => {
+  it("reassigns ids throughout a duplicated subtree", () => {
     const { result } = renderCssEditing(
-      `<section ${RAISIN_ID_ATTR}="a"><div ${RAISIN_ID_ATTR}="b"><span ${RAISIN_ID_ATTR}="c"></span></div></section>`
+      `<section ${RAISIN_ID_ATTR}="a"><div ${RAISIN_ID_ATTR}="b"><span ${RAISIN_ID_ATTR}="c"></span></div></section>`,
     );
 
-    act(() => result.current.duplicate(findTag(result.current.root, 'section')));
+    act(() =>
+      result.current.duplicate(findTag(result.current.root, "section")),
+    );
 
     expect(result.current.usedIds.size).toBe(6);
   });
 
-  it('leaves an element with no id without one', () => {
-    const { result } = renderCssEditing('<div></div>');
+  it("leaves an element with no id without one", () => {
+    const { result } = renderCssEditing("<div></div>");
 
-    act(() => result.current.duplicate(findTag(result.current.root, 'div')));
+    act(() => result.current.duplicate(findTag(result.current.root, "div")));
 
-    const divs = findTags(result.current.root, 'div');
+    const divs = findTags(result.current.root, "div");
     expect(divs).toHaveLength(2);
     expect(divs[1].attribs[RAISIN_ID_ATTR]).toBeUndefined();
   });
 
-  it('keeps ids unique across repeated duplication', () => {
+  it("keeps ids unique across repeated duplication", () => {
     const { result } = renderCssEditing(withCss);
 
-    act(() => result.current.duplicate(findTag(result.current.root, 'div')));
-    act(() => result.current.duplicate(findTag(result.current.root, 'div')));
+    act(() => result.current.duplicate(findTag(result.current.root, "div")));
+    act(() => result.current.duplicate(findTag(result.current.root, "div")));
 
-    const ids = findTags(result.current.root, 'div').map(
-      d => d.attribs[RAISIN_ID_ATTR]
+    const ids = findTags(result.current.root, "div").map(
+      (d) => d.attribs[RAISIN_ID_ATTR],
     );
     expect(ids).toHaveLength(3);
     expect(new Set(ids).size).toBe(3);

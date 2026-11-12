@@ -1,24 +1,24 @@
-import type { NodePath, NodeSelection, RaisinNode } from '@raisins/core';
-import { getNode, getPath, isElementNode } from '@raisins/core';
-import type { Getter, PrimitiveAtom, SetStateAction } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import type { SelectionBookmark } from 'prosemirror-state';
-import { isFunction } from '../../util/isFunction.ts';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import type { Soul } from '../souls/Soul.ts';
-import { SoulsMolecule } from '../souls/Soul.ts';
-import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms.tsx';
+import type { NodePath, NodeSelection, RaisinNode } from "@raisins/core";
+import { getNode, getPath, isElementNode } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { Getter, PrimitiveAtom, SetStateAction } from "jotai";
+import { atom } from "jotai";
+import type { SelectionBookmark } from "prosemirror-state";
+import { isFunction } from "../../util/isFunction.ts";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import type { Soul } from "../souls/Soul.ts";
+import { SoulsMolecule } from "../souls/Soul.ts";
+import { SoulsInDocMolecule } from "../souls/SoulsInDocumentAtoms.tsx";
 
 export type Selection = RichTextSelection | NodeSelection;
 
 export type RichTextSelection = {
-  type: 'text';
+  type: "text";
   path: NodePath;
   bookmark: SelectionBookmark;
 };
 
-export const SelectedNodeMolecule = molecule(getMol => {
+export const SelectedNodeMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { GetSoulAtom } = getMol(SoulsMolecule);
   const { SoulToNodeAtom } = getMol(SoulsInDocMolecule);
@@ -29,14 +29,14 @@ export const SelectedNodeMolecule = molecule(getMol => {
    * @deprecated use {@link SelectionAtom} or {@link SelectedNodeAtom} instead
    */
   const SelectedAtom = atom(
-    get => get(SelectionAtom),
+    (get) => get(SelectionAtom),
     (get, set, next?: RaisinNode | undefined) => {
       const nextPath = next
-        ? ({ type: 'node', path: getPath(get(RootNodeAtom), next)! } as const)
+        ? ({ type: "node", path: getPath(get(RootNodeAtom), next)! } as const)
         : undefined;
 
       set(SelectionAtom, nextPath);
-    }
+    },
   );
 
   function getSelected(get: Getter) {
@@ -51,20 +51,20 @@ export const SelectedNodeMolecule = molecule(getMol => {
   }
 
   const SelectedNodeAtom = atom(
-    get => {
+    (get) => {
       return getSelected(get);
     },
     (get, set, next: SetStateAction<RaisinNode | undefined>) =>
       set(
         SelectedAtom,
-        isFunction(next) ? (next as Function)(getSelected(get)) : next
-      )
+        isFunction(next) ? (next as Function)(getSelected(get)) : next,
+      ),
   );
 
   const SelectedBookmark: PrimitiveAtom<SelectionBookmark | undefined> = atom(
-    get => {
+    (get) => {
       const selection = get(SelectionAtom);
-      if (selection?.type === 'text') {
+      if (selection?.type === "text") {
         return selection.bookmark;
       }
       return undefined;
@@ -73,17 +73,17 @@ export const SelectedNodeMolecule = molecule(getMol => {
       const nextValue = isFunction(next)
         ? (next as Function)(get(SelectedBookmark))
         : next;
-      set(SelectionAtom, prev => {
-        if (prev?.type === 'node' && nextValue) {
+      set(SelectionAtom, (prev) => {
+        if (prev?.type === "node" && nextValue) {
           // When text selection is set
           // And a node is selected
           // Then the selection becomes a node selection
           return {
-            type: 'text',
+            type: "text",
             path: prev.path,
             bookmark: nextValue,
           };
-        } else if (prev?.type === 'text' && nextValue) {
+        } else if (prev?.type === "text" && nextValue) {
           // When text selection is set
           // And text is currently selected
           // Then change it
@@ -91,12 +91,12 @@ export const SelectedNodeMolecule = molecule(getMol => {
             ...prev,
             bookmark: nextValue,
           };
-        } else if (prev?.type === 'text' && !nextValue) {
+        } else if (prev?.type === "text" && !nextValue) {
           // When text selection is cleared
           // And text selection exists
           // Then it goes back to node selection
           return {
-            type: 'node',
+            type: "node",
             path: prev?.path,
           };
         } else {
@@ -107,11 +107,11 @@ export const SelectedNodeMolecule = molecule(getMol => {
           return prev;
         }
       });
-    }
+    },
   );
 
   const SelectedSoulAtom = atom(
-    get => {
+    (get) => {
       const getSoul = get(GetSoulAtom);
       const node = get(SelectedNodeAtom);
       if (!node) return undefined;
@@ -125,18 +125,18 @@ export const SelectedNodeMolecule = molecule(getMol => {
       const getNode = get(SoulToNodeAtom);
       const node = getNode(next);
       set(SelectedAtom, node);
-    }
+    },
   );
 
-  const HasSelectionAtom = atom(get => get(SelectionAtom) !== undefined);
+  const HasSelectionAtom = atom((get) => get(SelectionAtom) !== undefined);
 
   return {
     SelectionAtom,
     SelectedAtom,
     SelectedNodeAtom,
     SelectedSoulAtom,
-    SelectedPathString: atom(get => get(SelectedAtom)?.path.toString),
-    SelectedIsElement: atom(get => isElementNode(get(SelectedNodeAtom))),
+    SelectedPathString: atom((get) => get(SelectedAtom)?.path.toString),
+    SelectedIsElement: atom((get) => isElementNode(get(SelectedNodeAtom))),
     HasSelectionAtom,
     SelectedBookmark,
   };

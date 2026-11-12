@@ -1,17 +1,15 @@
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import type { VNodeStyle } from 'snabbdom';
-import { PickAndPlopMolecule } from '../../core/index.ts';
-import {
-  SelectedNodeMolecule,
-} from '../../core/selection/SelectedNodeMolecule.tsx';
-import { SoulsMolecule } from '../../core/souls/Soul.ts';
-import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
-import type { RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
-import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
-import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
-import type { SnabbdomRenderer } from '../util/raisinToSnabdom.tsx';
+import { molecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom } from "jotai";
+import type { VNodeStyle } from "snabbdom";
+import { PickAndPlopMolecule } from "../../core/index.ts";
+import { SelectedNodeMolecule } from "../../core/selection/SelectedNodeMolecule.tsx";
+import { SoulsMolecule } from "../../core/souls/Soul.ts";
+import { CanvasConfigMolecule } from "../CanvasConfig.tsx";
+import type { RichCanvasEvent } from "../CanvasScopeMolecule.tsx";
+import { CanvasScopeMolecule } from "../CanvasScopeMolecule.tsx";
+import { defaultRectAtom } from "../util/defaultRectAtom.tsx";
+import type { SnabbdomRenderer } from "../util/raisinToSnabdom.tsx";
 
 export const CanvasSelectionMolecule = molecule((getMol) => {
   const CanvasAtoms = getMol(CanvasScopeMolecule);
@@ -23,12 +21,12 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
    * Listens for click events, marks clicked elements as selected
    */
   const SelectedClickedAtom = atom(null, (get, set, e: RichCanvasEvent) => {
-    if (e.type === 'click' && !get(PickedAtom)) {
+    if (e.type === "click" && !get(PickedAtom)) {
       set(SelectedSoulAtom, e.soul);
     }
   });
-  SelectedClickedAtom.debugLabel = 'SelectedClickedAtom';
-  CanvasAtoms.addEventListener('click', SelectedClickedAtom);
+  SelectedClickedAtom.debugLabel = "SelectedClickedAtom";
+  CanvasAtoms.addEventListener("click", SelectedClickedAtom);
 
   const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const selected = get(SelectedNodeAtom);
@@ -38,9 +36,9 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
       const { delayed, remove, ...rest } = d.style || {};
       const style = {
         ...rest,
-        cursor: 'pointer',
-        outline: isSelected ? '2px solid #0077DB' : rest.outline ?? '',
-        outlineOffset: '',
+        cursor: "pointer",
+        outline: isSelected ? "2px solid #0077DB" : (rest.outline ?? ""),
+        outlineOffset: "",
       } as VNodeStyle;
 
       return {
@@ -59,7 +57,7 @@ export const CanvasSelectionMolecule = molecule((getMol) => {
       CanvasAtoms.GeometryAtom,
       SelectedNodeAtom,
       GetSoulAtom,
-      CanvasConfig.SoulAttributeAtom
+      CanvasConfig.SoulAttributeAtom,
     ),
   };
 });

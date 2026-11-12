@@ -1,7 +1,7 @@
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { ConfigMolecule } from '../core/RaisinConfigScope.tsx';
+import { molecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom } from "jotai";
+import { ConfigMolecule } from "../core/RaisinConfigScope.tsx";
 
 export type CanvasConfig = {
   /**
@@ -42,8 +42,8 @@ export const CanvasConfigMolecule = molecule((getMol) => {
 
   return {
     IframeHead: props.IframeHead,
-    SoulAttributeAtom: props.SoulAttributeAtom ?? atom('raisins-soul'),
-    EventAttributeAtom: props.EventSelectorAtom ?? atom('raisins-events'),
+    SoulAttributeAtom: props.SoulAttributeAtom ?? atom("raisins-soul"),
+    EventAttributeAtom: props.EventSelectorAtom ?? atom("raisins-events"),
     CustomPlopContainersAtom:
       props.CustomPlopContainersAtom ?? atom(() => noCustomPlopContainers),
   };

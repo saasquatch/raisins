@@ -1,10 +1,8 @@
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { ConfigMolecule } from '../core/RaisinConfigScope.tsx';
-import type { AttributeThemeMoleculeValue } from './AttributeThemeMolecule.tsx';
-import {
-  DefaultAttributeThemeMolecule,
-} from './DefaultAttributeThemeMolecule.tsx';
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { ConfigMolecule } from "../core/RaisinConfigScope.tsx";
+import type { AttributeThemeMoleculeValue } from "./AttributeThemeMolecule.tsx";
+import { DefaultAttributeThemeMolecule } from "./DefaultAttributeThemeMolecule.tsx";
 
 export type AttributeConfig = {
   AttributeTheme: Partial<AttributeThemeMoleculeValue>;

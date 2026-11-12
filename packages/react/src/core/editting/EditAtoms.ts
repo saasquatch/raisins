@@ -2,16 +2,17 @@ import type {
   NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { htmlUtil } from '@raisins/core';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import { SoulsMolecule } from '../souls/Soul.ts';
-import { generateId, RAISIN_ID_ATTR } from '../../css-editing/RaisinCssIds.ts';
-import { RaisinIdsMolecule } from '../../css-editing/RaisinIdsMolecule.ts';
+} from "@raisins/core";
+import { htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { generateId, RAISIN_ID_ATTR } from "../../css-editing/RaisinCssIds.ts";
+import { RaisinIdsMolecule } from "../../css-editing/RaisinIdsMolecule.ts";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import { SoulsMolecule } from "../souls/Soul.ts";
 
-const { clone, duplicate, insertAt, remove, replace, replacePath, visit } = htmlUtil;
+const { clone, duplicate, insertAt, remove, replace, replacePath, visit } =
+  htmlUtil;
 
 function cloneWithFreshRaisinIds(node: RaisinNode, usedIds: Set<string>) {
   const nextId = () => {
@@ -22,10 +23,10 @@ function cloneWithFreshRaisinIds(node: RaisinNode, usedIds: Set<string>) {
   };
 
   return visit<RaisinNode>(clone(node), {
-    onText: text => text,
-    onDirective: directive => directive,
-    onComment: comment => comment,
-    onStyle: style => style,
+    onText: (text) => text,
+    onDirective: (directive) => directive,
+    onComment: (comment) => comment,
+    onStyle: (style) => style,
     onElement: (element, children) => ({
       ...element,
       attribs: element.attribs[RAISIN_ID_ATTR]
@@ -47,8 +48,8 @@ export const EditMolecule = molecule((getMol) => {
    */
   const RemoveNodeAtom = atom(null, (get, set, toRemove: RaisinNode) =>
     set(RootNodeAtom, (previous: RaisinNode) =>
-      remove(previous, toRemove, get(SoulSaverAtom))
-    )
+      remove(previous, toRemove, get(SoulSaverAtom)),
+    ),
   );
 
   /**
@@ -56,10 +57,10 @@ export const EditMolecule = molecule((getMol) => {
    */
   const DuplicateNodeAtom = atom(null, (get, set, toClone: RaisinNode) => {
     const usedIds = new Set(get(UsedRaisinIdsAtom));
-    set(RootNodeAtom, previous =>
-      duplicate(previous, toClone, get(SoulSaverAtom), node =>
-        cloneWithFreshRaisinIds(node, usedIds)
-      )
+    set(RootNodeAtom, (previous) =>
+      duplicate(previous, toClone, get(SoulSaverAtom), (node) =>
+        cloneWithFreshRaisinIds(node, usedIds),
+      ),
     );
   });
 
@@ -79,12 +80,12 @@ export const EditMolecule = molecule((getMol) => {
         node: RaisinNode;
         parent: RaisinNodeWithChildren;
         idx: number;
-      }
+      },
     ) => {
       set(RootNodeAtom, (prev) =>
-        insertAt(prev, n, parent, idx, get(SoulSaverAtom))
+        insertAt(prev, n, parent, idx, get(SoulSaverAtom)),
       );
-    }
+    },
   );
 
   /**
@@ -100,19 +101,19 @@ export const EditMolecule = molecule((getMol) => {
           prev,
           next,
           (old: RaisinNode, replacement: RaisinNode) =>
-            soulSaver(old, replacement)
-        )
+            soulSaver(old, replacement),
+        ),
       );
-    }
+    },
   );
 
   const ReplacePathAtom = atom(
     null,
     (get, set, { prev, next }: { prev: NodePath; next: RaisinNode }) => {
       set(RootNodeAtom, (previous) =>
-        replacePath(previous, prev, next, get(SoulSaverAtom))
+        replacePath(previous, prev, next, get(SoulSaverAtom)),
       );
-    }
+    },
   );
   return {
     RootNodeAtom,

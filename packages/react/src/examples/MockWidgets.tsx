@@ -1,15 +1,15 @@
-import { useAtom, useSetAtom } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import React from 'react';
-import { AttributeMolecule } from '../attributes/index.ts';
+import { useMolecule } from "bunshi/react";
+import { useAtom, useSetAtom } from "jotai";
+import React from "react";
+import { AttributeMolecule } from "../attributes/index.ts";
 
 const colorStyle = {
-  height: '25px',
-  width: '25px',
+  height: "25px",
+  width: "25px",
 
-  cursor: 'pointer',
-  display: 'inline-block',
-  marginLeft: '5px',
+  cursor: "pointer",
+  display: "inline-block",
+  marginLeft: "5px",
 };
 export const ColorWidget = () => {
   const { valueAtom } = useMolecule(AttributeMolecule);
@@ -24,24 +24,24 @@ export const ColorWidget = () => {
       <Clear />
       <div>
         <div
-          style={{ ...colorStyle, backgroundColor: 'salmon' }}
-          onClick={() => setValue('salmon')}
+          style={{ ...colorStyle, backgroundColor: "salmon" }}
+          onClick={() => setValue("salmon")}
         ></div>
         <div
-          style={{ ...colorStyle, backgroundColor: 'BlanchedAlmond' }}
-          onClick={() => setValue('BlanchedAlmond')}
+          style={{ ...colorStyle, backgroundColor: "BlanchedAlmond" }}
+          onClick={() => setValue("BlanchedAlmond")}
         ></div>
         <div
-          style={{ ...colorStyle, backgroundColor: 'lime' }}
-          onClick={() => setValue('lime')}
+          style={{ ...colorStyle, backgroundColor: "lime" }}
+          onClick={() => setValue("lime")}
         ></div>
         <div
-          style={{ ...colorStyle, backgroundColor: 'PeachPuff' }}
-          onClick={() => setValue('PeachPuff')}
+          style={{ ...colorStyle, backgroundColor: "PeachPuff" }}
+          onClick={() => setValue("PeachPuff")}
         ></div>
         <div
-          style={{ ...colorStyle, backgroundColor: 'LemonChiffon' }}
-          onClick={() => setValue('LemonChiffon')}
+          style={{ ...colorStyle, backgroundColor: "LemonChiffon" }}
+          onClick={() => setValue("LemonChiffon")}
         ></div>
       </div>
     </div>

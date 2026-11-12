@@ -1,8 +1,8 @@
-import type { RaisinElementNode } from '@raisins/core';
-import { htmlParser as parse } from '@raisins/core';
-import type * as schema from '@raisins/schema/schema';
-import type { Block } from '../ComponentModel.tsx';
-import type { ModuleDetails } from '../types.ts';
+import type { RaisinElementNode } from "@raisins/core";
+import { htmlParser as parse } from "@raisins/core";
+import type * as schema from "@raisins/schema/schema";
+import type { Block } from "../ComponentModel.tsx";
+import type { ModuleDetails } from "../types.ts";
 
 /**
  * Converts module details into a set of `Block`
@@ -34,7 +34,7 @@ export function moduleDetailsToBlocks(moduleDetails: ModuleDetails[]): Block[] {
 
 function reduceExamples(
   previousValue: Block[],
-  currentValue: schema.Example
+  currentValue: schema.Example,
 ): Block[] {
   const elm = blockFromHtml(currentValue.content);
   if (!elm) return previousValue;

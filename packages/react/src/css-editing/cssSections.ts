@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { cssParser, cssSerializer } from '@raisins/core';
+import { cssParser, cssSerializer } from "@raisins/core";
 
 /**
  * A logical editable section of the per-instance CSS for a single element.
@@ -10,10 +10,10 @@ import { cssParser, cssSerializer } from '@raisins/core';
  * Other rules in the CSS (e.g. raw selectors, at-rules) are left untouched by
  * {@link writeSection} — only the matching rule, if any, is rewritten.
  */
-export type SectionKey = { type: 'element' } | { type: 'part'; name: string };
+export type SectionKey = { type: "element" } | { type: "part"; name: string };
 
 export function selectorOf(section: SectionKey): string {
-  if (section.type === 'element') return ':host';
+  if (section.type === "element") return ":host";
   return `::part(${section.name})`;
 }
 
@@ -39,22 +39,22 @@ export type ReadSectionOptions = {
 export function readSection(
   css: string,
   section: SectionKey,
-  options?: ReadSectionOptions
+  options?: ReadSectionOptions,
 ): string {
   const { property, exclude } = options ?? {};
-  if (!css.trim()) return '';
+  if (!css.trim()) return "";
   let ast: any;
   try {
     ast = cssParser(css);
   } catch {
-    return '';
+    return "";
   }
   const rule = findMatchingRule(ast, section);
-  if (!rule) return '';
+  if (!rule) return "";
   if (property) {
     const decl = findDeclaration(rule, property);
     // Custom property values are kept verbatim by css-tree, whitespace included.
-    return decl && decl.value ? cssSerializer(decl.value).trim() : '';
+    return decl && decl.value ? cssSerializer(decl.value).trim() : "";
   }
   return serializeDeclarations(rule.block, exclude);
 }
@@ -62,7 +62,7 @@ export function readSection(
 export function readSectionShorthandDimension(
   css: string,
   section: SectionKey,
-  property: string
+  property: string,
 ): ShorthandDimensions {
   const nil: ShorthandDimensions = {
     top: null,
@@ -80,7 +80,7 @@ export function readSectionShorthandDimension(
   const rule = findMatchingRule(ast, section);
   if (!rule) return nil;
 
-  const sides = ['top', 'right', 'bottom', 'left'] as const;
+  const sides = ["top", "right", "bottom", "left"] as const;
   const properties = [
     property,
     `${property}-top`,
@@ -113,9 +113,9 @@ export function readSectionShorthandDimension(
         result.left = dims[3];
       }
     } else {
-      const propertyParts = decl.property.split('-');
+      const propertyParts = decl.property.split("-");
       const side = propertyParts[propertyParts.length - 1] as
-        | typeof sides[number]
+        | (typeof sides)[number]
         | undefined;
       if (!side || !sides.includes(side)) continue;
       const val = nodeToDimension(nonWhitespaceChildren(decl.value)[0]);
@@ -127,18 +127,18 @@ export function readSectionShorthandDimension(
 
 function nonWhitespaceChildren(value: any): any[] {
   return (value?.children ?? []).filter(
-    (node: any) => node.type !== 'WhiteSpace'
+    (node: any) => node.type !== "WhiteSpace",
   );
 }
 
 function nodeToDimension(node: any): CssDimension | null {
   if (!node) return null;
-  if (node.type === 'Dimension') return { value: node.value, unit: node.unit };
-  if (node.type === 'Percentage') return { value: node.value, unit: '%' };
+  if (node.type === "Dimension") return { value: node.value, unit: node.unit };
+  if (node.type === "Percentage") return { value: node.value, unit: "%" };
   // Only unitless zero is a valid CSS length; other numeric values are
   // invalid lengths and should not be treated as shorthand dimensions.
-  if (node.type === 'Number' && node.value === '0') {
-    return { value: node.value, unit: '' };
+  if (node.type === "Number" && node.value === "0") {
+    return { value: node.value, unit: "" };
   }
   return null;
 }
@@ -159,12 +159,12 @@ export function writeSection(
   css: string,
   section: SectionKey,
   declarations: string,
-  preserve: RegExp[] = []
+  preserve: RegExp[] = [],
 ): { css: string; conflict: boolean } {
   const trimmed = declarations.trim();
   let ast: any;
   try {
-    ast = css.trim() ? cssParser(css) : cssParser('');
+    ast = css.trim() ? cssParser(css) : cssParser("");
   } catch {
     return { css, conflict: false };
   }
@@ -180,7 +180,7 @@ export function writeSection(
   const newBlock =
     trimmed.length > 0
       ? parseDeclarationBlock(trimmed)
-      : { type: 'Block', children: [] as any[] };
+      : { type: "Block", children: [] as any[] };
   if (!newBlock) return { css, conflict: false };
 
   const conflict = identifyAndFilterConflicts(newBlock, preserve);
@@ -190,9 +190,9 @@ export function writeSection(
     if (existingBlock && Array.isArray(existingBlock.children)) {
       const preservedDecls = existingBlock.children.filter(
         (d: any) =>
-          d.type === 'Declaration' &&
-          typeof d.property === 'string' &&
-          preserve.some(regex => regex.test(d.property))
+          d.type === "Declaration" &&
+          typeof d.property === "string" &&
+          preserve.some((regex) => regex.test(d.property)),
       );
       newBlock.children = [...preservedDecls, ...newBlock.children];
     }
@@ -220,9 +220,9 @@ function identifyAndFilterConflicts(block: any, preserve: RegExp[]): boolean {
   const filteredBlock = block.children.filter((d: any) => {
     if (
       !(
-        d.type === 'Declaration' &&
-        typeof d.property === 'string' &&
-        preserve.some(regex => regex.test(d.property))
+        d.type === "Declaration" &&
+        typeof d.property === "string" &&
+        preserve.some((regex) => regex.test(d.property))
       )
     ) {
       return true;
@@ -239,34 +239,34 @@ export function writeSectionProperty(
   css: string,
   section: SectionKey,
   property: string,
-  value: string
+  value: string,
 ): string {
   const current = readSection(css, section);
 
   // Parse existing declarations into a block AST
   let block: any = current.trim()
     ? parseDeclarationBlock(current)
-    : parseDeclarationBlock('');
-  if (!block) block = { type: 'Block', children: [] };
+    : parseDeclarationBlock("");
+  if (!block) block = { type: "Block", children: [] };
 
   const matchingIndexes = block.children.reduce(
     (indexes: number[], declaration: any, index: number) => {
       if (
-        declaration.type === 'Declaration' &&
+        declaration.type === "Declaration" &&
         declaration.property === property
       ) {
         indexes.push(index);
       }
       return indexes;
     },
-    []
+    [],
   );
   const lastMatchingIndex = matchingIndexes[matchingIndexes.length - 1];
 
   if (value.trim().length === 0) {
     block.children = block.children.filter(
       (declaration: any) =>
-        declaration.type !== 'Declaration' || declaration.property !== property
+        declaration.type !== "Declaration" || declaration.property !== property,
     );
   } else {
     // No space after the colon: custom property values keep it, and it compounds.
@@ -278,13 +278,13 @@ export function writeSectionProperty(
       block.children = block.children.flatMap(
         (declaration: any, index: number) => {
           if (
-            declaration.type !== 'Declaration' ||
+            declaration.type !== "Declaration" ||
             declaration.property !== property
           ) {
             return declaration;
           }
           return index === lastMatchingIndex ? freshDecl : [];
-        }
+        },
       );
     } else {
       block.children.push(freshDecl);
@@ -304,7 +304,7 @@ function findMatchingRuleIndex(ast: any, section: SectionKey): number {
   if (!Array.isArray(ast.children)) return -1;
   for (let index = ast.children.length - 1; index >= 0; index--) {
     const rule = ast.children[index];
-    if (rule.type === 'Rule' && ruleMatches(rule, section)) return index;
+    if (rule.type === "Rule" && ruleMatches(rule, section)) return index;
   }
   return -1;
 }
@@ -349,7 +349,7 @@ function findDeclarations(rule: any, properties: string[]): any[] {
   const notImportant = [];
 
   for (const d of rule.block.children) {
-    if (d.type === 'Declaration' && asSet.has(d.property)) {
+    if (d.type === "Declaration" && asSet.has(d.property)) {
       if (d.important) {
         important.push(d);
       } else {
@@ -367,21 +367,21 @@ function ruleMatches(rule: any, section: SectionKey): boolean {
 }
 
 function selectorMatches(selector: any, section: SectionKey): boolean {
-  if (selector.type !== 'Selector' || !Array.isArray(selector.children)) {
+  if (selector.type !== "Selector" || !Array.isArray(selector.children)) {
     return false;
   }
   if (selector.children.length !== 1) return false;
   const only = selector.children[0];
-  if (section.type === 'element') {
+  if (section.type === "element") {
     return (
-      only.type === 'PseudoClassSelector' &&
-      only.name === 'host' &&
+      only.type === "PseudoClassSelector" &&
+      only.name === "host" &&
       !only.children
     );
   }
   if (
-    only.type !== 'PseudoElementSelector' ||
-    only.name !== 'part' ||
+    only.type !== "PseudoElementSelector" ||
+    only.name !== "part" ||
     !Array.isArray(only.children)
   ) {
     return false;
@@ -390,23 +390,20 @@ function selectorMatches(selector: any, section: SectionKey): boolean {
 }
 
 function serializeDeclarations(block: any, exclude: RegExp[] = []): string {
-  if (!block || !Array.isArray(block.children)) return '';
+  if (!block || !Array.isArray(block.children)) return "";
   return block.children
     .map((decl: any) => {
-      if (exclude.some(regex => regex.test(decl.property))) return '';
+      if (exclude.some((regex) => regex.test(decl.property))) return "";
       const fauxBlock = { ...block, children: [decl] };
       const inner = cssSerializer(fauxBlock);
-      return inner
-        .replace(/^\{/, '')
-        .replace(/\}$/, '')
-        .trim();
+      return inner.replace(/^\{/, "").replace(/\}$/, "").trim();
     })
     .filter((line: string) => line.length > 0)
-    .join(';\n');
+    .join(";\n");
 }
 
 function parseDeclarationBlock(declarations: string): any | undefined {
-  const normalized = declarations.replace(/;\s*$/, '');
+  const normalized = declarations.replace(/;\s*$/, "");
   const wrapped = `*{${normalized}}`;
   let ast: any;
   try {
@@ -415,7 +412,7 @@ function parseDeclarationBlock(declarations: string): any | undefined {
     return undefined;
   }
   const rule = ast.children?.[0];
-  if (!rule || rule.type !== 'Rule' || !rule.block) return undefined;
+  if (!rule || rule.type !== "Rule" || !rule.block) return undefined;
   return rule.block;
 }
 

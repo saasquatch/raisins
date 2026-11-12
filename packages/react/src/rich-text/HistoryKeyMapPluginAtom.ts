@@ -1,9 +1,9 @@
-import { molecule } from 'bunshi/react';
-import { keymap } from 'prosemirror-keymap';
-import type { Plugin } from 'prosemirror-state';
-import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom.ts';
-import { HistoryMolecule } from '../core/editting/HistoryAtoms.tsx';
-import connectedAtom from '../util/atoms/connectedAtom.tsx';
+import { molecule } from "bunshi/react";
+import { keymap } from "prosemirror-keymap";
+import type { Plugin } from "prosemirror-state";
+import { EditSelectedMolecule } from "../core/editting/EditSelectedAtom.ts";
+import { HistoryMolecule } from "../core/editting/HistoryAtoms.tsx";
+import connectedAtom from "../util/atoms/connectedAtom.tsx";
 
 export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);
@@ -13,15 +13,15 @@ export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
 
     const plugin: Plugin = keymap({
       //  Uppercase Z implies "Shift" is used
-      'Mod-Z': () => {
+      "Mod-Z": () => {
         set(RedoAtom);
         return true;
       },
-      'Mod-z': () => {
+      "Mod-z": () => {
         set(UndoAtom);
         return true;
       },
-      'Mod-y': () => {
+      "Mod-y": () => {
         set(RedoAtom);
         return true;
       },

@@ -5,12 +5,12 @@ export const MintComponents = [
   //   version: '1.6.1-2',
   // },
   {
-    package: '@saasquatch/bedrock-components',
-    version: '1.3.x',
+    package: "@saasquatch/bedrock-components",
+    version: "1.3.x",
   },
   {
-    package: '@saasquatch/mint-components',
-    version: '1.6.x',
+    package: "@saasquatch/mint-components",
+    version: "1.6.x",
   },
   // {
   //   package: '@local',
@@ -20,12 +20,12 @@ export const MintComponents = [
 
 export const NextComponents = [
   {
-    package: '@saasquatch/bedrock-components',
-    version: 'next',
+    package: "@saasquatch/bedrock-components",
+    version: "next",
   },
   {
-    package: '@saasquatch/mint-components',
-    version: 'next',
+    package: "@saasquatch/mint-components",
+    version: "next",
   },
 ];
 
@@ -37,12 +37,12 @@ export const LocalBedrockComponents = [
   // },
 
   {
-    package: '@saasquatch/mint-components',
-    version: '1.6.8-22',
+    package: "@saasquatch/mint-components",
+    version: "1.6.8-22",
   },
   {
-    package: '@local',
-    version: 'next',
+    package: "@local",
+    version: "next",
   },
 ];
 

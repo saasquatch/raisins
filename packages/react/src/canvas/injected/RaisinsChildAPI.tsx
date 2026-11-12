@@ -6,15 +6,15 @@ Important!
 Since this file is used to generate serialized code from this function, it can only import types, not values.
 
 */
-import type PenpalType from 'penpal';
-import type * as SnabbdomType from 'snabbdom';
-import type { DOMAPI, Module, VNode, VNodeData } from 'snabbdom';
+import type PenpalType from "penpal";
+import type * as SnabbdomType from "snabbdom";
+import type { DOMAPI, Module, VNode, VNodeData } from "snabbdom";
 import type {
   ChildRPC,
   GeometryEntry,
   ParentRPC,
-} from '../api/_CanvasRPCContract.tsx';
-import type { Props } from './childApiSrc.tsx';
+} from "../api/_CanvasRPCContract.tsx";
+import type { Props } from "./childApiSrc.tsx";
 
 type Snabbdom = typeof SnabbdomType;
 type Penpal = typeof PenpalType;
@@ -29,7 +29,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
    * Tracks when a render is active to prevent events mid-render
    */
   let rendering: boolean = false;
-  const geometryEvent = 'sq:geometry';
+  const geometryEvent = "sq:geometry";
 
   function isElement(value: any): value is HTMLElement {
     return value instanceof window.HTMLElement;
@@ -50,12 +50,12 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       // ResizeObserver only reports the elements whose size changed; this
       // is a partial delta, not a full snapshot.
       dispatchResize(elements, false);
-    }
+    },
   );
 
   function ensureShadow(el: HTMLElement) {
     if (el.shadowRoot === null) {
-      el.attachShadow({ mode: 'open' });
+      el.attachShadow({ mode: "open" });
     }
     return el.shadowRoot!;
   }
@@ -87,8 +87,8 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     },
   };
 
-  const xmlnsAttr = 'xmlns';
-  const xmlnsNS = 'http://www.w3.org/2000/xmlns/';
+  const xmlnsAttr = "xmlns";
+  const xmlnsNS = "http://www.w3.org/2000/xmlns/";
 
   function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     let key: string;
@@ -107,11 +107,11 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       const old = oldAttrs[key];
       if (old !== cur) {
         if (cur === true) {
-          elm.setAttribute(key, '');
+          elm.setAttribute(key, "");
         } else if (cur === false) {
           elm.removeAttribute(key);
         } else {
-          const parts = key.split(':');
+          const parts = key.split(":");
           if (parts.length === 1) {
             elm.setAttribute(key, cur as any);
           } else if (parts.length === 2) {
@@ -143,21 +143,20 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     }
   }
 
-
   type Patch = (
     oldVnode: Element | VNode | DocumentFragment,
-    vnode: VNode
+    vnode: VNode,
   ) => VNode;
 
   /**
    * Patches template tags correctly. Uses the special `templateContent` data
    * property on VNodes to track state and patch.
-   * 
+   *
    * See MDN
    *
    * @param patch - the patch function. Useful to support recursive patching of templates within templates without creating new snabbdom downstream config
    */
-  function templateModule(patch: ()=>Patch): Module {
+  function templateModule(patch: () => Patch): Module {
     return {
       create: function (_, vNode: VNode) {
         if (isElement(vNode.elm)) {
@@ -169,7 +168,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
             // Do fragment patch
             patch()(
               (vNode.elm as HTMLTemplateElement).content,
-              vNode.data.templateContent
+              vNode.data.templateContent,
             );
           }
         }
@@ -181,13 +180,18 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
             tagName.toLocaleLowerCase() === "template" &&
             vNode.data?.templateContent !== undefined
           ) {
-            if (oldVNode.data?.templateContent !== vNode.data?.templateContent) {
+            if (
+              oldVNode.data?.templateContent !== vNode.data?.templateContent
+            ) {
               // Do fragment patch
-              patch()(oldVNode.data!.templateContent, vNode.data.templateContent);
+              patch()(
+                oldVNode.data!.templateContent,
+                vNode.data.templateContent,
+              );
             }
           }
         }
-      }
+      },
     };
   }
 
@@ -207,32 +211,35 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       insertBefore: function (
         parent: Node,
         newNode: Node,
-        reference: Node | null
+        reference: Node | null,
       ) {
         const relocatedParent = reference && reference.parentNode;
         snabbdom.htmlDomApi.insertBefore(
           relocatedParent || parent,
           newNode,
-          reference
+          reference,
         );
       },
       removeChild: function (node: Node, child: Node) {
         snabbdom.htmlDomApi.removeChild(child.parentNode || node, child);
       },
-    }
+    },
   );
 
-  const patch = snabbdom.init([
-    // Init patch function with chosen modules
-    shadowDomModule,
-    resizeModule,
-    snabbdom.propsModule,
-    snabbdom.classModule,
-    attributesModule,
-    snabbdom.styleModule,
-    snabbdom.datasetModule,
-    templateModule(()=>patch)
-  ], relocationTolerantDomApi);
+  const patch = snabbdom.init(
+    [
+      // Init patch function with chosen modules
+      shadowDomModule,
+      resizeModule,
+      snabbdom.propsModule,
+      snabbdom.classModule,
+      attributesModule,
+      snabbdom.styleModule,
+      snabbdom.datasetModule,
+      templateModule(() => patch),
+    ],
+    relocationTolerantDomApi,
+  );
 
   function dispatchResize(elements: Element[], full?: boolean) {
     document.body.dispatchEvent(
@@ -252,7 +259,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
             return mappedEntry;
           }),
         },
-      })
+      }),
     );
   }
 
@@ -260,7 +267,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     rendering = true;
     try {
       // An element means first render, or recovery from a patch that left the DOM stale
-      if (isElement(currentNode)) document.body.innerHTML = '';
+      if (isElement(currentNode)) document.body.innerHTML = "";
       patch(currentNode, next);
       currentNode = next;
     } catch (e) {
@@ -270,7 +277,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
       rendering = false;
     }
   }
-  window.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener("DOMContentLoaded", function () {
     const methods: ChildRPC = {
       render(content) {
         try {
@@ -278,12 +285,12 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
         } catch (e) {
           document.body.innerHTML = `<div style="color:red; width: 300px; margin: 0 auto;"><b>Canvas Render Error</b><details>${e}</details></div><hr/>`;
           console.error(
-            'Canvas render error',
+            "Canvas render error",
             e,
-            'rendering content',
+            "rendering content",
             content,
-            'into currentNode',
-            currentNode
+            "into currentNode",
+            currentNode,
           );
           throw e;
         } finally {
@@ -302,7 +309,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
        */
       postMessage(data, targetOrigin) {
         window.postMessage(data, targetOrigin);
-      }
+      },
     };
     const myConnection = (window as any).Penpal.connectToParent({
       // Methods child is exposing to parent
@@ -312,16 +319,16 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     myConnection.promise.then(function (parent: ParentRPC) {
       // @ts-ignore - fails only for build, not local dev
       const ro = new window.ResizeObserver(function (
-        entries: ResizeObserverEntry[]
+        entries: ResizeObserverEntry[],
       ) {
         // Adds 5 pixels of padding to support hover/selection states
-        const height = entries[0].contentRect.height + 5 + '';
+        const height = entries[0].contentRect.height + 5 + "";
         parent.resizeHeight(height);
       });
       ro.observe(document.body);
 
       document.addEventListener(geometryEvent, (e: Event) =>
-        parent.geometry((e as CustomEvent).detail)
+        parent.geometry((e as CustomEvent).detail),
       );
       dispatchResizeAll();
 
@@ -360,6 +367,6 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
     // Full document snapshot: signals the parent to replace its cached
     // geometry rather than merge, so stale entries for removed elements
     // (e.g. plop targets after a drag ends) are evicted.
-    dispatchResize(Array.from(document.querySelectorAll('*')), true);
+    dispatchResize(Array.from(document.querySelectorAll("*")), true);
   }
 }.toString();

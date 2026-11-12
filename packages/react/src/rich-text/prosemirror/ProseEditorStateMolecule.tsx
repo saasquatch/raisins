@@ -1,10 +1,10 @@
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { Node } from 'prosemirror-model';
-import type { SelectionBookmark, Transaction } from 'prosemirror-state';
-import { EditorState, TextSelection } from 'prosemirror-state';
-import { ProseEditorScope } from './ProseEditorScope.tsx';
-import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin.ts';
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { Node } from "prosemirror-model";
+import type { SelectionBookmark, Transaction } from "prosemirror-state";
+import { EditorState, TextSelection } from "prosemirror-state";
+import { ProseEditorScope } from "./ProseEditorScope.tsx";
+import { proseRichDocToRaisin, raisinToProseDoc } from "./util/Prose2Raisin.ts";
 
 /**
  * Molecule wrapper for ProseMirror {@link EditorState} that adapts {@link RaisinNode} to
@@ -14,17 +14,17 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
   const scope = getScope(ProseEditorScope);
   if (!scope)
     throw new Error(
-      'ProseEditorStateMolecule must be used in a ProseEditorProvider'
+      "ProseEditorStateMolecule must be used in a ProseEditorProvider",
     );
 
-  const proseDocAtom = atom(get => raisinToProseDoc(get(get(scope).node)));
-  const proseNodeAtom = atom(get => {
+  const proseDocAtom = atom((get) => raisinToProseDoc(get(get(scope).node)));
+  const proseNodeAtom = atom((get) => {
     const schema = get(get(scope).schema);
     const doc = get(proseDocAtom);
     const richDoc = Node.fromJSON(schema, doc);
     return richDoc;
   });
-  const proseSelectionAtom = atom(get => {
+  const proseSelectionAtom = atom((get) => {
     const doc = get(proseNodeAtom);
     const bookmark: SelectionBookmark | undefined = get(get(scope).selection);
     if (!bookmark) return undefined;
@@ -39,7 +39,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
 
   // Build editor state
   const editorStateAtom = atom<EditorState, Transaction[], void>(
-    get => {
+    (get) => {
       const state = EditorState.create({
         doc: get(proseNodeAtom),
         selection: get(proseSelectionAtom),
@@ -56,7 +56,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       if (nextState.state.doc !== currentState.doc) {
         // Only lazily serializes changes
         const nextRaisinNode = proseRichDocToRaisin(
-          nextState.state.doc.content
+          nextState.state.doc.content,
         );
         set(get(scope).node, nextRaisinNode);
       }
@@ -65,7 +65,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
       // Restricted to pointer-originated, doc-unchanged transactions so
       // typing and arrow-key navigation don't trigger it.
       if (
-        trans.getMeta('pointer') === true &&
+        trans.getMeta("pointer") === true &&
         nextState.state.doc === currentState.doc &&
         currentState.selection.$anchor.pos === 0 &&
         currentState.selection.$head.pos === 0
@@ -75,8 +75,8 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
           TextSelection.create(
             nextState.state.doc,
             0,
-            nextState.state.doc.content.size
-          ).getBookmark()
+            nextState.state.doc.content.size,
+          ).getBookmark(),
         );
         return;
       }
@@ -89,7 +89,7 @@ export const ProseEditorStateMolecule = molecule((_, getScope) => {
         const nextSelection = nextState.state.selection.getBookmark();
         set(get(scope).selection, nextSelection);
       }
-    }
+    },
   );
 
   return editorStateAtom;

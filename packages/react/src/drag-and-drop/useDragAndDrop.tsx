@@ -1,13 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import type { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import type { Block } from '../component-metamodel/ComponentModel.tsx';
-import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
-import {
-  SelectedNodeMolecule,
-} from '../core/selection/SelectedNodeMolecule.tsx';
-import { NodeMolecule } from '../node/NodeMolecule.tsx';
+import type { RaisinNode, RaisinNodeWithChildren } from "@raisins/core";
+import { useMolecule } from "bunshi/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import type { Block } from "../component-metamodel/ComponentModel.tsx";
+import { DragAndDropMolecule } from "../core/selection/DragAndDropMolecule.tsx";
+import { SelectedNodeMolecule } from "../core/selection/SelectedNodeMolecule.tsx";
+import { NodeMolecule } from "../node/NodeMolecule.tsx";
 
 /**
  * Sizing for the drag ghost (the "drag image" that follows the cursor).
@@ -64,35 +62,35 @@ function useDragGhost(options?: DragGhostOptions) {
       const w = clamp(
         Math.round(width ?? GHOST_DEFAULT_WIDTH),
         GHOST_MIN_WIDTH,
-        GHOST_MAX_WIDTH
+        GHOST_MAX_WIDTH,
       );
       const h = clamp(
         Math.round(height ?? GHOST_DEFAULT_HEIGHT),
         GHOST_MIN_HEIGHT,
-        GHOST_MAX_HEIGHT
+        GHOST_MAX_HEIGHT,
       );
 
-      const ghost = document.createElement('div');
+      const ghost = document.createElement("div");
       ghost.style.cssText = [
-        'position: absolute',
+        "position: absolute",
         // Off-screen; the browser captures the bitmap synchronously.
-        'top: -1000px',
-        'left: -1000px',
+        "top: -1000px",
+        "left: -1000px",
         `width: ${w}px`,
         `height: ${h}px`,
-        'box-sizing: border-box',
-        'border: 1px solid #c5c5c5',
-        'border-radius: 4px',
-        'background: rgba(255, 255, 255, 0.85)',
-        'box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)',
-        'pointer-events: none',
-      ].join(';');
+        "box-sizing: border-box",
+        "border: 1px solid #c5c5c5",
+        "border-radius: 4px",
+        "background: rgba(255, 255, 255, 0.85)",
+        "box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)",
+        "pointer-events: none",
+      ].join(";");
       document.body.appendChild(ghost);
       ghostRef.current = ghost;
 
       e.dataTransfer.setDragImage(ghost, offsetX, offsetY);
     },
-    [enabled, width, height, offsetX, offsetY]
+    [enabled, width, height, offsetX, offsetY],
   );
 
   return { applyGhost, removeGhost };
@@ -117,16 +115,16 @@ export function useDragBlock(block: Block, options?: UseDragOptions) {
   const { applyGhost, removeGhost } = useDragGhost(options?.ghost);
 
   const isThisBlockDragged =
-    dragged?.type === 'block' && dragged.block === block;
+    dragged?.type === "block" && dragged.block === block;
 
   const onDragStart = useCallback(
     (e: React.DragEvent) => {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', block.title);
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", block.title);
       applyGhost(e);
-      setDragged({ type: 'block', block });
+      setDragged({ type: "block", block });
     },
-    [block, setDragged, applyGhost]
+    [block, setDragged, applyGhost],
   );
 
   const onDragEnd = useCallback(() => {
@@ -155,7 +153,7 @@ export function useDragBlock(block: Block, options?: UseDragOptions) {
  */
 function useDragForNode(
   node: RaisinNode | undefined,
-  options?: UseDragOptions
+  options?: UseDragOptions,
 ) {
   const {
     DraggedAtom,
@@ -177,12 +175,12 @@ function useDragForNode(
   const onDragStart = useCallback(
     (e: React.DragEvent) => {
       if (!node) return;
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', 'node');
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", "node");
       applyGhost(e);
       setDraggedNode(node);
     },
-    [node, setDraggedNode, applyGhost]
+    [node, setDraggedNode, applyGhost],
   );
 
   const onDragEnd = useCallback(() => {
@@ -214,7 +212,7 @@ function useDragForNode(
  */
 export function useDragNode(
   nodeOverride?: RaisinNode,
-  options?: UseDragOptions
+  options?: UseDragOptions,
 ) {
   const { nodeAtom } = useMolecule(NodeMolecule);
   const scopeNode = useAtomValue(nodeAtom);
@@ -256,17 +254,17 @@ export function useDropTarget({ idx, slot }: DropTargetProps) {
 
   const isDroppable = useMemo(
     () => canPlop({ slot, idx }),
-    [canPlop, slot, idx]
+    [canPlop, slot, idx],
   );
 
   const onDragOver = useCallback(
     (e: React.DragEvent) => {
       if (!isDroppable) return;
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
+      e.dataTransfer.dropEffect = "move";
       setIsOver(true);
     },
-    [isDroppable]
+    [isDroppable],
   );
 
   const onDragEnter = useCallback(
@@ -280,7 +278,7 @@ export function useDropTarget({ idx, slot }: DropTargetProps) {
         slot,
       });
     },
-    [isDroppable, setLastHovered, node, idx, slot]
+    [isDroppable, setLastHovered, node, idx, slot],
   );
 
   const onDragLeave = useCallback(() => {
@@ -295,7 +293,7 @@ export function useDropTarget({ idx, slot }: DropTargetProps) {
       if (!isDroppable) return;
       dropNode({ parent: node as RaisinNodeWithChildren, idx, slot });
     },
-    [isDroppable, dropNode, node, idx, slot]
+    [isDroppable, dropNode, node, idx, slot],
   );
 
   return {

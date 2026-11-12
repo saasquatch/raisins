@@ -1,11 +1,11 @@
-import type { Atom, PrimitiveAtom } from 'jotai';
-import { atom } from 'jotai';
-import { createScope, ScopeProvider } from 'bunshi/react';
-import { molecule } from 'bunshi/react';
-import React from 'react';
-import type { AttributeConfig } from '../attributes/AttributeConfig.ts';
-import type { CanvasConfig } from '../canvas/CanvasConfig.tsx';
-import type { Module } from '../component-metamodel/types.ts';
+import { createScope, ScopeProvider } from "bunshi/react";
+import { molecule } from "bunshi/react";
+import type { Atom, PrimitiveAtom } from "jotai";
+import { atom } from "jotai";
+import React from "react";
+import type { AttributeConfig } from "../attributes/AttributeConfig.ts";
+import type { CanvasConfig } from "../canvas/CanvasConfig.tsx";
+import type { Module } from "../component-metamodel/types.ts";
 
 export type RaisinConfig = Partial<CanvasConfig> &
   Partial<AttributeConfig> & {
@@ -40,7 +40,7 @@ type Molecule<T> = ReturnType<typeof molecule>;
 export type RaisinConfigMolecule = Molecule<Partial<RaisinConfig>>;
 
 const configScope = createScope<RaisinConfigMolecule | undefined>(undefined);
-configScope.displayName = 'ConfigScope';
+configScope.displayName = "ConfigScope";
 
 export const ConfigMolecule = molecule<RaisinConfig>((getMol, getScope) => {
   /**
@@ -49,14 +49,14 @@ export const ConfigMolecule = molecule<RaisinConfig>((getMol, getScope) => {
   const config = getScope(configScope);
   if (!config)
     throw new Error(
-      'Must use this molecule in a wrapping <RaisinsProvider> element'
+      "Must use this molecule in a wrapping <RaisinsProvider> element",
     );
 
   const LocalURLAtom = atom<string | undefined>(undefined);
-  LocalURLAtom.debugLabel = 'LocalURLAtom';
+  LocalURLAtom.debugLabel = "LocalURLAtom";
 
-  const HTMLAtom = atom('');
-  HTMLAtom.debugLabel = 'HTMLAtom';
+  const HTMLAtom = atom("");
+  HTMLAtom.debugLabel = "HTMLAtom";
 
   const provided = getMol(config) as Partial<RaisinConfig>;
 

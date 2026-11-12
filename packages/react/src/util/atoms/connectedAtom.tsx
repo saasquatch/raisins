@@ -1,6 +1,6 @@
-import type { Atom, Getter, Setter } from 'jotai';
-import { atom } from 'jotai';
-import type { MutableRefObject } from 'react';
+import type { Atom, Getter, Setter } from "jotai";
+import { atom } from "jotai";
+import type { MutableRefObject } from "react";
 
 /**
  * Creates a read-only atom for some external state connection that needs to be both initialized and optionally destroyed.
@@ -13,7 +13,7 @@ import type { MutableRefObject } from 'react';
  */
 export default function connectedAtom<T>(
   initializer: (get: Getter, set: Setter) => T,
-  destroy?: (value: T | null) => void
+  destroy?: (value: T | null) => void,
 ): Atom<T | null> {
   const ValueAtom = atom<T | null>(null);
   const ProxyAtom = atom(
@@ -22,7 +22,7 @@ export default function connectedAtom<T>(
       const value = initializer(get, set);
       ref.current = value;
       set(ValueAtom, value);
-    }
+    },
   );
   ProxyAtom.onMount = (setAtom) => {
     const ref: MutableRefObject<T | null> = {

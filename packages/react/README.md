@@ -538,7 +538,7 @@ const Editor = () => {
 const Editor = () => {
   useHotkeys();
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: "flex" }}>
       <div style={{ flex: 0.3 }}>
         <LayersController />
       </div>
@@ -570,8 +570,8 @@ export function CustomComponents() {
         startingHtml: html,
         startingPackages: [
           {
-            package: '@saasquatch/mint-components',
-            version: '1.6.x',
+            package: "@saasquatch/mint-components",
+            version: "1.6.x",
           },
         ],
       }}

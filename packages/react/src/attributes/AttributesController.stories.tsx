@@ -1,8 +1,8 @@
-import { atom, useAtomValue } from 'jotai';
-import { molecule, useMolecule } from 'bunshi/react';
-import React from 'react';
-import { CanvasController } from '../canvas/index.ts';
-import type { RaisinConfig } from '../core/RaisinConfigScope.tsx';
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtomValue } from "jotai";
+import React from "react";
+import { CanvasController } from "../canvas/index.ts";
+import type { RaisinConfig } from "../core/RaisinConfigScope.tsx";
 import {
   big,
   mintBigStat,
@@ -10,29 +10,29 @@ import {
   mintHeroImage,
   mintMono,
   mintTaskCard,
-} from '../examples/MintComponents.tsx';
-import { widgets } from '../examples/MockWidgets.tsx';
+} from "../examples/MintComponents.tsx";
+import { widgets } from "../examples/MockWidgets.tsx";
 import {
   referralList,
   referrerWidget,
   VanillaComponents,
-} from '../examples/VanillaComponents.tsx';
+} from "../examples/VanillaComponents.tsx";
 import {
   BasicStory,
   ErrorListController,
   StoryConfigMolecule,
-} from '../index.stories.tsx';
-import { NodeChildrenEditor } from '../node/NodeChildrenEditor.tsx';
-import { NodeMolecule } from '../node/NodeMolecule.tsx';
-import { AttributeMolecule } from './AttributeMolecule.tsx';
-import { AttributesController } from './AttributesController.tsx';
-import type { AttributeTemplateProps } from './AttributeThemeMolecule.tsx';
+} from "../index.stories.tsx";
+import { NodeChildrenEditor } from "../node/NodeChildrenEditor.tsx";
+import { NodeMolecule } from "../node/NodeMolecule.tsx";
+import { AttributeMolecule } from "./AttributeMolecule.tsx";
+import { AttributesController } from "./AttributesController.tsx";
+import type { AttributeTemplateProps } from "./AttributeThemeMolecule.tsx";
 
 export default {
-  title: 'Attributes Controller',
+  title: "Attributes Controller",
   argTypes: {
     canvas: {
-      control: 'boolean',
+      control: "boolean",
     },
   },
 };
@@ -47,7 +47,7 @@ const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
 });
 
 const CustomTemplate = (
-  props: React.PropsWithChildren<AttributeTemplateProps>
+  props: React.PropsWithChildren<AttributeTemplateProps>,
 ) => {
   const { name, schemaAtom } = useMolecule(AttributeMolecule);
   const schema = useAtomValue(schemaAtom);
@@ -58,25 +58,24 @@ const CustomTemplate = (
         <b>{schema.title ?? name}</b>
       </p>
       <div>{props.children}</div>
-      <p style={{ color: 'red' }}>Description override</p>
+      <p style={{ color: "red" }}>Description override</p>
     </div>
   );
 };
 
 const CustomField = () => {
-  const { WidgetAtom, TemplateAtom, schemaAtom } = useMolecule(
-    AttributeMolecule
-  );
+  const { WidgetAtom, TemplateAtom, schemaAtom } =
+    useMolecule(AttributeMolecule);
   const Widget = useAtomValue(WidgetAtom);
   const Template = useAtomValue(TemplateAtom);
   const schema = useAtomValue(schemaAtom);
 
   return (
     <Template>
-      <p style={{ margin: '0' }}>
-        <b>Your widget: {schema.uiWidget || 'default'}</b>
-        {' - '}
-        <b>Group: {schema.uiGroup || 'default'}</b>
+      <p style={{ margin: "0" }}>
+        <b>Your widget: {schema.uiWidget || "default"}</b>
+        {" - "}
+        <b>Group: {schema.uiGroup || "default"}</b>
       </p>
       <Widget />
       <br />
@@ -95,7 +94,7 @@ const NodeChildrenEditorStory = ({ canvas }: { canvas: boolean }) => {
     );
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: "flex" }}>
       <NodeChildrenEditor Component={AttributesAndChildren} />
       <Canvas />
     </div>
@@ -106,7 +105,7 @@ const AttributesAndChildren = () => {
   return (
     <div>
       <AttributesEditor />
-      <div style={{ borderLeft: '10px solid grey' }}>
+      <div style={{ borderLeft: "10px solid grey" }}>
         <NodeChildrenEditor Component={AttributesAndChildren} />
       </div>
     </div>
@@ -265,7 +264,7 @@ export const Big = ({ canvas }: { canvas: boolean }) => {
 
 function AttributesEditor() {
   return (
-    <div data-attributes-editor style={{ flex: '1' }}>
+    <div data-attributes-editor style={{ flex: "1" }}>
       <TagName />
       <AttributesController />
       <Debugging />
@@ -302,7 +301,7 @@ const Debugging = () => {
     <details>
       <summary>Debugging</summary>
       Attributes: <br />
-      <pre style={{ overflow: 'scroll' }}>
+      <pre style={{ overflow: "scroll" }}>
         {JSON.stringify(attributes, null, 2)}
       </pre>
       Schema:

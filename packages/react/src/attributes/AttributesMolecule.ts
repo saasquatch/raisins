@@ -1,11 +1,11 @@
-import type { RaisinElementNode } from '@raisins/core';
-import type { Attribute } from '@raisins/schema/schema.js';
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { ComponentModelMolecule } from '../component-metamodel/index.ts';
-import { SelectedNodeMolecule } from '../core/index.ts';
-import { NodeMolecule } from '../node/NodeMolecule.tsx';
+import type { RaisinElementNode } from "@raisins/core";
+import type { Attribute } from "@raisins/schema/schema.js";
+import { molecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom } from "jotai";
+import { ComponentModelMolecule } from "../component-metamodel/index.ts";
+import { SelectedNodeMolecule } from "../core/index.ts";
+import { NodeMolecule } from "../node/NodeMolecule.tsx";
 
 /**
  * Properties and changes for ALL the attributes of a node.
@@ -37,7 +37,8 @@ export const AttributesMolecule = molecule((getMol) => {
   const keysAtom = atom(
     (get) =>
       // Use the set of attributes from the schema, default to the sey from the attributes
-      get(schemaAtom)?.map((a) => a.name) ?? Object.keys(get(attributesForNode))
+      get(schemaAtom)?.map((a) => a.name) ??
+      Object.keys(get(attributesForNode)),
   );
 
   return {
@@ -57,13 +58,13 @@ function sortByGroup(attributes?: Attribute[]) {
 }
 
 // TODO: Config we want this name, it could conflict
-const DEFAULT_GROUP = 'default';
+const DEFAULT_GROUP = "default";
 
 type AttributeGroups = Record<string, Attribute[]>;
 function group(list: Attribute[]): AttributeGroups {
   return list.reduce(function (
     allGroups: AttributeGroups,
-    attribute: Attribute
+    attribute: Attribute,
   ) {
     const key = attribute.uiGroup ?? DEFAULT_GROUP;
     const groupArray = allGroups[key] ?? [];
@@ -72,6 +73,5 @@ function group(list: Attribute[]): AttributeGroups {
       ...allGroups,
       [key]: withAttribute,
     };
-  },
-  {} as AttributeGroups);
+  }, {} as AttributeGroups);
 }

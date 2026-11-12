@@ -1,5 +1,5 @@
-import type { NodePath, RaisinNode } from '@raisins/core';
-import { isNodeWithChildren } from '@raisins/core';
+import type { NodePath, RaisinNode } from "@raisins/core";
+import { isNodeWithChildren } from "@raisins/core";
 
 /**
  * Resolves a {@link NodePath} against a document, returning `undefined` for a
@@ -8,7 +8,7 @@ import { isNodeWithChildren } from '@raisins/core';
  */
 export function tryGetNode(
   root: RaisinNode,
-  path: NodePath
+  path: NodePath,
 ): RaisinNode | undefined {
   let node: RaisinNode | undefined = root;
   for (const idx of path) {

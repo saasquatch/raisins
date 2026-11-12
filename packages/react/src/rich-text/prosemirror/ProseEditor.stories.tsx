@@ -1,31 +1,27 @@
-import { htmlParser } from '@raisins/core';
-import type { PrimitiveAtom } from 'jotai';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import type { SelectionBookmark } from 'prosemirror-state';
-import React from 'react';
-import { DefaultProseSchema } from './default-schema/DefaultProseSchema.ts';
-import {
-  DefaultProseSchemaHotkeysPlugin,
-} from './default-schema/DefaultProseSchemaHotkeysPlugin.ts';
-import {
-  DefaultProseSchemaMarkMolecule,
-} from './default-schema/DefaultProseSchemaMarkMolecule.ts';
-import { ProseEditor } from './ProseEditor.tsx';
+import { htmlParser } from "@raisins/core";
+import { useMolecule } from "bunshi/react";
+import type { PrimitiveAtom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import type { SelectionBookmark } from "prosemirror-state";
+import React from "react";
+import { DefaultProseSchema } from "./default-schema/DefaultProseSchema.ts";
+import { DefaultProseSchemaHotkeysPlugin } from "./default-schema/DefaultProseSchemaHotkeysPlugin.ts";
+import { DefaultProseSchemaMarkMolecule } from "./default-schema/DefaultProseSchemaMarkMolecule.ts";
+import { ProseEditor } from "./ProseEditor.tsx";
 import type {
   ProseEditorScopeProps,
   ProseEditorScopeType,
-} from './ProseEditorScope.tsx';
-import { ProseEditorScopeProvider } from './ProseEditorScope.tsx';
+} from "./ProseEditorScope.tsx";
+import { ProseEditorScopeProvider } from "./ProseEditorScope.tsx";
 
-export default { title: 'Prose Editor' };
+export default { title: "Prose Editor" };
 
 const proseAtom: ProseEditorScopeType = atom(() => {
   const props: ProseEditorScopeProps = {
     node: atom(
       htmlParser(
-        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a> and without href <a>test</a>`
-      )
+        `A bunch of text nodes with <b>inline content</b> and <a href="example">links</a> and without href <a>test</a>`,
+      ),
     ),
     plugins: atom([DefaultProseSchemaHotkeysPlugin]),
     schema: atom(DefaultProseSchema),
@@ -119,19 +115,19 @@ const Toolbar = () => {
     <>
       <button
         onMouseDown={toggleBold}
-        style={{ background: isBold ? 'grey' : undefined }}
+        style={{ background: isBold ? "grey" : undefined }}
       >
         B
       </button>
       <button
         onMouseDown={toggleItalic}
-        style={{ background: isItalic ? 'grey' : undefined }}
+        style={{ background: isItalic ? "grey" : undefined }}
       >
         I
       </button>
       <button
         onMouseDown={toggleUnderline}
-        style={{ background: isUnderline ? 'grey' : undefined }}
+        style={{ background: isUnderline ? "grey" : undefined }}
       >
         U
       </button>
@@ -142,7 +138,9 @@ const Toolbar = () => {
 
 export const SwappablePlugin = () => {
   const atoms = useAtomValue(proseAtom);
-  const [plugins, setPlugin] = useAtom(atoms.plugins as PrimitiveAtom<unknown[]>);
+  const [plugins, setPlugin] = useAtom(
+    atoms.plugins as PrimitiveAtom<unknown[]>,
+  );
   return (
     <>
       <span>{plugins.length} plugins</span>

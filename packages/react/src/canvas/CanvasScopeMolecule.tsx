@@ -1,39 +1,39 @@
-import type { RaisinDocumentNode, RaisinNode } from '@raisins/core';
-import { molecule } from 'bunshi/react';
-import type { Atom, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import type { VNodeChildElement, VNodeChildren } from 'snabbdom';
-import { h } from 'snabbdom';
-import { ComponentModelMolecule } from '../component-metamodel/index.ts';
+import type { RaisinDocumentNode, RaisinNode } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { Atom, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import type { VNodeChildElement, VNodeChildren } from "snabbdom";
+import { h } from "snabbdom";
+import { ComponentModelMolecule } from "../component-metamodel/index.ts";
 import {
   CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../core/index.ts';
-import { CssEditingMolecule } from '../css-editing/CssEditingMolecule.tsx';
-import type { Soul } from '../core/souls/Soul.ts';
-import { NPMRegistryAtom } from '../util/NPMRegistry.ts';
+} from "../core/index.ts";
+import type { Soul } from "../core/souls/Soul.ts";
+import { CssEditingMolecule } from "../css-editing/CssEditingMolecule.tsx";
+import { NPMRegistryAtom } from "../util/NPMRegistry.ts";
 import type {
   GeometryDetail,
   GeometryEntry,
   RawCanvasEvent,
-} from './api/_CanvasRPCContract.tsx';
-import { CanvasConfigMolecule } from './CanvasConfig.tsx';
-import { CanvasScope } from './CanvasScope.tsx';
-import { CanvasScriptsMolecule } from './CanvasScriptsMolecule.tsx';
-import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom.tsx';
-import { createProxy } from './ProxySet.ts';
-import type { RootRenderer } from './types.tsx';
+} from "./api/_CanvasRPCContract.tsx";
+import { CanvasConfigMolecule } from "./CanvasConfig.tsx";
+import { CanvasScope } from "./CanvasScope.tsx";
+import { CanvasScriptsMolecule } from "./CanvasScriptsMolecule.tsx";
+import { createAtoms } from "./iframe/SnabbdomSanboxedIframeAtom.tsx";
+import { createProxy } from "./ProxySet.ts";
+import type { RootRenderer } from "./types.tsx";
 import type {
   SnabbdomAppender,
   SnabbdomRenderer,
-} from './util/raisinToSnabdom.tsx';
+} from "./util/raisinToSnabdom.tsx";
 import {
   combineAppenders,
   combineRenderers,
   raisinToSnabbdom,
-} from './util/raisinToSnabdom.tsx';
+} from "./util/raisinToSnabdom.tsx";
 
 type CanvasEventListener = WritableAtom<null, RichCanvasEvent[], void>;
 
@@ -50,7 +50,7 @@ let renderTick = 0;
 /**
  * Stable key so snabbdom patches the managed stylesheet's text in place.
  */
-const MANAGED_STYLE_KEY = 'raisin-managed-style';
+const MANAGED_STYLE_KEY = "raisin-managed-style";
 
 /**
  * A molecule used for tracking events and geometry for an iframe canvas.
@@ -61,7 +61,7 @@ const MANAGED_STYLE_KEY = 'raisin-managed-style';
  */
 export const CanvasScopeMolecule = molecule((getMol, getScope) => {
   const value = getScope(CanvasScope);
-  if (!value) throw new Error('Must be rendered in a <CanvasProvider/>');
+  if (!value) throw new Error("Must be rendered in a <CanvasProvider/>");
 
   const ComponentModelAtoms = getMol(ComponentModelMolecule);
   const CanvasConfig = getMol(CanvasConfigMolecule);
@@ -89,7 +89,7 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     return () => set?.delete(listener);
   };
 
-  const VnodeAtom = atom(get => {
+  const VnodeAtom = atom((get) => {
     const node = get(RootNodeAtom);
     const souls = get(GetSoulAtom);
     const raisinsSoulAttribute = get(CanvasConfig.SoulAttributeAtom);
@@ -101,18 +101,18 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
 
     const isInteractible = get(ComponentModelAtoms.IsInteractibleAtom);
     const renderers = Array.from(RendererSet.values()).map(
-      a => get(a) as SnabbdomRenderer
+      (a) => get(a) as SnabbdomRenderer,
     );
     const eventsRenderer: SnabbdomRenderer = (d, n) => {
       const soul = souls(n);
       if (!isInteractible(n)) return d;
       const componentMeta = meta.getComponentMeta(n.tagName);
 
-      const canvasRenderer = componentMeta.canvasRenderer ?? 'in-place-update';
+      const canvasRenderer = componentMeta.canvasRenderer ?? "in-place-update";
 
       // Only replace if duplicating or pick-and-plopping to prevent misaligned toolbars, flickering, and errors
       const useCanvasRenderer =
-        (picked || rerender) && canvasRenderer === 'always-replace';
+        (picked || rerender) && canvasRenderer === "always-replace";
 
       const key = useCanvasRenderer ? ++renderTick : soul.toString();
 
@@ -128,17 +128,17 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       };
     };
     const renderer = combineRenderers(eventsRenderer, ...renderers);
-    const appenders = Array.from(AppendersSet.values()).map(a => get(a));
+    const appenders = Array.from(AppendersSet.values()).map((a) => get(a));
     const appender = combineAppenders(...appenders);
 
-    const rootRenderers = Array.from(
-      get(RootRendererProxy.atom).values
-    ).map(r => get(r));
+    const rootRenderers = Array.from(get(RootRendererProxy.atom).values).map(
+      (r) => get(r),
+    );
     const composedRootRenderer = rootRenderers.reduce<RootRenderer>(
       (prev, renderer) => {
         return (c, n) => renderer(prev(c, n), n);
       },
-      c => c
+      (c) => c,
     );
 
     // Applied after plugin root renderers so the stylesheet can't be swallowed
@@ -146,9 +146,9 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     const rootRenderer: RootRenderer = (c, n) => {
       const inner = composedRootRenderer(c, n);
       const managedStyle = h(
-        'style',
-        { key: MANAGED_STYLE_KEY, attrs: { 'data-raisin-managed': true } },
-        managedCss
+        "style",
+        { key: MANAGED_STYLE_KEY, attrs: { "data-raisin-managed": true } },
+        managedCss,
       );
       return [managedStyle, ...toChildArray(inner)];
     };
@@ -157,12 +157,12 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       node as RaisinDocumentNode,
       renderer,
       appender,
-      rootRenderer
+      rootRenderer,
     );
 
     return vnode;
   });
-  VnodeAtom.debugLabel = 'VnodeAtom';
+  VnodeAtom.debugLabel = "VnodeAtom";
 
   const CanvasEventAtom = atom(null, (get, set, e: RawCanvasEvent) => {
     const listenersSet = ListenersMap.get(e.type);
@@ -200,8 +200,8 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
       // and drop) can locate them via the cursor position.
       // NOTE: boolean snabbdom attrs become empty-string DOM attrs, so we
       // use `in` rather than a truthy check.
-      if ('raisin-plop-target' in attrs) {
-        return `plop:${attrs['raisin-plop-parent']}/${attrs['raisin-plop-slot']}/${attrs['raisin-plop-idx']}`;
+      if ("raisin-plop-target" in attrs) {
+        return `plop:${attrs["raisin-plop-parent"]}/${attrs["raisin-plop-slot"]}/${attrs["raisin-plop-idx"]}`;
       }
       return undefined;
     };
@@ -212,35 +212,35 @@ export const CanvasScopeMolecule = molecule((getMol, getScope) => {
     // For partial deltas (ResizeObserver callbacks), preserve existing
     // entries and merge the new ones in.
     if (!next.full) {
-      existing.entries?.forEach(geo => {
+      existing.entries?.forEach((geo) => {
         const key = keyFor(geo);
         if (key) geometryMap.set(key, geo);
       });
     }
 
-    next.entries?.forEach(geo => {
+    next.entries?.forEach((geo) => {
       const key = keyFor(geo);
       if (key) geometryMap.set(key, geo);
     });
 
     const geometry = Array.from(geometryMap.values()).map(
-      geo => geo
+      (geo) => geo,
     ) as GeometryEntry[];
 
     const newGeometry = { entries: geometry };
     set(GeometryAtom, newGeometry);
   });
 
-  const IframeHeadAtom = atom(get => {
+  const IframeHeadAtom = atom((get) => {
     const script = get(CanvasScriptsAtom);
-    const extra = CanvasConfig.IframeHead ? get(CanvasConfig.IframeHead) : '';
+    const extra = CanvasConfig.IframeHead ? get(CanvasConfig.IframeHead) : "";
     const bonus = Array.from(HTMLSet.values())
-      .map(a => get(a))
-      .join('');
+      .map((a) => get(a))
+      .join("");
     return script + extra + bonus;
   });
 
-  const selector = atom(get => `[${get(EventSelectorAtom)}]`);
+  const selector = atom((get) => `[${get(EventSelectorAtom)}]`);
   const IframeAtom = createAtoms({
     head: IframeHeadAtom,
     registry: NPMRegistryAtom,

@@ -4,18 +4,18 @@ import {
   htmlSerializer,
   htmlUtil,
   parseWithErrors,
-} from '@raisins/core';
+} from "@raisins/core";
 import type {
   ParseErrorStack,
   NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { molecule } from 'bunshi/react';
-import type { SetStateAction, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import type { MutableRefObject } from 'react';
-import { ConfigMolecule } from './RaisinConfigScope.tsx';
+} from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { SetStateAction, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import type { MutableRefObject } from "react";
+import { ConfigMolecule } from "./RaisinConfigScope.tsx";
 
 export type InternalState = {
   current: RaisinNode;
@@ -26,11 +26,11 @@ const { getParents, getAncestry: getAncestryUtil } = htmlUtil;
 export type InternalStateTransaction =
   | {
       // Mostly just used for undo/redo. Will skip state listeners.
-      type: 'raw-set';
+      type: "raw-set";
       next: RaisinNode;
     }
   | {
-      type: 'set';
+      type: "set";
       next: RaisinNode;
     };
 
@@ -58,7 +58,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
         And a cached node is used
         And souls are preserved
   */
-  const ParsedHtmlAtom = atom(get => {
+  const ParsedHtmlAtom = atom((get) => {
     const ref = get(NodeWithHtmlRefAtom);
     const html = get(HTMLAtom);
 
@@ -72,10 +72,10 @@ export const CoreMolecule = molecule((getMol, getScope) => {
     ref.current = { html, node: parsed.node, parsed };
     return parsed;
   });
-  ParsedHtmlAtom.debugLabel = 'ParsedHtmlAtom';
+  ParsedHtmlAtom.debugLabel = "ParsedHtmlAtom";
 
   const NodeFromHtml = atom(
-    get => get(ParsedHtmlAtom).node,
+    (get) => get(ParsedHtmlAtom).node,
     (get, set, current: RaisinNode) => {
       const cache = get(HtmlCacheAtom);
       let htmlString = cache.get(current);
@@ -86,11 +86,11 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       const ref = get(NodeWithHtmlRefAtom);
       ref.current = { html: htmlString, node: current };
       set(HTMLAtom, htmlString);
-    }
+    },
   );
 
-  const ParseErrorsAtom = atom(get => get(ParsedHtmlAtom).errors);
-  ParseErrorsAtom.debugLabel = 'ParseErrorsAtom';
+  const ParseErrorsAtom = atom((get) => get(ParsedHtmlAtom).errors);
+  ParseErrorsAtom.debugLabel = "ParseErrorsAtom";
 
   const StateListeners = new Set<
     WritableAtom<unknown, { prev: RaisinNode; next: RaisinNode }[], void>
@@ -102,23 +102,23 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       const prev = get(NodeFromHtml);
       set(NodeFromHtml, next.next);
 
-      if (next.type === 'set') {
-        StateListeners.forEach(l => set(l, { prev: prev, next: next.next }));
+      if (next.type === "set") {
+        StateListeners.forEach((l) => set(l, { prev: prev, next: next.next }));
       }
-    }
+    },
   );
 
   const RootNodeAtom = atom(
-    get => get(NodeFromHtml),
+    (get) => get(NodeFromHtml),
     (get, set, next: SetStateAction<RaisinNode>) => {
       const nextNode =
-        typeof next === 'function' ? next(get(NodeFromHtml)) : next;
-      set(InternalTransactionAtom, { type: 'set', next: nextNode });
-    }
+        typeof next === "function" ? next(get(NodeFromHtml)) : next;
+      set(InternalTransactionAtom, { type: "set", next: nextNode });
+    },
   );
-  RootNodeAtom.debugLabel = 'RootNodeAtom';
+  RootNodeAtom.debugLabel = "RootNodeAtom";
 
-  const IdentifierModelAtom = atom<IdentifierModel>(get => {
+  const IdentifierModelAtom = atom<IdentifierModel>((get) => {
     const current = get(RootNodeAtom);
     const parents = get(ParentsAtom);
 
@@ -133,7 +133,7 @@ export const CoreMolecule = molecule((getMol, getScope) => {
       getPath: getPathInternal,
     };
   });
-  IdentifierModelAtom.debugLabel = 'IdentifierModelAtom';
+  IdentifierModelAtom.debugLabel = "IdentifierModelAtom";
 
   /**
    * RaisinNode --> RaisinNode (Parent)
@@ -141,14 +141,16 @@ export const CoreMolecule = molecule((getMol, getScope) => {
    * Map of children to their parents in the current document
    *
    */
-  const ParentsAtom = atom(get => {
+  const ParentsAtom = atom((get) => {
     const doc = get(RootNodeAtom);
     return getParents(doc);
   });
-  ParentsAtom.debugLabel = 'ParentsAtom';
+  ParentsAtom.debugLabel = "ParentsAtom";
 
-  const JsonPointersAtom = atom(get => generateJsonPointers(get(RootNodeAtom)));
-  JsonPointersAtom.debugLabel = 'JsonPointersAtom';
+  const JsonPointersAtom = atom((get) =>
+    generateJsonPointers(get(RootNodeAtom)),
+  );
+  JsonPointersAtom.debugLabel = "JsonPointersAtom";
 
   /**
    * Used to override default behavior of @canvasRenderer "always-replace"

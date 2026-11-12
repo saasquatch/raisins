@@ -1,5 +1,5 @@
-import type { Atom } from 'jotai';
-import { atom } from 'jotai';
+import type { Atom } from "jotai";
+import { atom } from "jotai";
 
 /**
  * Create an atom-in-atom that will produce an atom of `initialValue`
@@ -13,6 +13,6 @@ export function dependentAtom<T>(sourceAtom: Atom<unknown>, initialValue: T) {
 
   return atom(
     (get) => get(get(whichAtom)),
-    (get, set, next: T) => set(get(whichAtom), next)
+    (get, set, next: T) => set(get(whichAtom), next),
   );
 }

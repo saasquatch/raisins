@@ -2,23 +2,19 @@ import type {
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { calculatePlopTargets, isElementNode, isRoot } from '@raisins/core';
-import type { CustomElement } from '@raisins/schema/schema.js';
-import type { Atom } from 'jotai';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
-import { molecule, useMolecule } from 'bunshi/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
-import { CoreMolecule, SoulsInDocMolecule } from '../../core/index.ts';
-import type {
-  DragPlopDestination,
-} from '../../core/selection/DragAndDropMolecule.tsx';
-import {
-  DragAndDropMolecule,
-} from '../../core/selection/DragAndDropMolecule.tsx';
-import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
-import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
+} from "@raisins/core";
+import { calculatePlopTargets, isElementNode, isRoot } from "@raisins/core";
+import type { CustomElement } from "@raisins/schema/schema.js";
+import { molecule, useMolecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom, useAtomValue, useSetAtom } from "jotai";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ComponentModelMolecule } from "../../component-metamodel/index.ts";
+import { CoreMolecule, SoulsInDocMolecule } from "../../core/index.ts";
+import type { DragPlopDestination } from "../../core/selection/DragAndDropMolecule.tsx";
+import { DragAndDropMolecule } from "../../core/selection/DragAndDropMolecule.tsx";
+import { CanvasConfigMolecule } from "../CanvasConfig.tsx";
+import { CanvasScopeMolecule } from "../CanvasScopeMolecule.tsx";
 
 /**
  * Synthetic component metadata used as the "parent meta" when the drop parent
@@ -26,9 +22,9 @@ import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
  * metadata). Root accepts a single default content slot.
  */
 const ROOT_META: CustomElement = {
-  tagName: '',
-  title: 'Body',
-  slots: [{ name: '', title: 'Content' }],
+  tagName: "",
+  title: "Body",
+  slots: [{ name: "", title: "Content" }],
 };
 
 // ---------------------------------------------------------------------------
@@ -40,7 +36,7 @@ const ROOT_META: CustomElement = {
 
 type Rect = { left: number; top: number; right: number; bottom: number };
 
-type Axis = 'vertical' | 'horizontal';
+type Axis = "vertical" | "horizontal";
 
 /**
  * An insertion line as a segment. For a vertical stack the segment is
@@ -84,7 +80,7 @@ function bbox(rects: Rect[]): Rect | undefined {
  * rects defaults to vertical (the common email-layout case).
  */
 function detectAxis(rects: Rect[]): Axis {
-  if (rects.length < 2) return 'vertical';
+  if (rects.length < 2) return "vertical";
   let dx = 0;
   let dy = 0;
   for (let i = 1; i < rects.length; i++) {
@@ -93,7 +89,7 @@ function detectAxis(rects: Rect[]): Axis {
     dx += Math.abs((b.left + b.right) / 2 - (a.left + a.right) / 2);
     dy += Math.abs((b.top + b.bottom) / 2 - (a.top + a.bottom) / 2);
   }
-  return dx > dy ? 'horizontal' : 'vertical';
+  return dx > dy ? "horizontal" : "vertical";
 }
 
 /** Shortest distance from a point to a line segment. */
@@ -116,19 +112,19 @@ function insertionLineForGap(
   axis: Axis,
   prev: Rect | undefined,
   next: Rect | undefined,
-  container: Rect | undefined
+  container: Rect | undefined,
 ): InsertionLine {
-  if (axis === 'vertical') {
+  if (axis === "vertical") {
     const y =
       prev && next
         ? (prev.bottom + next.top) / 2
         : next
-        ? next.top
-        : prev
-        ? prev.bottom
-        : container
-        ? container.top + 2
-        : 0;
+          ? next.top
+          : prev
+            ? prev.bottom
+            : container
+              ? container.top + 2
+              : 0;
     const span = container ?? next ?? prev;
     return {
       axis,
@@ -142,12 +138,12 @@ function insertionLineForGap(
     prev && next
       ? (prev.right + next.left) / 2
       : next
-      ? next.left
-      : prev
-      ? prev.right
-      : container
-      ? container.left + 2
-      : 0;
+        ? next.left
+        : prev
+          ? prev.right
+          : container
+            ? container.left + 2
+            : 0;
   const span = container ?? next ?? prev;
   return {
     axis,
@@ -182,7 +178,7 @@ export type DropResolution = {
  *
  * Wrap the canvas with {@link CanvasDragDropWrapper} or {@link useCanvasDragDrop}.
  */
-export const CanvasDragAndDropMolecule = molecule(getMol => {
+export const CanvasDragAndDropMolecule = molecule((getMol) => {
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const {
     DropNodeInSlotAtom,
@@ -194,9 +190,8 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
   const { IdToSoulAtom, SoulToNodeAtom } = getMol(SoulsInDocMolecule);
   const { ParentsAtom, RootNodeAtom } = getMol(CoreMolecule);
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
-  const { SoulAttributeAtom, CustomPlopContainersAtom } = getMol(
-    CanvasConfigMolecule
-  );
+  const { SoulAttributeAtom, CustomPlopContainersAtom } =
+    getMol(CanvasConfigMolecule);
 
   /**
    * Resolves a drop placement from a cursor position (in iframe-relative
@@ -213,250 +208,255 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
    *   4. For each valid target compute an insertion line and choose the one
    *      nearest the cursor.
    */
-  const ResolveDropAtom: Atom<(x: number, y: number) => DropResolution | undefined> = atom(
-    get => {
-      const geo = get(CanvasAtoms.GeometryAtom);
-      const idToSoul = get(IdToSoulAtom);
-      const soulToNode = get(SoulToNodeAtom);
-      const parents = get(ParentsAtom);
-      const root = get(RootNodeAtom);
-      const metamodel = get(ComponentModelAtom);
-      const dragged = get(DraggedAtom);
-      const soulAttr = get(SoulAttributeAtom);
-      const isCustomPlopContainer = get(CustomPlopContainersAtom);
+  const ResolveDropAtom: Atom<
+    (x: number, y: number) => DropResolution | undefined
+  > = atom((get) => {
+    const geo = get(CanvasAtoms.GeometryAtom);
+    const idToSoul = get(IdToSoulAtom);
+    const soulToNode = get(SoulToNodeAtom);
+    const parents = get(ParentsAtom);
+    const root = get(RootNodeAtom);
+    const metamodel = get(ComponentModelAtom);
+    const dragged = get(DraggedAtom);
+    const soulAttr = get(SoulAttributeAtom);
+    const isCustomPlopContainer = get(CustomPlopContainersAtom);
 
-      const noop = () => undefined;
-      if (!dragged) return noop;
-      const possiblePlop = get(DraggedContentAtom);
-      if (!possiblePlop || !isElementNode(possiblePlop)) return noop;
-      const addOrMove = dragged.type === 'block' ? 'add' : 'move';
+    const noop = () => undefined;
+    if (!dragged) return noop;
+    const possiblePlop = get(DraggedContentAtom);
+    if (!possiblePlop || !isElementNode(possiblePlop)) return noop;
+    const addOrMove = dragged.type === "block" ? "add" : "move";
 
-      // node -> rect (iframe-relative), only for souled elements.
-      const rectByNode = new Map<RaisinNode, Rect>();
-      // Injected plop targets (custom-layout containers only, during drags).
-      const plopEntries: { rect: Rect; dest: DragPlopDestination }[] = [];
-      for (const e of geo.entries) {
-        const attrs = e.target?.attributes;
-        if (!attrs) continue;
-        if ('raisin-plop-target' in attrs) {
-          const soul = idToSoul(attrs['raisin-plop-parent']);
-          const parent = soul && soulToNode(soul);
-          if (!parent) continue;
-          const r = e.contentRect;
-          plopEntries.push({
-            rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
-            dest: {
-              parent: parent as RaisinNodeWithChildren,
-              idx: Number(attrs['raisin-plop-idx']),
-              slot: attrs['raisin-plop-slot'] ?? '',
-            },
-          });
-          continue;
-        }
-        const soulId = attrs[soulAttr];
-        if (!soulId) continue;
-        const soul = idToSoul(soulId);
-        if (!soul) continue;
-        const node = soulToNode(soul);
-        if (!node) continue;
+    // node -> rect (iframe-relative), only for souled elements.
+    const rectByNode = new Map<RaisinNode, Rect>();
+    // Injected plop targets (custom-layout containers only, during drags).
+    const plopEntries: { rect: Rect; dest: DragPlopDestination }[] = [];
+    for (const e of geo.entries) {
+      const attrs = e.target?.attributes;
+      if (!attrs) continue;
+      if ("raisin-plop-target" in attrs) {
+        const soul = idToSoul(attrs["raisin-plop-parent"]);
+        const parent = soul && soulToNode(soul);
+        if (!parent) continue;
         const r = e.contentRect;
-        rectByNode.set(node, {
-          left: r.left,
-          top: r.top,
-          right: r.right,
-          bottom: r.bottom,
+        plopEntries.push({
+          rect: { left: r.left, top: r.top, right: r.right, bottom: r.bottom },
+          dest: {
+            parent: parent as RaisinNodeWithChildren,
+            idx: Number(attrs["raisin-plop-idx"]),
+            slot: attrs["raisin-plop-slot"] ?? "",
+          },
         });
+        continue;
       }
-      const rectForNode = (n: RaisinNode): Rect | undefined => rectByNode.get(n);
+      const soulId = attrs[soulAttr];
+      if (!soulId) continue;
+      const soul = idToSoul(soulId);
+      if (!soul) continue;
+      const node = soulToNode(soul);
+      if (!node) continue;
+      const r = e.contentRect;
+      rectByNode.set(node, {
+        left: r.left,
+        top: r.top,
+        right: r.right,
+        bottom: r.bottom,
+      });
+    }
+    const rectForNode = (n: RaisinNode): Rect | undefined => rectByNode.get(n);
 
-      const depthOf = (n: RaisinNode): number => {
-        let d = 0;
-        let c = parents.get(n);
-        while (c) {
-          d++;
-          c = parents.get(c);
-        }
-        return d;
-      };
+    const depthOf = (n: RaisinNode): number => {
+      let d = 0;
+      let c = parents.get(n);
+      while (c) {
+        d++;
+        c = parents.get(c);
+      }
+      return d;
+    };
 
-      const tryParent = (parentNode: RaisinNode) => {
-        if (!isElementNode(parentNode) && !isRoot(parentNode)) return undefined;
-        // Custom-layout containers accept drops only via injected targets.
+    const tryParent = (parentNode: RaisinNode) => {
+      if (!isElementNode(parentNode) && !isRoot(parentNode)) return undefined;
+      // Custom-layout containers accept drops only via injected targets.
+      if (
+        isElementNode(parentNode) &&
+        isCustomPlopContainer(parentNode.tagName)
+      )
+        return undefined;
+      const parentMeta = isRoot(parentNode)
+        ? ROOT_META
+        : metamodel.getComponentMeta((parentNode as RaisinElementNode).tagName);
+      const possiblePlopMeta = metamodel.getComponentMeta(possiblePlop.tagName);
+      const targets = calculatePlopTargets(
+        parentNode,
+        possiblePlop,
+        { parentMeta, possiblePlopMeta },
+        parents,
+      );
+      if (!targets.length) return undefined;
+      return { parentNode, parentMeta, targets };
+    };
+
+    const lineForTarget = (
+      parentNode: RaisinNodeWithChildren,
+      target: { idx: number; slot: string },
+      axis: Axis,
+      parentRect: Rect | undefined,
+    ): InsertionLine => {
+      let prevRect: Rect | undefined;
+      let nextRect: Rect | undefined;
+      for (let i = target.idx - 1; i >= 0; i--) {
+        const ch = parentNode.children[i];
         if (
-          isElementNode(parentNode) &&
-          isCustomPlopContainer(parentNode.tagName)
-        )
-          return undefined;
-        const parentMeta = isRoot(parentNode)
-          ? ROOT_META
-          : metamodel.getComponentMeta((parentNode as RaisinElementNode).tagName);
-        const possiblePlopMeta = metamodel.getComponentMeta(possiblePlop.tagName);
-        const targets = calculatePlopTargets(
-          parentNode,
-          possiblePlop,
-          { parentMeta, possiblePlopMeta },
-          parents
-        );
-        if (!targets.length) return undefined;
-        return { parentNode, parentMeta, targets };
-      };
+          isElementNode(ch) &&
+          ((ch as RaisinElementNode).attribs.slot ?? "") === target.slot
+        ) {
+          prevRect = rectForNode(ch);
+          if (prevRect) break;
+        }
+      }
+      for (let i = target.idx; i < parentNode.children.length; i++) {
+        const ch = parentNode.children[i];
+        if (
+          isElementNode(ch) &&
+          ((ch as RaisinElementNode).attribs.slot ?? "") === target.slot
+        ) {
+          nextRect = rectForNode(ch);
+          if (nextRect) break;
+        }
+      }
+      return insertionLineForGap(axis, prevRect, nextRect, parentRect);
+    };
 
-      const lineForTarget = (
-        parentNode: RaisinNodeWithChildren,
-        target: { idx: number; slot: string },
-        axis: Axis,
-        parentRect: Rect | undefined
-      ): InsertionLine => {
-        let prevRect: Rect | undefined;
-        let nextRect: Rect | undefined;
-        for (let i = target.idx - 1; i >= 0; i--) {
-          const ch = parentNode.children[i];
-          if (
-            isElementNode(ch) &&
-            ((ch as RaisinElementNode).attribs.slot ?? '') === target.slot
-          ) {
-            prevRect = rectForNode(ch);
-            if (prevRect) break;
-          }
-        }
-        for (let i = target.idx; i < parentNode.children.length; i++) {
-          const ch = parentNode.children[i];
-          if (
-            isElementNode(ch) &&
-            ((ch as RaisinElementNode).attribs.slot ?? '') === target.slot
-          ) {
-            nextRect = rectForNode(ch);
-            if (nextRect) break;
-          }
-        }
-        return insertionLineForGap(axis, prevRect, nextRect, parentRect);
-      };
-
-      // Injected targets (custom-layout containers) win over gap geometry:
-      // the container positions them itself, so their rect IS the drop zone.
-      const PLOP_HIT_PADDING = 8;
-      const plopResolution = (x: number, y: number): DropResolution | undefined => {
-        let best: { rect: Rect; dest: DragPlopDestination } | undefined;
-        let bestDist = Infinity;
-        for (const p of plopEntries) {
-          const padded: Rect = {
-            left: p.rect.left - PLOP_HIT_PADDING,
-            top: p.rect.top - PLOP_HIT_PADDING,
-            right: p.rect.right + PLOP_HIT_PADDING,
-            bottom: p.rect.bottom + PLOP_HIT_PADDING,
-          };
-          if (!rectContains(padded, x, y)) continue;
-          const d = Math.hypot(
-            x - (p.rect.left + p.rect.right) / 2,
-            y - (p.rect.top + p.rect.bottom) / 2
-          );
-          if (d < bestDist) {
-            bestDist = d;
-            best = p;
-          }
-        }
-        if (!best) return undefined;
-        const parent = best.dest.parent;
-        const parentMeta = isRoot(parent)
-          ? ROOT_META
-          : metamodel.getComponentMeta((parent as RaisinElementNode).tagName);
-        const slotTitle =
-          parentMeta?.slots?.find(s => s.name === best!.dest.slot)?.title ||
-          parentMeta?.title ||
-          'Content';
-        const { rect } = best;
-        const axis: Axis =
-          rect.right - rect.left >= rect.bottom - rect.top
-            ? 'vertical'
-            : 'horizontal';
-        const midX = (rect.left + rect.right) / 2;
-        const midY = (rect.top + rect.bottom) / 2;
-        const line: InsertionLine =
-          axis === 'vertical'
-            ? { axis, x0: rect.left, y0: midY, x1: rect.right, y1: midY }
-            : { axis, x0: midX, y0: rect.top, x1: midX, y1: rect.bottom };
-        return {
-          destination: best.dest,
-          parentRect: rectByNode.get(parent),
-          line,
-          label: `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`,
+    // Injected targets (custom-layout containers) win over gap geometry:
+    // the container positions them itself, so their rect IS the drop zone.
+    const PLOP_HIT_PADDING = 8;
+    const plopResolution = (
+      x: number,
+      y: number,
+    ): DropResolution | undefined => {
+      let best: { rect: Rect; dest: DragPlopDestination } | undefined;
+      let bestDist = Infinity;
+      for (const p of plopEntries) {
+        const padded: Rect = {
+          left: p.rect.left - PLOP_HIT_PADDING,
+          top: p.rect.top - PLOP_HIT_PADDING,
+          right: p.rect.right + PLOP_HIT_PADDING,
+          bottom: p.rect.bottom + PLOP_HIT_PADDING,
         };
+        if (!rectContains(padded, x, y)) continue;
+        const d = Math.hypot(
+          x - (p.rect.left + p.rect.right) / 2,
+          y - (p.rect.top + p.rect.bottom) / 2,
+        );
+        if (d < bestDist) {
+          bestDist = d;
+          best = p;
+        }
+      }
+      if (!best) return undefined;
+      const parent = best.dest.parent;
+      const parentMeta = isRoot(parent)
+        ? ROOT_META
+        : metamodel.getComponentMeta((parent as RaisinElementNode).tagName);
+      const slotTitle =
+        parentMeta?.slots?.find((s) => s.name === best!.dest.slot)?.title ||
+        parentMeta?.title ||
+        "Content";
+      const { rect } = best;
+      const axis: Axis =
+        rect.right - rect.left >= rect.bottom - rect.top
+          ? "vertical"
+          : "horizontal";
+      const midX = (rect.left + rect.right) / 2;
+      const midY = (rect.top + rect.bottom) / 2;
+      const line: InsertionLine =
+        axis === "vertical"
+          ? { axis, x0: rect.left, y0: midY, x1: rect.right, y1: midY }
+          : { axis, x0: midX, y0: rect.top, x1: midX, y1: rect.bottom };
+      return {
+        destination: best.dest,
+        parentRect: rectByNode.get(parent),
+        line,
+        label: `${addOrMove === "add" ? "Add" : "Move"} to ${slotTitle}`,
       };
+    };
 
-      return (x: number, y: number): DropResolution | undefined => {
-        const plopHit = plopResolution(x, y);
-        if (plopHit) return plopHit;
+    return (x: number, y: number): DropResolution | undefined => {
+      const plopHit = plopResolution(x, y);
+      if (plopHit) return plopHit;
 
-        const containing: { node: RaisinNode; rect: Rect }[] = [];
-        for (const [node, rect] of rectByNode) {
-          if (rectContains(rect, x, y)) containing.push({ node, rect });
-        }
-        containing.sort((a, b) => {
-          const dd = depthOf(b.node) - depthOf(a.node);
-          if (dd !== 0) return dd;
-          return rectArea(a.rect) - rectArea(b.rect);
-        });
+      const containing: { node: RaisinNode; rect: Rect }[] = [];
+      for (const [node, rect] of rectByNode) {
+        if (rectContains(rect, x, y)) containing.push({ node, rect });
+      }
+      containing.sort((a, b) => {
+        const dd = depthOf(b.node) - depthOf(a.node);
+        if (dd !== 0) return dd;
+        return rectArea(a.rect) - rectArea(b.rect);
+      });
 
-        let chosen:
-          | {
-              parentNode: RaisinNode;
-              parentMeta: CustomElement;
-              targets: { idx: number; slot: string }[];
-              parentRect?: Rect;
-            }
-          | undefined;
-        for (const c of containing) {
-          const r = tryParent(c.node);
-          if (r) {
-            chosen = { ...r, parentRect: c.rect };
-            break;
+      let chosen:
+        | {
+            parentNode: RaisinNode;
+            parentMeta: CustomElement;
+            targets: { idx: number; slot: string }[];
+            parentRect?: Rect;
           }
+        | undefined;
+      for (const c of containing) {
+        const r = tryParent(c.node);
+        if (r) {
+          chosen = { ...r, parentRect: c.rect };
+          break;
         }
-        if (!chosen) {
-          const r = tryParent(root);
-          if (!r) return undefined;
-          const childRects = (root as RaisinNodeWithChildren).children
-            .filter(isElementNode)
-            .map(rectForNode)
-            .filter((x2): x2 is Rect => !!x2);
-          chosen = { ...r, parentRect: bbox(childRects) };
-        }
-
-        const parentNode = chosen.parentNode as RaisinNodeWithChildren;
-        const { parentMeta, targets, parentRect } = chosen;
-
-        const childRects = parentNode.children
+      }
+      if (!chosen) {
+        const r = tryParent(root);
+        if (!r) return undefined;
+        const childRects = (root as RaisinNodeWithChildren).children
           .filter(isElementNode)
           .map(rectForNode)
           .filter((x2): x2 is Rect => !!x2);
-        const axis = detectAxis(childRects);
+        chosen = { ...r, parentRect: bbox(childRects) };
+      }
 
-        let best: { t: { idx: number; slot: string }; line: InsertionLine } | undefined;
-        let bestDist = Infinity;
-        for (const t of targets) {
-          const line = lineForTarget(parentNode, t, axis, parentRect);
-          const d = distanceToLine(x, y, line);
-          if (d < bestDist) {
-            bestDist = d;
-            best = { t, line };
-          }
+      const parentNode = chosen.parentNode as RaisinNodeWithChildren;
+      const { parentMeta, targets, parentRect } = chosen;
+
+      const childRects = parentNode.children
+        .filter(isElementNode)
+        .map(rectForNode)
+        .filter((x2): x2 is Rect => !!x2);
+      const axis = detectAxis(childRects);
+
+      let best:
+        | { t: { idx: number; slot: string }; line: InsertionLine }
+        | undefined;
+      let bestDist = Infinity;
+      for (const t of targets) {
+        const line = lineForTarget(parentNode, t, axis, parentRect);
+        const d = distanceToLine(x, y, line);
+        if (d < bestDist) {
+          bestDist = d;
+          best = { t, line };
         }
-        if (!best) return undefined;
+      }
+      if (!best) return undefined;
 
-        const slotTitle =
-          parentMeta?.slots?.find(s => s.name === best!.t.slot)?.title ||
-          parentMeta?.title ||
-          'Content';
+      const slotTitle =
+        parentMeta?.slots?.find((s) => s.name === best!.t.slot)?.title ||
+        parentMeta?.title ||
+        "Content";
 
-        return {
-          destination: { parent: parentNode, idx: best.t.idx, slot: best.t.slot },
-          parentRect,
-          line: best.line,
-          label: `${addOrMove === 'add' ? 'Add' : 'Move'} to ${slotTitle}`,
-        };
+      return {
+        destination: { parent: parentNode, idx: best.t.idx, slot: best.t.slot },
+        parentRect,
+        line: best.line,
+        label: `${addOrMove === "add" ? "Add" : "Move"} to ${slotTitle}`,
       };
-    }
-  );
+    };
+  });
 
   return {
     GeometryAtom: CanvasAtoms.GeometryAtom,
@@ -487,14 +487,8 @@ export function CanvasDragDropWrapper({
   style?: React.CSSProperties;
   className?: string;
 }) {
-  const {
-    containerRef,
-    onDragOver,
-    onDragLeave,
-    onDrop,
-    isDragging,
-    overlay,
-  } = useCanvasDragDrop();
+  const { containerRef, onDragOver, onDragLeave, onDrop, isDragging, overlay } =
+    useCanvasDragDrop();
 
   return (
     <div
@@ -502,7 +496,7 @@ export function CanvasDragDropWrapper({
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      style={{ position: 'relative', isolation: 'isolate', ...style }}
+      style={{ position: "relative", isolation: "isolate", ...style }}
       className={className}
     >
       {children}
@@ -512,16 +506,16 @@ export function CanvasDragDropWrapper({
             <div
               aria-hidden
               style={{
-                position: 'absolute',
+                position: "absolute",
                 left: overlay.border.left,
                 top: overlay.border.top,
                 width: overlay.border.width,
                 height: overlay.border.height,
-                border: '1px solid #0077DB',
-                borderRadius: '2px',
-                background: 'rgba(0, 119, 219, 0.06)',
-                boxSizing: 'border-box',
-                pointerEvents: 'none',
+                border: "1px solid #0077DB",
+                borderRadius: "2px",
+                background: "rgba(0, 119, 219, 0.06)",
+                boxSizing: "border-box",
+                pointerEvents: "none",
                 zIndex: OVERLAY_Z.parentHighlight,
               }}
             />
@@ -529,32 +523,32 @@ export function CanvasDragDropWrapper({
           <div
             aria-hidden
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: overlay.line.left,
               top: overlay.line.top,
               width: overlay.line.width,
               height: overlay.line.height,
-              background: '#0077DB',
-              borderRadius: '2px',
-              pointerEvents: 'none',
+              background: "#0077DB",
+              borderRadius: "2px",
+              pointerEvents: "none",
               zIndex: OVERLAY_Z.insertionLine,
             }}
           />
           <div
             aria-hidden
             style={{
-              position: 'absolute',
+              position: "absolute",
               left: overlay.pill.left,
               top: overlay.pill.top,
-              transform: 'translate(-50%, -50%)',
-              background: '#0077DB',
-              color: '#fff',
-              fontSize: '12px',
-              lineHeight: '16px',
-              padding: '4px 8px',
-              borderRadius: '100px',
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
+              transform: "translate(-50%, -50%)",
+              background: "#0077DB",
+              color: "#fff",
+              fontSize: "12px",
+              lineHeight: "16px",
+              padding: "4px 8px",
+              borderRadius: "100px",
+              whiteSpace: "nowrap",
+              pointerEvents: "none",
               zIndex: OVERLAY_Z.pill,
             }}
           >
@@ -614,12 +608,12 @@ export function useCanvasDragDrop() {
   // Disable pointer-events on the iframe while a drag is active so the
   // wrapper element actually receives drag events from the parent window.
   useEffect(() => {
-    const iframe = containerRef.current?.querySelector('iframe');
+    const iframe = containerRef.current?.querySelector("iframe");
     if (!iframe) return;
     if (isDragging) {
-      iframe.style.pointerEvents = 'none';
+      iframe.style.pointerEvents = "none";
       return () => {
-        iframe.style.pointerEvents = '';
+        iframe.style.pointerEvents = "";
         currentDestRef.current = null;
         setOverlay(undefined);
       };
@@ -631,7 +625,7 @@ export function useCanvasDragDrop() {
   const computeOverlay = useCallback(
     (res: DropResolution): DropOverlay | undefined => {
       const container = containerRef.current;
-      const iframe = container?.querySelector('iframe');
+      const iframe = container?.querySelector("iframe");
       if (!container || !iframe) return undefined;
       const containerRect = container.getBoundingClientRect();
       const iframeRect = iframe.getBoundingClientRect();
@@ -648,8 +642,8 @@ export function useCanvasDragDrop() {
         : undefined;
 
       const { line } = res;
-      let lineBox: DropOverlay['line'];
-      if (line.axis === 'vertical') {
+      let lineBox: DropOverlay["line"];
+      if (line.axis === "vertical") {
         // Horizontal bar.
         lineBox = {
           left: ox + Math.min(line.x0, line.x1),
@@ -675,7 +669,7 @@ export function useCanvasDragDrop() {
 
       return { border, line: lineBox, pill };
     },
-    []
+    [],
   );
 
   const clear = useCallback(() => {
@@ -687,7 +681,7 @@ export function useCanvasDragDrop() {
   const onDragOver = useCallback(
     (e: React.DragEvent) => {
       if (!isDragging) return;
-      const iframe = containerRef.current?.querySelector('iframe');
+      const iframe = containerRef.current?.querySelector("iframe");
       if (!iframe) return;
       const iframeRect = iframe.getBoundingClientRect();
       const x = e.clientX - iframeRect.left;
@@ -701,12 +695,12 @@ export function useCanvasDragDrop() {
         return;
       }
       e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
+      e.dataTransfer.dropEffect = "move";
       currentDestRef.current = res.destination;
       setOverlay(computeOverlay(res));
       setLastHovered(res.destination);
     },
-    [isDragging, resolveDrop, computeOverlay, setLastHovered]
+    [isDragging, resolveDrop, computeOverlay, setLastHovered],
   );
 
   const onDragLeave = useCallback(
@@ -721,7 +715,7 @@ export function useCanvasDragDrop() {
       }
       clear();
     },
-    [clear]
+    [clear],
   );
 
   const onDrop = useCallback(
@@ -736,16 +730,19 @@ export function useCanvasDragDrop() {
         clear();
         return;
       }
-      const iframe = containerRef.current?.querySelector('iframe');
+      const iframe = containerRef.current?.querySelector("iframe");
       if (!iframe) return;
       const iframeRect = iframe.getBoundingClientRect();
-      const res = resolveDrop(e.clientX - iframeRect.left, e.clientY - iframeRect.top);
+      const res = resolveDrop(
+        e.clientX - iframeRect.left,
+        e.clientY - iframeRect.top,
+      );
       if (!res) return;
       e.preventDefault();
       dropNode(res.destination);
       clear();
     },
-    [isDragging, resolveDrop, dropNode, clear]
+    [isDragging, resolveDrop, dropNode, clear],
   );
 
   return {

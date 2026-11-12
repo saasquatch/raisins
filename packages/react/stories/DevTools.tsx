@@ -1,4 +1,4 @@
-import { useAtomsSnapshot } from 'jotai/devtools';
+import { useAtomsSnapshot } from "jotai/devtools";
 
 export const RegisteredAtoms = () => {
   const atoms = useAtomsSnapshot();
@@ -20,7 +20,7 @@ export const RegisteredAtoms = () => {
               }
               return (
                 <tr key={`${atom}`}>
-                  <td>{`${atom} - ${atom.debugLabel ?? ''}`}</td>
+                  <td>{`${atom} - ${atom.debugLabel ?? ""}`}</td>
                   <td>
                     <details>
                       <summary>{typeof atomValue}</summary>

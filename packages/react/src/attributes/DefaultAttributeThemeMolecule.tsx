@@ -1,22 +1,22 @@
-import { isElementNode } from '@raisins/core';
-import { molecule, useMolecule } from 'bunshi/react';
-import { atom, useAtom, useAtomValue } from 'jotai';
-import React from 'react';
-import { AttributeMolecule } from './AttributeMolecule.tsx';
+import { isElementNode } from "@raisins/core";
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtom, useAtomValue } from "jotai";
+import React from "react";
+import { SelectedNodeMolecule } from "../core/index.ts";
+import {
+  CssEditingMolecule,
+  RAISIN_CSS_ATTR,
+} from "../css-editing/CssEditingMolecule.tsx";
+import { AttributeMolecule } from "./AttributeMolecule.tsx";
 import type {
   AttributeField,
   AttributeTemplate,
   AttributeThemeMoleculeValue,
   AttributeWidget,
-} from './AttributeThemeMolecule.tsx';
-import { DefaultAttributeComponent } from './AttributeThemeMolecule.tsx';
-import {
-  CssEditingMolecule,
-  RAISIN_CSS_ATTR,
-} from '../css-editing/CssEditingMolecule.tsx';
-import { SelectedNodeMolecule } from '../core/index.ts';
+} from "./AttributeThemeMolecule.tsx";
+import { DefaultAttributeComponent } from "./AttributeThemeMolecule.tsx";
 
-export const DefaultAttributeTemplate: AttributeTemplate = props => {
+export const DefaultAttributeTemplate: AttributeTemplate = (props) => {
   const { name, schemaAtom } = useMolecule(AttributeMolecule);
   const schema = useAtomValue(schemaAtom);
 
@@ -47,7 +47,7 @@ export const DefaultTextWidget: AttributeWidget = () => {
     <input
       type="text"
       value={value}
-      onInput={e => setValue((e.target as HTMLInputElement).value)}
+      onInput={(e) => setValue((e.target as HTMLInputElement).value)}
     />
   );
 };
@@ -59,7 +59,7 @@ export const DefaultBooleanWidget: AttributeWidget = () => {
     <input
       type="checkbox"
       checked={value}
-      onChange={e => setValue((e.target as HTMLInputElement).checked)}
+      onChange={(e) => setValue((e.target as HTMLInputElement).checked)}
     />
   );
 };
@@ -71,7 +71,7 @@ export const DefaultNumberWidget: AttributeWidget = () => {
     <input
       type="number"
       value={value}
-      onInput={e => setValue(+(e.target as HTMLInputElement).value)}
+      onInput={(e) => setValue(+(e.target as HTMLInputElement).value)}
     />
   );
 };
@@ -83,9 +83,11 @@ export const DefaultSelectWidget: AttributeWidget = () => {
   const schema = useAtomValue(schemaAtom);
 
   return (
-    <select value={value} onChange={e => setValue(e.target.value)}>
+    <select value={value} onChange={(e) => setValue(e.target.value)}>
       {schema.enum?.map((key, idx) => (
-        <option key={key} value={key}>{schema.enumNames?.[idx] ?? key}</option>
+        <option key={key} value={key}>
+          {schema.enumNames?.[idx] ?? key}
+        </option>
       ))}
     </select>
   );
@@ -106,9 +108,9 @@ export const DefaultCssWidget: AttributeWidget = () => {
   return (
     <textarea
       rows={6}
-      style={{ width: '100%', fontFamily: 'monospace' }}
-      value={value ?? ''}
-      onChange={e => {
+      style={{ width: "100%", fontFamily: "monospace" }}
+      value={value ?? ""}
+      onChange={(e) => {
         const next = (e.target as HTMLTextAreaElement).value;
         if (name === RAISIN_CSS_ATTR && node && isElementNode(node)) {
           setInstanceCss({ node, css: next });
@@ -120,23 +122,22 @@ export const DefaultCssWidget: AttributeWidget = () => {
   );
 };
 
-export const DefaultAttributeThemeMolecule = molecule<
-  AttributeThemeMoleculeValue
->(() => {
-  return {
-    widgets: atom<{}>({
-      text: DefaultTextWidget,
-      boolean: DefaultBooleanWidget,
-      number: DefaultNumberWidget,
-      select: DefaultSelectWidget,
-      css: DefaultCssWidget,
-      [DefaultAttributeComponent]: DefaultTextWidget,
-    }),
-    templates: atom({
-      [DefaultAttributeComponent]: DefaultAttributeTemplate,
-    }),
-    fields: atom({
-      [DefaultAttributeComponent]: DefaultAttributeField,
-    }),
-  };
-});
+export const DefaultAttributeThemeMolecule =
+  molecule<AttributeThemeMoleculeValue>(() => {
+    return {
+      widgets: atom<{}>({
+        text: DefaultTextWidget,
+        boolean: DefaultBooleanWidget,
+        number: DefaultNumberWidget,
+        select: DefaultSelectWidget,
+        css: DefaultCssWidget,
+        [DefaultAttributeComponent]: DefaultTextWidget,
+      }),
+      templates: atom({
+        [DefaultAttributeComponent]: DefaultAttributeTemplate,
+      }),
+      fields: atom({
+        [DefaultAttributeComponent]: DefaultAttributeField,
+      }),
+    };
+  });

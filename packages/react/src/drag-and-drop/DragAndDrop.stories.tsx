@@ -1,42 +1,11 @@
-import type { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { htmlParser } from '@raisins/core';
-import type { Meta } from '@storybook/react';
-import { useMolecule } from 'bunshi/react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import type { CSSProperties } from 'react';
-import React from 'react';
-import { PickAndPlopMolecule, SelectedNodeController } from '../core/index.ts';
-import {
-  SelectedNodeMolecule,
-} from '../core/selection/SelectedNodeMolecule.tsx';
-import type { Block } from '../component-metamodel/index.ts';
-import { ComponentModelMolecule } from '../component-metamodel/index.ts';
-import { big, MintComponents, mintMono } from '../examples/MintComponents.tsx';
-import {
-  referrerWidget,
-  VanillaComponents,
-} from '../examples/VanillaComponents.tsx';
-import { useHotkeys } from '../hotkeys/index.ts';
-import { BasicStory } from '../index.stories.tsx';
-import { AttributesController } from '../attributes/index.ts';
-import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
-import {
-  useDragBlock,
-  useDragSelectedNode,
-  useDropTarget,
-} from './useDragAndDrop.tsx';
-import {
-  NodeChildrenEditor,
-  ChildrenEditorForAtoms,
-} from '../node/NodeChildrenEditor.tsx';
-import { NodeMolecule } from '../node/NodeMolecule.tsx';
-import { NodeScopeProvider } from '../node/NodeScope.tsx';
-import {
-  SlotChildrenController,
-} from '../node/slots/SlotChildrenController.tsx';
-import { SlotMolecule, SlotScopeProvider } from '../node/slots/SlotScope.tsx';
-import { NodeRichTextController } from '../rich-text/RichTextEditor.tsx';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import type { RaisinDocumentNode, RaisinElementNode } from "@raisins/core";
+import { htmlParser } from "@raisins/core";
+import type { Meta } from "@storybook/react";
+import { useMolecule } from "bunshi/react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import type { CSSProperties } from "react";
+import React from "react";
+import { AttributesController } from "../attributes/index.ts";
 import {
   BasicCanvasController,
   CanvasDragAndDropMolecule,
@@ -45,159 +14,186 @@ import {
   CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasSelectionMolecule,
-} from '../canvas/index.ts';
+} from "../canvas/index.ts";
+import type { Block } from "../component-metamodel/index.ts";
+import { ComponentModelMolecule } from "../component-metamodel/index.ts";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { PickAndPlopMolecule, SelectedNodeController } from "../core/index.ts";
+import { DragAndDropMolecule } from "../core/selection/DragAndDropMolecule.tsx";
+import { SelectedNodeMolecule } from "../core/selection/SelectedNodeMolecule.tsx";
+import { big, MintComponents, mintMono } from "../examples/MintComponents.tsx";
+import {
+  referrerWidget,
+  VanillaComponents,
+} from "../examples/VanillaComponents.tsx";
+import { useHotkeys } from "../hotkeys/index.ts";
+import { BasicStory } from "../index.stories.tsx";
+import {
+  NodeChildrenEditor,
+  ChildrenEditorForAtoms,
+} from "../node/NodeChildrenEditor.tsx";
+import { NodeMolecule } from "../node/NodeMolecule.tsx";
+import { NodeScopeProvider } from "../node/NodeScope.tsx";
+import { SlotChildrenController } from "../node/slots/SlotChildrenController.tsx";
+import { SlotMolecule, SlotScopeProvider } from "../node/slots/SlotScope.tsx";
+import { NodeRichTextController } from "../rich-text/RichTextEditor.tsx";
+import {
+  useDragBlock,
+  useDragSelectedNode,
+  useDropTarget,
+} from "./useDragAndDrop.tsx";
 
 const meta: Meta = {
-  title: 'Drag and Drop',
+  title: "Drag and Drop",
 };
 export default meta;
 
 // -- Styles --
 
 const EditorContainer: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: '240px 1fr 240px',
-  gridTemplateRows: '1fr',
-  gap: '12px',
-  height: '100vh',
+  display: "grid",
+  gridTemplateColumns: "240px 1fr 240px",
+  gridTemplateRows: "1fr",
+  gap: "12px",
+  height: "100vh",
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '13px',
-  color: '#1a1a1a',
-  background: '#f5f5f5',
+  fontSize: "13px",
+  color: "#1a1a1a",
+  background: "#f5f5f5",
 };
 
 const SidebarStyle: CSSProperties = {
-  background: '#ffffff',
-  borderRight: '1px solid #e0e0e0',
-  padding: '16px',
-  overflowY: 'auto',
+  background: "#ffffff",
+  borderRight: "1px solid #e0e0e0",
+  padding: "16px",
+  overflowY: "auto",
 };
 
 const CanvasArea: CSSProperties = {
-  padding: '16px',
-  overflowY: 'auto',
-  background: '#ffffff',
-  borderRadius: '8px',
-  margin: '8px 0',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+  padding: "16px",
+  overflowY: "auto",
+  background: "#ffffff",
+  borderRadius: "8px",
+  margin: "8px 0",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
 };
 
 const PropertiesPanel: CSSProperties = {
-  background: '#ffffff',
-  borderLeft: '1px solid #e0e0e0',
-  padding: '16px',
-  overflowY: 'auto',
+  background: "#ffffff",
+  borderLeft: "1px solid #e0e0e0",
+  padding: "16px",
+  overflowY: "auto",
 };
 
 const BlockItem: CSSProperties = {
-  padding: '10px 12px',
-  margin: '4px 0',
-  background: '#f8f9fa',
-  border: '1px solid #e0e0e0',
-  borderRadius: '6px',
-  cursor: 'grab',
-  fontSize: '12px',
+  padding: "10px 12px",
+  margin: "4px 0",
+  background: "#f8f9fa",
+  border: "1px solid #e0e0e0",
+  borderRadius: "6px",
+  cursor: "grab",
+  fontSize: "12px",
   fontWeight: 500,
-  transition: 'all 0.15s ease',
-  userSelect: 'none',
+  transition: "all 0.15s ease",
+  userSelect: "none",
 };
 
 const BlockItemDragging: CSSProperties = {
   ...BlockItem,
   opacity: 0.5,
-  background: '#e3f2fd',
-  border: '1px solid #90caf9',
+  background: "#e3f2fd",
+  border: "1px solid #90caf9",
 };
 
 const SectionTitle: CSSProperties = {
-  fontSize: '11px',
+  fontSize: "11px",
   fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '0.5px',
-  color: '#666',
-  marginBottom: '8px',
-  marginTop: '16px',
+  textTransform: "uppercase",
+  letterSpacing: "0.5px",
+  color: "#666",
+  marginBottom: "8px",
+  marginTop: "16px",
 };
 
 const DropZone: CSSProperties = {
-  border: '2px dashed #90caf9',
-  borderRadius: '4px',
-  padding: '4px 8px',
-  margin: '2px 0',
-  textAlign: 'center',
-  fontSize: '11px',
-  color: '#1976d2',
-  transition: 'all 0.2s ease',
-  background: '#e3f2fd',
+  border: "2px dashed #90caf9",
+  borderRadius: "4px",
+  padding: "4px 8px",
+  margin: "2px 0",
+  textAlign: "center",
+  fontSize: "11px",
+  color: "#1976d2",
+  transition: "all 0.2s ease",
+  background: "#e3f2fd",
 };
 
 const DropZoneHover: CSSProperties = {
   ...DropZone,
-  border: '2px solid #1976d2',
-  padding: '12px 8px',
-  background: '#bbdefb',
-  transform: 'scaleY(1.3)',
+  border: "2px solid #1976d2",
+  padding: "12px 8px",
+  background: "#bbdefb",
+  transform: "scaleY(1.3)",
   fontWeight: 600,
 };
 
 // -- Layer styles --
 
 const LayerItem: CSSProperties = {
-  padding: '6px 8px',
-  margin: '2px 0',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  transition: 'background 0.1s ease',
+  padding: "6px 8px",
+  margin: "2px 0",
+  borderRadius: "4px",
+  cursor: "pointer",
+  transition: "background 0.1s ease",
 };
 
 const LayerItemSelected: CSSProperties = {
   ...LayerItem,
-  background: '#e3f2fd',
-  border: '1px solid #90caf9',
+  background: "#e3f2fd",
+  border: "1px solid #90caf9",
 };
 
 const LayerItemHovered: CSSProperties = {
   ...LayerItem,
-  background: '#f5f5f5',
+  background: "#f5f5f5",
 };
 
 const SlotContainer: CSSProperties = {
-  marginLeft: '12px',
-  borderLeft: '2px solid #e0e0e0',
-  paddingLeft: '8px',
+  marginLeft: "12px",
+  borderLeft: "2px solid #e0e0e0",
+  paddingLeft: "8px",
 };
 
 const SlotLabel: CSSProperties = {
-  fontSize: '10px',
-  color: '#999',
-  textTransform: 'uppercase',
-  letterSpacing: '0.3px',
-  margin: '4px 0 2px',
+  fontSize: "10px",
+  color: "#999",
+  textTransform: "uppercase",
+  letterSpacing: "0.3px",
+  margin: "4px 0 2px",
 };
 
 // -- Components --
 
 const fakeBlocks: Block[] = [
   {
-    title: 'Div',
-    content: htmlParser('<div>New div block</div>')
+    title: "Div",
+    content: htmlParser("<div>New div block</div>")
       .children[0] as RaisinElementNode,
   },
   {
-    title: 'Paragraph',
-    content: htmlParser('<p>New paragraph</p>')
+    title: "Paragraph",
+    content: htmlParser("<p>New paragraph</p>")
       .children[0] as RaisinElementNode,
   },
   {
-    title: 'Heading',
-    content: htmlParser('<h2>New heading</h2>')
+    title: "Heading",
+    content: htmlParser("<h2>New heading</h2>")
       .children[0] as RaisinElementNode,
   },
   {
-    title: 'Table',
+    title: "Table",
     content: htmlParser(
-      '<table><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr></tbody></table>'
+      "<table><tbody><tr><td>Cell 1</td><td>Cell 2</td></tr></tbody></table>",
     ).children[0] as RaisinElementNode,
   },
 ];
@@ -206,8 +202,7 @@ const fakeBlocks: Block[] = [
  * A single draggable block in the sidebar.
  */
 function DraggableBlockItem({ block }: { block: Block }) {
-  const { draggable, onDragStart, onDragEnd, isDragging } =
-    useDragBlock(block);
+  const { draggable, onDragStart, onDragEnd, isDragging } = useDragBlock(block);
 
   return (
     <div
@@ -234,22 +229,20 @@ function DragBlocksSidebar() {
   // Group blocks by their component tag or example group
   const grouped = allBlocks.reduce(
     (acc, block) => {
-      const group = block.exampleGroup || block.componentTag || 'Components';
+      const group = block.exampleGroup || block.componentTag || "Components";
       if (!acc[group]) acc[group] = [];
       acc[group].push(block);
       return acc;
     },
-    {} as Record<string, Block[]>
+    {} as Record<string, Block[]>,
   );
 
   return (
     <div style={SidebarStyle}>
-      <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>
+      <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>
         Components
       </div>
-      <div
-        style={{ fontSize: '11px', color: '#888', marginBottom: '12px' }}
-      >
+      <div style={{ fontSize: "11px", color: "#888", marginBottom: "12px" }}>
         Drag a component to add it to the editor
       </div>
       {Object.entries(grouped).map(([group, groupBlocks]) => (
@@ -295,7 +288,7 @@ function DragDropLayersController() {
 
   return (
     <div>
-      <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>
+      <div style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>
         Layers
       </div>
       <NodeScopeProvider nodeAtom={RootNodeAtom}>
@@ -353,9 +346,9 @@ function DragDropElementLayer() {
     <div style={style}>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
         onClick={setSelected}
         onMouseOver={setHovered}
@@ -363,7 +356,7 @@ function DragDropElementLayer() {
         <span style={{ fontWeight: isSelected ? 600 : 400 }}>
           {title}
           {isPicked && (
-            <span style={{ color: '#1976d2', marginLeft: '4px' }}>
+            <span style={{ color: "#1976d2", marginLeft: "4px" }}>
               (moving)
             </span>
           )}
@@ -375,7 +368,7 @@ function DragDropElementLayer() {
               duplicate();
             }}
             disabled={isActive}
-            style={{ fontSize: '10px', marginRight: '2px' }}
+            style={{ fontSize: "10px", marginRight: "2px" }}
           >
             ⊕
           </button>
@@ -385,7 +378,7 @@ function DragDropElementLayer() {
               removeNode();
             }}
             disabled={isActive}
-            style={{ fontSize: '10px' }}
+            style={{ fontSize: "10px" }}
           >
             ✕
           </button>
@@ -405,7 +398,7 @@ function DragDropSlotWidget() {
   const childNodes = useAtomValue(atoms.childrenInSlot);
   const slotDetails = useAtomValue(atoms.slotDetails);
   const slotWidget = slotDetails.editor;
-  const hasEditor = slotWidget === 'inline';
+  const hasEditor = slotWidget === "inline";
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   if (hasEditor) {
@@ -489,15 +482,15 @@ function MoveSelectedHandle() {
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       style={{
-        cursor: 'grab',
-        userSelect: 'none',
-        padding: '6px 10px',
-        marginBottom: '12px',
-        border: '1px solid #1976d2',
-        borderRadius: '4px',
-        color: '#1976d2',
-        background: isDragging ? '#e3f2fd' : '#ffffff',
-        textAlign: 'center',
+        cursor: "grab",
+        userSelect: "none",
+        padding: "6px 10px",
+        marginBottom: "12px",
+        border: "1px solid #1976d2",
+        borderRadius: "4px",
+        color: "#1976d2",
+        background: isDragging ? "#e3f2fd" : "#ffffff",
+        textAlign: "center",
       }}
     >
       ⠿ Drag to move selected
@@ -518,15 +511,19 @@ function DragDropEditor() {
       </div>
       <div style={PropertiesPanel}>
         <div
-          style={{ fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}
+          style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}
         >
           Properties
         </div>
         <MoveSelectedHandle />
-        <SelectedNodeController
-          HasSelectionComponent={AttributesController}
+        <SelectedNodeController HasSelectionComponent={AttributesController} />
+        <hr
+          style={{
+            border: "none",
+            borderTop: "1px solid #eee",
+            margin: "16px 0",
+          }}
         />
-        <hr style={{ border: 'none', borderTop: '1px solid #eee', margin: '16px 0' }} />
         <DragDropLayersController />
       </div>
     </div>
@@ -550,7 +547,7 @@ export function DragAndDropBasic() {
     </BasicStory>
   );
 }
-DragAndDropBasic.storyName = 'Basic HTML';
+DragAndDropBasic.storyName = "Basic HTML";
 
 export function DragAndDropMint() {
   return (
@@ -559,7 +556,7 @@ export function DragAndDropMint() {
     </BasicStory>
   );
 }
-DragAndDropMint.storyName = 'Mint Components';
+DragAndDropMint.storyName = "Mint Components";
 
 export function DragAndDropVanilla() {
   return (
@@ -571,7 +568,7 @@ export function DragAndDropVanilla() {
     </BasicStory>
   );
 }
-DragAndDropVanilla.storyName = 'Vanilla Components';
+DragAndDropVanilla.storyName = "Vanilla Components";
 
 export function DragAndDropBig() {
   return (
@@ -580,4 +577,4 @@ export function DragAndDropBig() {
     </BasicStory>
   );
 }
-DragAndDropBig.storyName = 'Big Document';
+DragAndDropBig.storyName = "Big Document";

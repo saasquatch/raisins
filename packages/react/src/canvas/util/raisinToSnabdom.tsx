@@ -2,19 +2,19 @@ import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
-import { cssSerializer, htmlUtil } from '@raisins/core';
-import type { VNode, VNodeData } from 'snabbdom';
-import { h, fragment } from 'snabbdom';
-import styleToObject from 'style-to-object';
+} from "@raisins/core";
+import { cssSerializer, htmlUtil } from "@raisins/core";
+import type { VNode, VNodeData } from "snabbdom";
+import { h, fragment } from "snabbdom";
+import styleToObject from "style-to-object";
 import {
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from '../../css-editing/RaisinCssIds.ts';
-import type { RootRenderer } from '../types.tsx';
+} from "../../css-editing/RaisinCssIds.ts";
+import type { RootRenderer } from "../types.tsx";
 const { visit } = htmlUtil;
 
-const GLOBAL_ENTRY = 'body';
+const GLOBAL_ENTRY = "body";
 
 /**
  * Modifies a Snabbdom node
@@ -24,12 +24,12 @@ const GLOBAL_ENTRY = 'body';
  */
 export type SnabbdomRenderer = (
   d: VNodeData,
-  n: RaisinElementNode
+  n: RaisinElementNode,
 ) => VNodeData;
 
 export type SnabbdomAppender = (
   children: Array<VNode | string> | undefined,
-  n: RaisinNodeWithChildren
+  n: RaisinNodeWithChildren,
 ) => Array<VNode | string> | undefined;
 
 /**
@@ -58,23 +58,23 @@ export function raisinToSnabbdom(
   node: RaisinDocumentNode,
   modifier: SnabbdomRenderer = (d, n) => d,
   appender: SnabbdomAppender = (c, n) => c,
-  rootRenderer?: RootRenderer
+  rootRenderer?: RootRenderer,
 ): VNode {
   const vnode = visit<VNode | string>(node, {
     onComment(c) {
-      return h('!', c.data);
+      return h("!", c.data);
     },
     onStyle(el) {
       // Rendered via the managed stylesheet instead, to avoid applying it twice.
       if (el.attribs[RAISIN_DOCUMENT_CSS_ATTR]) {
-        return h('!', 'raisin-document-css');
+        return h("!", "raisin-document-css");
       } else if (el.attribs[RAISIN_MANAGED_CSS_ATTR]) {
-        return h('!', 'raisin-managed-css');
+        return h("!", "raisin-managed-css");
       }
       return h(
-        'style',
+        "style",
         { attrs: el.attribs },
-        el.contents && cssSerializer(el.contents)
+        el.contents && cssSerializer(el.contents),
       );
     },
     onElement(el, children) {
@@ -85,13 +85,13 @@ export function raisinToSnabbdom(
         }
       } catch (e) {
         // If the style string is malformed, avoid throwing an error that breaks the entire render
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('Failed to serialize style for', el.tagName, e);
+        if (process.env.NODE_ENV === "development") {
+          console.warn("Failed to serialize style for", el.tagName, e);
         }
         styleObj = {};
       }
 
-      if (el.tagName === 'template') {
+      if (el.tagName === "template") {
         return h(
           el.tagName,
           modifier(
@@ -106,14 +106,14 @@ export function raisinToSnabbdom(
               // https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment
               templateContent: fragment(appender(children, el)),
             },
-            el
-          )
+            el,
+          ),
         );
       }
       return h(
         el.tagName,
         modifier({ attrs: el.attribs, style: styleObj }, el),
-        appender(children, el)
+        appender(children, el),
       );
     },
     onText(text) {

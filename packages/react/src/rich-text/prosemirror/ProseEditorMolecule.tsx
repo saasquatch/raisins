@@ -1,6 +1,6 @@
-import { molecule } from 'bunshi/react';
-import { ProseEditorStateMolecule } from './ProseEditorStateMolecule.tsx';
-import { ProseEditorViewMolecule } from './ProseEditorViewMolecule.tsx';
+import { molecule } from "bunshi/react";
+import { ProseEditorStateMolecule } from "./ProseEditorStateMolecule.tsx";
+import { ProseEditorViewMolecule } from "./ProseEditorViewMolecule.tsx";
 
 export const ProseEditorMolecule = molecule((getMol) => {
   return {

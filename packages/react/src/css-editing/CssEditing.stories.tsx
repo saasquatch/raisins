@@ -1,20 +1,16 @@
-import React from 'react';
-import { useMolecule } from 'bunshi/react';
-import { BasicCanvasController } from '../canvas/CanvasController.tsx';
-import { CanvasProvider } from '../canvas/CanvasScope.tsx';
-import {
-  CanvasSelectionMolecule,
-} from '../canvas/plugins/CanvasSelectionMolecule.tsx';
-import {
-  SelectedNodeController,
-} from '../core/selection/SelectedNodeController.tsx';
-import { LocalBedrockComponents } from '../examples/MintComponents.tsx';
-import { BasicStory } from '../index.stories.tsx';
-import { DocumentCssEditor } from './DocumentCssMolecule.tsx';
-import { StylePanel } from './StyleMolecule.tsx';
+import { useMolecule } from "bunshi/react";
+import React from "react";
+import { BasicCanvasController } from "../canvas/CanvasController.tsx";
+import { CanvasProvider } from "../canvas/CanvasScope.tsx";
+import { CanvasSelectionMolecule } from "../canvas/plugins/CanvasSelectionMolecule.tsx";
+import { SelectedNodeController } from "../core/selection/SelectedNodeController.tsx";
+import { LocalBedrockComponents } from "../examples/MintComponents.tsx";
+import { BasicStory } from "../index.stories.tsx";
+import { DocumentCssEditor } from "./DocumentCssMolecule.tsx";
+import { StylePanel } from "./StyleMolecule.tsx";
 
 export default {
-  title: 'Css Editing',
+  title: "Css Editing",
 };
 
 const plainHtml = `<div class="card">
@@ -25,7 +21,7 @@ const plainHtml = `<div class="card">
 const kitchenSinkHtml = `<my-ui-component first="Ada" last="Lovelace"></my-ui-component>`;
 
 const NoSelection = () => (
-  <p style={{ color: '#888' }}>Select an element in the canvas to style it.</p>
+  <p style={{ color: "#888" }}>Select an element in the canvas to style it.</p>
 );
 
 const Editor: React.FC<{ Panel: React.ComponentType }> = ({ Panel }) => {
@@ -110,21 +106,22 @@ export const CssParts = () => (
 );
 
 const LayoutStyle: React.CSSProperties = {
-  display: 'flex',
-  height: '100vh',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  display: "flex",
+  height: "100vh",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   fontSize: 13,
 };
 
 const SidebarStyle: React.CSSProperties = {
-  flex: '0 0 320px',
-  overflowY: 'auto',
+  flex: "0 0 320px",
+  overflowY: "auto",
   padding: 12,
-  borderRight: '1px solid #e0e0e0',
+  borderRight: "1px solid #e0e0e0",
 };
 
 const MainStyle: React.CSSProperties = {
   flex: 1,
-  overflowY: 'auto',
+  overflowY: "auto",
   padding: 12,
 };

@@ -1,26 +1,26 @@
-import type { Molecule } from 'bunshi/react';
-import { createScope, molecule } from 'bunshi/react';
-import type { Atom, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import type { AsyncMethodReturns, Connection } from 'penpal';
-import { connectToChild } from 'penpal';
-import type { MutableRefObject } from 'react';
-import type { VNode } from 'snabbdom';
-import { throttle } from 'throttle-debounce';
-import type { NPMRegistry } from '../../util/NPMRegistry.ts';
+import type { Molecule } from "bunshi/react";
+import { createScope, molecule } from "bunshi/react";
+import type { Atom, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import type { AsyncMethodReturns, Connection } from "penpal";
+import { connectToChild } from "penpal";
+import type { MutableRefObject } from "react";
+import type { VNode } from "snabbdom";
+import { throttle } from "throttle-debounce";
+import type { NPMRegistry } from "../../util/NPMRegistry.ts";
 import type {
   ChildRPC,
   GeometryDetail,
   ParentRPC,
   RawCanvasEvent,
-} from '../api/_CanvasRPCContract.tsx';
-import { childApiSrc } from '../injected/childApiSrc.tsx';
+} from "../api/_CanvasRPCContract.tsx";
+import { childApiSrc } from "../injected/childApiSrc.tsx";
 
 const iframeSrc = (
   head: string,
   registry: NPMRegistry,
   selector: string,
-  events: Set<string>
+  events: Set<string>,
 ) => `
 <!DOCTYPE html>
 <html>
@@ -39,14 +39,14 @@ function renderInChild(child: AsyncMethodReturns<ChildRPC>, Comp: VNode): void {
 const FPS_60 = 1000 / 60;
 
 export type ConnectionState =
-  | { type: 'uninitialized' }
-  | { type: 'initializing'; connection: Connection<ChildRPC> }
+  | { type: "uninitialized" }
+  | { type: "initializing"; connection: Connection<ChildRPC> }
   | {
-      type: 'loaded';
+      type: "loaded";
       childRpc: AsyncMethodReturns<ChildRPC>;
       connection: Connection<ChildRPC>;
     }
-  | { type: 'error'; error: unknown; connection: Connection<ChildRPC> };
+  | { type: "error"; error: unknown; connection: Connection<ChildRPC> };
 
 export const SnabbdomIframeScope = createScope<
   Molecule<SnabbdomIframeProps> | undefined
@@ -56,7 +56,7 @@ export const SnabbdomIframeMolecule = molecule((getMol, getScope) => {
   const propsMol = getScope(SnabbdomIframeScope);
   if (!propsMol)
     throw new Error(
-      'Missing SnabbdomIframeScope for SnabbdomIframeMolecule, make sure this molecule is used inside a <ScopeProvider/>'
+      "Missing SnabbdomIframeScope for SnabbdomIframeMolecule, make sure this molecule is used inside a <ScopeProvider/>",
     );
   const props = getMol(propsMol);
   return createAtoms(props);
@@ -96,9 +96,9 @@ export function createAtoms(props: SnabbdomIframeProps) {
 
   const connectionAtom = atom<Atom<ConnectionState>>((get) => {
     const iframe = get(iframeAtom);
-    if (!iframe) return atom({ type: 'uninitialized' });
+    if (!iframe) return atom({ type: "uninitialized" });
 
-    const internalState = atom<ConnectionState>({ type: 'uninitialized' });
+    const internalState = atom<ConnectionState>({ type: "uninitialized" });
 
     type ConnectionRef = MutableRefObject<Connection<any> | null>;
 
@@ -126,24 +126,24 @@ export function createAtoms(props: SnabbdomIframeProps) {
           // Methods the parent is exposing to the child
           methods: parentRPC,
           timeout: 5000,
-          childOrigin: 'null',
+          childOrigin: "null",
         });
         // for atom `onMount` cleanup
         connectionRef.current = connection;
         //  { type: 'uninitialized' }
-        set(internalState, { type: 'initializing', connection });
+        set(internalState, { type: "initializing", connection });
         // { type: 'initializing'; connection: Connection }
         (async () => {
           try {
             const childRpc = await connection.promise;
             // { type: 'loaded'; childRpc: ChildRPC; connection: Connection }
-            set(internalState, { type: 'loaded', childRpc, connection });
+            set(internalState, { type: "loaded", childRpc, connection });
           } catch (error) {
             // { type: 'error'; error: Error; connection: Connection };
-            set(internalState, { type: 'error', error, connection });
+            set(internalState, { type: "error", error, connection });
           }
         })();
-      }
+      },
     );
 
     penpalStateAtom.onMount = (start) => {
@@ -162,13 +162,13 @@ export function createAtoms(props: SnabbdomIframeProps) {
 
   const throttledRender = throttle(
     FPS_60,
-    renderInChild
+    renderInChild,
   ) as typeof renderInChild;
 
   const lastRenderedComponent = atom<VNode | undefined>((get) => {
     const whichConnected = get(connectionAtom);
     const connectionStatus = get(whichConnected);
-    if (connectionStatus.type !== 'loaded') return undefined;
+    if (connectionStatus.type !== "loaded") return undefined;
 
     const component = get(props.vnodeAtom);
 
@@ -184,7 +184,7 @@ export function createAtoms(props: SnabbdomIframeProps) {
     },
     (_, set, el: HTMLElement | null) => {
       set(containerAtom, el);
-    }
+    },
   );
 
   return external;
@@ -192,9 +192,9 @@ export function createAtoms(props: SnabbdomIframeProps) {
 
 function createIframeAtom(
   containerAtom: Atom<HTMLElement | null>,
-  iframeSource: Atom<string>
+  iframeSource: Atom<string>,
 ) {
-  const mutableIframeRefAtom = atom(() => ({} as { prev?: HTMLIFrameElement }));
+  const mutableIframeRefAtom = atom(() => ({}) as { prev?: HTMLIFrameElement });
 
   const iframeAtom = atom<HTMLIFrameElement | undefined>((get) => {
     const el = get(containerAtom);
@@ -208,15 +208,15 @@ function createIframeAtom(
       mutableIframeRef.prev = undefined;
       return undefined;
     }
-    const iframe: HTMLIFrameElement = document.createElement('iframe');
+    const iframe: HTMLIFrameElement = document.createElement("iframe");
     iframe.srcdoc = get(iframeSource);
-    iframe.width = '100%';
-    iframe.scrolling = 'no';
+    iframe.width = "100%";
+    iframe.scrolling = "no";
     iframe.setAttribute(
-      'style',
-      'border: 0; background-color: none; width: 1px; min-width: 100%;'
+      "style",
+      "border: 0; background-color: none; width: 1px; min-width: 100%;",
     );
-    iframe.setAttribute('sandbox', 'allow-scripts');
+    iframe.setAttribute("sandbox", "allow-scripts");
     el.appendChild(iframe);
 
     mutableIframeRef.prev = iframe;

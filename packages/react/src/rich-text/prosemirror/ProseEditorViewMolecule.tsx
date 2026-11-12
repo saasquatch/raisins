@@ -1,9 +1,9 @@
-import type { Atom, SetStateAction } from 'jotai';
-import { atom } from 'jotai';
-import { createScope, molecule } from 'bunshi/react';
-import { EditorView } from 'prosemirror-view';
-import connectedAtom from '../../util/atoms/connectedAtom.tsx';
-import { ProseEditorStateMolecule } from './ProseEditorStateMolecule.tsx';
+import { createScope, molecule } from "bunshi/react";
+import type { Atom, SetStateAction } from "jotai";
+import { atom } from "jotai";
+import { EditorView } from "prosemirror-view";
+import connectedAtom from "../../util/atoms/connectedAtom.tsx";
+import { ProseEditorStateMolecule } from "./ProseEditorStateMolecule.tsx";
 
 /**
  * Wraps a ProseMirror {@link EditorView} in a way that works with atomic state in jotai
@@ -33,7 +33,7 @@ export const ProseEditorViewMolecule = molecule((getMol, getScope) => {
           dispatchTransaction: (tr) => set(editorStateAtom, tr),
         });
       },
-      (view) => view && view.destroy()
+      (view) => view && view.destroy(),
     );
   });
 
@@ -53,7 +53,7 @@ export const ProseEditorViewMolecule = molecule((getMol, getScope) => {
     },
     (_, set, next: SetStateAction<HTMLElement | null>) => {
       set(elementRef, next);
-    }
+    },
   );
   return {
     viewAtom,

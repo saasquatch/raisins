@@ -1,21 +1,21 @@
-import { DefaultTextMarks } from '@raisins/core';
-import { molecule } from 'bunshi/react';
-import type { WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { atomFamily } from 'jotai/utils';
-import type { MarkType } from 'prosemirror-model';
-import type { EditorState } from 'prosemirror-state';
-import React from 'react';
-import { ProseEditorStateMolecule } from '../ProseEditorStateMolecule.tsx';
-import { ProseToggleMarkMolecule } from '../ProseToggleMarkMolecule.tsx';
-import { DefaultProseSchema } from './DefaultProseSchema.ts';
+import { DefaultTextMarks } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { atomFamily } from "jotai/utils";
+import type { MarkType } from "prosemirror-model";
+import type { EditorState } from "prosemirror-state";
+import React from "react";
+import { ProseEditorStateMolecule } from "../ProseEditorStateMolecule.tsx";
+import { ProseToggleMarkMolecule } from "../ProseToggleMarkMolecule.tsx";
+import { DefaultProseSchema } from "./DefaultProseSchema.ts";
 
 type ToggleMarkAtom = WritableAtom<
   boolean,
   React.MouseEvent<Element, MouseEvent>[],
   void
 >;
-type MarkKey = typeof DefaultTextMarks[number];
+type MarkKey = (typeof DefaultTextMarks)[number];
 
 /**
  * A molecule for making mutations to a {@link ProseEditor} to add
@@ -30,7 +30,7 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
       (get) => markActive(get(stateAtom), mark),
       (_, set, e: React.MouseEvent) => {
         set(toggleMarks.toggleMarkAtom, { e, mark });
-      }
+      },
     );
   };
   const toggleMarkAtomFamily = atomFamily(toggleMarkAtom);
@@ -41,7 +41,7 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
       const hasLink = markActive(get(stateAtom), DefaultProseSchema.marks.link);
 
       if (!hasLink) {
-        const href = window.prompt('What link?');
+        const href = window.prompt("What link?");
         if (!href) return;
         // Add mark
         set(toggleMarks.toggleMarkAtom, {
@@ -56,19 +56,22 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
           mark: DefaultProseSchema.marks.link,
         });
       }
-    }
+    },
   );
 
   type ToggleMethodType = `toggle${Capitalize<MarkKey>}`;
 
-  const toggleDefaultMarks = DefaultTextMarks.reduce((atoms, mark) => {
-    return {
-      ...atoms,
-      [`toggle${capitalizeFirst(mark)}`]: toggleMarkAtomFamily(
-        DefaultProseSchema.marks[mark]
-      ),
-    };
-  }, {} as Record<ToggleMethodType, ToggleMarkAtom>);
+  const toggleDefaultMarks = DefaultTextMarks.reduce(
+    (atoms, mark) => {
+      return {
+        ...atoms,
+        [`toggle${capitalizeFirst(mark)}`]: toggleMarkAtomFamily(
+          DefaultProseSchema.marks[mark],
+        ),
+      };
+    },
+    {} as Record<ToggleMethodType, ToggleMarkAtom>,
+  );
 
   return {
     ...toggleDefaultMarks,
@@ -88,5 +91,5 @@ function markActive(state: EditorState, type: MarkType): boolean {
 
 const capitalizeFirst = ([first, ...rest]: string): string => {
   if (!Array.isArray(rest)) return `${first.toUpperCase()}${rest}`;
-  return `${first.toUpperCase()}${rest.join('')}`;
+  return `${first.toUpperCase()}${rest.join("")}`;
 };

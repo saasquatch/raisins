@@ -1,8 +1,8 @@
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { toggleMark } from 'prosemirror-commands';
-import type { MarkType } from 'prosemirror-model';
-import { ProseEditorStateMolecule } from './ProseEditorStateMolecule.tsx';
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { toggleMark } from "prosemirror-commands";
+import type { MarkType } from "prosemirror-model";
+import { ProseEditorStateMolecule } from "./ProseEditorStateMolecule.tsx";
 
 type ToggleMarkAction = {
   mark: MarkType;
@@ -20,7 +20,7 @@ export const ProseToggleMarkMolecule = molecule((getMol) => {
       e.preventDefault();
       const state = get(stateAtom);
       toggleMark(mark, attrs)(state, (tr) => set(stateAtom, tr));
-    }
+    },
   );
 
   return {

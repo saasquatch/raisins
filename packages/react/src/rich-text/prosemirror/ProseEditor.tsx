@@ -1,8 +1,8 @@
-import { useAtom } from 'jotai';
-import { ScopeProvider, useMolecule } from 'bunshi/react';
-import React from 'react';
-import { ProseEditorMolecule } from './ProseEditorMolecule.tsx';
-import { ProseEditorViewScope } from './ProseEditorViewMolecule.tsx';
+import { ScopeProvider, useMolecule } from "bunshi/react";
+import { useAtom } from "jotai";
+import React from "react";
+import { ProseEditorMolecule } from "./ProseEditorMolecule.tsx";
+import { ProseEditorViewScope } from "./ProseEditorViewMolecule.tsx";
 
 export const ProseEditor = () => {
   return (

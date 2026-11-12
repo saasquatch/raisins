@@ -1,6 +1,6 @@
-import type { PrimitiveAtom, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { createMemoizeAtom } from '../weakCache.ts';
+import type { PrimitiveAtom, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { createMemoizeAtom } from "../weakCache.ts";
 
 const memoizeAtom = createMemoizeAtom();
 
@@ -12,13 +12,13 @@ export function polymorphicAtom<T, V, A>(
   nodeAtom: PrimitiveAtom<T>,
   router: (
     node: T,
-    nodeAtom: PrimitiveAtom<T>
-  ) => WritableAtom<V, A[], void> | undefined
+    nodeAtom: PrimitiveAtom<T>,
+  ) => WritableAtom<V, A[], void> | undefined,
 ) {
   return memoizeAtom(
     () =>
       atom(
-        get => {
+        (get) => {
           const value = get(nodeAtom);
           const atomForType = router(value, nodeAtom);
           if (!atomForType) return undefined;
@@ -29,8 +29,8 @@ export function polymorphicAtom<T, V, A>(
           const atomForType = router(value, nodeAtom);
           if (!atomForType) return;
           set(atomForType, action);
-        }
+        },
       ),
-    [nodeAtom, router]
+    [nodeAtom, router],
   );
 }

@@ -1,17 +1,16 @@
-import type { RaisinElementNode, RaisinNode } from '@raisins/core';
-import type { Meta } from '@storybook/react';
+import type { RaisinElementNode, RaisinNode } from "@raisins/core";
+import type { Meta } from "@storybook/react";
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'bunshi/react';
-import type { Atom } from 'jotai';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-
-import JSONPointer from 'jsonpointer';
-import type { CSSProperties } from 'react';
-import React, { useMemo } from 'react';
+} from "bunshi/react";
+import type { Atom } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import JSONPointer from "jsonpointer";
+import type { CSSProperties } from "react";
+import React, { useMemo } from "react";
 import {
   BasicCanvasController,
   CanvasHoveredMolecule,
@@ -19,20 +18,18 @@ import {
   CanvasProvider,
   CanvasScopeMolecule,
   CanvasSelectionMolecule,
-} from './canvas/index.ts';
-import type { SnabbdomRenderer } from './canvas/util/raisinToSnabdom.tsx';
-import type { Module } from './component-metamodel/index.ts';
-import { ComponentModelMolecule } from './component-metamodel/index.ts';
-import {
-  PackageEditor,
-} from './component-metamodel/ComponentModel.stories.tsx';
-import { CoreMolecule, SelectedNodeMolecule } from './core/index.ts';
-import { HistoryMolecule } from './core/editting/HistoryAtoms.tsx';
-import type { RaisinConfig } from './core/RaisinConfigScope.tsx';
-import { RaisinsProvider } from './core/RaisinConfigScope.tsx';
-import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule.tsx';
-import { DocumentCssEditor } from './css-editing/DocumentCssMolecule.tsx';
-import { StylePanel } from './css-editing/StyleMolecule.tsx';
+} from "./canvas/index.ts";
+import type { SnabbdomRenderer } from "./canvas/util/raisinToSnabdom.tsx";
+import { PackageEditor } from "./component-metamodel/ComponentModel.stories.tsx";
+import type { Module } from "./component-metamodel/index.ts";
+import { ComponentModelMolecule } from "./component-metamodel/index.ts";
+import { HistoryMolecule } from "./core/editting/HistoryAtoms.tsx";
+import { CoreMolecule, SelectedNodeMolecule } from "./core/index.ts";
+import type { RaisinConfig } from "./core/RaisinConfigScope.tsx";
+import { RaisinsProvider } from "./core/RaisinConfigScope.tsx";
+import { HoveredNodeMolecule } from "./core/selection/HoveredNodeMolecule.tsx";
+import { DocumentCssEditor } from "./css-editing/DocumentCssMolecule.tsx";
+import { StylePanel } from "./css-editing/StyleMolecule.tsx";
 import {
   big,
   LocalBedrockComponents,
@@ -41,29 +38,25 @@ import {
   mintTemplates,
   NextComponents,
   templateExample,
-} from './examples/MintComponents.tsx';
+} from "./examples/MintComponents.tsx";
 import {
   referrerWidget,
   VanillaComponents,
-} from './examples/VanillaComponents.tsx';
-import { useHotkeys } from './hotkeys/useHotkeys.ts';
-import { NodeMolecule } from './node/index.ts';
-import {
-  LayersController,
-} from './node/slots/SlotChildrenController.stories.tsx';
-import {
-  SelectedNodeRichTextEditor,
-} from './rich-text/SelectedNodeRichTextEditor.tsx';
+} from "./examples/VanillaComponents.tsx";
+import { useHotkeys } from "./hotkeys/useHotkeys.ts";
+import { NodeMolecule } from "./node/index.ts";
+import { LayersController } from "./node/slots/SlotChildrenController.stories.tsx";
+import { SelectedNodeRichTextEditor } from "./rich-text/SelectedNodeRichTextEditor.tsx";
 
 const meta: Meta = {
-  title: 'Editor',
+  title: "Editor",
   component: Editor,
-  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
+  excludeStories: ["EditorView", "StoryConfigMolecule", "ErrorListController"],
 };
 export default meta;
 
 const StoryScope = createScope({
-  startingHtml: '<span>I am a span</span>',
+  startingHtml: "<span>I am a span</span>",
   startingPackages: [] as Module[],
 });
 
@@ -74,9 +67,9 @@ export const StoryConfigMolecule = molecule<Partial<RaisinConfig>>(
       HTMLAtom: atom(storyScope.startingHtml),
       PackagesAtom: atom(storyScope.startingPackages),
       uiWidgetsAtom: atom({}),
-      LocalURLAtom: atom('http://localhost:3000'),
+      LocalURLAtom: atom("http://localhost:3000"),
     };
-  }
+  },
 );
 
 const CanvasStyleMolecule = molecule((getMol, getScope) => {
@@ -85,31 +78,31 @@ const CanvasStyleMolecule = molecule((getMol, getScope) => {
   const outlineBaseAtom = atom(true);
 
   const OutlineAtom = atom(
-    get => get(outlineBaseAtom),
+    (get) => get(outlineBaseAtom),
     async (get, set, next: boolean) => {
       set(outlineBaseAtom, next);
       set(rerenderNodeAtom, true);
-    }
+    },
   );
-  const ModeAtom = atom<Mode>('edit');
+  const ModeAtom = atom<Mode>("edit");
   const SizeAtom = atom<Size>(sizes[0]);
 
   const CanvasAtoms = getMol(CanvasScopeMolecule);
   const { IsInteractibleAtom } = getMol(ComponentModelMolecule);
 
-  const Renderer: Atom<SnabbdomRenderer> = atom(get => {
+  const Renderer: Atom<SnabbdomRenderer> = atom((get) => {
     const isInteractible = get(IsInteractibleAtom);
     const outlined = get(OutlineAtom);
 
     const renderer: SnabbdomRenderer = (d, n) => {
-      if (!isInteractible(n)) return { ...d, outline: '', outlineOffset: '' };
+      if (!isInteractible(n)) return { ...d, outline: "", outlineOffset: "" };
 
       const { delayed, remove, ...rest } = d.style || {};
 
       const style = {
         ...rest,
-        outline: outlined ? '1px dashed #999' : '',
-        outlineOffset: outlined ? '-2px' : '',
+        outline: outlined ? "1px dashed #999" : "",
+        outlineOffset: outlined ? "-2px" : "",
       };
       return {
         ...d,
@@ -127,15 +120,15 @@ const CanvasStyleMolecule = molecule((getMol, getScope) => {
   };
 });
 
-const ErrorListMolecule = molecule(getMol => {
+const ErrorListMolecule = molecule((getMol) => {
   const { RootNodeAtom } = getMol(CoreMolecule);
   const { errorsAtom } = getMol(NodeMolecule);
 
-  const ErrorDetails = atom(get => {
+  const ErrorDetails = atom((get) => {
     const errors = get(errorsAtom);
     const root = get(RootNodeAtom);
 
-    return errors.map(e => {
+    return errors.map((e) => {
       return {
         error: e,
         node: JSONPointer.get(root, e.jsonPointer) as RaisinNode,
@@ -149,36 +142,36 @@ export function ErrorListController() {
   const { ErrorDetails } = useMolecule(ErrorListMolecule);
   const errors = useAtomValue(ErrorDetails);
   return (
-    <div style={{ color: 'red' }}>
+    <div style={{ color: "red" }}>
       Errors
       <hr />
-      <details style={{ maxHeight: '300px', overflow: 'scroll' }}>
+      <details style={{ maxHeight: "300px", overflow: "scroll" }}>
         <summary>{errors.length} errors</summary>
-        {errors.map(e => {
+        {errors.map((e) => {
           const error = e.error.error;
 
-          if (error.type === 'ancestry') {
+          if (error.type === "ancestry") {
             return (
               <li>
-                {error.rule === 'doesParentAllowChild' && (
+                {error.rule === "doesParentAllowChild" && (
                   <span>
                     {error.parentMeta?.title ??
-                      (error.parent as RaisinElementNode).type}{' '}
-                    does not allow{' '}
+                      (error.parent as RaisinElementNode).type}{" "}
+                    does not allow{" "}
                     {error.childMeta?.title ??
-                      (error.child as RaisinElementNode).tagName}{' '}
-                    inside it. Valid children are:{' '}
+                      (error.child as RaisinElementNode).tagName}{" "}
+                    inside it. Valid children are:{" "}
                     {error.parentMeta?.slots
-                      ?.map(s => s.validChildren)
-                      .join(',')}
+                      ?.map((s) => s.validChildren)
+                      .join(",")}
                   </span>
                 )}
-                {error.rule === 'doesChildAllowParent' && (
+                {error.rule === "doesChildAllowParent" && (
                   <span>
                     {error.childMeta?.title ?? error.child.type} is not allowed
                     inside of {error.parentMeta?.title ?? error.parent.type}.
-                    Valid parents are:{' '}
-                    {error.childMeta?.validParents?.join(',')}
+                    Valid parents are:{" "}
+                    {error.childMeta?.validParents?.join(",")}
                   </span>
                 )}
               </li>
@@ -197,7 +190,7 @@ export function ErrorListController() {
 }
 
 export function BasicStory({
-  startingHtml = '<span>I am a span</span>',
+  startingHtml = "<span>I am a span</span>",
   startingPackages = [] as Module[],
   children = (
     <>
@@ -215,7 +208,7 @@ export function BasicStory({
           value={{ startingHtml, startingPackages }}
         >
           <RaisinsProvider molecule={Molecule}>{children}</RaisinsProvider>
-        </ScopeProvider>{' '}
+        </ScopeProvider>{" "}
       </CanvasProvider>
     </>
   );
@@ -227,13 +220,13 @@ export function ExternalHTMLControl() {
       molecule(() => {
         return {
           HTMLAtom: atom(
-            '<div><my-thing><span slot="default">I am a span</span></my-thing></div>'
+            '<div><my-thing><span slot="default">I am a span</span></my-thing></div>',
           ),
           PackagesAtom: atom([] as Module[]),
           uiWidgetsAtom: atom({}),
         };
       }),
-    []
+    [],
   );
 
   const [html, setHtml] = useAtom(useMolecule(state).HTMLAtom);
@@ -242,7 +235,7 @@ export function ExternalHTMLControl() {
       <CanvasProvider>
         <textarea
           value={html}
-          onInput={e => setHtml((e.target as HTMLTextAreaElement).value)}
+          onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
         />
         <RaisinsProvider molecule={state}>
           <Editor />
@@ -306,7 +299,7 @@ export const CssEditing = () => (
   />
 );
 
-const ToolbarMolecule = molecule(getMol => {
+const ToolbarMolecule = molecule((getMol) => {
   return {
     ...getMol(HoveredNodeMolecule),
     ...getMol(SelectedNodeMolecule),
@@ -329,49 +322,50 @@ Editor.args = {
   /**
    * Used for serving local packages
    */
-  domain: 'https://localhost:5000',
+  domain: "https://localhost:5000",
 };
 
 const Header: CSSProperties = {
-  gridArea: 'header',
-  borderBottom: '1px solid #e0e0e0',
-  padding: '8px 12px',
-  background: '#fafafa',
+  gridArea: "header",
+  borderBottom: "1px solid #e0e0e0",
+  padding: "8px 12px",
+  background: "#fafafa",
 };
 const Edits: CSSProperties = {
-  gridArea: 'edits',
-  padding: '12px',
-  borderLeft: '1px solid #e0e0e0',
-  overflowY: 'auto',
+  gridArea: "edits",
+  padding: "12px",
+  borderLeft: "1px solid #e0e0e0",
+  overflowY: "auto",
 };
 const CanvasCss: CSSProperties = {
-  gridArea: 'canvas',
-  overflow: 'auto',
-  padding: '12px',
+  gridArea: "canvas",
+  overflow: "auto",
+  padding: "12px",
 };
 const LayersCss: CSSProperties = {
-  gridArea: 'layers',
-  overflowY: 'auto',
-  padding: '12px',
-  borderRight: '1px solid #e0e0e0',
+  gridArea: "layers",
+  overflowY: "auto",
+  padding: "12px",
+  borderRight: "1px solid #e0e0e0",
 };
 
 const Main: CSSProperties = {
-  display: 'grid',
+  display: "grid",
   gridTemplateAreas: `
     'header header header'
     'layers canvas edits'
     'footer footer footer'`,
-  gridTemplateRows: 'auto 1fr auto',
-  gridTemplateColumns: '220px 1fr 200px',
-  gridRowGap: '0',
-  gridColumnGap: '0',
-  height: '100vh',
-  margin: '0',
-  overflowY: 'hidden',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '13px',
-  color: '#1a1a1a',
+  gridTemplateRows: "auto 1fr auto",
+  gridTemplateColumns: "220px 1fr 200px",
+  gridRowGap: "0",
+  gridColumnGap: "0",
+  height: "100vh",
+  margin: "0",
+  overflowY: "hidden",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: "13px",
+  color: "#1a1a1a",
 };
 
 export function EditorView() {
@@ -410,14 +404,14 @@ export type Size = {
   height: number;
 };
 
-type Mode = 'preview' | 'edit';
+type Mode = "preview" | "edit";
 
 const sizes: Size[] = [
-  { name: 'Auto', width: 'auto', height: 1080 },
-  { name: 'Large', width: '992px', height: 1080 },
-  { name: 'Medium', width: '768px', height: 1080 },
-  { name: 'Small', width: '576px', height: 1080 },
-  { name: 'X-Small', width: '400px', height: 1080 },
+  { name: "Auto", width: "auto", height: 1080 },
+  { name: "Large", width: "992px", height: 1080 },
+  { name: "Medium", width: "768px", height: 1080 },
+  { name: "Small", width: "576px", height: 1080 },
+  { name: "X-Small", width: "400px", height: 1080 },
 ];
 
 function ToolbarController() {
@@ -432,33 +426,40 @@ function ToolbarController() {
   const hovered = useAtomValue(atoms.HoveredBreadcrumbsAtom);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-      <span style={{ fontWeight: 600, marginRight: '8px' }}>Toolbar</span>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        flexWrap: "wrap",
+      }}
+    >
+      <span style={{ fontWeight: 600, marginRight: "8px" }}>Toolbar</span>
       <button onClick={undo} disabled={historySize.undoSize <= 0}>
         Undo ({historySize.undoSize})
       </button>
       <button onClick={redo} disabled={historySize.redoSize <= 0}>
         Redo ({historySize.redoSize})
       </button>
-      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
-      <button disabled={mode === 'edit'} onClick={() => setMode('edit')}>
+      <span style={{ margin: "0 4px", color: "#666" }}>|</span>
+      <button disabled={mode === "edit"} onClick={() => setMode("edit")}>
         Edit
       </button>
-      <button disabled={mode === 'preview'} onClick={() => setMode('preview')}>
+      <button disabled={mode === "preview"} onClick={() => setMode("preview")}>
         Preview
       </button>
-      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
-      {sizes.map(s => (
+      <span style={{ margin: "0 4px", color: "#666" }}>|</span>
+      {sizes.map((s) => (
         <button onClick={() => setSize(s)} disabled={size === s} key={s.name}>
           {s.name}
         </button>
       ))}
-      <span style={{ margin: '0 4px', color: '#666' }}>|</span>
-      <button onClick={() => setOutlined(o => !o)}>
-        {outlined ? 'Outlined' : 'No Outline'}
+      <span style={{ margin: "0 4px", color: "#666" }}>|</span>
+      <button onClick={() => setOutlined((o) => !o)}>
+        {outlined ? "Outlined" : "No Outline"}
       </button>
       {hovered && (
-        <span style={{ marginLeft: '12px', color: '#666', fontSize: '12px' }}>
+        <span style={{ marginLeft: "12px", color: "#666", fontSize: "12px" }}>
           Hovered: {hovered}
         </span>
       )}

@@ -4,7 +4,7 @@ import type {
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
-} from '@raisins/core';
+} from "@raisins/core";
 import {
   DefaultTextMarks,
   doesChildAllowParent,
@@ -12,25 +12,25 @@ import {
   getSlots,
   HTMLComponents,
   isNodeAllowed,
-} from '@raisins/core';
-import type { CustomElement, Slot } from '@raisins/schema/schema';
-import { molecule } from 'bunshi/react';
-import { shallowEqual } from 'fast-equals';
-import type { Atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { loadable } from 'jotai/utils';
-import { ConfigMolecule } from '../core/index.ts';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
-import { isElementNode, isRoot } from '../util/isNode.tsx';
-import type { NPMRegistry } from '../util/NPMRegistry.ts';
-import { NPMRegistryAtom as RegistryAtom } from '../util/NPMRegistry.ts';
+} from "@raisins/core";
+import type { CustomElement, Slot } from "@raisins/schema/schema";
+import { molecule } from "bunshi/react";
+import { shallowEqual } from "fast-equals";
+import type { Atom, PrimitiveAtom, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { loadable } from "jotai/utils";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { ConfigMolecule } from "../core/index.ts";
+import { isElementNode, isRoot } from "../util/isNode.tsx";
+import type { NPMRegistry } from "../util/NPMRegistry.ts";
+import { NPMRegistryAtom as RegistryAtom } from "../util/NPMRegistry.ts";
 import {
   blockFromHtml,
   moduleDetailsToBlocks,
-} from './convert/moduleDetailsToBlocks.tsx';
-import { moduleDetailsToTags } from './convert/moduleDetailsToTags.tsx';
-import { modulesToDetails } from './convert/modulesToDetails.tsx';
-import type { Loadable, Module, ModuleDetails } from './types.ts';
+} from "./convert/moduleDetailsToBlocks.tsx";
+import { moduleDetailsToTags } from "./convert/moduleDetailsToTags.tsx";
+import { modulesToDetails } from "./convert/modulesToDetails.tsx";
+import type { Loadable, Module, ModuleDetails } from "./types.ts";
 
 export type ComponentModelMoleculeType = {
   ModulesAtom: PrimitiveAtom<Module[]>;
@@ -64,7 +64,8 @@ export const ComponentModelMolecule = molecule(
      * Module details from NPM (loaded async)
      */
     const ModuleDetailsAsync = atom(
-      async get => await modulesToDetails(get(PackagesAtom), get(LocalURLAtom))
+      async (get) =>
+        await modulesToDetails(get(PackagesAtom), get(LocalURLAtom)),
     );
     /**
      * Module details from NPM (or loading or error)
@@ -74,9 +75,9 @@ export const ComponentModelMolecule = molecule(
     /**
      * List of modules from NPM
      */
-    const ModuleDetailsAtom = atom(get => {
+    const ModuleDetailsAtom = atom((get) => {
       const state = get(ModuleDetailsStateAtom);
-      if (state.state === 'hasData') return state.data;
+      if (state.state === "hasData") return state.data;
       return [];
     });
 
@@ -84,17 +85,17 @@ export const ComponentModelMolecule = molecule(
      * `true` while module information is being loaded from NPM
      */
     const ModulesLoadingAtom = atom(
-      get =>
-        get(ModuleDetailsStateAtom).state === 'loading' ||
+      (get) =>
+        get(ModuleDetailsStateAtom).state === "loading" ||
         // Only has status while details are being loaded
-        ((get(ModuleDetailsAtom) as unknown) as ModuleDetails).status ===
-          'pending'
+        (get(ModuleDetailsAtom) as unknown as ModuleDetails).status ===
+          "pending",
     );
 
     /**
      * The array of {@link CustomElement} from ALL packages
      */
-    const ComponentsAtom = atom(get => {
+    const ComponentsAtom = atom((get) => {
       const moduleDetails = get(ModuleDetailsAtom);
 
       return [
@@ -106,9 +107,9 @@ export const ComponentModelMolecule = molecule(
     /**
      * The array of {@link Block} from ALL packages
      */
-    const BlocksAtom = atom(get => {
+    const BlocksAtom = atom((get) => {
       const blocksFromModules = moduleDetailsToBlocks(get(ModuleDetailsAtom));
-      const defaultBlocks = DEFAULT_BLOCKS.map(block => {
+      const defaultBlocks = DEFAULT_BLOCKS.map((block) => {
         return {
           title: block.title,
           content: blockFromHtml(block.examples?.[0]?.content as string),
@@ -118,43 +119,43 @@ export const ComponentModelMolecule = molecule(
       }) as Block[];
       return [...blocksFromModules, ...defaultBlocks];
     });
-    BlocksAtom.debugLabel = 'BlocksAtom';
+    BlocksAtom.debugLabel = "BlocksAtom";
 
     /**
      * Add another NPM package
      */
     const AddModuleAtom = atom(null, (_, set, next: Module) =>
-      set(PackagesAtom, modules => [...modules, next])
+      set(PackagesAtom, (modules) => [...modules, next]),
     );
-    AddModuleAtom.debugLabel = 'AddModuleAtom';
+    AddModuleAtom.debugLabel = "AddModuleAtom";
 
     /**
      * Remove an NPM package
      */
     const RemoveModuleAtom = atom(null, (_, set, next: Module) =>
-      set(PackagesAtom, modules =>
-        modules.filter(e => {
+      set(PackagesAtom, (modules) =>
+        modules.filter((e) => {
           return !shallowEqual(e, next);
-        })
-      )
+        }),
+      ),
     );
-    RemoveModuleAtom.debugLabel = 'RemoveModuleAtom';
+    RemoveModuleAtom.debugLabel = "RemoveModuleAtom";
 
     /**
      * Remove all packages based on their NPM name
      */
     const RemoveModuleByNameAtom = atom(null, (_, set, name: string) =>
-      set(PackagesAtom, modules => modules.filter(e => e.package !== name))
+      set(PackagesAtom, (modules) => modules.filter((e) => e.package !== name)),
     );
-    RemoveModuleByNameAtom.debugLabel = 'RemoveModuleByNameAtom';
+    RemoveModuleByNameAtom.debugLabel = "RemoveModuleByNameAtom";
 
     /**
      * A function used to find components details
      */
-    const ComponentMetaAtom = atom<ComponentMetaProvider>(get => {
+    const ComponentMetaAtom = atom<ComponentMetaProvider>((get) => {
       const components = get(ComponentsAtom);
       function getComponentMeta(tagName: string): CustomElement {
-        const found = components.find(c => c.tagName === tagName);
+        const found = components.find((c) => c.tagName === tagName);
         if (found) return found;
 
         return {
@@ -166,7 +167,7 @@ export const ComponentModelMolecule = molecule(
       }
       return getComponentMeta;
     });
-    ComponentMetaAtom.debugLabel = 'ComponentMetaAtom';
+    ComponentMetaAtom.debugLabel = "ComponentMetaAtom";
 
     /**
      * Maps component tag names to their NPM package.
@@ -174,13 +175,13 @@ export const ComponentModelMolecule = molecule(
      * Package order determines ownership when the same tag is declared more
      * than once, matching the lookup behavior used by the component metadata.
      */
-    const ComponentPackagesAtom = atom(get => {
+    const ComponentPackagesAtom = atom((get) => {
       const moduleDetails = get(ModuleDetailsAtom);
       const componentPackages = new Map<string, string>();
 
       for (const htmlComponent of Object.values(HTMLComponents)) {
         if (!componentPackages.has(htmlComponent.tagName)) {
-          componentPackages.set(htmlComponent.tagName, 'html');
+          componentPackages.set(htmlComponent.tagName, "html");
         }
       }
 
@@ -196,23 +197,23 @@ export const ComponentModelMolecule = molecule(
       }
       return componentPackages;
     });
-    ComponentPackagesAtom.debugLabel = 'ComponentPackagesAtom';
+    ComponentPackagesAtom.debugLabel = "ComponentPackagesAtom";
 
     /**
      * A function to get the NPM package for a component by its tag name
      */
-    const GetComponentPackageAtom = atom<(tagName: string) => string | undefined>(
-      get => {
-        const componentPackages = get(ComponentPackagesAtom);
-        return tagName => componentPackages.get(tagName);
-      }
-    );
-    GetComponentPackageAtom.debugLabel = 'GetComponentPackageAtom';
+    const GetComponentPackageAtom = atom<
+      (tagName: string) => string | undefined
+    >((get) => {
+      const componentPackages = get(ComponentPackagesAtom);
+      return (tagName) => componentPackages.get(tagName);
+    });
+    GetComponentPackageAtom.debugLabel = "GetComponentPackageAtom";
 
     /**
      * A function to get a list of possible children for a node/slot combo
      */
-    const ValidChildrenAtom = atom(get => {
+    const ValidChildrenAtom = atom((get) => {
       const blocks = get(BlocksAtom);
       const getComponentMeta = get(ComponentMetaAtom);
 
@@ -220,7 +221,7 @@ export const ComponentModelMolecule = molecule(
         // Non-documents and elements aren't allowed children
         if (!isElementNode(node) || !isRoot(node)) return [];
 
-        const allowedInParent = blocks.filter(block => {
+        const allowedInParent = blocks.filter((block) => {
           const childMeta = getComponentMeta(block.content.tagName);
           const childAllowsParents = doesChildAllowParent(childMeta, node);
           return childAllowsParents;
@@ -252,7 +253,7 @@ export const ComponentModelMolecule = molecule(
 
       return getValidChildren;
     });
-    ValidChildrenAtom.debugLabel = 'ValidChildrenAtom';
+    ValidChildrenAtom.debugLabel = "ValidChildrenAtom";
 
     /**
      * Returns the {@link ComponentModel}
@@ -260,7 +261,7 @@ export const ComponentModelMolecule = molecule(
      * A mixed bag of functions used to grab data from the NPM package details
      * and enforce validation
      */
-    const ComponentModelAtom = atom<ComponentModel>(get => {
+    const ComponentModelAtom = atom<ComponentModel>((get) => {
       const getComponentMeta = get(ComponentMetaAtom);
       const blocks: Block[] = get(BlocksAtom);
       const groupedBlocks = group(blocks, getComponentMeta);
@@ -269,7 +270,7 @@ export const ComponentModelMolecule = molecule(
       function isValidChild(
         child: RaisinElementNode,
         parent: RaisinElementNode | RaisinNodeWithChildren,
-        slot: string
+        slot: string,
       ): boolean {
         if (isRoot(parent)) return true;
         if (child === parent) {
@@ -298,7 +299,7 @@ export const ComponentModelMolecule = molecule(
             ...parentMeta,
             slots,
           },
-          slot
+          slot,
         );
       }
 
@@ -317,21 +318,21 @@ export const ComponentModelMolecule = molecule(
       };
     });
 
-    const NPMRegistryAtom = atom<NPMRegistry>(get => get(RegistryAtom));
+    const NPMRegistryAtom = atom<NPMRegistry>((get) => get(RegistryAtom));
 
-    ComponentModelAtom.debugLabel = 'ComponentModelAtom';
+    ComponentModelAtom.debugLabel = "ComponentModelAtom";
 
     /**
      * Set of tags that are not interactible. They should only be edited as rich text.
      */
     const NonInteractibleTags = new Set<string>(DefaultTextMarks);
     const IsInteractibleAtom = atom<InteractibleProvider>(() => {
-      return node => {
-        if (node.type === 'text') return false;
-        if (node.type === 'comment') return false;
-        if (node.type === 'directive') return false;
-        if (node.type === 'style') return true;
-        if (node.type === 'root') return true;
+      return (node) => {
+        if (node.type === "text") return false;
+        if (node.type === "comment") return false;
+        if (node.type === "directive") return false;
+        if (node.type === "style") return true;
+        if (node.type === "root") return true;
         if (NonInteractibleTags.has(node.tagName)) return false;
         return true;
       };
@@ -357,11 +358,11 @@ export const ComponentModelMolecule = molecule(
       NPMRegistryAtom,
       GetComponentPackageAtom,
     };
-  }
+  },
 );
 
 // TODO: figure out where to put examples without a group
-const DEFAULT_BLOCK_GROUP = 'Default';
+const DEFAULT_BLOCK_GROUP = "Default";
 
 const DEFAULT_BLOCKS = [
   HTMLComponents.P,
@@ -373,7 +374,7 @@ const DEFAULT_BLOCKS = [
 
 type BlockGroups = Record<string, Block[]>;
 function group(list: Block[], getComponentMeta: Function): BlockGroups {
-  return list.reduce(function(allGroups: BlockGroups, block: Block) {
+  return list.reduce(function (allGroups: BlockGroups, block: Block) {
     const exampleGroup =
       getComponentMeta(block.content?.tagName)?.exampleGroup ??
       block.exampleGroup ??
@@ -406,7 +407,7 @@ export type ComponentModel = {
   isValidChild: (
     from: RaisinElementNode,
     to: RaisinElementNode | RaisinDocumentNode,
-    slot: string
+    slot: string,
   ) => boolean;
 };
 

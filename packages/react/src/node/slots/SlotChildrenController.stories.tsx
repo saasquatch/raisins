@@ -1,107 +1,103 @@
-import type { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { htmlUtil } from '@raisins/core';
-import type { Meta } from '@storybook/react';
-import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { molecule, useMolecule } from 'bunshi/react';
-import type { CSSProperties, FC } from 'react';
-import React, { useCallback, useState } from 'react';
-import {
-  ComponentModelMolecule,
-} from '../../component-metamodel/ComponentModel.tsx';
-import { CoreMolecule } from '../../core/CoreAtoms.tsx';
-import { EditMolecule } from '../../core/editting/EditAtoms.ts';
-import {
-  PickAndPlopMolecule,
-} from '../../core/selection/PickAndPlopMolecule.tsx';
-import { NodeRichTextController } from '../../rich-text/RichTextEditor.tsx';
-import { BasicStory } from '../../index.stories.tsx';
-import {
-  big,
-  MintComponents,
-  mintMono,
-} from '../../examples/MintComponents.tsx';
-import {
-  ChildrenEditorForAtoms,
-  NodeChildrenEditor,
-} from '../NodeChildrenEditor.tsx';
-import { NodeMolecule } from '../NodeMolecule.tsx';
-import { NodeScopeProvider, useNodeAtom } from '../NodeScope.tsx';
-import { SlotChildrenController } from './SlotChildrenController.tsx';
-import { SlotMolecule, SlotScopeProvider } from './SlotScope.tsx';
+import type { RaisinDocumentNode, RaisinElementNode } from "@raisins/core";
+import { htmlUtil } from "@raisins/core";
+import type { Meta } from "@storybook/react";
+import { molecule, useMolecule } from "bunshi/react";
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import type { CSSProperties, FC } from "react";
+import React, { useCallback, useState } from "react";
+import { AttributesController } from "../../attributes/index.ts";
+import { CanvasFull } from "../../canvas/CanvasController.stories.tsx";
 import {
   BasicCanvasController,
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasSelectionMolecule,
-} from '../../canvas/index.ts';
-import { AttributesController } from '../../attributes/index.ts';
-import { SelectedNodeController } from '../../core/index.ts';
+} from "../../canvas/index.ts";
+import { ComponentModelMolecule } from "../../component-metamodel/ComponentModel.tsx";
+import { CoreMolecule } from "../../core/CoreAtoms.tsx";
+import { EditMolecule } from "../../core/editting/EditAtoms.ts";
+import { SelectedNodeController } from "../../core/index.ts";
+import { PickAndPlopMolecule } from "../../core/selection/PickAndPlopMolecule.tsx";
+import {
+  big,
+  MintComponents,
+  mintMono,
+} from "../../examples/MintComponents.tsx";
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents.tsx';
-import { CanvasFull } from '../../canvas/CanvasController.stories.tsx';
+} from "../../examples/VanillaComponents.tsx";
+import { BasicStory } from "../../index.stories.tsx";
+import { NodeRichTextController } from "../../rich-text/RichTextEditor.tsx";
+import {
+  ChildrenEditorForAtoms,
+  NodeChildrenEditor,
+} from "../NodeChildrenEditor.tsx";
+import { NodeMolecule } from "../NodeMolecule.tsx";
+import { NodeScopeProvider, useNodeAtom } from "../NodeScope.tsx";
+import { SlotChildrenController } from "./SlotChildrenController.tsx";
+import { SlotMolecule, SlotScopeProvider } from "./SlotScope.tsx";
 
 const meta: Meta = {
-  title: 'Slot Children Controller',
-  excludeStories: ['LayersController'],
+  title: "Slot Children Controller",
+  excludeStories: ["LayersController"],
 };
 export default meta;
 
 const { clone } = htmlUtil;
 
 const Label: CSSProperties = {
-  cursor: 'pointer',
-  lineHeight: '28px',
+  cursor: "pointer",
+  lineHeight: "28px",
 };
 
 const Layer: CSSProperties = {
-  position: 'relative',
-  userSelect: 'none',
-  cursor: 'pointer',
-  padding: '10px 0',
-  outlineOffset: '-2px',
+  position: "relative",
+  userSelect: "none",
+  cursor: "pointer",
+  padding: "10px 0",
+  outlineOffset: "-2px",
 };
 
 const SelectedLayer: CSSProperties = {
-  background: 'green',
+  background: "green",
 };
 
 const SlotContainer: CSSProperties = {
-  marginLeft: '3px',
-  display: 'flex',
-  padding: '0 0 3px 0',
+  marginLeft: "3px",
+  display: "flex",
+  padding: "0 0 3px 0",
 };
 
 const SlotName: CSSProperties = {
-  writingMode: 'vertical-lr',
-  textOrientation: 'sideways',
-  fontSize: '0.7em',
-  padding: '5px 0 5px 2px',
-  color: 'grey',
-  background: 'rgba(0, 0, 0, 0.1)',
+  writingMode: "vertical-lr",
+  textOrientation: "sideways",
+  fontSize: "0.7em",
+  padding: "5px 0 5px 2px",
+  color: "grey",
+  background: "rgba(0, 0, 0, 0.1)",
 };
 
 const SlotChildren: CSSProperties = {
-  width: '100%',
+  width: "100%",
 };
 
 const TitleBar: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
+  display: "flex",
+  justifyContent: "space-between",
 };
 
 const AddBlock: CSSProperties = {
-  flex: '1',
-  width: '100%',
-  justifySelf: 'stretch',
-  alignSelf: 'stretch',
-  background: 'rgba(0, 0, 255, 0.1)',
-  color: 'rgba(0, 0, 0, 0.6)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  flex: "1",
+  width: "100%",
+  justifySelf: "stretch",
+  alignSelf: "stretch",
+  background: "rgba(0, 0, 255, 0.1)",
+  color: "rgba(0, 0, 0, 0.6)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 };
 
 const AttributeEditor = () => {
@@ -114,8 +110,8 @@ const AttributeEditor = () => {
 
 export const BigLayersOnly = () => (
   <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <LayersController />
       </div>
     </div>
@@ -123,8 +119,8 @@ export const BigLayersOnly = () => (
 );
 export const MintLayersOnly = () => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <LayersController />
       </div>
     </div>
@@ -150,8 +146,8 @@ export const SVGLayersOnly = () => (
   `}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+    <div style={{ display: "flex", height: "100vh" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <LayersController />
       </div>
     </div>
@@ -168,16 +164,38 @@ function Canvas() {
 export const MintLayersFull = () => {
   return (
     <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-      <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
-        <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
+      <div
+        style={{
+          display: "flex",
+          height: "100vh",
+          fontFamily:
+            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontSize: "13px",
+        }}
+      >
+        <div
+          style={{
+            flex: "0 0 280px",
+            overflowY: "auto",
+            padding: "12px",
+            borderRight: "1px solid #e0e0e0",
+          }}
+        >
           <LayersController />
         </div>
-        <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           <CanvasProvider>
             <Canvas />
           </CanvasProvider>
         </div>
-        <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
+        <div
+          style={{
+            flex: "0 0 280px",
+            overflowY: "auto",
+            padding: "12px",
+            borderLeft: "1px solid #e0e0e0",
+          }}
+        >
           <AttributeEditor />
         </div>
       </div>
@@ -241,16 +259,38 @@ export const ReferralTableFull = () => (
     startingHtml={referralTableExamples}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
-      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: "13px",
+      }}
+    >
+      <div
+        style={{
+          flex: "0 0 280px",
+          overflowY: "auto",
+          padding: "12px",
+          borderRight: "1px solid #e0e0e0",
+        }}
+      >
         <LayersController />
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
       </div>
-      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
+      <div
+        style={{
+          flex: "0 0 280px",
+          overflowY: "auto",
+          padding: "12px",
+          borderLeft: "1px solid #e0e0e0",
+        }}
+      >
         <AttributeEditor />
       </div>
     </div>
@@ -262,16 +302,38 @@ export const VanillaLayersFull = () => (
     startingHtml={referrerWidget}
     startingPackages={VanillaComponents}
   >
-    <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', fontSize: '13px' }}>
-      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderRight: '1px solid #e0e0e0' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: "13px",
+      }}
+    >
+      <div
+        style={{
+          flex: "0 0 280px",
+          overflowY: "auto",
+          padding: "12px",
+          borderRight: "1px solid #e0e0e0",
+        }}
+      >
         <LayersController />
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
         <CanvasProvider>
           <CanvasFull />
         </CanvasProvider>
       </div>
-      <div style={{ flex: '0 0 280px', overflowY: 'auto', padding: '12px', borderLeft: '1px solid #e0e0e0' }}>
+      <div
+        style={{
+          flex: "0 0 280px",
+          overflowY: "auto",
+          padding: "12px",
+          borderLeft: "1px solid #e0e0e0",
+        }}
+      >
         <AttributeEditor />
       </div>
     </div>
@@ -317,7 +379,7 @@ function AddNew(props: { idx: number; slot?: string }) {
         </div>
       )}
       {open && (
-        <div style={{ display: 'flex', overflowX: 'auto' }}>
+        <div style={{ display: "flex", overflowX: "auto" }}>
           {validChildren.map((b) => {
             const meta = comp.getComponentMeta(b.content.tagName);
             return (
@@ -350,7 +412,7 @@ const LayersMolecule = molecule((getMol) => {
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const RootHasChildren = atom(
-    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0,
   );
 
   return {
@@ -399,11 +461,11 @@ function ElementLayer() {
   const name = (
     <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
       <div style={Label}>
-        {title} {isPicked && ' Moving...'} {soul.toString()}
+        {title} {isPicked && " Moving..."} {soul.toString()}
       </div>
       <div>
         <button onClick={moveNode} disabled={!canMove}>
-          {isPicked ? 'Cancel move' : 'Move'}
+          {isPicked ? "Cancel move" : "Move"}
         </button>
         <button onClick={duplicate} disabled={isPlopping}>
           Dupe
@@ -420,7 +482,7 @@ function ElementLayer() {
   const style = {
     ...Layer,
     ...(isSelected ? SelectedLayer : {}),
-    ...(isHovered ? { outline: '1px dashed green' } : {}),
+    ...(isHovered ? { outline: "1px dashed green" } : {}),
   };
 
   return (
@@ -446,7 +508,7 @@ function SlotWidget() {
 
   const slotDetails = useAtomValue(atoms.slotDetails);
   const slotWidget = slotDetails.editor;
-  const hasEditor = slotWidget === 'inline';
+  const hasEditor = slotWidget === "inline";
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   return (
@@ -503,8 +565,8 @@ function PlopTarget(props: { idx: number; slot: string }) {
     return <></>;
   }
   return (
-    <div style={{ border: '1px dashed red' }}>
-      Position {idx} in {slot || 'content'}
+    <div style={{ border: "1px dashed red" }}>
+      Position {idx} in {slot || "content"}
       <button onClick={plop}>Plop</button>
     </div>
   );

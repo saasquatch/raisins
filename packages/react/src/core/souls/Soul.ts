@@ -1,8 +1,8 @@
-import type { RaisinNode } from '@raisins/core';
-import { htmlUtil } from '@raisins/core';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { CoreMolecule } from '../CoreAtoms.tsx';
+import type { RaisinNode } from "@raisins/core";
+import { htmlUtil } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import { atom } from "jotai";
+import { CoreMolecule } from "../CoreAtoms.tsx";
 const { visit } = htmlUtil;
 
 export type Soul = { id: string };
@@ -12,10 +12,10 @@ export type Soul = { id: string };
  */
 export function generateSoulTree(
   node: RaisinNode,
-  map: WeakMap<RaisinNode, Soul>
+  map: WeakMap<RaisinNode, Soul>,
 ) {
   const getSoul = (n: RaisinNode) => ({
-    soul: map.get(n)?.toString() ?? 'No soul',
+    soul: map.get(n)?.toString() ?? "No soul",
   });
   const getSoulAndChildren = (n: RaisinNode, children: string[]) => ({
     ...getSoul(n),
@@ -57,7 +57,7 @@ export const SoulsMolecule = molecule((getMol) => {
   function createSoul(): Soul {
     return {
       created: Date.now(),
-      id: 'soul-' + ++soulNumber,
+      id: "soul-" + ++soulNumber,
       toString() {
         return this.id;
       },

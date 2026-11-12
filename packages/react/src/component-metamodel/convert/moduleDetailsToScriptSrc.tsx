@@ -1,7 +1,7 @@
-import type { ModuleDetails } from '../types.ts';
-import type { NPMRegistry } from '../../util/NPMRegistry.ts';
-import { makeLocalRegistry } from '../../util/NPMRegistry.ts';
-import { LOCAL_REPO } from './LOCAL_REPO.tsx';
+import type { NPMRegistry } from "../../util/NPMRegistry.ts";
+import { makeLocalRegistry } from "../../util/NPMRegistry.ts";
+import type { ModuleDetails } from "../types.ts";
+import { LOCAL_REPO } from "./LOCAL_REPO.tsx";
 
 /**
  * Converts a set of ModuleDetails into appropriate `<script>` and `<link>` tags
@@ -13,15 +13,15 @@ import { LOCAL_REPO } from './LOCAL_REPO.tsx';
 export function moduleDetailsToScriptSrc(
   moduleDetails: ModuleDetails[],
   localUrl: string | undefined,
-  registry: NPMRegistry
+  registry: NPMRegistry,
 ) {
   const scripts =
     moduleDetails?.map((m) => {
-      const { module, browser, main, unpkg } = m['package.json'];
+      const { module, browser, main, unpkg } = m["package.json"];
       // Use the prescribed file path, if not then module, browser, or main or empty
-      const filePath = m.filePath || unpkg || module || browser || main || '';
-      const useModule = filePath === module || filePath?.endsWith('.esm.js');
-      const isCss = filePath && filePath.endsWith('.css');
+      const filePath = m.filePath || unpkg || module || browser || main || "";
+      const useModule = filePath === module || filePath?.endsWith(".esm.js");
+      const isCss = filePath && filePath.endsWith(".css");
       // TODO: Centralize registry better
       let registryToUse = registry;
       if (m.package === LOCAL_REPO && localUrl) {
@@ -30,13 +30,13 @@ export function moduleDetailsToScriptSrc(
       if (isCss)
         return ` <link rel="stylesheet" href="${registryToUse.resolvePath(
           m,
-          m.filePath!
+          m.filePath!,
         )}" />`;
       return `<script src="${registryToUse.resolvePath(m, filePath)}" ${
         useModule && `type="module"`
       }></script>`;
     }) ?? [];
 
-  const scriptSrc = scripts.join('\n');
+  const scriptSrc = scripts.join("\n");
   return scriptSrc;
 }

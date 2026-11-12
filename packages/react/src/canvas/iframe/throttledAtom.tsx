@@ -1,6 +1,6 @@
-import type { Setter, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { throttle } from 'throttle-debounce';
+import type { Setter, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { throttle } from "throttle-debounce";
 
 /**
  * Creates a writeable atom, where the set function is always throttled
@@ -14,13 +14,13 @@ export function throttledWriteAtom(delay: number) {
       let throttledSet = throttledSetRef.current;
       if (!throttledSet) {
         throttledSet = set;
-        throttledSetRef.current = (throttle(
+        throttledSetRef.current = throttle(
           delay,
-          throttledSet
-        ) as unknown) as Setter;
+          throttledSet,
+        ) as unknown as Setter;
       }
       throttledSet(e.atom, e.value);
-    }
+    },
   );
   return throttledOnEvent;
 }
@@ -30,12 +30,12 @@ export function throttledWriteAtom(delay: number) {
  */
 export function throttleAtom<R, W>(
   ms: number,
-  atomToThrottle: WritableAtom<R, W[], void>
+  atomToThrottle: WritableAtom<R, W[], void>,
 ): WritableAtom<R, W[], void> {
   const throttleSet = throttledWriteAtom(ms);
   return atom(
-    get => get(atomToThrottle),
+    (get) => get(atomToThrottle),
     (get, set, next: W) =>
-      set(throttleSet, { atom: atomToThrottle, value: next })
+      set(throttleSet, { atom: atomToThrottle, value: next }),
   );
 }

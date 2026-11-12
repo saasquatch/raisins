@@ -3,38 +3,38 @@ import type {
   RaisinNode,
   RaisinNodeWithChildren,
   RaisinStyleNode,
-} from '@raisins/core';
+} from "@raisins/core";
 import {
   cssParser,
   cssSerializer,
   htmlSerializer,
   htmlUtil,
   scopeStylesheet,
-} from '@raisins/core';
-import { molecule } from 'bunshi/react';
-import type { Atom, WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
-import { EditMolecule } from '../core/editting/EditAtoms.ts';
+} from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { Atom, WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { EditMolecule } from "../core/editting/EditAtoms.ts";
 import {
   generateId,
   RAISIN_CSS_ATTR,
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_ID_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from './RaisinCssIds.ts';
-import { RaisinIdsMolecule } from './RaisinIdsMolecule.ts';
+} from "./RaisinCssIds.ts";
+import { RaisinIdsMolecule } from "./RaisinIdsMolecule.ts";
 
 /**
  * HTML attributes used by Raisins to mark elements that participate in
  * per-instance CSS editing.
  */
-export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds.ts';
+export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from "./RaisinCssIds.ts";
 
 const { visit, remove } = htmlUtil;
 
 function isElement(n: RaisinNode): n is RaisinElementNode {
-  return n.type === 'tag';
+  return n.type === "tag";
 }
 
 /**
@@ -42,7 +42,7 @@ function isElement(n: RaisinNode): n is RaisinElementNode {
  */
 function findStyleNode(
   root: RaisinNode,
-  marker: string
+  marker: string,
 ): RaisinStyleNode | undefined {
   let found: RaisinStyleNode | undefined;
   visit<undefined>(root, {
@@ -74,7 +74,7 @@ function withoutStyleNodes(root: RaisinNode, marker: string): RaisinNode {
 }
 
 function collectElementsWithInstanceCss(
-  root: RaisinNode
+  root: RaisinNode,
 ): Array<{ id: string; css: string }> {
   const collected: Array<{ id: string; css: string }> = [];
   visit(root, {
@@ -82,9 +82,9 @@ function collectElementsWithInstanceCss(
       const css = el.attribs[RAISIN_CSS_ATTR];
       const id = el.attribs[RAISIN_ID_ATTR];
       if (
-        typeof css === 'string' &&
+        typeof css === "string" &&
         css.length > 0 &&
-        typeof id === 'string' &&
+        typeof id === "string" &&
         id.length > 0
       ) {
         collected.push({ id, css });
@@ -140,173 +140,167 @@ export type CssEditingMoleculeType = {
   PersistedHtmlAtom: Atom<string>;
 };
 
-export const CssEditingMolecule = molecule(
-  (getMol): CssEditingMoleculeType => {
-    const { RootNodeAtom } = getMol(CoreMolecule);
-    const { ReplaceNodeAtom, InsertNodeAtom, RemoveNodeAtom } = getMol(
-      EditMolecule
-    );
-    const { UsedRaisinIdsAtom } = getMol(RaisinIdsMolecule);
+export const CssEditingMolecule = molecule((getMol): CssEditingMoleculeType => {
+  const { RootNodeAtom } = getMol(CoreMolecule);
+  const { ReplaceNodeAtom, InsertNodeAtom, RemoveNodeAtom } =
+    getMol(EditMolecule);
+  const { UsedRaisinIdsAtom } = getMol(RaisinIdsMolecule);
 
-    // Scoped CSS keyed by id + source css. Replaced wholesale on each pass so
-    // it can't outgrow the number of styled elements.
-    let scopedCssCache = new Map<string, string>();
+  // Scoped CSS keyed by id + source css. Replaced wholesale on each pass so
+  // it can't outgrow the number of styled elements.
+  let scopedCssCache = new Map<string, string>();
 
-    const DocumentCssAtom = atom(
-      get => {
-        const node = findStyleNode(get(RootNodeAtom), RAISIN_DOCUMENT_CSS_ATTR);
-        if (!node?.contents) return '';
-        try {
-          return cssSerializer(node.contents);
-        } catch {
-          return '';
-        }
-      },
-      (get, set, next: string) => {
-        const root = get(RootNodeAtom);
-        const existing = findStyleNode(root, RAISIN_DOCUMENT_CSS_ATTR);
-
-        if (next.length === 0) {
-          if (existing) set(RemoveNodeAtom, existing);
-          return;
-        }
-
-        let contents;
-        try {
-          contents = cssParser(next);
-        } catch {
-          return;
-        }
-
-        if (existing) {
-          set(ReplaceNodeAtom, {
-            prev: existing,
-            next: { ...existing, contents },
-          });
-        } else {
-          const styleNode: RaisinStyleNode = {
-            type: 'style',
-            tagName: 'style',
-            attribs: { [RAISIN_DOCUMENT_CSS_ATTR]: 'true' },
-            contents,
-          };
-          const rootWithChildren = root as RaisinNodeWithChildren;
-          set(InsertNodeAtom, {
-            node: styleNode,
-            parent: rootWithChildren,
-            idx: rootWithChildren.children.length,
-          });
-        }
+  const DocumentCssAtom = atom(
+    (get) => {
+      const node = findStyleNode(get(RootNodeAtom), RAISIN_DOCUMENT_CSS_ATTR);
+      if (!node?.contents) return "";
+      try {
+        return cssSerializer(node.contents);
+      } catch {
+        return "";
       }
-    );
-    DocumentCssAtom.debugLabel = 'DocumentCssAtom';
-
-    const InstanceStyleSheetAtom = atom(get => {
+    },
+    (get, set, next: string) => {
       const root = get(RootNodeAtom);
-      const instances = collectElementsWithInstanceCss(root);
+      const existing = findStyleNode(root, RAISIN_DOCUMENT_CSS_ATTR);
 
-      // Every document edit recomputes this, so re-scoping the untouched
-      // elements would make each keystroke cost O(all styled elements).
-      const nextCache = new Map<string, string>();
-      const scopedParts = instances
-        .map(({ id, css }) => {
-          const key = `${id}\u0000${css}`;
-          const cached = scopedCssCache.get(key);
-          if (cached !== undefined) {
-            nextCache.set(key, cached);
-            return cached;
-          }
-          let scoped: string;
-          try {
-            scoped = cssSerializer(scopeStylesheet(cssParser(css), id));
-          } catch {
-            scoped = '';
-          }
-          nextCache.set(key, scoped);
-          return scoped;
-        })
-        .filter(part => part.length > 0);
-      scopedCssCache = nextCache;
-
-      return scopedParts.join('\n');
-    });
-
-    const ManagedStyleSheetAtom = atom(get => {
-      const documentCss = get(DocumentCssAtom);
-      const instanceCss = get(InstanceStyleSheetAtom);
-
-      return [documentCss, instanceCss].filter(s => s.length > 0).join('\n');
-    });
-    ManagedStyleSheetAtom.debugLabel = 'ManagedStyleSheetAtom';
-
-    const PersistedHtmlAtom = atom(get => {
-      const instanceCss = get(InstanceStyleSheetAtom);
-      // Re-serializing a document that was loaded from persisted html would
-      // otherwise stack a second copy of the managed node on every save.
-      const root = withoutStyleNodes(
-        get(RootNodeAtom),
-        RAISIN_MANAGED_CSS_ATTR
-      );
-      if (instanceCss.length === 0) return htmlSerializer(root);
-
-      const styleNode: RaisinStyleNode = {
-        type: 'style',
-        tagName: 'style',
-        attribs: { [RAISIN_MANAGED_CSS_ATTR]: 'true' },
-        contents: cssParser(instanceCss),
-      };
-      const rootWithChildren = root as RaisinNodeWithChildren;
-      return htmlSerializer({
-        ...rootWithChildren,
-        children: [...rootWithChildren.children, styleNode],
-      });
-    });
-    PersistedHtmlAtom.debugLabel = 'PersistedHtmlAtom';
-
-    const GetInstanceCssAtom = atom(() => {
-      return (node: RaisinElementNode): string => {
-        if (!isElement(node)) return '';
-        return node.attribs[RAISIN_CSS_ATTR] ?? '';
-      };
-    });
-
-    const SetInstanceCssAtom = atom(
-      null,
-      (get, set, { node, css }: { node: RaisinElementNode; css: string }) => {
-        // Every write re-serializes the whole document and re-renders the
-        // canvas, so a write that changes nothing is never worth doing.
-        const current = node.attribs[RAISIN_CSS_ATTR];
-        const unchanged =
-          css.length === 0
-            ? current === undefined
-            : current === css && Boolean(node.attribs[RAISIN_ID_ATTR]);
-        if (unchanged) return;
-
-        const nextAttribs = { ...node.attribs };
-        if (css.length === 0) {
-          delete nextAttribs[RAISIN_CSS_ATTR];
-        } else {
-          nextAttribs[RAISIN_CSS_ATTR] = css;
-          if (!nextAttribs[RAISIN_ID_ATTR]) {
-            let id = generateId();
-            const existingIds = get(UsedRaisinIdsAtom);
-            while (existingIds.has(id)) {
-              id = generateId();
-            }
-            nextAttribs[RAISIN_ID_ATTR] = id;
-          }
-        }
-        const nextNode: RaisinElementNode = { ...node, attribs: nextAttribs };
-        set(ReplaceNodeAtom, { prev: node, next: nextNode });
+      if (next.length === 0) {
+        if (existing) set(RemoveNodeAtom, existing);
+        return;
       }
-    );
 
-    return {
-      DocumentCssAtom,
-      ManagedStyleSheetAtom,
-      GetInstanceCssAtom,
-      SetInstanceCssAtom,
-      PersistedHtmlAtom,
+      let contents;
+      try {
+        contents = cssParser(next);
+      } catch {
+        return;
+      }
+
+      if (existing) {
+        set(ReplaceNodeAtom, {
+          prev: existing,
+          next: { ...existing, contents },
+        });
+      } else {
+        const styleNode: RaisinStyleNode = {
+          type: "style",
+          tagName: "style",
+          attribs: { [RAISIN_DOCUMENT_CSS_ATTR]: "true" },
+          contents,
+        };
+        const rootWithChildren = root as RaisinNodeWithChildren;
+        set(InsertNodeAtom, {
+          node: styleNode,
+          parent: rootWithChildren,
+          idx: rootWithChildren.children.length,
+        });
+      }
+    },
+  );
+  DocumentCssAtom.debugLabel = "DocumentCssAtom";
+
+  const InstanceStyleSheetAtom = atom((get) => {
+    const root = get(RootNodeAtom);
+    const instances = collectElementsWithInstanceCss(root);
+
+    // Every document edit recomputes this, so re-scoping the untouched
+    // elements would make each keystroke cost O(all styled elements).
+    const nextCache = new Map<string, string>();
+    const scopedParts = instances
+      .map(({ id, css }) => {
+        const key = `${id}\u0000${css}`;
+        const cached = scopedCssCache.get(key);
+        if (cached !== undefined) {
+          nextCache.set(key, cached);
+          return cached;
+        }
+        let scoped: string;
+        try {
+          scoped = cssSerializer(scopeStylesheet(cssParser(css), id));
+        } catch {
+          scoped = "";
+        }
+        nextCache.set(key, scoped);
+        return scoped;
+      })
+      .filter((part) => part.length > 0);
+    scopedCssCache = nextCache;
+
+    return scopedParts.join("\n");
+  });
+
+  const ManagedStyleSheetAtom = atom((get) => {
+    const documentCss = get(DocumentCssAtom);
+    const instanceCss = get(InstanceStyleSheetAtom);
+
+    return [documentCss, instanceCss].filter((s) => s.length > 0).join("\n");
+  });
+  ManagedStyleSheetAtom.debugLabel = "ManagedStyleSheetAtom";
+
+  const PersistedHtmlAtom = atom((get) => {
+    const instanceCss = get(InstanceStyleSheetAtom);
+    // Re-serializing a document that was loaded from persisted html would
+    // otherwise stack a second copy of the managed node on every save.
+    const root = withoutStyleNodes(get(RootNodeAtom), RAISIN_MANAGED_CSS_ATTR);
+    if (instanceCss.length === 0) return htmlSerializer(root);
+
+    const styleNode: RaisinStyleNode = {
+      type: "style",
+      tagName: "style",
+      attribs: { [RAISIN_MANAGED_CSS_ATTR]: "true" },
+      contents: cssParser(instanceCss),
     };
-  }
-);
+    const rootWithChildren = root as RaisinNodeWithChildren;
+    return htmlSerializer({
+      ...rootWithChildren,
+      children: [...rootWithChildren.children, styleNode],
+    });
+  });
+  PersistedHtmlAtom.debugLabel = "PersistedHtmlAtom";
+
+  const GetInstanceCssAtom = atom(() => {
+    return (node: RaisinElementNode): string => {
+      if (!isElement(node)) return "";
+      return node.attribs[RAISIN_CSS_ATTR] ?? "";
+    };
+  });
+
+  const SetInstanceCssAtom = atom(
+    null,
+    (get, set, { node, css }: { node: RaisinElementNode; css: string }) => {
+      // Every write re-serializes the whole document and re-renders the
+      // canvas, so a write that changes nothing is never worth doing.
+      const current = node.attribs[RAISIN_CSS_ATTR];
+      const unchanged =
+        css.length === 0
+          ? current === undefined
+          : current === css && Boolean(node.attribs[RAISIN_ID_ATTR]);
+      if (unchanged) return;
+
+      const nextAttribs = { ...node.attribs };
+      if (css.length === 0) {
+        delete nextAttribs[RAISIN_CSS_ATTR];
+      } else {
+        nextAttribs[RAISIN_CSS_ATTR] = css;
+        if (!nextAttribs[RAISIN_ID_ATTR]) {
+          let id = generateId();
+          const existingIds = get(UsedRaisinIdsAtom);
+          while (existingIds.has(id)) {
+            id = generateId();
+          }
+          nextAttribs[RAISIN_ID_ATTR] = id;
+        }
+      }
+      const nextNode: RaisinElementNode = { ...node, attribs: nextAttribs };
+      set(ReplaceNodeAtom, { prev: node, next: nextNode });
+    },
+  );
+
+  return {
+    DocumentCssAtom,
+    ManagedStyleSheetAtom,
+    GetInstanceCssAtom,
+    SetInstanceCssAtom,
+    PersistedHtmlAtom,
+  };
+});

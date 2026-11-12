@@ -1,29 +1,27 @@
-import { DefaultTextMarks } from '@raisins/core';
-import type { Meta } from '@storybook/react';
-import type { Atom } from 'jotai';
-import { useAtomValue } from 'jotai';
-import { useMolecule } from 'bunshi/react';
-import React, { useState } from 'react';
+import { DefaultTextMarks } from "@raisins/core";
+import type { Meta } from "@storybook/react";
+import { useMolecule } from "bunshi/react";
+import type { Atom } from "jotai";
+import { useAtomValue } from "jotai";
+import React, { useState } from "react";
 import {
   big,
   MintComponents,
   mintMono,
   mintTimelineNewlines,
   mintTimelineTrimmed,
-} from '../examples/MintComponents.tsx';
-import { BasicStory } from '../index.stories.tsx';
-import { example } from '../node/children/LoadTest.example.ts';
-import {
-  SelectedNodeRichTextEditor,
-} from '../rich-text/SelectedNodeRichTextEditor.tsx';
-import { CanvasProvider } from './CanvasScope.tsx';
-import { BasicCanvasController, CanvasController } from './index.ts';
+} from "../examples/MintComponents.tsx";
+import { BasicStory } from "../index.stories.tsx";
+import { example } from "../node/children/LoadTest.example.ts";
+import { SelectedNodeRichTextEditor } from "../rich-text/SelectedNodeRichTextEditor.tsx";
+import { CanvasProvider } from "./CanvasScope.tsx";
+import { BasicCanvasController, CanvasController } from "./index.ts";
 import {
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasSelectionMolecule,
-} from './plugins/index.ts';
-import type { Rect } from './types.tsx';
+} from "./plugins/index.ts";
+import type { Rect } from "./types.tsx";
 
 export const LoadTest = () => {
   return (
@@ -45,8 +43,8 @@ export const LoadTestFull = () => {
 
 export const UninteractibleTextFull = () => {
   const inlineHtml = DefaultTextMarks.map(
-    tagName => `<${tagName}>${tagName}</${tagName}>`
-  ).join('&nbsp;');
+    (tagName) => `<${tagName}>${tagName}</${tagName}>`,
+  ).join("&nbsp;");
   return (
     <BasicStory startingHtml={`<div>${inlineHtml}</div>`}>
       <CanvasProvider>
@@ -57,9 +55,8 @@ export const UninteractibleTextFull = () => {
 };
 
 const CanvasStory = ({ html }: { html: string }) => {
-  const [canvasType, setCanvasType] = useState<keyof typeof CanvasTypes>(
-    'BasicCanvas'
-  );
+  const [canvasType, setCanvasType] =
+    useState<keyof typeof CanvasTypes>("BasicCanvas");
   const CanvasComponent = CanvasTypes[canvasType];
   return (
     <BasicStory startingHtml={html}>
@@ -82,7 +79,7 @@ export const CanvasFull = () => {
   useMolecule(CanvasHoveredMolecule);
   useMolecule(CanvasPickAndPlopMolecule);
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: "relative" }}>
       <Toolbars />
       <BasicCanvasController />
     </div>
@@ -167,10 +164,12 @@ class TemplateSwitcher extends HTMLElement {
 
 customElements.define('template-switcher', TemplateSwitcher);
 </script>
-`
+`;
 const basicTemplateHTML = `<style>template{border: 1px dashed red; padding: 20px; display:block;}</style><template>I am inside a template</template>`;
 export const TemplateTags = () => <CanvasStory html={basicTemplateHTML} />;
-export const TemplateSwitcher = () => <CanvasStory html={templateSwitcherExample} />;
+export const TemplateSwitcher = () => (
+  <CanvasStory html={templateSwitcherExample} />
+);
 
 export const BigCanvasWithHover = () => (
   <BigCanvasOnly Component={CanvasWithHover} />
@@ -180,13 +179,34 @@ export const BigCanvasWithSelection = () => (
 );
 export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={big}>
-    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        gap: "1px",
+        background: "#e0e0e0",
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -221,7 +241,7 @@ const PositionedToolbar = ({
   const rect = useAtomValue(rectAtom);
   if (!rect)
     return (
-      <div style={{ position: 'absolute', top: 0, left: 0, display: 'none' }} />
+      <div style={{ position: "absolute", top: 0, left: 0, display: "none" }} />
     );
 
   const { x, y, width, height } = rect;
@@ -229,13 +249,13 @@ const PositionedToolbar = ({
   return (
     <div
       style={{
-        background: 'green',
-        color: 'white',
-        position: 'absolute',
+        background: "green",
+        color: "white",
+        position: "absolute",
         top: y + height,
         left: x - 2,
-        width: width + 'px',
-        minWidth: '200px',
+        width: width + "px",
+        minWidth: "200px",
       }}
     >
       {children}
@@ -245,13 +265,34 @@ const PositionedToolbar = ({
 
 export const MintCanvasOnly = ({ Component = BasicCanvasController }) => (
   <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
-    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        gap: "1px",
+        background: "#e0e0e0",
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -293,13 +334,34 @@ export const SQMText = ({ Component = BasicCanvasController }) => (
     startingHtml={`<div>First</div><div>Before</div><sqm-text>in sqm-text</sqm-text><div>After</div>`}
     startingPackages={MintComponents}
   >
-    <div style={{ display: 'flex', height: '100vh', gap: '1px', background: '#e0e0e0' }}>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+    <div
+      style={{
+        display: "flex",
+        height: "100vh",
+        gap: "1px",
+        background: "#e0e0e0",
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px', background: '#fff' }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          background: "#fff",
+        }}
+      >
         <CanvasProvider>
           <Component />
         </CanvasProvider>
@@ -352,7 +414,7 @@ export const SVGWithXlinkButNoNamespace = () => (
 </svg>`}
   />
 );
-const SVGExample = ({ html = '' }) => (
+const SVGExample = ({ html = "" }) => (
   <BasicStory startingHtml={html} startingPackages={[]}>
     <CanvasProvider>
       <BasicCanvasController />
@@ -361,12 +423,12 @@ const SVGExample = ({ html = '' }) => (
 );
 
 const meta: Meta = {
-  title: 'Canvas Controller',
-  excludeStories: ['CanvasFull'],
+  title: "Canvas Controller",
+  excludeStories: ["CanvasFull"],
   argTypes: {
     CanvasType: {
       options: Object.keys(CanvasTypes),
-      control: { type: 'select' },
+      control: { type: "select" },
     },
   },
 };

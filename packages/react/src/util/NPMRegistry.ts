@@ -1,5 +1,5 @@
-import { atom } from 'jotai';
-import type { Module } from '../component-metamodel/index.ts';
+import { atom } from "jotai";
+import type { Module } from "../component-metamodel/index.ts";
 
 export type PackageJson = {
   name: string;
@@ -53,19 +53,19 @@ export interface NPMRegistry {
   resolvePath(module: Module, path: string): string;
 }
 
-const UNPKG_BASE = 'https://fast.ssqt.io/npm';
+const UNPKG_BASE = "https://fast.ssqt.io/npm";
 
 export const unpkgNpmRegistry: NPMRegistry = {
   async getPackageJson(m) {
-    const path = this.resolvePath(m, 'package.json');
+    const path = this.resolvePath(m, "package.json");
 
     const resp = await fetch(path);
     const json = await resp.json();
     return json;
   },
   resolvePath(module, path) {
-    const version = module.version ?? 'latest';
-    if (path.charAt(0) == '/') path = path.substring(1);
+    const version = module.version ?? "latest";
+    if (path.charAt(0) == "/") path = path.substring(1);
     const resolved = `${UNPKG_BASE}/${module.package}@${version}/${path}`;
     return resolved;
   },
@@ -74,7 +74,7 @@ export const unpkgNpmRegistry: NPMRegistry = {
 export function makeLocalRegistry(url: string): NPMRegistry {
   return {
     async getPackageJson(m) {
-      const path = this.resolvePath(m, 'package.json');
+      const path = this.resolvePath(m, "package.json");
 
       const resp = await fetch(path);
       const json = await resp.json();

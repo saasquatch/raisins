@@ -1,16 +1,16 @@
-import type { RaisinDocumentNode } from '@raisins/core';
-import type { Atom, PrimitiveAtom } from 'jotai';
-import { createScope, ScopeProvider } from 'bunshi/react';
-import type { Schema } from 'prosemirror-model';
-import type { Plugin, SelectionBookmark } from 'prosemirror-state';
-import React from 'react';
+import type { RaisinDocumentNode } from "@raisins/core";
+import { createScope, ScopeProvider } from "bunshi/react";
+import type { Atom, PrimitiveAtom } from "jotai";
+import type { Schema } from "prosemirror-model";
+import type { Plugin, SelectionBookmark } from "prosemirror-state";
+import React from "react";
 
 export const ProseEditorScope = createScope<ProseEditorScopeType | undefined>(
-  undefined
+  undefined,
 );
 
 export type ProseTextSelection = {
-  type: 'text';
+  type: "text";
   anchor: number;
   head: number;
 };
@@ -37,7 +37,7 @@ export const ProseEditorScopeProvider = (props: {
   children: React.ReactNode;
 }) => {
   if (!props.value)
-    throw new Error('Must provide value to ProseEditorScopeProvider');
+    throw new Error("Must provide value to ProseEditorScopeProvider");
   return (
     <ScopeProvider scope={ProseEditorScope} value={props.value}>
       {props.children}

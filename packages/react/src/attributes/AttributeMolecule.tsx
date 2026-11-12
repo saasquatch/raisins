@@ -1,15 +1,15 @@
-import type { Attribute } from '@raisins/schema/schema.js';
-import { createScope, molecule, ScopeProvider } from 'bunshi/react';
-import type { Atom, PrimitiveAtom, SetStateAction } from 'jotai';
-import { atom } from 'jotai';
-import React from 'react';
-import { isFunction } from '../util/isFunction.ts';
-import { AttributeConfigMolecule } from './AttributeConfig.ts';
-import { AttributesMolecule } from './AttributesMolecule.ts';
-import { resolveComponent } from './resolveComponent.tsx';
+import type { Attribute } from "@raisins/schema/schema.js";
+import { createScope, molecule, ScopeProvider } from "bunshi/react";
+import type { Atom, PrimitiveAtom, SetStateAction } from "jotai";
+import { atom } from "jotai";
+import React from "react";
+import { isFunction } from "../util/isFunction.ts";
+import { AttributeConfigMolecule } from "./AttributeConfig.ts";
+import { AttributesMolecule } from "./AttributesMolecule.ts";
+import { resolveComponent } from "./resolveComponent.tsx";
 
 const AttributeScope = createScope<string | undefined>(undefined);
-AttributeScope.displayName = 'AttributeScope';
+AttributeScope.displayName = "AttributeScope";
 
 /**
  * Scope for the attribute name (i.e. key) that is in scope
@@ -17,7 +17,7 @@ AttributeScope.displayName = 'AttributeScope';
 export const AttributeScopeMolecule = molecule((_, getScope) => {
   const name = getScope(AttributeScope);
   if (!name)
-    throw new Error('AttributeMolecule must be used in a <AttributeProvider>');
+    throw new Error("AttributeMolecule must be used in a <AttributeProvider>");
   return name;
 });
 
@@ -25,13 +25,13 @@ export const AttributeScopeMolecule = molecule((_, getScope) => {
  * Atoms for a single attribute for a node
  *
  */
-export const AttributeMolecule = molecule(getMol => {
+export const AttributeMolecule = molecule((getMol) => {
   const attributesAtoms = getMol(AttributesMolecule);
   const name = getMol(AttributeScopeMolecule);
   const config = getMol(AttributeConfigMolecule);
 
   const valueAtom = atom(
-    get => {
+    (get) => {
       return get(attributesAtoms.valuesAtom)[name];
     },
     (_, set, next: SetStateAction<string | undefined>) => {
@@ -46,47 +46,47 @@ export const AttributeMolecule = molecule(getMol => {
         }
         return attrbsClone;
       });
-    }
+    },
   );
   const schemaAtom: Atom<Attribute> = atom(
-    get =>
-      get(attributesAtoms.schemaAtom)?.find(s => s.name === name) ?? { name }
+    (get) =>
+      get(attributesAtoms.schemaAtom)?.find((s) => s.name === name) ?? { name },
   );
 
   const clearAtom = atom(null, (_, set) => set(valueAtom, undefined));
 
-  const WidgetAtom = atom(get =>
-    resolveComponent(get(schemaAtom), get(config.AttributeTheme.widgets))
+  const WidgetAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.widgets)),
   );
-  const FieldAtom = atom(get =>
-    resolveComponent(get(schemaAtom), get(config.AttributeTheme.fields))
+  const FieldAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.fields)),
   );
-  const TemplateAtom = atom(get =>
-    resolveComponent(get(schemaAtom), get(config.AttributeTheme.templates))
+  const TemplateAtom = atom((get) =>
+    resolveComponent(get(schemaAtom), get(config.AttributeTheme.templates)),
   );
 
   const booleanValueAtom: PrimitiveAtom<boolean | undefined> = atom(
-    get => toBoolean(get(valueAtom)),
+    (get) => toBoolean(get(valueAtom)),
     (_, set, next) => {
-      set(valueAtom, prev => {
+      set(valueAtom, (prev) => {
         // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(toBoolean(prev)) : next;
         // Empty string for true, undefined for false
-        return value ? '' : undefined;
+        return value ? "" : undefined;
       });
-    }
+    },
   );
 
   const numberValueAtom: PrimitiveAtom<number | undefined> = atom(
-    get => toNumber(get(valueAtom)),
+    (get) => toNumber(get(valueAtom)),
     (_, set, next) => {
-      set(valueAtom, prev => {
+      set(valueAtom, (prev) => {
         // @ts-expect-error Not all constituents of type are callable
         const value = isFunction(next) ? next(toNumber(prev)) : next;
         // Empty string for true, undefined for false
         return value?.toString();
       });
-    }
+    },
   );
 
   return {
@@ -104,7 +104,7 @@ export const AttributeMolecule = molecule(getMol => {
 
 function toBoolean(value: string | undefined): boolean | undefined {
   if (value === undefined) return undefined;
-  return typeof value !== 'undefined';
+  return typeof value !== "undefined";
 }
 function toNumber(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
@@ -119,8 +119,8 @@ function toNumber(value: string | undefined): number | undefined {
  */
 export const AttributeProvider: React.FC<{
   attributeName: string;
-  children: React.PropsWithChildren['children'];
-}> = props => (
+  children: React.PropsWithChildren["children"];
+}> = (props) => (
   <ScopeProvider scope={AttributeScope} value={props.attributeName}>
     {props.children}
   </ScopeProvider>

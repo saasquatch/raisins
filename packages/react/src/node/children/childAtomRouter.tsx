@@ -1,20 +1,20 @@
-import type { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import type { Atom, PrimitiveAtom } from 'jotai';
-import { useAtom } from 'jotai';
-import { focusAtom } from 'jotai-optics';
-import { splitAtom } from 'jotai/utils';
-import { optic_ } from 'optics-ts';
-import { polymorphicAtom } from '../../util/atoms/polymorphicAtom.tsx';
-import { isElementNode, isRoot } from '../../util/isNode.tsx';
-import { createMemoizeAtom } from '../../util/weakCache.ts';
-import { atomForChildren } from '../atoms/atomForChildren.tsx';
+import type { RaisinNode, RaisinNodeWithChildren } from "@raisins/core";
+import type { Atom, PrimitiveAtom } from "jotai";
+import { useAtom } from "jotai";
+import { focusAtom } from "jotai-optics";
+import { splitAtom } from "jotai/utils";
+import { optic_ } from "optics-ts";
+import { polymorphicAtom } from "../../util/atoms/polymorphicAtom.tsx";
+import { isElementNode, isRoot } from "../../util/isNode.tsx";
+import { createMemoizeAtom } from "../../util/weakCache.ts";
+import { atomForChildren } from "../atoms/atomForChildren.tsx";
 
 /**
  * Returns a child atom when children exist. Prevents exceptions by returning undefined when not.
  */
 const childAtomRouter = (
   node: RaisinNode,
-  innerNodeAtom: PrimitiveAtom<RaisinNode>
+  innerNodeAtom: PrimitiveAtom<RaisinNode>,
 ) => {
   if (isElementNode(node) || isRoot(node)) {
     return splitAtom(atomForChildren(innerNodeAtom));
@@ -23,11 +23,11 @@ const childAtomRouter = (
 };
 
 export function useChildAtoms(
-  nodeAtom: PrimitiveAtom<RaisinNode>
+  nodeAtom: PrimitiveAtom<RaisinNode>,
 ): PrimitiveAtom<RaisinNode>[] {
   const childrenOrUndefined = polymorphicAtom(
     nodeAtom,
-    childAtomRouter
+    childAtomRouter,
   ) as Atom<unknown>;
 
   const [
@@ -41,16 +41,16 @@ export function useChildAtoms(
 
 const chilOptic = () =>
   optic_<RaisinNodeWithChildren>()
-    .prop('children')
-    .filter(c => isElementNode(c));
+    .prop("children")
+    .filter((c) => isElementNode(c));
 
 export function useChildAtomsForked(
-  nodeAtom: PrimitiveAtom<RaisinNode>
+  nodeAtom: PrimitiveAtom<RaisinNode>,
 ): PrimitiveAtom<RaisinNode>[] {
   const childrenOrUndefined = memoize(() => {
     return splitAtom(
       // Need to replace this to not replace souls
-      focusAtom(nodeAtom, chilOptic)
+      focusAtom(nodeAtom, chilOptic),
     );
   }, [nodeAtom]);
 

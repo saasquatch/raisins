@@ -1,4 +1,4 @@
-import type { VNode } from 'snabbdom';
+import type { VNode } from "snabbdom";
 
 export type GeometryDetail = {
   entries: GeometryEntry[];
@@ -15,7 +15,7 @@ export type GeometryDetail = {
   full?: boolean;
 };
 export type GeometryEntry = {
-  contentRect: Omit<DOMRectReadOnly, 'toJSON'>;
+  contentRect: Omit<DOMRectReadOnly, "toJSON">;
   target?: {
     attributes: Record<string, string>;
   };

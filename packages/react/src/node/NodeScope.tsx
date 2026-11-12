@@ -1,22 +1,22 @@
-import type { RaisinNode } from '@raisins/core';
-import type { PrimitiveAtom } from 'jotai';
-import { atom } from 'jotai';
+import type { RaisinNode } from "@raisins/core";
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'bunshi/react';
-import React from 'react';
-import { CoreMolecule } from '../core/CoreAtoms.tsx';
-import { SoulsMolecule } from '../core/souls/Soul.ts';
-import { isFunction } from '../util/isFunction.ts';
-import { createMemoizeAtom } from '../util/weakCache.ts';
+} from "bunshi/react";
+import type { PrimitiveAtom } from "jotai";
+import { atom } from "jotai";
+import React from "react";
+import { CoreMolecule } from "../core/CoreAtoms.tsx";
+import { SoulsMolecule } from "../core/souls/Soul.ts";
+import { isFunction } from "../util/isFunction.ts";
+import { createMemoizeAtom } from "../util/weakCache.ts";
 
 export const NodeScope = createScope<PrimitiveAtom<RaisinNode> | undefined>(
-  undefined
+  undefined,
 );
-NodeScope.displayName = 'NodeScope';
+NodeScope.displayName = "NodeScope";
 
 /**
  * Uses atom for the "current node"
@@ -47,20 +47,20 @@ export const NodeScopeMolecule = molecule((getMol, getScope) => {
    * @returns a proxy atom with soul saved
    */
   function nodeAtomWithSoulSaved(
-    nodeAtom: PrimitiveAtom<RaisinNode>
+    nodeAtom: PrimitiveAtom<RaisinNode>,
   ): PrimitiveAtom<RaisinNode> {
     return memoized(() => {
       return atom(
-        get => get(nodeAtom),
+        (get) => get(nodeAtom),
         (get, set, next) => {
-          set(nodeAtom, prev => {
+          set(nodeAtom, (prev) => {
             const souls = get(SoulsAtom);
             const soul = souls.get(prev);
             const nextNode = isFunction(next) ? (next as Function)(prev) : next;
             soul && souls.set(nextNode, soul);
             return nextNode;
           });
-        }
+        },
       );
     }, [SoulsAtom, nodeAtom]);
   }

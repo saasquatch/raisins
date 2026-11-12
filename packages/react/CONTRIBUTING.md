@@ -22,6 +22,10 @@ To do a one-off build, use `npm run build` or `yarn build`.
 
 To run tests, use `npm test` or `yarn test`.
 
+To lint, use `npm run lint`, which runs [oxlint](https://oxc.rs/docs/guide/usage/linter) (type-aware, using `tsconfig.json`).
+
+To format, use `npm run format`, which runs [oxfmt](https://oxc.rs/docs/guide/usage/formatter).
+
 ### Jest
 
 Jest tests are set up to run with `npm test` or `yarn test`.

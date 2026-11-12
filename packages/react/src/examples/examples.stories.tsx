@@ -2,31 +2,31 @@ import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
-} from '@raisins/core';
-import type { Meta } from '@storybook/react';
-import type { Atom, WritableAtom, PrimitiveAtom } from 'jotai';
-import { useAtomValue, atom, useSetAtom, useAtom } from 'jotai';
+} from "@raisins/core";
+import type { Meta } from "@storybook/react";
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
-} from 'bunshi/react';
-import type { CSSProperties } from 'react';
-import React, { type FC, useCallback, useMemo } from 'react';
-import { AttributesController } from '../attributes/index.ts';
-import type { Rect } from '../canvas/index.ts';
+} from "bunshi/react";
+import type { Atom, WritableAtom, PrimitiveAtom } from "jotai";
+import { useAtomValue, atom, useSetAtom, useAtom } from "jotai";
+import type { CSSProperties } from "react";
+import React, { type FC, useCallback, useMemo } from "react";
+import { AttributesController } from "../attributes/index.ts";
+import type { Rect } from "../canvas/index.ts";
 import {
   CanvasSelectionMolecule,
   CanvasHoveredMolecule,
   BasicCanvasController,
   CanvasProvider,
   CanvasPickAndPlopMolecule,
-} from '../canvas/index.ts';
-import type { Module } from '../component-metamodel/index.ts';
-import { ComponentModelMolecule } from '../component-metamodel/index.ts';
-import type { Slot } from '../component-metamodel/Component.ts';
-import type { RaisinConfig } from '../core/index.ts';
+} from "../canvas/index.ts";
+import type { Slot } from "../component-metamodel/Component.ts";
+import type { Module } from "../component-metamodel/index.ts";
+import { ComponentModelMolecule } from "../component-metamodel/index.ts";
+import type { RaisinConfig } from "../core/index.ts";
 import {
   HoveredNodeMolecule,
   SelectedNodeMolecule,
@@ -37,8 +37,8 @@ import {
   EditMolecule,
   CoreMolecule,
   PickAndPlopMolecule,
-} from '../core/index.ts';
-import { useHotkeys } from '../hotkeys/index.ts';
+} from "../core/index.ts";
+import { useHotkeys } from "../hotkeys/index.ts";
 import {
   ChildrenEditorForAtoms,
   NodeChildrenEditor,
@@ -47,51 +47,52 @@ import {
   SlotChildrenController,
   SlotMolecule,
   SlotScopeProvider,
-} from '../node/index.ts';
+} from "../node/index.ts";
 import {
   ProseEditor,
   ProseEditorScopeProvider,
   RichTextMolecule,
-} from '../rich-text/index.ts';
-import { NodeRichTextController } from '../rich-text/RichTextEditor.tsx';
+} from "../rich-text/index.ts";
+import { NodeRichTextController } from "../rich-text/RichTextEditor.tsx";
 
 const meta: Meta = {
-  title: 'Examples',
-  excludeStories: ['EditorView', 'StoryConfigMolecule', 'ErrorListController'],
+  title: "Examples",
+  excludeStories: ["EditorView", "StoryConfigMolecule", "ErrorListController"],
 };
 export default meta;
 
 // -- Shared layout styles --
 const panelLayout: CSSProperties = {
-  display: 'flex',
-  height: '100vh',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  fontSize: '13px',
+  display: "flex",
+  height: "100vh",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: "13px",
 };
 const sidePanel: CSSProperties = {
-  flex: '0 0 280px',
-  overflowY: 'auto',
-  padding: '12px',
-  borderRight: '1px solid #e0e0e0',
+  flex: "0 0 280px",
+  overflowY: "auto",
+  padding: "12px",
+  borderRight: "1px solid #e0e0e0",
 };
 const mainPanel: CSSProperties = {
   flex: 1,
-  overflowY: 'auto',
-  padding: '12px',
+  overflowY: "auto",
+  padding: "12px",
 };
 const rightPanel: CSSProperties = {
-  flex: '0 0 280px',
-  overflowY: 'auto',
-  padding: '12px',
-  borderLeft: '1px solid #e0e0e0',
+  flex: "0 0 280px",
+  overflowY: "auto",
+  padding: "12px",
+  borderLeft: "1px solid #e0e0e0",
 };
 
 const WidgetScope = createScope<{
   startingHtml: string;
   startingPackages: Module[];
 }>({
-  startingHtml: '',
-  startingPackages: [{ package: '', version: '' }] as Module[],
+  startingHtml: "",
+  startingPackages: [{ package: "", version: "" }] as Module[],
 });
 
 const ConfigMolecule = molecule<Partial<RaisinConfig>>((_, getScope) => {
@@ -165,7 +166,12 @@ export function ExternalHTMLControl() {
           value={html}
           onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
           rows={6}
-          style={{ width: '100%', fontFamily: 'monospace', fontSize: '12px', marginBottom: '12px' }}
+          style={{
+            width: "100%",
+            fontFamily: "monospace",
+            fontSize: "12px",
+            marginBottom: "12px",
+          }}
         />
         <div style={panelLayout}>
           <div style={mainPanel}>
@@ -339,8 +345,8 @@ export function WithMintComponents() {
         startingHtml: html,
         startingPackages: [
           {
-            package: '@saasquatch/mint-components',
-            version: 'next',
+            package: "@saasquatch/mint-components",
+            version: "next",
           },
         ],
       }}
@@ -367,7 +373,12 @@ export function FullExample() {
           value={html}
           onInput={(e) => setHtml((e.target as HTMLTextAreaElement).value)}
           rows={6}
-          style={{ width: '100%', fontFamily: 'monospace', fontSize: '12px', marginBottom: '12px' }}
+          style={{
+            width: "100%",
+            fontFamily: "monospace",
+            fontSize: "12px",
+            marginBottom: "12px",
+          }}
         />
         <div style={panelLayout}>
           <div style={sidePanel}>
@@ -415,8 +426,8 @@ export function FullExample() {
         startingHtml: html,
         startingPackages: [
           {
-            package: '@saasquatch/mint-components',
-            version: 'next',
+            package: "@saasquatch/mint-components",
+            version: "next",
           },
         ],
       }}
@@ -459,7 +470,7 @@ const Toolbars = () => {
   const { getComponentMeta } = useAtomValue(ComponentModelAtom);
   const hoveredMeta = getComponentMeta(hoveredNode?.tagName);
   const selectedMeta = getComponentMeta(selectedNode?.tagName);
-  const textEditor = selectedMeta.slotEditor === 'richText';
+  const textEditor = selectedMeta.slotEditor === "richText";
   return (
     <>
       <PositionedToolbar rectAtom={HoveredRectAtom}>
@@ -487,7 +498,7 @@ const PositionedToolbar = ({
   const rect = useAtomValue(rectAtom);
   if (!rect)
     return (
-      <div style={{ position: 'absolute', top: 0, left: 0, display: 'none' }} />
+      <div style={{ position: "absolute", top: 0, left: 0, display: "none" }} />
     );
 
   const { x, y, width, height } = rect;
@@ -496,13 +507,13 @@ const PositionedToolbar = ({
   return (
     <div
       style={{
-        background: 'green',
-        color: 'white',
-        position: 'absolute',
+        background: "green",
+        color: "white",
+        position: "absolute",
         transform: `translate(${x - 2}px, ${y + height}px)`,
-        transition: 'transform .2s',
-        width: toolbarWidth + 'px',
-        minWidth: '200px',
+        transition: "transform .2s",
+        width: toolbarWidth + "px",
+        minWidth: "200px",
       }}
     >
       {children}
@@ -515,7 +526,7 @@ const LayersMolecule = molecule((getMol) => {
   const { ComponentModelAtom } = getMol(ComponentModelMolecule);
   const { RootNodeAtom } = getMol(CoreMolecule);
   const RootHasChildren = atom(
-    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0
+    (get) => (get(RootNodeAtom) as RaisinDocumentNode).children.length > 0,
   );
 
   return {
@@ -558,43 +569,43 @@ const LayersController = () => {
 };
 
 const Label: CSSProperties = {
-  cursor: 'pointer',
-  lineHeight: '28px',
+  cursor: "pointer",
+  lineHeight: "28px",
 };
 
 const Layer: CSSProperties = {
-  position: 'relative',
-  userSelect: 'none',
-  cursor: 'pointer',
-  padding: '10px 0',
-  outlineOffset: '-2px',
+  position: "relative",
+  userSelect: "none",
+  cursor: "pointer",
+  padding: "10px 0",
+  outlineOffset: "-2px",
 };
 
 const SelectedLayer: CSSProperties = {
-  background: 'green',
+  background: "green",
 };
 
 const SlotContainer: CSSProperties = {
-  marginLeft: '3px',
-  display: 'flex',
-  padding: '0 0 3px 0',
+  marginLeft: "3px",
+  display: "flex",
+  padding: "0 0 3px 0",
 };
 
 const SlotName: CSSProperties = {
-  writingMode: 'vertical-lr',
-  textOrientation: 'sideways',
-  fontSize: '0.7em',
-  padding: '5px 0 5px 2px',
-  color: 'grey',
-  background: 'rgba(0, 0, 0, 0.1)',
+  writingMode: "vertical-lr",
+  textOrientation: "sideways",
+  fontSize: "0.7em",
+  padding: "5px 0 5px 2px",
+  color: "grey",
+  background: "rgba(0, 0, 0, 0.1)",
 };
 
 const SlotChildren: CSSProperties = {
-  width: '100%',
+  width: "100%",
 };
 const TitleBar: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
+  display: "flex",
+  justifyContent: "space-between",
 };
 
 function ElementLayerName() {
@@ -626,7 +637,7 @@ function ElementLayerName() {
   const style = {
     ...Layer,
     ...(isSelected ? SelectedLayer : {}),
-    ...(isHovered ? { outline: '1px dashed green' } : {}),
+    ...(isHovered ? { outline: "1px dashed green" } : {}),
   };
 
   return (
@@ -652,7 +663,7 @@ function SlotWidgetSimple() {
 
   const slotDetails = useAtomValue(atoms.slotDetails);
   const slotWidget = slotDetails.editor;
-  const hasEditor = slotWidget === 'inline';
+  const hasEditor = slotWidget === "inline";
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   return (
@@ -729,11 +740,11 @@ function ElementLayer() {
   const name = (
     <div style={TitleBar} onClick={setSelected} onMouseOver={setHovered}>
       <div style={Label}>
-        {title} {isPicked && ' Moving...'}
+        {title} {isPicked && " Moving..."}
       </div>
       <div>
         <button onClick={moveNode} disabled={!canMove}>
-          {isPicked ? 'Cancel move' : 'Move'}
+          {isPicked ? "Cancel move" : "Move"}
         </button>
         <button onClick={duplicate} disabled={isPlopping}>
           Dupe
@@ -749,7 +760,7 @@ function ElementLayer() {
   const style = {
     ...Layer,
     ...(isSelected ? SelectedLayer : {}),
-    ...(isHovered ? { outline: '1px dashed green' } : {}),
+    ...(isHovered ? { outline: "1px dashed green" } : {}),
   };
 
   return (
@@ -786,7 +797,7 @@ function SlotWidget() {
 
   const slotDetails = useAtomValue(atoms.slotDetails);
   const slotWidget = slotDetails.editor;
-  const hasEditor = slotWidget === 'inline';
+  const hasEditor = slotWidget === "inline";
   const isEmpty = (childNodes?.length ?? 0) <= 0;
 
   return (
@@ -837,8 +848,8 @@ function PlopTarget({ idx, slot }: { idx: number; slot: string }) {
     return <></>;
   }
   return (
-    <div style={{ border: '1px dashed red' }}>
-      Position {idx} in {slot || 'content'}
+    <div style={{ border: "1px dashed red" }}>
+      Position {idx} in {slot || "content"}
       <button onClick={plop}>Plop</button>
     </div>
   );

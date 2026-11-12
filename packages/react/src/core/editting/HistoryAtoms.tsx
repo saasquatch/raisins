@@ -1,11 +1,11 @@
-import type { RaisinNode } from '@raisins/core';
-import type { WritableAtom } from 'jotai';
-import { atom } from 'jotai';
-import { molecule } from 'bunshi/react';
-import { waitForUpdate } from '../../util/waitForUpdate.ts';
-import { CoreMolecule } from '../CoreAtoms.tsx';
-import type { Selection } from '../selection/index.ts';
-import { SelectedNodeMolecule } from '../selection/index.ts';
+import type { RaisinNode } from "@raisins/core";
+import { molecule } from "bunshi/react";
+import type { WritableAtom } from "jotai";
+import { atom } from "jotai";
+import { waitForUpdate } from "../../util/waitForUpdate.ts";
+import { CoreMolecule } from "../CoreAtoms.tsx";
+import type { Selection } from "../selection/index.ts";
+import { SelectedNodeMolecule } from "../selection/index.ts";
 
 type HistoryState = {
   node: RaisinNode;
@@ -15,7 +15,7 @@ type HistoryState = {
  * A set of atoms for dealing with undo/redo history
  *
  */
-export const HistoryMolecule = molecule(getMol => {
+export const HistoryMolecule = molecule((getMol) => {
   const {
     InternalTransactionAtom,
     StateListeners,
@@ -32,20 +32,20 @@ export const HistoryMolecule = molecule(getMol => {
     (get, set, { prev, next }: { prev: RaisinNode; next: RaisinNode }) => {
       set(undoAtoms.push, { node: prev, selection: get(SelectionAtom) });
       set(redoAtoms.resetStack);
-    }
+    },
   );
   StateListeners.add(onChangeAtom);
 
   /**
    * Returns the sizes of the undo/redo stacks for the UI
    */
-  const HistorySizeAtom = atom(get => {
+  const HistorySizeAtom = atom((get) => {
     return {
       undoSize: get(undoAtoms.stack).length,
       redoSize: get(redoAtoms.stack).length,
     };
   });
-  HistorySizeAtom.debugLabel = 'HistorySizeAtom';
+  HistorySizeAtom.debugLabel = "HistorySizeAtom";
 
   const UndoAtom = atom(null, async (_, set) => {
     set(rerenderNodeAtom, true);
@@ -57,13 +57,13 @@ export const HistoryMolecule = molecule(getMol => {
           selection: get(SelectionAtom),
         });
         set(SelectionAtom, next.selection);
-        set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
-      })
+        set(InternalTransactionAtom, { type: "raw-set", next: next.node });
+      }),
     );
     await waitForUpdate();
     set(rerenderNodeAtom, false);
   });
-  UndoAtom.debugLabel = 'UndoAtom';
+  UndoAtom.debugLabel = "UndoAtom";
 
   const RedoAtom = atom(null, async (_, set) => {
     set(rerenderNodeAtom, true);
@@ -74,14 +74,14 @@ export const HistoryMolecule = molecule(getMol => {
           node: get(RootNodeAtom),
           selection: get(SelectionAtom),
         });
-        set(InternalTransactionAtom, { type: 'raw-set', next: next.node });
+        set(InternalTransactionAtom, { type: "raw-set", next: next.node });
         set(SelectionAtom, next.selection);
-      })
+      }),
     );
     await waitForUpdate();
     set(rerenderNodeAtom, false);
   });
-  RedoAtom.debugLabel = 'RedoAtom';
+  RedoAtom.debugLabel = "RedoAtom";
 
   return {
     HistorySizeAtom,
@@ -108,7 +108,7 @@ export function branchAtoms<T>() {
   const stack = atom<T[]>([]);
   const resetStack = atom(null, (_, set) => set(stack, []));
   const forcePush = atom(null, (get, set, item: T) =>
-    set(stack, [item, ...get(stack)])
+    set(stack, [item, ...get(stack)]),
   );
 
   const push = atom(null, (get, set, item: T) => {
@@ -136,7 +136,7 @@ export function branchAtoms<T>() {
       set(prevTime, undefined);
       set(stack, rest);
       set(target, item);
-    }
+    },
   );
 
   return {

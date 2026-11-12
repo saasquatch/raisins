@@ -1,16 +1,16 @@
-import { atom, useAtom } from 'jotai';
-import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
-import React from 'react';
-import { h } from 'snabbdom';
-import { unpkgNpmRegistry } from '../../util/NPMRegistry.ts';
-import type { SnabbdomIframeProps } from './SnabbdomSanboxedIframeAtom.tsx';
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { molecule, ScopeProvider, useMolecule } from "bunshi/react";
+import { atom, useAtom } from "jotai";
+import React from "react";
+import { h } from "snabbdom";
+import { unpkgNpmRegistry } from "../../util/NPMRegistry.ts";
+import type { SnabbdomIframeProps } from "./SnabbdomSanboxedIframeAtom.tsx";
 import {
   SnabbdomIframeMolecule,
   SnabbdomIframeScope,
-} from './SnabbdomSanboxedIframeAtom.tsx';
-import { act, renderHook, waitFor } from '@testing-library/react';
+} from "./SnabbdomSanboxedIframeAtom.tsx";
 
-describe('Thing', () => {
+describe("Thing", () => {
   const useSnabbdom = () => {
     const atoms = useMolecule(SnabbdomIframeMolecule);
     const [state, setState] = useAtom(atoms);
@@ -19,23 +19,23 @@ describe('Thing', () => {
 
   const Props = molecule<SnabbdomIframeProps>(() => {
     return {
-      head: atom(''),
+      head: atom(""),
       onEvent: atom(null, () => {}),
       onResize: atom(null, () => {}),
       registry: atom(unpkgNpmRegistry),
-      selector: atom('[raisin-events]'),
+      selector: atom("[raisin-events]"),
       eventTypes: atom(new Set<string>()),
-      vnodeAtom: atom(h('div')),
+      vnodeAtom: atom(h("div")),
     };
   });
-  it('Fails without a wrapper', () => {
+  it("Fails without a wrapper", () => {
     expect(() => {
       const { result } = renderHook(() => useSnabbdom());
     }).toThrowError();
   });
 
   // TODO: Move this testing functionality to playwright tests
-  it.skip('Should render an iframe', async () => {
+  it.skip("Should render an iframe", async () => {
     const Wrapper: React.FC = ({ children }) => (
       <ScopeProvider scope={SnabbdomIframeScope} value={Props}>
         {children}
@@ -45,19 +45,19 @@ describe('Thing', () => {
       wrapper: Wrapper,
     });
 
-    expect(result.current.state.type).toBe('uninitialized');
+    expect(result.current.state.type).toBe("uninitialized");
 
-    const element: HTMLElement | undefined = document.createElement('div');
+    const element: HTMLElement | undefined = document.createElement("div");
     document.body.appendChild(element);
 
     act(() => {
       result.current.setState(element);
     });
     expect((result.current.state as any).error).toBeUndefined();
-    expect(result.current.state.type).toBe('initializing');
+    expect(result.current.state.type).toBe("initializing");
 
-    await waitFor(() => result.current.state.type === 'loaded');
+    await waitFor(() => result.current.state.type === "loaded");
     expect((result.current.state as any).error).toBeUndefined();
-    expect(result.current.state.type).toBe('loaded');
+    expect(result.current.state.type).toBe("loaded");
   });
 });
