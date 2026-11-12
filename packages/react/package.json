@@ -1,12 +1,9 @@
 {
   "name": "@raisins/react",
-  "version": "1.7.2",
-  "description": "React package with tools for building a Raisins editor",
-  "bugs": {
-    "url": "https://github.com/saasquatch/raisins/issues"
-  },
-  "license": "MIT",
   "author": "ReferralSaaSquatch.com, Inc.",
+  "description": "React package with tools for building a Raisins editor",
+  "version": "1.8.0",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/saasquatch/raisins",

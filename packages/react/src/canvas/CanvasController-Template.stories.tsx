@@ -58,7 +58,9 @@ const PaintItRedMolecule = molecule((getMol, getScope) => {
     };
   });
 
-  CanvasScope.RootRendererSet.add(PaintItRed);
+  CanvasScope.registerOnce(PaintItRedMolecule, () =>
+    CanvasScope.RootRendererSet.add(PaintItRed)
+  );
   return { ColorAtom, TextAtom };
 });
 
