@@ -23,5 +23,10 @@
     "pify": "^6.1.0",
     "turbo": "^2.11.11"
   },
-  "packageManager": "npm@11.20.0"
+  "packageManager": "npm@11.20.0",
+  "overrides": {
+    "typescript-json-schema": {
+      "glob": "^14.0.2"
+    }
+  }
 }
