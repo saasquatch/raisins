@@ -1,37 +1,47 @@
-import { htmlUtil, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { Meta } from '@storybook/react';
+import type { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
+import { htmlUtil } from '@raisins/core';
+import type { Meta } from '@storybook/react';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
-import React, { CSSProperties, FC, useCallback, useState } from 'react';
-import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
-import { CoreMolecule } from '../../core/CoreAtoms';
-import { EditMolecule } from '../../core/editting/EditAtoms';
-import { PickAndPlopMolecule } from '../../core/selection/PickAndPlopMolecule';
-import { NodeRichTextController } from '../../rich-text/RichTextEditor';
-import { BasicStory } from '../../index.stories';
-import { big, MintComponents, mintMono } from '../../examples/MintComponents';
+import type { CSSProperties, FC } from 'react';
+import React, { useCallback, useState } from 'react';
+import {
+  ComponentModelMolecule,
+} from '../../component-metamodel/ComponentModel.tsx';
+import { CoreMolecule } from '../../core/CoreAtoms.tsx';
+import { EditMolecule } from '../../core/editting/EditAtoms.ts';
+import {
+  PickAndPlopMolecule,
+} from '../../core/selection/PickAndPlopMolecule.tsx';
+import { NodeRichTextController } from '../../rich-text/RichTextEditor.tsx';
+import { BasicStory } from '../../index.stories.tsx';
+import {
+  big,
+  MintComponents,
+  mintMono,
+} from '../../examples/MintComponents.tsx';
 import {
   ChildrenEditorForAtoms,
   NodeChildrenEditor,
-} from '../NodeChildrenEditor';
-import { NodeMolecule } from '../NodeMolecule';
-import { NodeScopeProvider, useNodeAtom } from '../NodeScope';
-import { SlotChildrenController } from './SlotChildrenController';
-import { SlotMolecule, SlotScopeProvider } from './SlotScope';
+} from '../NodeChildrenEditor.tsx';
+import { NodeMolecule } from '../NodeMolecule.tsx';
+import { NodeScopeProvider, useNodeAtom } from '../NodeScope.tsx';
+import { SlotChildrenController } from './SlotChildrenController.tsx';
+import { SlotMolecule, SlotScopeProvider } from './SlotScope.tsx';
 import {
   BasicCanvasController,
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasSelectionMolecule,
-} from '../../canvas';
-import { AttributesController } from '../../attributes';
-import { SelectedNodeController } from '../../core';
+} from '../../canvas/index.ts';
+import { AttributesController } from '../../attributes/index.ts';
+import { SelectedNodeController } from '../../core/index.ts';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents';
-import { CanvasFull } from '../../canvas/CanvasController.stories';
+} from '../../examples/VanillaComponents.tsx';
+import { CanvasFull } from '../../canvas/CanvasController.stories.tsx';
 
 const meta: Meta = {
   title: 'Slot Children Controller',

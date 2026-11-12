@@ -1,14 +1,10 @@
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { Node } from 'prosemirror-model';
-import {
-  EditorState,
-  SelectionBookmark,
-  TextSelection,
-  Transaction,
-} from 'prosemirror-state';
-import { ProseEditorScope } from './ProseEditorScope';
-import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin';
+import type { SelectionBookmark, Transaction } from 'prosemirror-state';
+import { EditorState, TextSelection } from 'prosemirror-state';
+import { ProseEditorScope } from './ProseEditorScope.tsx';
+import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin.ts';
 
 /**
  * Molecule wrapper for ProseMirror {@link EditorState} that adapts {@link RaisinNode} to

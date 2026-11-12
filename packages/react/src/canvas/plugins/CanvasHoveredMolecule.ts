@@ -1,14 +1,17 @@
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { VNodeStyle } from 'snabbdom';
-import { PickAndPlopMolecule } from '../../core';
-import { HoveredNodeMolecule } from '../../core/selection/HoveredNodeMolecule';
-import { SoulsMolecule } from '../../core/souls/Soul';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
-import { throttleAtom } from '../iframe/throttledAtom';
-import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabbdomRenderer } from '../util/raisinToSnabdom';
+import type { VNodeStyle } from 'snabbdom';
+import { PickAndPlopMolecule } from '../../core/index.ts';
+import {
+  HoveredNodeMolecule,
+} from '../../core/selection/HoveredNodeMolecule.tsx';
+import { SoulsMolecule } from '../../core/souls/Soul.ts';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import type { RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
+import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
+import { throttleAtom } from '../iframe/throttledAtom.tsx';
+import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
+import type { SnabbdomRenderer } from '../util/raisinToSnabdom.tsx';
 
 export const CanvasHoveredMolecule = molecule((getMol, getScope) => {
   const CanvasConfig = getMol(CanvasConfigMolecule);

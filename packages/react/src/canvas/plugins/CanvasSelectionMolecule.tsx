@@ -1,13 +1,17 @@
-import { Atom, atom } from 'jotai';
+import type { Atom } from 'jotai';
+import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { VNodeStyle } from 'snabbdom';
-import { PickAndPlopMolecule } from '../../core';
-import { SelectedNodeMolecule } from '../../core/selection/SelectedNodeMolecule';
-import { SoulsMolecule } from '../../core/souls/Soul';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
-import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabbdomRenderer } from '../util/raisinToSnabdom';
+import type { VNodeStyle } from 'snabbdom';
+import { PickAndPlopMolecule } from '../../core/index.ts';
+import {
+  SelectedNodeMolecule,
+} from '../../core/selection/SelectedNodeMolecule.tsx';
+import { SoulsMolecule } from '../../core/souls/Soul.ts';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import type { RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
+import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
+import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
+import type { SnabbdomRenderer } from '../util/raisinToSnabdom.tsx';
 
 export const CanvasSelectionMolecule = molecule((getMol) => {
   const CanvasAtoms = getMol(CanvasScopeMolecule);

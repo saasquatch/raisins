@@ -1,4 +1,5 @@
-import { Atom, atom } from 'jotai';
+import type { Atom } from 'jotai';
+import { atom } from 'jotai';
 
 /**
  * Create an atom-in-atom that will produce an atom of `initialValue`

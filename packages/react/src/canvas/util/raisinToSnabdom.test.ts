@@ -1,11 +1,11 @@
-import { cssParser, RaisinDocumentNode, RaisinStyleNode } from '@raisins/core';
-import expect from 'expect';
-import { VNode } from 'snabbdom';
+import type { RaisinDocumentNode, RaisinStyleNode } from '@raisins/core';
+import { cssParser } from '@raisins/core';
+import type { VNode } from 'snabbdom';
 import {
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from '../../css-editing/RaisinCssIds';
-import { raisinToSnabbdom } from './raisinToSnabdom';
+} from '../../css-editing/RaisinCssIds.ts';
+import { raisinToSnabbdom } from './raisinToSnabdom.tsx';
 
 const styleNode = (
   attribs: Record<string, string>,

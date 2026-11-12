@@ -1,7 +1,7 @@
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React from 'react';
-import { AttributeMolecule } from '../attributes';
+import { AttributeMolecule } from '../attributes/index.ts';
 
 const colorStyle = {
   height: '25px',

@@ -1,6 +1,8 @@
-import { isElementNode, RaisinNode } from '@raisins/core';
-import { Atom, atom, PrimitiveAtom } from 'jotai';
-import { createMemoizeAtom } from '../../util/weakCache';
+import type { RaisinNode } from '@raisins/core';
+import { isElementNode } from '@raisins/core';
+import type { Atom, PrimitiveAtom } from 'jotai';
+import { atom } from 'jotai';
+import { createMemoizeAtom } from '../../util/weakCache.ts';
 
 const memoized = createMemoizeAtom();
 

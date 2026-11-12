@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { Module } from '../component-metamodel';
+import type { Module } from '../component-metamodel/index.ts';
 
 export type PackageJson = {
   name: string;

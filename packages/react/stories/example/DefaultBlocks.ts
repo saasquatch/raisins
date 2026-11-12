@@ -1,6 +1,6 @@
-import { RaisinTextNode } from '@raisins/core';
+import type { RaisinTextNode } from '@raisins/core';
 import { ElementType } from 'domelementtype';
-import { Block } from '../../src/component-metamodel/ComponentModel';
+import type { Block } from '../../src/component-metamodel/ComponentModel.tsx';
 
 export const DEFAULT_BLOCKS: Block[] = [
   {

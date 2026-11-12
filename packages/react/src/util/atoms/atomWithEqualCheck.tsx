@@ -1,5 +1,6 @@
-import { Atom, atom } from 'jotai';
-import { createMemoizeAtom } from '../weakCache';
+import type { Atom } from 'jotai';
+import { atom } from 'jotai';
+import { createMemoizeAtom } from '../weakCache.ts';
 
 const memoized = createMemoizeAtom();
 const strictIsEqual = <T,>(a: T, b: T) => a === b;

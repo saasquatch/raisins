@@ -1,8 +1,8 @@
-import * as schema from '@raisins/schema/schema';
-import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry';
+import type * as schema from '@raisins/schema/schema';
+import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry.ts';
 
-import { Module, ModuleDetails } from '../types';
-import { LOCAL_REPO } from './LOCAL_REPO';
+import type { Module, ModuleDetails } from '../types.ts';
+import { LOCAL_REPO } from './LOCAL_REPO.tsx';
 
 /**
  * Downloads module details from an NPM registry

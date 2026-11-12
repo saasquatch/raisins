@@ -1,4 +1,5 @@
-import { atom, Setter, WritableAtom } from 'jotai';
+import type { Setter, WritableAtom } from 'jotai';
+import { atom } from 'jotai';
 import { throttle } from 'throttle-debounce';
 
 /**

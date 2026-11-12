@@ -1,6 +1,6 @@
 import React from 'react';
-import { Atom } from 'jotai';
-import { Molecule } from 'bunshi/react';
+import type { Atom } from 'jotai';
+import type { Molecule } from 'bunshi/react';
 
 export type AttributeThemeMoleculeValue = {
   widgets: Atom<Record<string, AttributeWidget>>;

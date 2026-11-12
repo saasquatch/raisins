@@ -1,49 +1,44 @@
-import {
+import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
 } from '@raisins/core';
-import { Meta } from '@storybook/react';
-import {
-  useAtomValue,
-  atom,
-  Atom,
-  useSetAtom,
-  useAtom,
-  WritableAtom,
-  PrimitiveAtom,
-} from 'jotai';
+import type { Meta } from '@storybook/react';
+import type { Atom, WritableAtom, PrimitiveAtom } from 'jotai';
+import { useAtomValue, atom, useSetAtom, useAtom } from 'jotai';
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
 } from 'bunshi/react';
-import React, { CSSProperties, FC, useCallback, useMemo } from 'react';
-import { AttributesController } from '../attributes';
+import type { CSSProperties } from 'react';
+import React, { type FC, useCallback, useMemo } from 'react';
+import { AttributesController } from '../attributes/index.ts';
+import type { Rect } from '../canvas/index.ts';
 import {
   CanvasSelectionMolecule,
   CanvasHoveredMolecule,
   BasicCanvasController,
   CanvasProvider,
-  Rect,
   CanvasPickAndPlopMolecule,
-} from '../canvas';
-import { ComponentModelMolecule, Module } from '../component-metamodel';
-import { Slot } from '../component-metamodel/Component';
+} from '../canvas/index.ts';
+import type { Module } from '../component-metamodel/index.ts';
+import { ComponentModelMolecule } from '../component-metamodel/index.ts';
+import type { Slot } from '../component-metamodel/Component.ts';
+import type { RaisinConfig } from '../core/index.ts';
 import {
   HoveredNodeMolecule,
   SelectedNodeMolecule,
   HistoryMolecule,
-  RaisinConfig,
   SelectedNodeController,
   RaisinsProvider,
   EditSelectedMolecule,
   EditMolecule,
   CoreMolecule,
   PickAndPlopMolecule,
-} from '../core';
-import { useHotkeys } from '../hotkeys';
+} from '../core/index.ts';
+import { useHotkeys } from '../hotkeys/index.ts';
 import {
   ChildrenEditorForAtoms,
   NodeChildrenEditor,
@@ -52,13 +47,13 @@ import {
   SlotChildrenController,
   SlotMolecule,
   SlotScopeProvider,
-} from '../node';
+} from '../node/index.ts';
 import {
   ProseEditor,
   ProseEditorScopeProvider,
   RichTextMolecule,
-} from '../rich-text';
-import { NodeRichTextController } from '../rich-text/RichTextEditor';
+} from '../rich-text/index.ts';
+import { NodeRichTextController } from '../rich-text/RichTextEditor.tsx';
 
 const meta: Meta = {
   title: 'Examples',

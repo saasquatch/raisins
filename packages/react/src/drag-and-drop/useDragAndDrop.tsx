@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'bunshi/react';
-import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import { Block } from '../component-metamodel/ComponentModel';
-import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
-import { NodeMolecule } from '../node/NodeMolecule';
+import type { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import type { Block } from '../component-metamodel/ComponentModel.tsx';
+import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
+import {
+  SelectedNodeMolecule,
+} from '../core/selection/SelectedNodeMolecule.tsx';
+import { NodeMolecule } from '../node/NodeMolecule.tsx';
 
 /**
  * Sizing for the drag ghost (the "drag image" that follows the cursor).

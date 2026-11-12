@@ -1,5 +1,5 @@
-import { DefaultAttributeComponent } from './AttributeThemeMolecule';
-import { Attribute } from '@raisins/schema/schema';
+import { DefaultAttributeComponent } from './AttributeThemeMolecule.tsx';
+import type { Attribute } from '@raisins/schema/schema.js';
 
 const FormatToComponent: Record<string, string> = {
   color: 'text',

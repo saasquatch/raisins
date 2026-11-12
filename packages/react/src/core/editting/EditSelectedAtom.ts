@@ -1,10 +1,12 @@
-import { htmlUtil, RaisinNode } from '@raisins/core';
-import { atom, SetStateAction } from 'jotai';
+import type { RaisinNode } from '@raisins/core';
+import { htmlUtil } from '@raisins/core';
+import type { SetStateAction } from 'jotai';
+import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { isFunction } from '../../util/isFunction';
-import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule';
-import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule';
-import { EditMolecule } from './EditAtoms';
+import { isFunction } from '../../util/isFunction.ts';
+import { PickAndPlopMolecule } from '../selection/PickAndPlopMolecule.tsx';
+import { SelectedNodeMolecule } from '../selection/SelectedNodeMolecule.tsx';
+import { EditMolecule } from './EditAtoms.ts';
 
 export const EditSelectedMolecule = molecule(getMol => {
   const { DuplicateNodeAtom, ReplaceNodeAtom, RemoveNodeAtom } = getMol(

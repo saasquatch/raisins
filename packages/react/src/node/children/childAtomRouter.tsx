@@ -1,12 +1,13 @@
-import { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
-import { Atom, PrimitiveAtom, useAtom } from 'jotai';
+import type { RaisinNode, RaisinNodeWithChildren } from '@raisins/core';
+import type { Atom, PrimitiveAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { focusAtom } from 'jotai-optics';
 import { splitAtom } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
-import { polymorphicAtom } from '../../util/atoms/polymorphicAtom';
-import { isElementNode, isRoot } from '../../util/isNode';
-import { createMemoizeAtom } from '../../util/weakCache';
-import { atomForChildren } from '../atoms/atomForChildren';
+import { polymorphicAtom } from '../../util/atoms/polymorphicAtom.tsx';
+import { isElementNode, isRoot } from '../../util/isNode.tsx';
+import { createMemoizeAtom } from '../../util/weakCache.ts';
+import { atomForChildren } from '../atoms/atomForChildren.tsx';
 
 /**
  * Returns a child atom when children exist. Prevents exceptions by returning undefined when not.

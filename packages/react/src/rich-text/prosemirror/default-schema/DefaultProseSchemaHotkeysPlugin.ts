@@ -6,10 +6,15 @@ import {
   splitBlock,
   toggleMark,
 } from 'prosemirror-commands';
-import {} from 'prosemirror-transform';
+import {  } from 'prosemirror-transform';
 import { keymap } from 'prosemirror-keymap';
-import { Command, EditorState, Plugin, Transaction } from 'prosemirror-state';
-import { DefaultProseSchema } from './DefaultProseSchema';
+import type {
+  Command,
+  EditorState,
+  Plugin,
+  Transaction,
+} from 'prosemirror-state';
+import { DefaultProseSchema } from './DefaultProseSchema.ts';
 
 const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
   // const { $from, $to } = state.selection;

@@ -1,9 +1,9 @@
 import { useAtomValue } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React from 'react';
-import { SelectedNodeMolecule } from '..';
-import { NodeScopeProvider } from '../../node';
-import { EditSelectedMolecule } from '../editting/EditSelectedAtom';
+import { SelectedNodeMolecule } from '../index.ts';
+import { NodeScopeProvider } from '../../node/index.ts';
+import { EditSelectedMolecule } from '../editting/EditSelectedAtom.ts';
 
 export type SelectedNodeControllerProps = {
   HasSelectionComponent: React.ComponentType;

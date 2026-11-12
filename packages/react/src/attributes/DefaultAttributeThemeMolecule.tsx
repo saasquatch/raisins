@@ -2,19 +2,19 @@ import { isElementNode } from '@raisins/core';
 import { molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue } from 'jotai';
 import React from 'react';
-import { AttributeMolecule } from './AttributeMolecule';
-import {
+import { AttributeMolecule } from './AttributeMolecule.tsx';
+import type {
   AttributeField,
   AttributeTemplate,
   AttributeThemeMoleculeValue,
   AttributeWidget,
-  DefaultAttributeComponent,
-} from './AttributeThemeMolecule';
+} from './AttributeThemeMolecule.tsx';
+import { DefaultAttributeComponent } from './AttributeThemeMolecule.tsx';
 import {
   CssEditingMolecule,
   RAISIN_CSS_ATTR,
-} from '../css-editing/CssEditingMolecule';
-import { SelectedNodeMolecule } from '../core';
+} from '../css-editing/CssEditingMolecule.tsx';
+import { SelectedNodeMolecule } from '../core/index.ts';
 
 export const DefaultAttributeTemplate: AttributeTemplate = props => {
   const { name, schemaAtom } = useMolecule(AttributeMolecule);

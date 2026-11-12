@@ -1,17 +1,17 @@
-import {
-  cssSerializer,
-  htmlUtil,
+import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { h, VNode, VNodeData, fragment } from 'snabbdom';
+import { cssSerializer, htmlUtil } from '@raisins/core';
+import type { VNode, VNodeData } from 'snabbdom';
+import { h, fragment } from 'snabbdom';
 import styleToObject from 'style-to-object';
 import {
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from '../../css-editing/RaisinCssIds';
-import { RootRenderer } from '../types';
+} from '../../css-editing/RaisinCssIds.ts';
+import type { RootRenderer } from '../types.tsx';
 const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';

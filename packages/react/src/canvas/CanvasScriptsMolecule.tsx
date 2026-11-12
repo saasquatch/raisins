@@ -1,8 +1,12 @@
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
-import { moduleDetailsToScriptSrc } from '../component-metamodel/convert/moduleDetailsToScriptSrc';
-import { NPMRegistryAtom } from '../util/NPMRegistry';
+import {
+  ComponentModelMolecule,
+} from '../component-metamodel/ComponentModel.tsx';
+import {
+  moduleDetailsToScriptSrc,
+} from '../component-metamodel/convert/moduleDetailsToScriptSrc.tsx';
+import { NPMRegistryAtom } from '../util/NPMRegistry.ts';
 
 export const CanvasScriptsMolecule = molecule((getMol) => {
   const { LocalURLAtom, ModuleDetailsAtom } = getMol(ComponentModelMolecule);

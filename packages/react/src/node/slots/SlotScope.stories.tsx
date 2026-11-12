@@ -2,10 +2,15 @@ import { htmlParser } from '@raisins/core';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope';
-import { NodeChildrenEditor } from '../NodeChildrenEditor';
-import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope';
-import { SlotScope, SlotScopeMolecule, SlotScopeProvider } from './SlotScope';
+import type { RaisinConfig } from '../../core/RaisinConfigScope.tsx';
+import { RaisinsProvider } from '../../core/RaisinConfigScope.tsx';
+import { NodeChildrenEditor } from '../NodeChildrenEditor.tsx';
+import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope.tsx';
+import {
+  SlotScope,
+  SlotScopeMolecule,
+  SlotScopeProvider,
+} from './SlotScope.tsx';
 
 export default {
   title: 'Slot scope',

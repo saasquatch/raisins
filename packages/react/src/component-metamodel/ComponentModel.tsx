@@ -1,3 +1,10 @@
+import type {
+  NodeWithSlots,
+  RaisinDocumentNode,
+  RaisinElementNode,
+  RaisinNode,
+  RaisinNodeWithChildren,
+} from '@raisins/core';
 import {
   DefaultTextMarks,
   doesChildAllowParent,
@@ -5,31 +12,25 @@ import {
   getSlots,
   HTMLComponents,
   isNodeAllowed,
-  NodeWithSlots,
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
 } from '@raisins/core';
-import { CustomElement, Slot } from '@raisins/schema/schema';
+import type { CustomElement, Slot } from '@raisins/schema/schema';
 import { molecule } from 'bunshi/react';
 import { shallowEqual } from 'fast-equals';
-import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
+import type { Atom, PrimitiveAtom, WritableAtom } from 'jotai';
+import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
-import { ConfigMolecule } from '../core';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { isElementNode, isRoot } from '../util/isNode';
-import {
-  NPMRegistry,
-  NPMRegistryAtom as RegistryAtom,
-} from '../util/NPMRegistry';
+import { ConfigMolecule } from '../core/index.ts';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { isElementNode, isRoot } from '../util/isNode.tsx';
+import type { NPMRegistry } from '../util/NPMRegistry.ts';
+import { NPMRegistryAtom as RegistryAtom } from '../util/NPMRegistry.ts';
 import {
   blockFromHtml,
   moduleDetailsToBlocks,
-} from './convert/moduleDetailsToBlocks';
-import { moduleDetailsToTags } from './convert/moduleDetailsToTags';
-import { modulesToDetails } from './convert/modulesToDetails';
-import { Loadable, Module, ModuleDetails } from './types';
+} from './convert/moduleDetailsToBlocks.tsx';
+import { moduleDetailsToTags } from './convert/moduleDetailsToTags.tsx';
+import { modulesToDetails } from './convert/modulesToDetails.tsx';
+import type { Loadable, Module, ModuleDetails } from './types.ts';
 
 export type ComponentModelMoleculeType = {
   ModulesAtom: PrimitiveAtom<Module[]>;

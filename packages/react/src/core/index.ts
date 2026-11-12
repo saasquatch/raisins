@@ -1,13 +1,13 @@
-export { CoreMolecule } from './CoreAtoms';
-export { EditMolecule } from './editting/EditAtoms';
-export { EditSelectedMolecule } from './editting/EditSelectedAtom';
-export { HistoryMolecule } from './editting/HistoryAtoms';
+export { CoreMolecule } from './CoreAtoms.tsx';
+export { EditMolecule } from './editting/EditAtoms.ts';
+export { EditSelectedMolecule } from './editting/EditSelectedAtom.ts';
+export { HistoryMolecule } from './editting/HistoryAtoms.tsx';
 export {
   ConfigMolecule,
   ConfigScopeProvider,
   RaisinsProvider,
-} from './RaisinConfigScope';
-export type { RaisinConfig, RaisinConfigMolecule } from './RaisinConfigScope';
-export { SoulsMolecule } from './souls/Soul';
-export { SoulsInDocMolecule } from './souls/SoulsInDocumentAtoms';
-export * from './selection';
+} from './RaisinConfigScope.tsx';
+export type { RaisinConfig, RaisinConfigMolecule } from './RaisinConfigScope.tsx';
+export { SoulsMolecule } from './souls/Soul.ts';
+export { SoulsInDocMolecule } from './souls/SoulsInDocumentAtoms.tsx';
+export * from './selection/index.ts';

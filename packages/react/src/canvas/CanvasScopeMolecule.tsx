@@ -1,35 +1,39 @@
-import { RaisinDocumentNode, RaisinNode } from '@raisins/core';
+import type { RaisinDocumentNode, RaisinNode } from '@raisins/core';
 import { molecule } from 'bunshi/react';
-import { Atom, atom, WritableAtom } from 'jotai';
-import { h, VNodeChildElement, VNodeChildren } from 'snabbdom';
-import { ComponentModelMolecule } from '../component-metamodel';
+import type { Atom, WritableAtom } from 'jotai';
+import { atom } from 'jotai';
+import type { VNodeChildElement, VNodeChildren } from 'snabbdom';
+import { h } from 'snabbdom';
+import { ComponentModelMolecule } from '../component-metamodel/index.ts';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../core';
-import { CssEditingMolecule } from '../css-editing/CssEditingMolecule';
-import { Soul } from '../core/souls/Soul';
-import { NPMRegistryAtom } from '../util/NPMRegistry';
-import {
+} from '../core/index.ts';
+import { CssEditingMolecule } from '../css-editing/CssEditingMolecule.tsx';
+import type { Soul } from '../core/souls/Soul.ts';
+import { NPMRegistryAtom } from '../util/NPMRegistry.ts';
+import type {
   GeometryDetail,
   GeometryEntry,
   RawCanvasEvent,
-} from './api/_CanvasRPCContract';
-import { CanvasConfigMolecule } from './CanvasConfig';
-import { CanvasScope } from './CanvasScope';
-import { CanvasScriptsMolecule } from './CanvasScriptsMolecule';
-import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom';
-import { createProxy } from './ProxySet';
-import { RootRenderer } from './types';
+} from './api/_CanvasRPCContract.tsx';
+import { CanvasConfigMolecule } from './CanvasConfig.tsx';
+import { CanvasScope } from './CanvasScope.tsx';
+import { CanvasScriptsMolecule } from './CanvasScriptsMolecule.tsx';
+import { createAtoms } from './iframe/SnabbdomSanboxedIframeAtom.tsx';
+import { createProxy } from './ProxySet.ts';
+import type { RootRenderer } from './types.tsx';
+import type {
+  SnabbdomAppender,
+  SnabbdomRenderer,
+} from './util/raisinToSnabdom.tsx';
 import {
   combineAppenders,
   combineRenderers,
   raisinToSnabbdom,
-  SnabbdomAppender,
-  SnabbdomRenderer,
-} from './util/raisinToSnabdom';
+} from './util/raisinToSnabdom.tsx';
 
 type CanvasEventListener = WritableAtom<null, RichCanvasEvent[], void>;
 

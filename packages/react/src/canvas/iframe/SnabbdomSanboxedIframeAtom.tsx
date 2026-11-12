@@ -1,17 +1,20 @@
-import { createScope, molecule, Molecule } from 'bunshi/react';
-import { Atom, atom, WritableAtom } from 'jotai';
-import { AsyncMethodReturns, Connection, connectToChild } from 'penpal';
-import { MutableRefObject } from 'react';
+import type { Molecule } from 'bunshi/react';
+import { createScope, molecule } from 'bunshi/react';
+import type { Atom, WritableAtom } from 'jotai';
+import { atom } from 'jotai';
+import type { AsyncMethodReturns, Connection } from 'penpal';
+import { connectToChild } from 'penpal';
+import type { MutableRefObject } from 'react';
 import type { VNode } from 'snabbdom';
 import { throttle } from 'throttle-debounce';
-import { NPMRegistry } from '../../util/NPMRegistry';
-import {
+import type { NPMRegistry } from '../../util/NPMRegistry.ts';
+import type {
   ChildRPC,
   GeometryDetail,
   ParentRPC,
   RawCanvasEvent,
-} from '../api/_CanvasRPCContract';
-import { childApiSrc } from '../injected/childApiSrc';
+} from '../api/_CanvasRPCContract.tsx';
+import { childApiSrc } from '../injected/childApiSrc.tsx';
 
 const iframeSrc = (
   head: string,

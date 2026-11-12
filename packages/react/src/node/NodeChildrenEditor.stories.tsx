@@ -1,19 +1,20 @@
-import { isElementNode, isRoot, RaisinNode } from '@raisins/core';
+import type { RaisinNode } from '@raisins/core';
+import { isElementNode, isRoot } from '@raisins/core';
 import { useAtom, useAtomValue } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React, { useContext } from 'react';
-import { ConfigMolecule } from '../core';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { invalidTBody } from '../examples/HTMLComponents';
-import { BasicStory } from '../index.stories';
-import { example } from './children/LoadTest.example';
+import { ConfigMolecule } from '../core/index.ts';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { invalidTBody } from '../examples/HTMLComponents.tsx';
+import { BasicStory } from '../index.stories.tsx';
+import { example } from './children/LoadTest.example.ts';
 import {
   ForkedChildrenEditor,
   ForkedContext,
   NodeChildrenEditor,
-} from './NodeChildrenEditor';
-import { NodeMolecule } from './NodeMolecule';
-import { NodeScopeMolecule } from './NodeScope';
+} from './NodeChildrenEditor.tsx';
+import { NodeMolecule } from './NodeMolecule.tsx';
+import { NodeScopeMolecule } from './NodeScope.tsx';
 
 export default {
   title: 'Children Editor',

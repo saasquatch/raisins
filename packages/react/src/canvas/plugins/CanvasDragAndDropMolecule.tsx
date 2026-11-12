@@ -1,23 +1,24 @@
-import {
-  calculatePlopTargets,
-  isElementNode,
-  isRoot,
+import type {
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { CustomElement } from '@raisins/schema/schema';
-import { atom, Atom, useAtomValue, useSetAtom } from 'jotai';
+import { calculatePlopTargets, isElementNode, isRoot } from '@raisins/core';
+import type { CustomElement } from '@raisins/schema/schema.js';
+import type { Atom } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ComponentModelMolecule } from '../../component-metamodel';
-import { CoreMolecule, SoulsInDocMolecule } from '../../core';
+import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
+import { CoreMolecule, SoulsInDocMolecule } from '../../core/index.ts';
+import type {
+  DragPlopDestination,
+} from '../../core/selection/DragAndDropMolecule.tsx';
 import {
   DragAndDropMolecule,
-  DragPlopDestination,
-} from '../../core/selection/DragAndDropMolecule';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule } from '../CanvasScopeMolecule';
+} from '../../core/selection/DragAndDropMolecule.tsx';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
 
 /**
  * Synthetic component metadata used as the "parent meta" when the drop parent

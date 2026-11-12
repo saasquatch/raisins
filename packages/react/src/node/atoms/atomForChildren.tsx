@@ -1,7 +1,7 @@
-import { RaisinNode } from '@raisins/core';
-import { PrimitiveAtom } from 'jotai';
+import type { RaisinNode } from '@raisins/core';
+import type { PrimitiveAtom } from 'jotai';
 import { focusAtom } from 'jotai-optics';
-import { OpticFor_ } from 'optics-ts';
+import type { OpticFor_ } from 'optics-ts';
 
 const childOptic = (o: OpticFor_<RaisinNode>) =>
   o.prop('children' as any).valueOr([]);

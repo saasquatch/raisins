@@ -1,19 +1,19 @@
-import { RaisinElementNode } from '@raisins/core';
-import {
-  getPath,
-  htmlUtil,
+import type { RaisinElementNode } from '@raisins/core';
+import type {
   NodePath,
   RaisinNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { atom, PrimitiveAtom } from 'jotai';
+import { getPath, htmlUtil } from '@raisins/core';
+import type { PrimitiveAtom } from 'jotai';
+import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { Block } from '../../component-metamodel/ComponentModel';
-import { isFunction } from '../../util/isFunction';
-import { tryGetNode } from '../../util/tryGetNode';
-import { waitForUpdate } from '../../util/waitForUpdate';
-import { CoreMolecule } from '../CoreAtoms';
-import { SelectedNodeMolecule } from './SelectedNodeMolecule';
+import type { Block } from '../../component-metamodel/ComponentModel.tsx';
+import { isFunction } from '../../util/isFunction.ts';
+import { tryGetNode } from '../../util/tryGetNode.ts';
+import { waitForUpdate } from '../../util/waitForUpdate.ts';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { SelectedNodeMolecule } from './SelectedNodeMolecule.tsx';
 
 const { moveNode, insertAtPath, clone } = htmlUtil;
 

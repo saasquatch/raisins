@@ -1,8 +1,8 @@
-import { RaisinDocumentNode } from '@raisins/core';
-import { Atom, PrimitiveAtom } from 'jotai';
+import type { RaisinDocumentNode } from '@raisins/core';
+import type { Atom, PrimitiveAtom } from 'jotai';
 import { createScope, ScopeProvider } from 'bunshi/react';
-import { Schema } from 'prosemirror-model';
-import { Plugin, SelectionBookmark } from 'prosemirror-state';
+import type { Schema } from 'prosemirror-model';
+import type { Plugin, SelectionBookmark } from 'prosemirror-state';
 import React from 'react';
 
 export const ProseEditorScope = createScope<ProseEditorScopeType | undefined>(

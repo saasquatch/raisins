@@ -1,17 +1,22 @@
 import { htmlParser } from '@raisins/core';
-import { atom, PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import type { PrimitiveAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { useMolecule } from 'bunshi/react';
-import { SelectionBookmark } from 'prosemirror-state';
+import type { SelectionBookmark } from 'prosemirror-state';
 import React from 'react';
-import { DefaultProseSchema } from './default-schema/DefaultProseSchema';
-import { DefaultProseSchemaHotkeysPlugin } from './default-schema/DefaultProseSchemaHotkeysPlugin';
-import { DefaultProseSchemaMarkMolecule } from './default-schema/DefaultProseSchemaMarkMolecule';
-import { ProseEditor } from './ProseEditor';
+import { DefaultProseSchema } from './default-schema/DefaultProseSchema.ts';
 import {
+  DefaultProseSchemaHotkeysPlugin,
+} from './default-schema/DefaultProseSchemaHotkeysPlugin.ts';
+import {
+  DefaultProseSchemaMarkMolecule,
+} from './default-schema/DefaultProseSchemaMarkMolecule.ts';
+import { ProseEditor } from './ProseEditor.tsx';
+import type {
   ProseEditorScopeProps,
-  ProseEditorScopeProvider,
   ProseEditorScopeType,
-} from './ProseEditorScope';
+} from './ProseEditorScope.tsx';
+import { ProseEditorScopeProvider } from './ProseEditorScope.tsx';
 
 export default { title: 'Prose Editor' };
 

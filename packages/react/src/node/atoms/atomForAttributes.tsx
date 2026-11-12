@@ -1,8 +1,9 @@
-import { RaisinNode } from '@raisins/core';
-import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
-import { isFunction } from '../../util/isFunction';
-import { isElementNode } from '../../util/isNode';
-import { createMemoizeAtom } from '../../util/weakCache';
+import type { RaisinNode } from '@raisins/core';
+import type { PrimitiveAtom, SetStateAction } from 'jotai';
+import { atom } from 'jotai';
+import { isFunction } from '../../util/isFunction.ts';
+import { isElementNode } from '../../util/isNode.tsx';
+import { createMemoizeAtom } from '../../util/weakCache.ts';
 
 const memoizeAtom = createMemoizeAtom();
 

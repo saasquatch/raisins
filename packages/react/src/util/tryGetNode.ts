@@ -1,4 +1,5 @@
-import { isNodeWithChildren, NodePath, RaisinNode } from '@raisins/core';
+import type { NodePath, RaisinNode } from '@raisins/core';
+import { isNodeWithChildren } from '@raisins/core';
 
 /**
  * Resolves a {@link NodePath} against a document, returning `undefined` for a

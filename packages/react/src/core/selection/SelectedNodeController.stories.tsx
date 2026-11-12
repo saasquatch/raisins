@@ -1,30 +1,32 @@
 import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { RaisinConfig } from '..';
+import type { RaisinConfig } from '../index.ts';
+import type { AttributesControllerProps } from '../../attributes/index.ts';
 import {
   AttributeMolecule,
   AttributeProvider,
   AttributesController,
-  AttributesControllerProps,
   AttributesMolecule,
-} from '../../attributes';
-import { BasicCanvasController } from '../../canvas/CanvasController';
-import { CanvasProvider } from '../../canvas/CanvasScope';
-import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
+} from '../../attributes/index.ts';
+import { BasicCanvasController } from '../../canvas/CanvasController.tsx';
+import { CanvasProvider } from '../../canvas/CanvasScope.tsx';
+import {
+  CanvasSelectionMolecule,
+} from '../../canvas/plugins/CanvasSelectionMolecule.tsx';
 import {
   mintMono,
   MintComponents,
   mintReferralTable,
   mintBigStat,
-} from '../../examples/MintComponents';
-import { widgets } from '../../examples/MockWidgets';
+} from '../../examples/MintComponents.tsx';
+import { widgets } from '../../examples/MockWidgets.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents';
-import { BasicStory, StoryConfigMolecule } from '../../index.stories';
-import { SelectedNodeController } from './SelectedNodeController';
+} from '../../examples/VanillaComponents.tsx';
+import { BasicStory, StoryConfigMolecule } from '../../index.stories.tsx';
+import { SelectedNodeController } from './SelectedNodeController.tsx';
 
 export default {
   title: 'Selected Node Controller',

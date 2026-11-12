@@ -1,7 +1,8 @@
-import { htmlParser as parse, RaisinElementNode } from '@raisins/core';
-import * as schema from '@raisins/schema/schema';
-import { Block } from '../ComponentModel';
-import { ModuleDetails } from '../types';
+import type { RaisinElementNode } from '@raisins/core';
+import { htmlParser as parse } from '@raisins/core';
+import type * as schema from '@raisins/schema/schema';
+import type { Block } from '../ComponentModel.tsx';
+import type { ModuleDetails } from '../types.ts';
 
 /**
  * Converts module details into a set of `Block`

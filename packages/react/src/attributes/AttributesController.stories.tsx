@@ -1,8 +1,8 @@
 import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { CanvasController } from '../canvas';
-import { RaisinConfig } from '../core/RaisinConfigScope';
+import { CanvasController } from '../canvas/index.ts';
+import type { RaisinConfig } from '../core/RaisinConfigScope.tsx';
 import {
   big,
   mintBigStat,
@@ -10,23 +10,23 @@ import {
   mintHeroImage,
   mintMono,
   mintTaskCard,
-} from '../examples/MintComponents';
-import { widgets } from '../examples/MockWidgets';
+} from '../examples/MintComponents.tsx';
+import { widgets } from '../examples/MockWidgets.tsx';
 import {
   referralList,
   referrerWidget,
   VanillaComponents,
-} from '../examples/VanillaComponents';
+} from '../examples/VanillaComponents.tsx';
 import {
   BasicStory,
   ErrorListController,
   StoryConfigMolecule,
-} from '../index.stories';
-import { NodeChildrenEditor } from '../node/NodeChildrenEditor';
-import { NodeMolecule } from '../node/NodeMolecule';
-import { AttributeMolecule } from './AttributeMolecule';
-import { AttributesController } from './AttributesController';
-import { AttributeTemplateProps } from './AttributeThemeMolecule';
+} from '../index.stories.tsx';
+import { NodeChildrenEditor } from '../node/NodeChildrenEditor.tsx';
+import { NodeMolecule } from '../node/NodeMolecule.tsx';
+import { AttributeMolecule } from './AttributeMolecule.tsx';
+import { AttributesController } from './AttributesController.tsx';
+import type { AttributeTemplateProps } from './AttributeThemeMolecule.tsx';
 
 export default {
   title: 'Attributes Controller',

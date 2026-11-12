@@ -1,28 +1,34 @@
-import {
-  calculatePlopTargets,
-  isElementNode,
-  isRoot,
+import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNodeWithChildren,
 } from '@raisins/core';
-import { CustomElement } from '@raisins/schema/schema';
-import { Atom, atom } from 'jotai';
+import { calculatePlopTargets, isElementNode, isRoot } from '@raisins/core';
+import type { CustomElement } from '@raisins/schema/schema.js';
+import type { Atom } from 'jotai';
+import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { h, VNode, VNodeStyle } from 'snabbdom';
-import { ComponentModelMolecule } from '../../component-metamodel';
+import type { VNode, VNodeStyle } from 'snabbdom';
+import { h } from 'snabbdom';
+import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../../core';
-import { DragAndDropMolecule } from '../../core/selection/DragAndDropMolecule';
-import { RawCanvasEvent } from '../api/_CanvasRPCContract';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
-import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
+} from '../../core/index.ts';
+import {
+  DragAndDropMolecule,
+} from '../../core/selection/DragAndDropMolecule.tsx';
+import type { RawCanvasEvent } from '../api/_CanvasRPCContract.tsx';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import type { RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
+import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
+import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
+import type {
+  SnabbdomAppender,
+  SnabbdomRenderer,
+} from '../util/raisinToSnabdom.tsx';
 
 export const CanvasPickAndPlopMolecule = molecule(getMol => {
   const CanvasConfig = getMol(CanvasConfigMolecule);

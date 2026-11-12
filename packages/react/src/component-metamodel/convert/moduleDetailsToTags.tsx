@@ -1,6 +1,6 @@
-import * as schema from '@raisins/schema/schema';
-import { CustomElement } from '../Component';
-import { ModuleDetails } from '../types';
+import type * as schema from '@raisins/schema/schema';
+import type { CustomElement } from '../Component.ts';
+import type { ModuleDetails } from '../types.ts';
 
 /**
  * Reduces a set of ModuleDetails into a set of CustomElement definitions.

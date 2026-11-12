@@ -1,5 +1,6 @@
-import { RaisinNode } from '@raisins/core';
-import { atom, PrimitiveAtom } from 'jotai';
+import type { RaisinNode } from '@raisins/core';
+import type { PrimitiveAtom } from 'jotai';
+import { atom } from 'jotai';
 import {
   createScope,
   molecule,
@@ -7,10 +8,10 @@ import {
   useMolecule,
 } from 'bunshi/react';
 import React from 'react';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { SoulsMolecule } from '../core/souls/Soul';
-import { isFunction } from '../util/isFunction';
-import { createMemoizeAtom } from '../util/weakCache';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { SoulsMolecule } from '../core/souls/Soul.ts';
+import { isFunction } from '../util/isFunction.ts';
+import { createMemoizeAtom } from '../util/weakCache.ts';
 
 export const NodeScope = createScope<PrimitiveAtom<RaisinNode> | undefined>(
   undefined

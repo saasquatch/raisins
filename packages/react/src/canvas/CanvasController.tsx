@@ -1,8 +1,8 @@
 import { useAtom } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React from 'react';
-import { CanvasScopeMolecule } from './CanvasScopeMolecule';
-import { CanvasProvider } from './CanvasScope';
+import { CanvasScopeMolecule } from './CanvasScopeMolecule.tsx';
+import { CanvasProvider } from './CanvasScope.tsx';
 
 function useCanvas() {
   const atoms = useMolecule(CanvasScopeMolecule);
