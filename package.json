@@ -18,6 +18,9 @@
   "overrides": {
     "typescript-json-schema": {
       "glob": "^14.0.2"
+    },
+    "@joshwooding/vite-plugin-react-docgen-typescript": {
+      "glob": "^14.0.2"
     }
   },
   "devDependencies": {
