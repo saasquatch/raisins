@@ -1,6 +1,7 @@
 {
   "name": "root",
   "private": true,
+  "packageManager": "npm@11.20.0",
   "scripts": {
     "build": "turbo run build",
     "storybook": "turbo run storybook",
@@ -21,12 +22,19 @@
     },
     "@joshwooding/vite-plugin-react-docgen-typescript": {
       "glob": "^14.0.2"
+    },
+    "serve": {
+      "compression": "^1.8.2"
+    },
+    "jest-cucumber": {
+      "glob": "^14.0.2",
+      "uuid": "^11.1.1"
     }
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.5.0",
-    "@changesets/cli": "^2.27.1",
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.31.1",
     "pify": "^6.1.0",
-    "turbo": "^1.13.3"
+    "turbo": "^2.11.11"
   }
 }

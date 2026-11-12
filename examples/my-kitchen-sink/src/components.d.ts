@@ -6,12 +6,24 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     */
     interface MyCard {
         /**
           * Should show backwards?
          */
         "label": string;
     }
+    /**
+     * @uiName Kutay Component
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     */
     interface MyComponent {
         /**
           * What to call people if we don't have their name
@@ -54,18 +66,46 @@ export namespace Components {
          */
         "reverse": boolean;
     }
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     * @canvasRenderer always-replace
+     */
     interface MyShadowlessCard {
         /**
           * Should show backwards?
          */
         "label": string;
     }
+    /**
+     * @uiName 2 Columns
+     * @slots [{"name":"left", "title":"Left Column", "description":"Things that should show up on the left"},{"name":"right", "title":"Right Column", "description":"Things that should show up on the right"}]
+     * @example Empty - <my-split></my-split>
+     * @example Left Only - <my-split><div slot="left"></div></my-split>
+     */
     interface MySplit {
         /**
           * Should show backwards?
          */
         "reverse": boolean;
     }
+    /**
+     * @uiName Sam Component
+     * @uiOrder ["first", "middle", "last", "*"]
+     * @validParents ["div"]
+     * @slots [{"name":"mySlot", "validChildren":["div"]}]
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     * @exampleGroup Cool Kids
+     * @slotEditor richText
+     * @canvasRenderer always-replace
+     * @csspart greeting - The greeting text container
+     * @csspart date - The formatted date text
+     * @cssprop --my-ui-component-date-color - Controls the date text color
+     */
     interface MyUiComponent {
         /**
           * The Age
@@ -139,30 +179,70 @@ export namespace Components {
     }
 }
 declare global {
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     */
     interface HTMLMyCardElement extends Components.MyCard, HTMLStencilElement {
     }
     var HTMLMyCardElement: {
         prototype: HTMLMyCardElement;
         new (): HTMLMyCardElement;
     };
+    /**
+     * @uiName Kutay Component
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     */
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     * @canvasRenderer always-replace
+     */
     interface HTMLMyShadowlessCardElement extends Components.MyShadowlessCard, HTMLStencilElement {
     }
     var HTMLMyShadowlessCardElement: {
         prototype: HTMLMyShadowlessCardElement;
         new (): HTMLMyShadowlessCardElement;
     };
+    /**
+     * @uiName 2 Columns
+     * @slots [{"name":"left", "title":"Left Column", "description":"Things that should show up on the left"},{"name":"right", "title":"Right Column", "description":"Things that should show up on the right"}]
+     * @example Empty - <my-split></my-split>
+     * @example Left Only - <my-split><div slot="left"></div></my-split>
+     */
     interface HTMLMySplitElement extends Components.MySplit, HTMLStencilElement {
     }
     var HTMLMySplitElement: {
         prototype: HTMLMySplitElement;
         new (): HTMLMySplitElement;
     };
+    /**
+     * @uiName Sam Component
+     * @uiOrder ["first", "middle", "last", "*"]
+     * @validParents ["div"]
+     * @slots [{"name":"mySlot", "validChildren":["div"]}]
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     * @exampleGroup Cool Kids
+     * @slotEditor richText
+     * @canvasRenderer always-replace
+     * @csspart greeting - The greeting text container
+     * @csspart date - The formatted date text
+     * @cssprop --my-ui-component-date-color - Controls the date text color
+     */
     interface HTMLMyUiComponentElement extends Components.MyUiComponent, HTMLStencilElement {
     }
     var HTMLMyUiComponentElement: {
@@ -178,12 +258,24 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     */
     interface MyCard {
         /**
           * Should show backwards?
          */
         "label"?: string;
     }
+    /**
+     * @uiName Kutay Component
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     */
     interface MyComponent {
         /**
           * What to call people if we don't have their name
@@ -226,18 +318,46 @@ declare namespace LocalJSX {
          */
         "reverse"?: boolean;
     }
+    /**
+     * @uiName Card
+     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slotEditor inline
+     * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+     * @canvasRenderer always-replace
+     */
     interface MyShadowlessCard {
         /**
           * Should show backwards?
          */
         "label"?: string;
     }
+    /**
+     * @uiName 2 Columns
+     * @slots [{"name":"left", "title":"Left Column", "description":"Things that should show up on the left"},{"name":"right", "title":"Right Column", "description":"Things that should show up on the right"}]
+     * @example Empty - <my-split></my-split>
+     * @example Left Only - <my-split><div slot="left"></div></my-split>
+     */
     interface MySplit {
         /**
           * Should show backwards?
          */
         "reverse"?: boolean;
     }
+    /**
+     * @uiName Sam Component
+     * @uiOrder ["first", "middle", "last", "*"]
+     * @validParents ["div"]
+     * @slots [{"name":"mySlot", "validChildren":["div"]}]
+     * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+     * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+     * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+     * @exampleGroup Cool Kids
+     * @slotEditor richText
+     * @canvasRenderer always-replace
+     * @csspart greeting - The greeting text container
+     * @csspart date - The formatted date text
+     * @cssprop --my-ui-component-date-color - Controls the date text color
+     */
     interface MyUiComponent {
         /**
           * The Age
@@ -321,10 +441,50 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            /**
+             * @uiName Card
+             * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+             * @slotEditor inline
+             * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+             */
             "my-card": LocalJSX.MyCard & JSXBase.HTMLAttributes<HTMLMyCardElement>;
+            /**
+             * @uiName Kutay Component
+             * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+             * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+             * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+             */
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * @uiName Card
+             * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+             * @slotEditor inline
+             * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
+             * @canvasRenderer always-replace
+             */
             "my-shadowless-card": LocalJSX.MyShadowlessCard & JSXBase.HTMLAttributes<HTMLMyShadowlessCardElement>;
+            /**
+             * @uiName 2 Columns
+             * @slots [{"name":"left", "title":"Left Column", "description":"Things that should show up on the left"},{"name":"right", "title":"Right Column", "description":"Things that should show up on the right"}]
+             * @example Empty - <my-split></my-split>
+             * @example Left Only - <my-split><div slot="left"></div></my-split>
+             */
             "my-split": LocalJSX.MySplit & JSXBase.HTMLAttributes<HTMLMySplitElement>;
+            /**
+             * @uiName Sam Component
+             * @uiOrder ["first", "middle", "last", "*"]
+             * @validParents ["div"]
+             * @slots [{"name":"mySlot", "validChildren":["div"]}]
+             * @example Cool Kid - <my-component first="a" middle="cool" last="kid" max-length="400"></my-component>
+             * @example Nerd Bird - <my-component first="The" middle="Nerd" last="Bird" max-length="400"></my-component>
+             * @example Surely Sam - <my-component first="The" middle="Surely" last="Sam" max-length="400"></my-component>
+             * @exampleGroup Cool Kids
+             * @slotEditor richText
+             * @canvasRenderer always-replace
+             * @csspart greeting - The greeting text container
+             * @csspart date - The formatted date text
+             * @cssprop --my-ui-component-date-color - Controls the date text color
+             */
             "my-ui-component": LocalJSX.MyUiComponent & JSXBase.HTMLAttributes<HTMLMyUiComponentElement>;
         }
     }
