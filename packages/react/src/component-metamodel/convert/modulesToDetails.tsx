@@ -1,4 +1,4 @@
-import * as schema from '@raisins/schema/schema';
+import type * as schema from '@raisins/schema';
 import { makeLocalRegistry, unpkgNpmRegistry } from '../../util/NPMRegistry.ts';
 
 import { type Module, type ModuleDetails } from '../types.ts';

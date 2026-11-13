@@ -8,7 +8,7 @@ import { CoreMolecule } from '../../core/CoreAtoms.tsx';
 import { EditMolecule } from '../../core/editting/EditAtoms.ts';
 import { PickAndPlopMolecule } from '../../core/selection/PickAndPlopMolecule.tsx';
 import { NodeRichTextController } from '../../rich-text/RichTextEditor.tsx';
-import { BasicStory } from '../../index.stories';
+import { BasicStory } from '../../index.stories.tsx';
 import { big, MintComponents, mintMono } from '../../examples/MintComponents.tsx';
 import {
   ChildrenEditorForAtoms,
@@ -31,7 +31,7 @@ import {
   referrerWidget,
   VanillaComponents,
 } from '../../examples/VanillaComponents.tsx';
-import { CanvasFull } from '../../canvas/CanvasController.stories';
+import { CanvasFull } from '../../canvas/CanvasController.stories.tsx';
 
 const meta: Meta = {
   title: 'Slot Children Controller',

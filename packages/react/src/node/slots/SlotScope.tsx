@@ -1,5 +1,5 @@
 import { type RaisinElementNode, type RaisinNodeWithChildren } from '@raisins/core';
-import type { Slot } from '@raisins/schema/schema';
+import type { Slot } from '@raisins/schema';
 import { atom } from 'jotai';
 import { createScope, molecule, ScopeProvider } from 'bunshi/react';
 import { focusAtom } from 'jotai-optics';

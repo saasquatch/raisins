@@ -1,5 +1,5 @@
 import { type RaisinElementNode } from '@raisins/core';
-import type { Attribute } from '@raisins/schema/schema';
+import type { Attribute } from '@raisins/schema';
 import { type Atom, atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { ComponentModelMolecule } from '../component-metamodel/index.ts';

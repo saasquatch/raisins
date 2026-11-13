@@ -6,7 +6,7 @@ import {
   type RaisinElementNode,
   type RaisinNodeWithChildren,
 } from '@raisins/core';
-import { CustomElement } from '@raisins/schema/schema';
+import type { CustomElement } from '@raisins/schema';
 import { type Atom, atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { h, type VNode, type VNodeStyle } from 'snabbdom';

@@ -19,7 +19,7 @@ import {
   VanillaComponents,
 } from '../examples/VanillaComponents.tsx';
 import { useHotkeys } from '../hotkeys/index.ts';
-import { BasicStory } from '../index.stories';
+import { BasicStory } from '../index.stories.tsx';
 import { AttributesController } from '../attributes/index.ts';
 import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
 import { useDragBlock, useDragSelectedNode, useDropTarget } from './useDragAndDrop.tsx';

@@ -21,7 +21,7 @@ import {
   BasicStory,
   ErrorListController,
   StoryConfigMolecule,
-} from '../index.stories';
+} from '../index.stories.tsx';
 import { NodeChildrenEditor } from '../node/NodeChildrenEditor.tsx';
 import { NodeMolecule } from '../node/NodeMolecule.tsx';
 import { AttributeMolecule } from './AttributeMolecule.tsx';

@@ -20,7 +20,7 @@ import {
 } from './canvas/index.ts';
 import { type SnabbdomRenderer } from './canvas/util/raisinToSnabdom.tsx';
 import { ComponentModelMolecule, type Module } from './component-metamodel/index.ts';
-import { PackageEditor } from './component-metamodel/ComponentModel.stories';
+import { PackageEditor } from './component-metamodel/ComponentModel.stories.tsx';
 import { CoreMolecule, SelectedNodeMolecule } from './core/index.ts';
 import { HistoryMolecule } from './core/editting/HistoryAtoms.tsx';
 import { type RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope.tsx';

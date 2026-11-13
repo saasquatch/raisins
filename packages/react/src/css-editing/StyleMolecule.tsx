@@ -1,5 +1,5 @@
 import { type RaisinElementNode } from '@raisins/core';
-import { CssPart, CustomElement } from '@raisins/schema/schema';
+import type { CssPart, CustomElement } from '@raisins/schema';
 import { createScope, molecule, useMolecule } from 'bunshi/react';
 import { atom, useAtom, useAtomValue, type Atom, type WritableAtom } from 'jotai';
 import React, { useEffect, useRef, useState } from 'react';

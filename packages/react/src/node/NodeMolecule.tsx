@@ -1,5 +1,5 @@
 import { getSubErrors, type RaisinElementNode } from '@raisins/core';
-import { Slot } from '@raisins/schema/schema';
+import type { Slot } from '@raisins/schema';
 import { molecule } from 'bunshi/react';
 import { atom, type PrimitiveAtom } from 'jotai';
 import { type SelectionBookmark } from 'prosemirror-state';

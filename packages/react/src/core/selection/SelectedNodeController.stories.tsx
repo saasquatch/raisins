@@ -1,7 +1,7 @@
 import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { RaisinConfig } from '..';
+import type { RaisinConfig } from '../../core/index.ts';
 import {
   AttributeMolecule,
   AttributeProvider,

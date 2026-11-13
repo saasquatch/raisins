@@ -1,5 +1,5 @@
 import { htmlParser as parse, type RaisinElementNode } from '@raisins/core';
-import * as schema from '@raisins/schema/schema';
+import type * as schema from '@raisins/schema';
 import { type Block } from '../ComponentModel.tsx';
 import { type ModuleDetails } from '../types.ts';
 
