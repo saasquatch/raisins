@@ -1,7 +1,7 @@
-import * as schema from '@raisins/schema/schema';
-import { JsonDocs, OutputTargetDocsCustom } from '@stencil/core/internal';
-import { convertToGrapesJSMeta } from './convertToRaisins';
-import { writeFile } from './writeFile';
+import * as schema from '@raisins/schema';
+import type { JsonDocs, OutputTargetDocsCustom } from '@stencil/core/internal';
+import { convertToGrapesJSMeta } from './convertToRaisins.ts';
+import { writeFile } from './writeFile.ts';
 
 export type Config = {
   /**

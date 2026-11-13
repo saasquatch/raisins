@@ -1,7 +1,7 @@
-import * as schema from '@raisins/schema/schema';
-import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
-import splitOnFirst from './split-on-first';
-import { walk } from './walk';
+import type * as schema from '@raisins/schema';
+import type { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
+import splitOnFirst from './split-on-first.ts';
+import { walk } from './walk.ts';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
