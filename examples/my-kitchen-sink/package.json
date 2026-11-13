@@ -23,7 +23,7 @@
     "start:raisins": "run-p start serve:package"
   },
   "dependencies": {
-    "@stencil/core": "^2.7.0"
+    "@stencil/core": "^4.45.3"
   },
   "devDependencies": {
     "@raisins/stencil-docs-target": "^1.4.0",
