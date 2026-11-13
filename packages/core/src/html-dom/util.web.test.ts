@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
-import { RaisinNode } from "./RaisinNode";
-import { visit, visitAll } from "./util";
+import type { RaisinNode } from "./RaisinNode.ts";
+import { visit, visitAll } from "./util.ts";
 
 it("Visitor skip node", () => {
   const node: RaisinNode = {

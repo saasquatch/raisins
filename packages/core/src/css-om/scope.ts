@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
+import csstree, { type CssNodePlain, parse, toPlainObject } from "css-tree";
 
 /**
  * Rewrites every selector in a stylesheet AST so that the rules apply only to

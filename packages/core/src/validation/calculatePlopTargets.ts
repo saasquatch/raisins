@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../html-dom/isNode";
-import { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode";
-import { isNodeAllowed } from "./rules/isNodeAllowed";
+import type { CustomElement } from "@raisins/schema";
+import { isElementNode, isRoot } from "../html-dom/isNode.ts";
+import type { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode.ts";
+import { isNodeAllowed } from "./rules/isNodeAllowed.ts";
 
 export type PlopTarget = {
   idx: number;

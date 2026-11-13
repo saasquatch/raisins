@@ -1,21 +1,20 @@
-import expect from "expect";
-import parse from "../html-dom/parser";
-import {
+import parse from "../html-dom/parser.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "../html-dom/RaisinNode";
+} from "../html-dom/RaisinNode.ts";
 import {
   isValidColor,
   isValidDateInterval,
   isValidURL,
   validateAttributes,
   validateChildConstraints
-} from "../validation/validateNode/validateNode";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+} from "../validation/validateNode/validateNode.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

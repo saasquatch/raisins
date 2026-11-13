@@ -1,8 +1,7 @@
-import { CssNodePlain } from "css-tree";
-import expect from "expect";
-import { StateUpdater } from "../util/NewState";
-import { StyleNodeWithChildren } from "./Types";
-import { createChildUpdater, createUpdater } from "./util";
+import { type CssNodePlain } from "css-tree";
+import type { StateUpdater } from "../util/NewState.ts";
+import type { StyleNodeWithChildren } from "./Types.ts";
+import { createChildUpdater, createUpdater } from "./util.ts";
 
 describe("createChildUpdater", () => {
   it("With function", () => {

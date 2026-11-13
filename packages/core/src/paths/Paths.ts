@@ -1,5 +1,5 @@
-import { isNodeWithChildren } from "../html-dom/isNode";
-import { RaisinNode } from "../html-dom/RaisinNode";
+import { isNodeWithChildren } from "../html-dom/isNode.ts";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
 
 export type NodePath = number[];
 

@@ -3,12 +3,11 @@ import {
   Then as then,
   When as when
 } from "cypress-cucumber-preprocessor/steps";
-import expect from "expect";
-import { StepDefinitions } from "jest-cucumber";
-import parse from "../html-dom/parser";
-import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
-import selector, { matches } from "../html-dom/selector";
-import isJest from "../testing/isJest";
+import type { StepDefinitions } from "jest-cucumber";
+import parse from "../html-dom/parser.ts";
+import type { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode.ts";
+import selector, { matches } from "../html-dom/selector.ts";
+import isJest from "../testing/isJest.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

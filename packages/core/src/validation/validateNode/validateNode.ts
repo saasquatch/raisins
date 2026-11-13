@@ -1,14 +1,14 @@
-import { Attribute, CustomElement } from "@raisins/schema/schema";
+import type { Attribute, CustomElement } from "@raisins/schema";
 import { parseToRgba } from "color2k";
 import { Interval } from "luxon";
-import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinNode } from "../../html-dom/RaisinNode";
-import { doesChildAllowParent } from "../rules/doesChildAllowParent";
-import { doesParentAllowChild } from "../rules/doesParentAllowChild";
-import {
+import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
+import { doesChildAllowParent } from "../rules/doesChildAllowParent.ts";
+import { doesParentAllowChild } from "../rules/doesParentAllowChild.ts";
+import type {
   ErrorEntry as BaseErrorEntry,
   ErrorStack as BaseErrorStack
-} from "./types";
+} from "./types.ts";
 
 export type AttributeError = {
   type: "attribute";

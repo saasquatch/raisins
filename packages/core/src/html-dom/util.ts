@@ -1,8 +1,8 @@
 import cloneDeep from "lodash.clonedeep";
-import { getNode, NodePath } from "../paths/Paths";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
-import { isElementNode } from "./isNode";
-import {
+import { getNode, type NodePath } from "../paths/Paths.ts";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType.ts";
+import { isElementNode } from "./isNode.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -11,7 +11,7 @@ import {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./RaisinNode";
+} from "./RaisinNode.ts";
 
 /**
  * Provides a WeakMap for parent lookups

@@ -1,10 +1,9 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import parse from "../html-dom/parser";
-import { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode";
-import { getParents, visitAll } from "../html-dom/util";
-import { calculatePlopTargets } from "../validation/calculatePlopTargets";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+import type { CustomElement } from "@raisins/schema";
+import parse from "../html-dom/parser.ts";
+import type { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode.ts";
+import { getParents, visitAll } from "../html-dom/util.ts";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

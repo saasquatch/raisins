@@ -1,7 +1,6 @@
-import expect from "expect";
-import { NodePath } from "../paths/Paths";
-import { calculatePlopTargets } from "../validation/calculatePlopTargets";
-import {
+import type { NodePath } from "../paths/Paths.ts";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -9,7 +8,7 @@ import {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./RaisinNode";
+} from "./RaisinNode.ts";
 import {
   clone,
   duplicate,
@@ -21,7 +20,7 @@ import {
   remove,
   replace,
   replacePath
-} from "./util";
+} from "./util.ts";
 
 it("Remove node", () => {
   const node: RaisinNode = {

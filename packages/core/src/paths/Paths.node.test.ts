@@ -1,7 +1,7 @@
-import expect from "expect";
-import { getNode, getPath, RaisinDocumentNode } from "../../src";
-import parse from "../../src/html-dom/parser";
-import selector from "../../src/html-dom/selector";
+
+import { getNode, getPath, type RaisinDocumentNode } from "../../src/index.ts";
+import parse from "../../src/html-dom/parser.ts";
+import selector from "../../src/html-dom/selector.ts";
 
 describe("Paths", () => {
   test("In matches out", () => {

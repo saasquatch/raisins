@@ -1,9 +1,8 @@
 import { ElementType } from "domelementtype";
-import expect from "expect";
-import { RaisinNode } from "../html-dom/RaisinNode";
-import { removeWhitespace, visit } from "../html-dom/util";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
-import isJest from "../testing/isJest";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import { removeWhitespace, visit } from "../html-dom/util.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
+import isJest from "../testing/isJest.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

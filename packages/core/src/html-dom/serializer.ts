@@ -1,7 +1,7 @@
-import { CssNodePlain } from "css-tree";
+import type { CssNodePlain } from "css-tree";
 import { encodeXML, escapeAttribute } from "entities";
-import cssSerializer from "../css-om/serializer";
-import foreignNames from "./foreignNames";
+import cssSerializer from "../css-om/serializer.ts";
+import foreignNames from "./foreignNames.ts";
 // eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
@@ -10,8 +10,8 @@ import type {
   RaisinNodeWithChildren,
   RaisinProcessingInstructionNode,
   RaisinTextNode
-} from "./RaisinNode";
-import { getParents, visit } from "./util";
+} from "./RaisinNode.ts";
+import { getParents, visit } from "./util.ts";
 
 /**
  * `\/` is a valid CSS escape for `/`, so this is safe anywhere `</style` can

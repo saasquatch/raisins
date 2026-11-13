@@ -1,7 +1,7 @@
-import cssParser from "../css-om/parser";
-import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
+import cssParser from "../css-om/parser.ts";
+import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode, RaisinNode } from "./RaisinNode.ts";
 
 export type DomNativeToRaisinOptions = {
   onParseError?: (error: ParseError, jsonPointer: string) => void;

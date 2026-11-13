@@ -1,6 +1,5 @@
-import expect from "expect";
-import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

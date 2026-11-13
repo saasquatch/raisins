@@ -1,13 +1,13 @@
 import { is, selectAll } from "css-select";
-import { Adapter, Predicate, Query } from "css-select/lib/types";
-import { DefaultTextMarks } from "./DefaultTextMarks";
-import {
+import type { Adapter, Predicate, Query } from "css-select/lib/types.js";
+import { DefaultTextMarks } from "./DefaultTextMarks.ts";
+import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren
-} from "./RaisinNode";
-import { getAncestry, getParents, visit } from "./util";
+} from "./RaisinNode.ts";
+import { getAncestry, getParents, visit } from "./util.ts";
 
 type Node = RaisinNode;
 type ElementNode = RaisinElementNode;

@@ -1,7 +1,7 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
-import { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode";
-import { visit } from "../html-dom/util";
-import { DefaultSlot, NodeWithSlots } from "./SlotModel";
+import type { CustomElement, Slot } from "@raisins/schema";
+import type { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode.ts";
+import { visit } from "../html-dom/util.ts";
+import { DefaultSlot, type NodeWithSlots } from "./SlotModel.ts";
 
 export type ComponentMetaProvider = (tagName: string) => CustomElement;
 

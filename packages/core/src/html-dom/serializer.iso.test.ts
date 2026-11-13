@@ -1,9 +1,8 @@
-import cssParser from "../css-om/parser";
+import cssParser from "../css-om/parser.ts";
 import { ElementType } from "domelementtype";
-import expect from "expect";
-import parse from "./parser";
-import { RaisinElementNode, RaisinStyleNode } from "./RaisinNode";
-import serializer from "./serializer";
+import parse from "./parser.ts";
+import type { RaisinElementNode, RaisinStyleNode } from "./RaisinNode.ts";
+import serializer from "./serializer.ts";
 
 describe("Boolean attributes", () => {
   /*

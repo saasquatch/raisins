@@ -1,10 +1,9 @@
 /* istanbul ignore file */
-import expect from "expect";
-import parse from "../html-dom/parser";
-import { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode";
-import selector from "../html-dom/selector";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
-import isJest from "../testing/isJest";
+import parse from "../html-dom/parser.ts";
+import type { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode.ts";
+import selector from "../html-dom/selector.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
+import isJest from "../testing/isJest.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

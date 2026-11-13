@@ -2,10 +2,9 @@
 
 /// <reference types="cypress" />
 
-import expect from "expect";
-import isHtmlEquivalent from "./isHtmlEquivalent";
-import parse from "./parser";
-import serializer from "./serializer";
+import isHtmlEquivalent from "./isHtmlEquivalent.ts";
+import parse from "./parser.ts";
+import serializer from "./serializer.ts";
 
 describe("Parse + serialize", () => {
   it("Can parse simple HTML", () => {

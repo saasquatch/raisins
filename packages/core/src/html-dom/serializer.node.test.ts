@@ -1,9 +1,8 @@
-import expect from "expect";
 import glob from "glob";
 import { fs } from "mz";
-import isHtmlEquivalent from "./isHtmlEquivalent";
-import parse from "./parser";
-import serializer from "./serializer";
+import isHtmlEquivalent from "./isHtmlEquivalent.ts";
+import parse from "./parser.ts";
+import serializer from "./serializer.ts";
 
 describe("Parse + serialize", () => {
   test("Can parse simple HTML", () => {

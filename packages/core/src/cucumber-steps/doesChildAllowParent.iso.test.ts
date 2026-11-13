@@ -1,15 +1,14 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import {
+import type { CustomElement } from "@raisins/schema";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "../html-dom/RaisinNode";
-import { doesChildAllowParent } from "../validation/rules/doesChildAllowParent";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+} from "../html-dom/RaisinNode.ts";
+import { doesChildAllowParent } from "../validation/rules/doesChildAllowParent.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,

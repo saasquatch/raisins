@@ -1,7 +1,7 @@
-import { domNativeToRaisin } from "./DomNativeToRaisin";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode } from "./RaisinNode";
-import { removeWhitespace } from "./util";
+import { domNativeToRaisin } from "./DomNativeToRaisin.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode } from "./RaisinNode.ts";
+import { removeWhitespace } from "./util.ts";
 
 type Options = {
   cleanWhitespace?: boolean;

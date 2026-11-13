@@ -1,6 +1,5 @@
-import { RaisinNode } from "./RaisinNode";
-import { visit, visitAll } from "./util";
-import expect from "expect";
+import type { RaisinNode } from "./RaisinNode.ts";
+import { visit, visitAll } from "./util.ts";
 
 test("Visitor skip node", () => {
   const node: RaisinNode = {
