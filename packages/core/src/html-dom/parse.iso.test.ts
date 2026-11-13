@@ -130,6 +130,7 @@ describe("parseWithErrors", () => {
     cases.forEach(({ html, childField }) => {
       it(`${html} → child.${childField} is defined`, () => {
         const result = parseWithErrors(html);
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         const child = result.node.children[0] as any;
         expect(child[childField]).toBeDefined();
       });

@@ -91,7 +91,7 @@ interface PurifyOptions {
     - removing text nodes caused by whitespaces between elements
       or containing html elements
 */
-function purify(node: any, options?: PurifyOptions | undefined) {
+function purify(node: any, options?: PurifyOptions  ) {
   for (var i = 0; i < node.childNodes.length; i++) {
     var child = node.childNodes[i];
     if (child.hasOwnProperty("parentNode")) {

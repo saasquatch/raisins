@@ -21,7 +21,7 @@ export function createUpdater<
     const reducer = (prev: Node): Node => {
       const prevChild = selector(prev);
       const nextVal = typeof next === "function" ? next(prevChild) : next;
-      const clone = { ...prev } as Node;
+      const clone = { ...prev };
       updater(clone, nextVal);
       return clone;
     };

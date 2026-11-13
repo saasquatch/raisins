@@ -19,7 +19,6 @@ export type AttributeError = {
     | "minimum"
     | "required"
     | `enum/string`
-    | `enum/number`
     | `enum/boolean`
     | "minLength"
     | "maxLength"
@@ -81,7 +80,7 @@ export function validateChildConstraints(
       }
       if (
         parentMeta &&
-        !doesParentAllowChild(child, parentMeta, child.attribs.slot, node)
+        !doesParentAllowChild(child, parentMeta, child.attribs["slot"], node)
       ) {
         return {
           jsonPointer: `/children/${idx}`,
@@ -126,7 +125,7 @@ function validateChildNodes(
 export function generateJsonPointers(
   node: RaisinNode,
   path = "",
-  map = new WeakMap()
+  map: WeakMap<RaisinNode, string> = new WeakMap<RaisinNode, string>()
 ): WeakMap<RaisinNode, string> {
   map.set(node, path);
   if (isElementNode(node) || isRoot(node)) {
@@ -198,7 +197,7 @@ export function validateAttributes(
               attribute: a
             }
           });
-        if (a.maximum !== undefined && Number(value) > Number(a.maximum))
+        if (a.maximum !== undefined && Number(value) > a.maximum)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -209,7 +208,7 @@ export function validateAttributes(
               attribute: a
             }
           });
-        if (a.minimum !== undefined && Number(value) < Number(a.minimum))
+        if (a.minimum !== undefined && Number(value) < a.minimum)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -233,7 +232,7 @@ export function validateAttributes(
               attribute: a
             }
           });
-        if (a.maxLength !== undefined && value.length > Number(a.maxLength))
+        if (a.maxLength !== undefined && value.length > a.maxLength)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -244,7 +243,7 @@ export function validateAttributes(
               attribute: a
             }
           });
-        if (a.minLength !== undefined && value.length < Number(a.minLength))
+        if (a.minLength !== undefined && value.length < a.minLength)
           errorStack.push({
             jsonPointer: "/attribs/" + a.name,
             error: {
@@ -258,7 +257,7 @@ export function validateAttributes(
         if (a.format !== undefined) {
           switch (a.format) {
             case "color":
-              if (isValidColor(value) === false)
+              if (!isValidColor(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
@@ -270,7 +269,7 @@ export function validateAttributes(
                 });
               break;
             case "date-interval":
-              if (isValidDateInterval(value) === false)
+              if (!isValidDateInterval(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
@@ -282,7 +281,7 @@ export function validateAttributes(
                 });
               break;
             case "url":
-              if (isValidURL(value) === false)
+              if (!isValidURL(value))
                 errorStack.push({
                   jsonPointer: "/attribs/" + a.name,
                   error: {
@@ -311,7 +310,7 @@ export function validateAttributes(
     }
   });
 
-  return errorStack as ErrorStack;
+  return errorStack;
 }
 
 export function isValidColor(value: string): boolean {

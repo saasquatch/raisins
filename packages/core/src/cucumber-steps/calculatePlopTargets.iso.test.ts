@@ -1,5 +1,6 @@
 import type { CustomElement } from "@raisins/schema";
 import parse from "../html-dom/parser.ts";
+import { isElementNode } from "../html-dom/isNode.ts";
 import type { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode.ts";
 import { getParents, visitAll } from "../html-dom/util.ts";
 import featureText from "../validation/calculatePlopTargets.feature?raw";
@@ -19,8 +20,11 @@ const cucumber = (
   let parentMeta: CustomElement;
 
   given("a parent with following html", (html: string) => {
-    parent = parse(html, { cleanWhitespace: false })
-      .children[0] as RaisinElementNode;
+    const firstChild = parse(html, { cleanWhitespace: false }).children[0];
+    if (!isElementNode(firstChild)) {
+      throw new Error("Expected parsed HTML to contain an element child");
+    }
+    parent = firstChild;
     parents = getParents(parent);
   });
 

@@ -12,11 +12,9 @@ describe("createChildUpdater", () => {
 
     let updatedNode: any;
 
-    const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-    ) => {
-      updatedNode = reducer(node);
-    }) as StateUpdater<StyleNodeWithChildren>;
+    const updater: StateUpdater<StyleNodeWithChildren> = value => {
+      updatedNode = typeof value === "function" ? value(node) : value;
+    };
 
     const stateUpdater = createChildUpdater(updater, 0);
 
@@ -41,11 +39,9 @@ describe("createChildUpdater", () => {
       children: [{ type: "Comment", value: "hello world" }]
     };
 
-    const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-    ) => {
-      node = reducer(node);
-    }) as StateUpdater<StyleNodeWithChildren>;
+    const updater: StateUpdater<StyleNodeWithChildren> = value => {
+      node = typeof value === "function" ? value(node) : value;
+    };
 
     const stateUpdater = createChildUpdater(updater, 0);
 
@@ -78,11 +74,9 @@ describe("createChildUpdater", () => {
     const node2: any = { type: "Comment", value: "hello world!" };
 
     let updatedNode: any;
-    const updater: StateUpdater<StyleNodeWithChildren> = ((
-      reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-    ) => {
-      updatedNode = reducer(node1);
-    }) as StateUpdater<StyleNodeWithChildren>;
+    const updater: StateUpdater<StyleNodeWithChildren> = value => {
+      updatedNode = typeof value === "function" ? value(node1) : value;
+    };
 
     const stateUpdater = createChildUpdater(updater, 0);
 
@@ -109,14 +103,10 @@ describe("createUpdater", () => {
       return clonedNode;
     };
 
-    const props = {
-      node,
-      setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-      ) => {
-        node = reducer(node);
-      }) as StateUpdater<StyleNodeWithChildren>
+    const setNode: StateUpdater<StyleNodeWithChildren> = value => {
+      node = typeof value === "function" ? value(node) : value;
     };
+    const props = { node, setNode };
 
     const stateUpdater = createUpdater(props, selector, updater);
 
@@ -153,14 +143,10 @@ describe("createUpdater", () => {
       return clonedNode;
     };
 
-    const props = {
-      node,
-      setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-      ) => {
-        node = reducer(node);
-      }) as StateUpdater<StyleNodeWithChildren>
+    const setNode: StateUpdater<StyleNodeWithChildren> = value => {
+      node = typeof value === "function" ? value(node) : value;
     };
+    const props = { node, setNode };
 
     const stateUpdater = createUpdater(props, selector, updater);
     const node2: any = { type: "Number", value: "5" };
@@ -184,15 +170,10 @@ describe("createUpdater", () => {
       return clonedNode;
     };
 
-    const props = {
-      node,
-      setNode: ((
-        reducer: (current: StyleNodeWithChildren) => StyleNodeWithChildren
-      ) => {
-        updatedNode = reducer(node);
-        return updatedNode;
-      }) as StateUpdater<StyleNodeWithChildren>
+    const setNode: StateUpdater<StyleNodeWithChildren> = value => {
+      updatedNode = typeof value === "function" ? value(node) : value;
     };
+    const props = { node, setNode };
 
     const stateUpdater = createUpdater(props, selector, updater);
 

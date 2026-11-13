@@ -31,9 +31,9 @@ export function getPath(
 }
 
 export function getNode(root: RaisinNode, path: NodePath): RaisinNode {
-  return path.reduce((node: RaisinNode, path) => {
+  return path.reduce((node: RaisinNode, index) => {
     if (isNodeWithChildren(node)) {
-      return node.children[path];
+      return node.children[index];
     }
     throw new Error("Node type" + node.type + "doesn't have children");
   }, root);

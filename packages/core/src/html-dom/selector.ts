@@ -1,5 +1,6 @@
 import { is, selectAll, type Options } from "css-select";
 import { DefaultTextMarks } from "./DefaultTextMarks.ts";
+import { isElementNode, isNodeWithChildren } from "./isNode.ts";
 import type {
   RaisinDocumentNode,
   RaisinElementNode,
@@ -15,12 +16,12 @@ type Predicate<V> = (v: V) => boolean;
 type Query = Parameters<typeof selectAll<RaisinNode, RaisinElementNode>>[0];
 
 class RaisinAdapter implements Adapter {
-  _parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
+  private parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
   private root: RaisinDocumentNode;
 
   constructor(root: RaisinDocumentNode) {
     this.root = root;
-    this._parents = getParents(root);
+    this.parents = getParents(root);
   }
 
   /**
@@ -40,7 +41,8 @@ class RaisinAdapter implements Adapter {
   /**
    * Get the node's children
    */
-  getChildren = (node: Node) => (node as RaisinNodeWithChildren).children;
+  getChildren = (node: Node) =>
+    isNodeWithChildren(node) ? node.children : [];
   /**
    * Get the name of the tag
    */
@@ -48,15 +50,17 @@ class RaisinAdapter implements Adapter {
   /**
    * Get the parent of the node
    */
-  getParent = (node: ElementNode) =>
-    (this._parents.get(node) as RaisinElementNode) || null;
+  getParent(node: ElementNode) {
+    const parent = this.parents.get(node);
+    return parent && isElementNode(parent) ? parent : null;
+  }
   /**
    * Get the siblings of the node. Note that unlike jQuery's `siblings` method,
    * this is expected to include the current node as well
    */
   getSiblings(node: Node) {
-    const parent = this._parents.get(node) as RaisinElementNode;
-    return parent?.children;
+    const parent = this.parents.get(node);
+    return parent?.children ?? [];
   }
   /**
    * Get the text content of the node, and its children if it has any.
@@ -64,10 +68,10 @@ class RaisinAdapter implements Adapter {
   getText(node: Node) {
     return (
       visit<string>(node, {
-        onComment: (_) => "",
-        onDirective: (_) => "",
-        onElement: (_, c) => c.join(""),
-        onRoot: (_, c) => c.join(""),
+        onComment: () => "",
+        onDirective: () => "",
+        onElement: (_element, c) => c.join(""),
+        onRoot: (_root, c) => c.join(""),
         onStyle: () => "",
         onText: (e) => e.data,
       }) ?? ""
@@ -85,7 +89,7 @@ class RaisinAdapter implements Adapter {
    */
   removeSubsets(nodes: Node[]) {
     const removable = nodes.reduce((acc, node) => {
-      const ancestors = getAncestry(this.root, node, this._parents);
+      const ancestors = getAncestry(this.root, node, this.parents);
       return [...acc, ...ancestors];
     }, [] as Node[]);
     return nodes.filter((n) => removable.includes(n));
@@ -96,17 +100,17 @@ class RaisinAdapter implements Adapter {
    * as well as any of their children that match it.
    */
   findAll(test: Predicate<ElementNode>, nodes: Node[]) {
-    return (nodes.filter((n) => n.type === "tag") as ElementNode[]).reduce(
-      (arr, n) => {
-        const matchingChildren = (
-          n.children.filter((n) => n.type === "tag") as ElementNode[]
-        ).filter(test);
-        if (test(n)) {
-          return [...arr, n, ...matchingChildren];
+    return nodes.filter(isElementNode).reduce<ElementNode[]>(
+      (elements, element) => {
+        const matchingChildren = element.children
+          .filter(isElementNode)
+          .filter(test);
+        if (test(element)) {
+          return [...elements, element, ...matchingChildren];
         }
-        return [...arr, ...matchingChildren];
+        return [...elements, ...matchingChildren];
       },
-      [] as ElementNode[],
+      [],
     );
   }
 
@@ -123,7 +127,7 @@ class RaisinAdapter implements Adapter {
    * Does at least one of passed element nodes pass the test predicate?
    */
   existsOne(test: Predicate<ElementNode>, elems: Node[]) {
-    return this.findOne(test, elems) ? true : false;
+    return Boolean(this.findOne(test, elems));
   }
 
   /**

@@ -128,7 +128,7 @@ describe("Attribute escaping", () => {
       try {
         testAttribute(`Unescaped ${char}`, `Unescaped ${char}`);
       } catch (e) {
-        throw new Error(`${char} (charcode ${charCode}) is being escaped`);
+        throw new Error(`${char} (charcode ${charCode}) is being escaped`, { cause: e });
       }
     }
   });
@@ -154,8 +154,9 @@ describe("Style raw-text escaping", () => {
       tagName: "style",
       attribs: {},
       contents: cssParser('.x{content:"</style>"}'),
-    } as RaisinStyleNode);
+    });
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const reparsed = parse(once).children[0] as RaisinStyleNode;
 
     expect(serializer(reparsed)).toBe(once);
