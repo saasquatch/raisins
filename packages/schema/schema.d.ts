@@ -6,21 +6,21 @@ export interface Package {
   /**
    * An array of the modules this package contains.
    */
-  modules: Array<Module>;
+  modules: Module[];
 }
 
 /**
  * Examples that can be used for dropping in content into the raisins editor
  */
-export type Example = {
+export interface Example {
   title: string;
   content: string;
   tagName?: string;
   exampleGroup?: string;
-};
+}
 
 // Custom element modules
-export type Module = {
+export interface Module {
   /**
    * A markdown title suitable for display in a listing.
    */
@@ -38,13 +38,13 @@ export type Module = {
    * exports should be described here. Ie, functions and objects that may be
    * properties of exported objects, or passed as arguments to functions.
    */
-  tags?: Array<CustomElement>;
+  tags?: CustomElement[];
 
   /**
    * Example content
    */
-  examples?: Array<Example>;
-};
+  examples?: Example[];
+}
 
 /**
  * The additional fields that a custom element adds to classes and mixins.
@@ -92,7 +92,7 @@ export interface CustomElement {
   /**
    * HTML examples of how this content can be used
    */
-  examples?: Array<Example>;
+  examples?: Example[];
 
   /**
    * Named group for the example content
@@ -113,7 +113,7 @@ export interface CustomElement {
    * States for previewing the internal state of components
    */
   demoStates?: {
-    states: Array<ComponentState>;
+    states: ComponentState[];
     tag: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     children: any;
@@ -271,7 +271,7 @@ export interface ComponentState {
   /**
    * Array of component tags that this state depends on
    */
-  dependencies: Array<string>;
+  dependencies: string[];
   /**
    * Metadata
    */
