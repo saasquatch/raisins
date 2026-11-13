@@ -1,4 +1,4 @@
-import expect from 'expect';
+import { expect } from 'vitest';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';

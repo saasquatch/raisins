@@ -4,7 +4,7 @@ import {
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
 } from '../../css-editing/RaisinCssIds.ts';
-import { raisinToSnabbdom } from './raisinToSnabdom.ts';
+import { raisinToSnabbdom } from './raisinToSnabdom.tsx';
 
 const styleNode = (
   attribs: Record<string, string>,

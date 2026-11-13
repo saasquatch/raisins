@@ -1,7 +1,7 @@
 import { parseWithErrors, type RaisinElementNode, type RaisinNode } from '@raisins/core';
 import { act, renderHook } from '@testing-library/react';
 import { molecule, useMolecule } from 'bunshi/react';
-import expect from 'expect';
+import { expect } from 'vitest';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import { type Module } from '../component-metamodel/types.ts';
