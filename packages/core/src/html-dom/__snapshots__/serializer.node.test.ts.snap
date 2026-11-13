@@ -1,12 +1,12 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Parse + serialize Can parse simple HTML 1`] = `
-Object {
-  "children": Array [
-    Object {
-      "attribs": Object {},
-      "children": Array [
-        Object {
+exports[`Parse + serialize > Can parse simple HTML 1`] = `
+{
+  "children": [
+    {
+      "attribs": {},
+      "children": [
+        {
           "data": "Example",
           "type": "text",
         },

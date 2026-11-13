@@ -1,8 +1,8 @@
 import cloneDeep from "lodash.clonedeep";
-import { getNode, NodePath } from "../paths/Paths";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
-import { isElementNode } from "./isNode";
-import {
+import { getNode, type NodePath } from "../paths/Paths.ts";
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType.ts";
+import { isElementNode } from "./isNode.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -11,7 +11,7 @@ import {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./RaisinNode";
+} from "./RaisinNode.ts";
 
 /**
  * Provides a WeakMap for parent lookups
@@ -49,7 +49,7 @@ export function visit<T = unknown>(
   let result: T | undefined;
   const skip = visitor.skipNode && visitor.skipNode(node);
   if (skip) {
-    return;
+    return undefined;
   }
 
   switch (node.type) {
@@ -81,7 +81,7 @@ export function visit<T = unknown>(
     }
     case ROOT: {
       if (!visitor.onRoot) break;
-      const root = node as RaisinDocumentNode;
+      const root = node;
       const children =
         recursive && root.children
           ? (root.children
@@ -180,7 +180,7 @@ export function duplicate(
   const nodes = visit(root, DuplicateVisitor)!;
   if (nodes.length > 1) throw new Error("Cannot duplicate root RaisinNode.");
   // Root node should not be duplicatable
-  return freeze(nodes![0]);
+  return freeze(nodes[0]);
 }
 
 /**
@@ -302,7 +302,7 @@ export function moveNode(
     ? {
         ...nodeToMove,
         // Remove slot from node being moved
-        attribs: (({ slot, ...o }) => o)(nodeToMove.attribs)
+        attribs: (({ slot: _slot, ...o }) => o)(nodeToMove.attribs)
       }
     : {
         ...nodeToMove,
@@ -318,8 +318,8 @@ export function moveNode(
 
     if (el === parent && found >= 0) {
       const isMovingFromSlot = isMovingNodeFromSlot(
-        nodeToMove as RaisinElementNode,
-        nodeWithNewSlot as RaisinElementNode
+        nodeToMove,
+        nodeWithNewSlot
       );
       // Case 0 -- moved within the same level of the tree
       return {
@@ -343,7 +343,7 @@ export function moveNode(
       return {
         ...el,
         children: removeItem(newChildren, found)
-      } as RaisinNodeWithChildren;
+      };
     } else if (shallowEqual(newChildren, el.children)) {
       // Don't modify
       return el;
@@ -487,17 +487,15 @@ export function clone(n: RaisinNode): RaisinNode {
  *
  * use recursion with reduce and concat
  */
-function flatDeep<T>(arr: T[] | T[][], d = 1): T[] {
-  // @ts-ignore
-  return d > 0
-    ? // @ts-ignore
-      arr.reduce(
-        // @ts-ignore
-        (acc, val) =>
-          acc.concat(Array.isArray(val) ? flatDeep(val, d - 1) : val),
-        []
-      )
-    : arr.slice();
+function flatDeep<T>(arr: (T | T[])[]): T[] {
+  return arr.reduce<T[]>((flattened, value) => {
+    if (Array.isArray(value)) {
+      flattened.push(...value);
+    } else {
+      flattened.push(value);
+    }
+    return flattened;
+  }, []);
 }
 
 /**
@@ -526,20 +524,20 @@ function addItemAndRemove<T>(
   arr: T[],
   elToAdd: T,
   idxToAdd: number,
-  remove: T,
+  nodeToRemove: T,
   isMovingFromSlot: boolean
 ): T[] {
   return arr.reduce((newArr, el, idx) => {
     // Move to new slot at same index or at the end of array
     if (
-      el === remove &&
+      el === nodeToRemove &&
       isMovingFromSlot &&
       (idx === idxToAdd || (idx === idxToAdd - 1 && idxToAdd === arr.length))
     ) {
       return [...newArr, elToAdd];
     }
 
-    if (el === remove) {
+    if (el === nodeToRemove) {
       // No remove item in new array
       return newArr;
     }
@@ -556,14 +554,14 @@ function addItemAndRemove<T>(
 }
 
 function isMovingNodeFromSlot(
-  nodeToMove: RaisinElementNode,
-  nodeWithNewSlot: RaisinElementNode
+  nodeToMove: RaisinNode,
+  nodeWithNewSlot: RaisinNode
 ) {
   return (
-    nodeToMove.attribs.slot !== undefined &&
     isElementNode(nodeToMove) &&
     isElementNode(nodeWithNewSlot) &&
-    nodeToMove?.attribs?.slot !== nodeWithNewSlot?.attribs?.slot
+    nodeToMove.attribs["slot"] !== undefined &&
+    nodeToMove.attribs["slot"] !== nodeWithNewSlot.attribs["slot"]
   );
 }
 

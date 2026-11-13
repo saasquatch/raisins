@@ -1,6 +1,6 @@
-import * as Css from "css-tree";
-import { StateUpdater } from "../util/NewState";
-import { StyleNodeProps, StyleNodeWithChildren } from "./Types";
+import type * as Css from "css-tree";
+import type { StateUpdater } from "../util/NewState.ts";
+import type { StyleNodeProps, StyleNodeWithChildren } from "./Types.ts";
 
 /**
  * Creates an immutable state updater for child editors
@@ -21,7 +21,7 @@ export function createUpdater<
     const reducer = (prev: Node): Node => {
       const prevChild = selector(prev);
       const nextVal = typeof next === "function" ? next(prevChild) : next;
-      const clone = { ...prev } as Node;
+      const clone = { ...prev };
       updater(clone, nextVal);
       return clone;
     };

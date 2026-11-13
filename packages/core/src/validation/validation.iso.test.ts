@@ -1,9 +1,8 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
-import expect from "expect";
-import { RaisinDocumentNode, RaisinNode } from "../index";
-import { ComponentMetaProvider, getSlots } from "./getSlots";
-import * as HTMLComponents from "./HTMLComponents";
-import { DefaultSlot, DefaultSlotMeta, NamedSlot } from "./SlotModel";
+import type { CustomElement, Slot } from "@raisins/schema";
+import type { RaisinDocumentNode, RaisinNode } from "../index.ts";
+import { type ComponentMetaProvider, getSlots } from "./getSlots.ts";
+import * as HTMLComponents from "./HTMLComponents.ts";
+import { DefaultSlot, DefaultSlotMeta, type NamedSlot } from "./SlotModel.ts";
 
 describe("Slot Model", () => {
   it("Default slot types use slot interfaces", () => {

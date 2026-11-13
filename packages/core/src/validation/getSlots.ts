@@ -1,7 +1,8 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
-import { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode";
-import { visit } from "../html-dom/util";
-import { DefaultSlot, NodeWithSlots } from "./SlotModel";
+import type { CustomElement, Slot } from "@raisins/schema";
+import { isElementNode } from "../html-dom/isNode.ts";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import { visit } from "../html-dom/util.ts";
+import { DefaultSlot, type NodeWithSlots } from "./SlotModel.ts";
 
 export type ComponentMetaProvider = (tagName: string) => CustomElement;
 
@@ -9,12 +10,12 @@ export function getSlots(
   node: RaisinNode,
   getComponentMeta: ComponentMetaProvider
 ): NodeWithSlots | undefined {
-  const noSlots = (_: RaisinNode): undefined => undefined;
+  const noSlots = (): undefined => undefined;
   const noSlotsWChildren = (
-    node: RaisinNode,
+    rootNode: RaisinNode,
     children: NodeWithSlots[]
   ): NodeWithSlots => ({
-    node,
+    node: rootNode,
     slots: [
       {
         ...DefaultSlot,
@@ -41,7 +42,9 @@ export function getSlots(
           };
         }, {} as Reduced) ?? {};
       const allSlots = children.reduce((acc, child) => {
-        const slotName = (child.node as RaisinElementNode)?.attribs?.slot ?? "";
+        const slotName = isElementNode(child.node)
+          ? child.node.attribs["slot"] ?? ""
+          : "";
         const previous = acc[slotName] ?? [];
 
         return {

@@ -1,16 +1,14 @@
-import {
+import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType.ts";
+import type {
   RaisinCommentNode,
   RaisinProcessingInstructionNode,
-  RaisinStyleNode
-} from "..";
-import { COMMENT, DIRECTIVE, ROOT, STYLE, TAG, TEXT } from "./domElementType";
-import {
+  RaisinStyleNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
   RaisinNodeWithChildren,
   RaisinTextNode
-} from "./RaisinNode";
+} from "./RaisinNode.ts";
 
 export function isNodeWithChildren(
   node?: RaisinNode

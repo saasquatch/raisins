@@ -1,4 +1,3 @@
-import expect from "expect";
 import {
   isCommentNode,
   isDirectiveNode,
@@ -7,8 +6,8 @@ import {
   isRoot,
   isStyleNode,
   isTextNode
-} from "./isNode";
-import parse from "./parser";
+} from "./isNode.ts";
+import parse from "./parser.ts";
 
 describe("isNode utility", () => {
   function isNode(src: string, ...fns: any[]) {

@@ -1,6 +1,5 @@
-import { RaisinNode } from "./RaisinNode";
-import { visit, visitAll } from "./util";
-import expect from "expect";
+import type { RaisinNode } from "./RaisinNode.ts";
+import { visit, visitAll } from "./util.ts";
 
 test("Visitor skip node", () => {
   const node: RaisinNode = {
@@ -12,18 +11,18 @@ test("Visitor skip node", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
   const visitor = {
-    skipNode: (_skipNode: any) => false
+    skipNode: (_skipNode: any) => false,
   };
 
-  const spySkip = jest.spyOn(visitor, "skipNode");
+  const spySkip = vi.spyOn(visitor, "skipNode");
 
   visit(node, visitor, true);
   visit(node, visitor, false);
@@ -41,19 +40,19 @@ test("Visit all", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
 
   const callback = {
-    callbackCounter: (_callback: any) => false
+    callbackCounter: (_callback: any) => false,
   };
 
-  const callbackSpy = jest.spyOn(callback, "callbackCounter");
+  const callbackSpy = vi.spyOn(callback, "callbackCounter");
 
   visitAll(node, (n: RaisinNode) => {
     callback.callbackCounter(0);

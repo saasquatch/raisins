@@ -1,15 +1,15 @@
 import { ElementType } from "domelementtype";
-import expect from "expect";
-import { RaisinNode } from "../html-dom/RaisinNode";
-import { removeWhitespace, visit } from "../html-dom/util";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
-import isJest from "../testing/isJest";
+import type { MockInstance } from "vitest";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import featureText from "../html-dom/util.feature?raw";
+import { removeWhitespace, visit } from "../html-dom/util.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
   when: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   let node: RaisinNode;
   let clean: RaisinNode;
@@ -29,7 +29,7 @@ const cucumber = (
       children: [
         {
           type: "text",
-          data: "\n  \t"
+          data: "\n  \t",
         },
         {
           type: "tag",
@@ -37,7 +37,7 @@ const cucumber = (
           children: [
             {
               type: "text",
-              data: "\n\t\t\t\t\t"
+              data: "\n\t\t\t\t\t",
             },
             {
               type: "tag",
@@ -45,23 +45,23 @@ const cucumber = (
               children: [
                 {
                   type: "text",
-                  data: "\n\t\t\t\t\tI am a div\n\t\t\t\t"
-                }
+                  data: "\n\t\t\t\t\tI am a div\n\t\t\t\t",
+                },
               ],
-              attribs: {}
+              attribs: {},
             },
             {
               type: "text",
-              data: "\t\t\n\t\t"
-            }
+              data: "\t\t\n\t\t",
+            },
           ],
-          attribs: {}
+          attribs: {},
         },
         {
           type: "text",
-          data: "\n  "
-        }
-      ]
+          data: "\n  ",
+        },
+      ],
     };
   });
 
@@ -87,15 +87,15 @@ const cucumber = (
               children: [
                 {
                   type: "text",
-                  data: "I am a div"
-                }
+                  data: "I am a div",
+                },
               ],
-              attribs: {}
-            }
+              attribs: {},
+            },
           ],
-          attribs: {}
-        }
-      ]
+          attribs: {},
+        },
+      ],
     };
 
     expect(clean).toStrictEqual(expected);
@@ -114,7 +114,7 @@ const cucumber = (
     comment: { type: ElementType.Comment, data: "Hello World" },
     tag: { type: ElementType.Tag, tagName: "div", children: [], attribs: {} },
     style: { type: ElementType.Style, tagName: "style", attribs: {} },
-    root: { type: ElementType.Root, children: [] }
+    root: { type: ElementType.Root, children: [] },
   };
 
   const visitor = {
@@ -123,7 +123,7 @@ const cucumber = (
     onComment: (_textNode: any) => "r_comment",
     onElement: (_textNode: any) => "r_tag",
     onStyle: (_textNode: any) => "r_style",
-    onRoot: (_textNode: any) => "r_root"
+    onRoot: (_textNode: any) => "r_root",
   };
 
   let types: "text" | "directive" | "comment" | "tag" | "style" | "root";
@@ -144,7 +144,7 @@ const cucumber = (
     | "r_style"
     | "r_root";
 
-  let callbackSpy: jest.SpyInstance;
+  let callbackSpy: MockInstance;
   let callbackResult: string | undefined;
 
   given(/^the node is (.*)$/, (type: any) => {
@@ -152,10 +152,8 @@ const cucumber = (
   });
 
   and(/^the visitor has a (.*) function defined$/, (callback: any) => {
-    if (isJest()) {
-      callbacks = callback;
-      callbackSpy = jest.spyOn(visitor, callbacks);
-    }
+    callbacks = callback;
+    callbackSpy = vi.spyOn(visitor, callbacks);
   });
 
   when("visit is called", () => {
@@ -163,9 +161,7 @@ const cucumber = (
   });
 
   then("the callback is called with the node", () => {
-    if (isJest()) {
-      expect(callbackSpy).toBeCalledTimes(1);
-    }
+    expect(callbackSpy).toBeCalledTimes(1);
   });
 
   and(/^the (.*) of the callback is returned$/, (result: any) => {
@@ -174,4 +170,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/util.feature");
+bindIsomorphicCucumberSteps(cucumber, featureText);

@@ -1,6 +1,6 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../../html-dom/isNode";
-import { RaisinElementNode, RaisinNode } from "../../html-dom/RaisinNode";
+import type { CustomElement } from "@raisins/schema";
+import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
 
 /**
  * Given a tag's metadata, checks if it allows children.
@@ -12,17 +12,13 @@ export function doesChildAllowParent(
   childMeta: CustomElement,
   parent: RaisinNode
 ): boolean {
-  let tagName: string | undefined = undefined;
-
   if (!isElementNode(parent) && !isRoot(parent)) {
     // Non-element nodes aren't picky. Text doesn't say where it can be, it's the other side of
     // the relationship that enforces this
     return true;
   }
 
-  let elementParent = parent as RaisinElementNode;
-
-  tagName = elementParent.tagName;
+  const tagName = isElementNode(parent) ? parent.tagName : undefined;
 
   if (childMeta.validParents === undefined) {
     // No constraints, so all parents are allowed.
@@ -31,7 +27,7 @@ export function doesChildAllowParent(
 
   // TODO: Use CSS selectors engine or ProseMirror content engine
   if (
-    childMeta.validParents.includes(tagName) ||
+    (tagName !== undefined && childMeta.validParents.includes(tagName)) ||
     childMeta.validParents.includes("*")
   ) {
     // Child allows parent

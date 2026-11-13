@@ -1,7 +1,6 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import { RaisinElementNode } from "../../html-dom/RaisinNode";
-import { isNodeAllowed } from "./isNodeAllowed";
+import type { CustomElement } from "@raisins/schema";
+import type { RaisinElementNode } from "../../html-dom/RaisinNode.ts";
+import { isNodeAllowed } from "./isNodeAllowed.ts";
 
 describe("isNodeAllowed", () => {
   it("Node is allowed", () => {

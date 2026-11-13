@@ -1,9 +1,8 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import parse from "../html-dom/parser";
-import { RaisinElementNode } from "../html-dom/RaisinNode";
-import { getParents } from "../html-dom/util";
-import { calculatePlopTargets } from "./calculatePlopTargets";
+import type { CustomElement } from "@raisins/schema";
+import parse from "../html-dom/parser.ts";
+import type { RaisinElementNode } from "../html-dom/RaisinNode.ts";
+import { getParents } from "../html-dom/util.ts";
+import { calculatePlopTargets } from "./calculatePlopTargets.ts";
 
 /**
  * Regression tests for the "global top-level drop target" bug: a component

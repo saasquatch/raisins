@@ -1,5 +1,5 @@
-import { Slot } from "@raisins/schema/schema";
-import { RaisinNode } from "../html-dom/RaisinNode";
+import type { Slot } from "@raisins/schema";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
 
 export type NodeWithSlots = {
   node: RaisinNode;

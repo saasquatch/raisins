@@ -1,51 +1,51 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import {
+import type { CustomElement } from "@raisins/schema";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode
-} from "../html-dom/RaisinNode";
-import { doesParentAllowChild } from "../validation/rules/doesParentAllowChild";
+  RaisinTextNode,
+} from "../html-dom/RaisinNode.ts";
+import featureText from "../validation/rules/doesParentAllowChild.feature?raw";
+import { doesParentAllowChild } from "../validation/rules/doesParentAllowChild.ts";
 import {
   bindIsomorphicCucumberSteps,
-  IsoStepDefs
-} from "./bindIsomorphicCucumberSteps";
+  type IsoStepDefs,
+} from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber: IsoStepDefs = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   const root: RaisinDocumentNode = {
     type: "root",
-    children: []
+    children: [],
   };
   const style: RaisinStyleNode = {
     type: "style",
     attribs: {},
-    tagName: "style"
+    tagName: "style",
   };
   const text: RaisinTextNode = {
     type: "text",
-    data: "text-data"
+    data: "text-data",
   };
   const comment: RaisinCommentNode = {
     type: "comment",
-    data: "comment-data"
+    data: "comment-data",
   };
   const instruction: RaisinProcessingInstructionNode = {
     type: "directive",
     name: "directive-name",
-    data: "directive-data"
+    data: "directive-data",
   };
   const element: RaisinElementNode = {
     type: "tag",
     attribs: {},
     tagName: "my-example",
-    children: []
+    children: [],
   };
 
   const nodes = {
@@ -54,7 +54,7 @@ const cucumber: IsoStepDefs = (
     text,
     comment,
     element,
-    instruction
+    instruction,
   };
 
   type nodeType =
@@ -90,14 +90,14 @@ const cucumber: IsoStepDefs = (
     /^parent allows node as child in the "(.*)" slot$/,
     (slotName: string) => {
       expect(doesParentAllowChild(node, parentMeta, slotName)).toBe(true);
-    }
+    },
   );
 
   then(
     /^parent does not allow node as child in the "(.*)" slot$/,
     (slotName: string) => {
       expect(doesParentAllowChild(node, parentMeta, slotName)).toBe(false);
-    }
+    },
   );
   then("parent allows node as child in the default slot", () => {
     expect(doesParentAllowChild(node, parentMeta, undefined)).toBe(true);
@@ -107,7 +107,4 @@ const cucumber: IsoStepDefs = (
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/rules/doesParentAllowChild.feature"
-);
+bindIsomorphicCucumberSteps(cucumber, featureText);

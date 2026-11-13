@@ -1,16 +1,17 @@
-import { CustomElement } from "@raisins/schema/schema";
-import expect from "expect";
-import parse from "../html-dom/parser";
-import { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode";
-import { getParents, visitAll } from "../html-dom/util";
-import { calculatePlopTargets } from "../validation/calculatePlopTargets";
-import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps";
+import type { CustomElement } from "@raisins/schema";
+import parse from "../html-dom/parser.ts";
+import { isElementNode } from "../html-dom/isNode.ts";
+import type { RaisinElementNode, RaisinNode } from "../html-dom/RaisinNode.ts";
+import { getParents, visitAll } from "../html-dom/util.ts";
+import featureText from "../validation/calculatePlopTargets.feature?raw";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
+import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   when: (...args: any[]) => void,
   and: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   let parent: RaisinElementNode;
   let parents: WeakMap<RaisinNode, RaisinNode>;
@@ -19,8 +20,11 @@ const cucumber = (
   let parentMeta: CustomElement;
 
   given("a parent with following html", (html: string) => {
-    parent = parse(html, { cleanWhitespace: false })
-      .children[0] as RaisinElementNode;
+    const firstChild = parse(html, { cleanWhitespace: false }).children[0];
+    if (!isElementNode(firstChild)) {
+      throw new Error("Expected parsed HTML to contain an element child");
+    }
+    parent = firstChild;
     parents = getParents(parent);
   });
 
@@ -28,15 +32,15 @@ const cucumber = (
     plop = parent;
   });
   then("there are no plop targets anywhere", () => {
-    visitAll(parent, n => {
+    visitAll(parent, (n) => {
       const targets = calculatePlopTargets(
         n,
         plop,
         {
           parentMeta,
-          possiblePlopMeta
+          possiblePlopMeta,
         },
-        parents
+        parents,
       );
       expect({ n, targets }).toStrictEqual({ n, targets: [] });
       return n;
@@ -48,10 +52,10 @@ const cucumber = (
       type: "tag",
       attribs: {},
       tagName: "plop",
-      children: []
+      children: [],
     };
     possiblePlopMeta = {
-      tagName: "plop"
+      tagName: "plop",
     };
   });
 
@@ -60,10 +64,10 @@ const cucumber = (
       type: "tag",
       attribs: {},
       tagName: "plop",
-      children: []
+      children: [],
     };
     possiblePlopMeta = {
-      tagName: "plop"
+      tagName: "plop",
     };
     parent.children[number] = plop;
   });
@@ -71,7 +75,7 @@ const cucumber = (
   and(/^parent meta has slots (.*)$/, (json: string) => {
     parentMeta = {
       tagName: "parent",
-      slots: []
+      slots: [],
     };
     parentMeta.slots = JSON.parse(json);
   });
@@ -85,10 +89,10 @@ const cucumber = (
         plop,
         {
           parentMeta,
-          possiblePlopMeta
+          possiblePlopMeta,
         },
-        parents
-      )
+        parents,
+      ),
     ).toStrictEqual(JSON.parse(json));
   });
 
@@ -99,15 +103,12 @@ const cucumber = (
         plop,
         {
           parentMeta,
-          possiblePlopMeta
+          possiblePlopMeta,
         },
-        parents
-      )
+        parents,
+      ),
     ).toStrictEqual(JSON.parse(json));
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/calculatePlopTargets.feature"
-);
+bindIsomorphicCucumberSteps(cucumber, featureText);

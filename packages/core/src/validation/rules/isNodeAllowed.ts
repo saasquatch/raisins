@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { RaisinNode } from "../../html-dom/RaisinNode";
-import { doesChildAllowParent } from "./doesChildAllowParent";
-import { doesParentAllowChild } from "./doesParentAllowChild";
+import type { CustomElement } from "@raisins/schema";
+import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
+import { doesChildAllowParent } from "./doesChildAllowParent.ts";
+import { doesParentAllowChild } from "./doesParentAllowChild.ts";
 
 /**
  * Given two nodes and their metadata

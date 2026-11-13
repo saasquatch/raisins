@@ -1,7 +1,6 @@
-import expect from "expect";
-import { NodePath } from "../paths/Paths";
-import { calculatePlopTargets } from "../validation/calculatePlopTargets";
-import {
+import type { NodePath } from "../paths/Paths.ts";
+import { calculatePlopTargets } from "../validation/calculatePlopTargets.ts";
+import type {
   RaisinCommentNode,
   RaisinDocumentNode,
   RaisinElementNode,
@@ -9,7 +8,7 @@ import {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./RaisinNode";
+} from "./RaisinNode.ts";
 import {
   clone,
   duplicate,
@@ -21,7 +20,7 @@ import {
   remove,
   replace,
   replacePath
-} from "./util";
+} from "./util.ts";
 
 it("Remove node", () => {
   const node: RaisinNode = {
@@ -214,6 +213,7 @@ describe("Move nodes", () => {
 
   it("Move node at the same level", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       root,
       node2,
@@ -265,6 +265,7 @@ describe("Move nodes", () => {
 
     expect(plopTargets.length).toBe(1);
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       emptyRoot,
       newNode,
@@ -302,6 +303,7 @@ describe("Move nodes", () => {
    */
   it("Move an existing node into a slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       slotRoot,
       node2,
@@ -327,6 +329,7 @@ describe("Move nodes", () => {
    */
   it("Move an existing node into a slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       slotRoot,
       node2,
@@ -372,6 +375,7 @@ describe("Move nodes", () => {
   it("Move a node with a slot name into a node without named slots", () => {
     const nodepath: NodePath = [];
     expect(slottedRoot.children.length).toBe(1);
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       slottedRoot,
       node2Moved,
@@ -417,6 +421,7 @@ describe("Move nodes", () => {
    */
   it("Move node at the same level with new slot to a specific index of an empty slot", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       multiSlotRoot,
       existingNode,
@@ -460,6 +465,7 @@ describe("Move nodes", () => {
    */
   it("Move a new node as a sibling with a different slot to a specific index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       multiSlotRoot,
       addingNoSlotNode,
@@ -503,6 +509,7 @@ describe("Move nodes", () => {
    */
   it("Move a new node as a sibling with a different slot to a specific index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       multiSlotRoot,
       movingNode,
@@ -560,6 +567,7 @@ describe("Move nodes", () => {
    */
   it("Move node with no slot to a new index", () => {
     const nodepath: NodePath = [];
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(
       slotlessRoot,
       node1NoSlot,
@@ -575,12 +583,14 @@ describe("Move nodes", () => {
   });
 
   it("Move sibling into another sibling, then back again", () => {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const res = moveNode(root, node2, "children", [0], 0) as any;
 
     const newNode2 = res.children[0].children[0];
     expect(res.children.length).toBe(1);
     expect(newNode2).toStrictEqual(node2);
 
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion
     const newOriginal = moveNode(res, newNode2, "children", [], 0) as any;
 
     expect(newOriginal.children.length).toBe(2);

@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import csstree, { CssNodePlain, parse, toPlainObject } from "css-tree";
+import csstree, { type CssNodePlain, parse, toPlainObject } from "css-tree";
 
 /**
  * Rewrites every selector in a stylesheet AST so that the rules apply only to
@@ -28,11 +28,7 @@ export function scopeStylesheet(
 /** Keyframe selectors (`from`, `to`, `0%`) are not style rules — scoping them breaks the animation. */
 const KEYFRAMES_AT_RULE = /^(-[a-z]+-)?keyframes$/i;
 
-type RuleNode = {
-  type: "Rule";
-  prelude: CssNodePlain;
-  block: { children: CssNodePlain[] };
-};
+type RuleNode = Extract<CssNodePlain, { type: "Rule" }>;
 
 function processChildren(node: any, scope: string): void {
   if (!node || !Array.isArray(node.children)) return;
@@ -65,10 +61,9 @@ function expandRule(rule: CssNodePlain): CssNodePlain[] {
       continue;
     }
 
-    const ruleNode = current as RuleNode;
-    const { kept, lifted } = expandNesting(ruleNode);
+    const { kept, lifted } = expandNesting(current);
     if (kept.length > 0) {
-      ruleNode.block.children = kept;
+      current.block.children = kept;
       result.push(current);
     }
     for (let index = lifted.length - 1; index >= 0; index -= 1) {
@@ -101,9 +96,7 @@ function expandNesting(
       child.value.includes("&")
     ) {
       const expanded = replaceNestingSelectorTokens(child.value, selectorStr);
-      const parsed = toPlainObject(parse(expanded)) as CssNodePlain & {
-        children?: CssNodePlain[];
-      };
+      const parsed = toPlainObject(parse(expanded));
       if (parsed.type === "StyleSheet" && Array.isArray(parsed.children)) {
         lifted.push(...parsed.children);
       }
@@ -128,9 +121,11 @@ function replaceNestingSelectorTokens(
   raw: string,
   selectorStr: string
 ): string {
-  const csstreeAny = csstree as any;
-  const tokenStream = new csstreeAny.TokenStream();
-  csstreeAny.tokenize(raw, tokenStream);
+  if (!isCssTreeTokenizer(csstree)) {
+    throw new Error("css-tree tokenizer API is unavailable");
+  }
+  const tokenStream = new csstree.TokenStream();
+  csstree.tokenize(raw, tokenStream);
 
   let result = "";
   let cursor = 0;
@@ -147,6 +142,28 @@ function replaceNestingSelectorTokens(
   });
   result += raw.slice(cursor);
   return result;
+}
+
+type CssTokenStream = {
+  forEachToken(
+    callback: (_type: number, start: number, end: number) => void
+  ): void;
+};
+
+type CssTreeTokenizer = {
+  TokenStream: new () => CssTokenStream;
+  tokenize(raw: string, tokenStream: CssTokenStream): void;
+};
+
+function isCssTreeTokenizer(value: unknown): value is CssTreeTokenizer {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "TokenStream" in value &&
+    "tokenize" in value &&
+    typeof value.TokenStream === "function" &&
+    typeof value.tokenize === "function"
+  );
 }
 
 function serializeNode(node: any): string {

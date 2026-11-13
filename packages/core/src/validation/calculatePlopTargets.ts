@@ -1,7 +1,7 @@
-import { CustomElement } from "@raisins/schema/schema";
-import { isElementNode, isRoot } from "../html-dom/isNode";
-import { RaisinNode, RaisinTextNode } from "../html-dom/RaisinNode";
-import { isNodeAllowed } from "./rules/isNodeAllowed";
+import type { CustomElement } from "@raisins/schema";
+import { isElementNode, isRoot, isTextNode } from "../html-dom/isNode.ts";
+import type { RaisinNode } from "../html-dom/RaisinNode.ts";
+import { isNodeAllowed } from "./rules/isNodeAllowed.ts";
 
 export type PlopTarget = {
   idx: number;
@@ -52,8 +52,9 @@ export function calculatePlopTargets(
     .map((child, idx) => ({ child, idx }))
     .filter(
       ({ child }) =>
-        !(child as RaisinTextNode).data ||
-        (child as RaisinTextNode).data?.trim()?.replace(/\\n/g, "")
+        !isTextNode(child) ||
+        !child.data ||
+        child.data.trim().replace(/\\n/g, "") !== ""
     );
   const seenSlots = new Set();
   const remainingSlots = new Set(
@@ -93,7 +94,7 @@ export function calculatePlopTargets(
         return acc;
       }
 
-      const slot = child.attribs.slot ?? "";
+      const slot = child.attribs["slot"] ?? "";
       const isValid = isNodeAllowed(
         possiblePlop,
         schema.possiblePlopMeta,

@@ -1,7 +1,8 @@
-import { domNativeToRaisin } from "./DomNativeToRaisin";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode } from "./RaisinNode";
-import { removeWhitespace } from "./util";
+import { domNativeToRaisin } from "./DomNativeToRaisin.ts";
+import { isRoot } from "./isNode.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode } from "./RaisinNode.ts";
+import { removeWhitespace } from "./util.ts";
 
 type Options = {
   cleanWhitespace?: boolean;
@@ -32,9 +33,10 @@ export function parseWithErrors(
   { cleanWhitespace = false, onParseError }: Options = {}
 ): { node: RaisinDocumentNode; errors: ParseErrorStack } {
   const { node, errors } = parseDomParser(html, onParseError);
-  const clean = cleanWhitespace
-    ? (removeWhitespace(node) as RaisinDocumentNode)
-    : node;
+  const clean = cleanWhitespace ? removeWhitespace(node) : node;
+  if (!isRoot(clean)) {
+    throw new Error("Whitespace removal did not preserve the document root");
+  }
   return { node: clean, errors };
 }
 

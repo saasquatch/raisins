@@ -1,98 +1,80 @@
 {
   "name": "@raisins/core",
-  "author": "ReferralSaaSquatch.com, Inc.",
-  "description": "Core functions for manipulating and validating HTML and raisin nodes",
   "version": "1.4.1",
+  "description": "Core functions for manipulating and validating HTML and raisin nodes",
+  "bugs": {
+    "url": "https://github.com/saasquatch/raisins/issues"
+  },
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/core.esm.js",
-  "typings": "dist/index.d.ts",
+  "author": "ReferralSaaSquatch.com, Inc.",
   "repository": {
     "type": "git",
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/core"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist",
     "src"
   ],
-  "engines": {
-    "node": ">=10"
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "test:watch": "tsdx test --watch",
-    "test:coverage": "tsdx test --coverage",
-    "lint": "tsdx lint src",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
-    "cypress:open": "cypress open"
-  },
-  "size-limit": [
-    {
-      "path": "dist/core.cjs.production.min.js",
-      "limit": "120 KB"
-    },
-    {
-      "path": "dist/core.esm.js",
-      "limit": "120 KB"
-    }
-  ],
-  "devDependencies": {
-    "@saasquatch/scoped-autobindsteps": "^1.0.0",
-    "@shoelace-style/react": "^2.0.0-beta.52",
-    "@size-limit/preset-small-lib": "^5.0.4",
-    "@testing-library/react-hooks": "^7.0.2",
-    "@types/css": "0.0.33",
-    "@types/css-tree": "^1.0.5",
-    "@types/cypress-cucumber-preprocessor": "^4.0.1",
-    "@types/domelementtype": "^2.0.1",
-    "@types/jest": "^27.4.1",
-    "@types/lodash.clonedeep": "^4.5.6",
-    "@types/luxon": "^2.3.1",
-    "@types/mz": "^2.7.4",
-    "@types/parse5": "^6.0.3",
-    "@types/styled-components": "^5.1.14",
-    "cypress": "^9.5.2",
-    "cypress-cucumber-preprocessor": "^4.3.1",
-    "glob": "^7.2.0",
-    "glob-promise": "^4.2.0",
-    "jest": "^25.5.4",
-    "jest-cucumber": "^3.0.1",
-    "jsonata": "^1.8.5",
-    "mz": "^2.7.0",
-    "parse5": "^6.0.1",
-    "size-limit": "^5.0.4",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^3.9.10"
+    "start": "tsdown --watch",
+    "build": "tsdown",
+    "test": "vitest run --project node",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --project node --coverage",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "test:browser": "vitest run --project browser"
   },
   "dependencies": {
     "@raisins/schema": "^1.4.0",
-    "color2k": "^2.0.0",
-    "css": "^3.0.0",
-    "css-select": "^5.1.0",
+    "color2k": "^2.0.4",
+    "css-select": "^5.2.2",
     "css-tree": "^1.1.3",
-    "domelementtype": "^2.2.0",
-    "entities": "^4.3.0",
+    "domelementtype": "^2.3.0",
+    "entities": "^4.5.0",
     "lodash.clonedeep": "^4.5.0",
-    "luxon": "^2.3.2"
+    "luxon": "^2.5.2"
   },
-  "jest": {
-    "testMatch": [
-      "**/*.@(iso|node).test.@(ts|tsx|js|jsx)"
-    ]
+  "devDependencies": {
+    "@saasquatch/scoped-autobindsteps": "^1.0.1",
+    "@types/css-tree": "^1.0.7",
+    "@types/lodash.clonedeep": "^4.5.9",
+    "@types/luxon": "^2.4.0",
+    "@types/mz": "^2.7.9",
+    "@types/node": "^24.19.2",
+    "@types/parse5": "^6.0.3",
+    "@vitest/browser-playwright": "^5.1.0",
+    "@vitest/coverage-v8": "^5.1.0",
+    "glob": "^7.2.3",
+    "jest-cucumber": "^4.5.0",
+    "jsdom": "^26.1.0",
+    "jsonata": "^1.8.9",
+    "mz": "^2.7.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2007",
+    "parse5": "^6.0.1",
+    "playwright": "^1.65.0",
+    "tsdown": "^0.23.7",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   },
-  "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": false,
-    "stepDefinitions": "src/cucumber-steps"
-  },
-  "bugs": {
-    "url": "https://github.com/saasquatch/raisins/issues"
+  "engines": {
+    "node": "^24 || ^26"
   }
 }

@@ -1,4 +1,4 @@
-import { ErrorEntry, ErrorStack } from "./types";
+import type { ErrorEntry, ErrorStack } from "./types.ts";
 
 export function getSubErrors<T>(
   stack: ErrorStack<T>,

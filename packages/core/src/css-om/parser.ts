@@ -1,4 +1,4 @@
-import { parse, toPlainObject, CssNodePlain, ParseOptions } from "css-tree";
+import { parse, toPlainObject, type CssNodePlain, type ParseOptions } from "css-tree";
 
 /**
  * Parses a CSS expression and returns a pure js object AST representation of the content
