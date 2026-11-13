@@ -1,14 +1,14 @@
-import expect from 'expect';
+import { expect } from 'vitest';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { h } from 'snabbdom';
-import { unpkgNpmRegistry } from '../../util/NPMRegistry';
+import { unpkgNpmRegistry } from '../../util/NPMRegistry.ts';
 import {
   SnabbdomIframeMolecule,
-  SnabbdomIframeProps,
+  type SnabbdomIframeProps,
   SnabbdomIframeScope,
-} from './SnabbdomSanboxedIframeAtom';
+} from './SnabbdomSanboxedIframeAtom.tsx';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 describe('Thing', () => {

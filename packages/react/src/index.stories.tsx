@@ -1,15 +1,15 @@
-import { RaisinElementNode, RaisinNode } from '@raisins/core';
-import { Meta } from '@storybook/react';
+import { type RaisinElementNode, type RaisinNode } from '@raisins/core';
+import { type Meta } from '@storybook/react';
 import {
   createScope,
   molecule,
   ScopeProvider,
   useMolecule,
 } from 'bunshi/react';
-import { Atom, atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { type Atom, atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 
 import JSONPointer from 'jsonpointer';
-import React, { CSSProperties, useMemo } from 'react';
+import React, { type CSSProperties, useMemo } from 'react';
 import {
   BasicCanvasController,
   CanvasHoveredMolecule,
@@ -17,16 +17,16 @@ import {
   CanvasProvider,
   CanvasScopeMolecule,
   CanvasSelectionMolecule,
-} from './canvas';
-import { SnabbdomRenderer } from './canvas/util/raisinToSnabdom';
-import { ComponentModelMolecule, Module } from './component-metamodel';
-import { PackageEditor } from './component-metamodel/ComponentModel.stories';
-import { CoreMolecule, SelectedNodeMolecule } from './core';
-import { HistoryMolecule } from './core/editting/HistoryAtoms';
-import { RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope';
-import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule';
-import { DocumentCssEditor } from './css-editing/DocumentCssMolecule';
-import { StylePanel } from './css-editing/StyleMolecule';
+} from './canvas/index.ts';
+import { type SnabbdomRenderer } from './canvas/util/raisinToSnabdom.tsx';
+import { ComponentModelMolecule, type Module } from './component-metamodel/index.ts';
+import { PackageEditor } from './component-metamodel/ComponentModel.stories.tsx';
+import { CoreMolecule, SelectedNodeMolecule } from './core/index.ts';
+import { HistoryMolecule } from './core/editting/HistoryAtoms.tsx';
+import { type RaisinConfig, RaisinsProvider } from './core/RaisinConfigScope.tsx';
+import { HoveredNodeMolecule } from './core/selection/HoveredNodeMolecule.tsx';
+import { DocumentCssEditor } from './css-editing/DocumentCssMolecule.tsx';
+import { StylePanel } from './css-editing/StyleMolecule.tsx';
 import {
   big,
   LocalBedrockComponents,
@@ -35,15 +35,15 @@ import {
   mintTemplates,
   NextComponents,
   templateExample,
-} from './examples/MintComponents';
+} from './examples/MintComponents.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from './examples/VanillaComponents';
-import { useHotkeys } from './hotkeys/useHotkeys';
-import { NodeMolecule } from './node';
+} from './examples/VanillaComponents.tsx';
+import { useHotkeys } from './hotkeys/useHotkeys.ts';
+import { NodeMolecule } from './node/index.ts';
 import { LayersController } from './node/slots/SlotChildrenController.stories';
-import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor';
+import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor.tsx';
 
 const meta: Meta = {
   title: 'Editor',

@@ -1,0 +1,20 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "options": {
+    "typeAware": true,
+    "typeCheck": true
+  },
+  "rules": {},
+  "ignorePatterns": ["dist", ".out", "example", "cypress"],
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true,
+    "vitest": true
+  }
+}

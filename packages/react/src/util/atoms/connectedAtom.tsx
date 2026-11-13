@@ -1,5 +1,5 @@
-import { Atom, atom, Getter, Setter } from 'jotai';
-import { MutableRefObject } from 'react';
+import { type Atom, atom, type Getter, type Setter } from 'jotai';
+import { type MutableRefObject } from 'react';
 
 /**
  * Creates a read-only atom for some external state connection that needs to be both initialized and optionally destroyed.

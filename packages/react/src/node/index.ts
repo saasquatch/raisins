@@ -1,8 +1,8 @@
 export {
   ChildrenEditorForAtoms, NodeChildrenEditor
-} from './NodeChildrenEditor';
-export type { NodeChildrenEditorProps } from './NodeChildrenEditor';
-export { NodeMolecule } from './NodeMolecule';
-export { NodeScope, NodeScopeMolecule, NodeScopeProvider } from './NodeScope';
-export * from './slots';
+} from './NodeChildrenEditor.tsx';
+export type { NodeChildrenEditorProps } from './NodeChildrenEditor.tsx';
+export { NodeMolecule } from './NodeMolecule.tsx';
+export { NodeScope, NodeScopeMolecule, NodeScopeProvider } from './NodeScope.tsx';
+export * from './slots/index.tsx';
 

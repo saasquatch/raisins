@@ -1,22 +1,22 @@
-import { RaisinElementNode } from '@raisins/core';
-import { CssPart, CustomElement } from '@raisins/schema/schema';
+import { type RaisinElementNode } from '@raisins/core';
+import type { CssPart, CustomElement } from '@raisins/schema';
 import { createScope, molecule, useMolecule } from 'bunshi/react';
-import { atom, useAtom, useAtomValue, Atom, WritableAtom } from 'jotai';
+import { atom, useAtom, useAtomValue, type Atom, type WritableAtom } from 'jotai';
 import React, { useEffect, useRef, useState } from 'react';
-import { ComponentModelMolecule } from '../component-metamodel';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
-import { isElementNode } from '../util/isNode';
-import { CssEditingMolecule } from './CssEditingMolecule';
+import { ComponentModelMolecule } from '../component-metamodel/index.ts';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule.tsx';
+import { isElementNode } from '../util/isNode.tsx';
+import { CssEditingMolecule } from './CssEditingMolecule.tsx';
 import {
   readSection,
   readSectionShorthandDimension,
-  ReadSectionOptions,
-  SectionKey,
+  type ReadSectionOptions,
+  type SectionKey,
   selectorOf,
-  ShorthandDimensions,
+  type ShorthandDimensions,
   writeSection,
   writeSectionProperty,
-} from './cssSections';
+} from './cssSections.ts';
 
 export const PartScope = createScope<SectionKey>({ type: "element" });
 

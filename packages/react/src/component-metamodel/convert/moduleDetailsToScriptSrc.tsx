@@ -1,6 +1,6 @@
-import { ModuleDetails } from '../types';
-import { makeLocalRegistry, NPMRegistry } from '../../util/NPMRegistry';
-import { LOCAL_REPO } from './LOCAL_REPO';
+import { type ModuleDetails } from '../types.ts';
+import { makeLocalRegistry, type NPMRegistry } from '../../util/NPMRegistry.ts';
+import { LOCAL_REPO } from './LOCAL_REPO.tsx';
 
 /**
  * Converts a set of ModuleDetails into appropriate `<script>` and `<link>` tags

@@ -13,8 +13,8 @@ import type {
   ChildRPC,
   GeometryEntry,
   ParentRPC,
-} from '../api/_CanvasRPCContract';
-import type { Props } from './childApiSrc';
+} from '../api/_CanvasRPCContract.tsx';
+import type { Props } from './childApiSrc.tsx';
 
 type Snabbdom = typeof SnabbdomType;
 type Penpal = typeof PenpalType;

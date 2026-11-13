@@ -1,8 +1,8 @@
 import { useAtomValue } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React from 'react';
-import { NodeMolecule } from '../NodeMolecule';
-import { SlotScopeProvider } from './SlotScope';
+import { NodeMolecule } from '../NodeMolecule.tsx';
+import { SlotScopeProvider } from './SlotScope.tsx';
 
 export type SlotChildrenControllerProps = {
   /**

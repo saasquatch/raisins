@@ -1,11 +1,11 @@
 export {
   SlotChildrenController,
-} from './SlotChildrenController';
+} from './SlotChildrenController.tsx';
 export type {
   SlotChildrenControllerProps,
-} from './SlotChildrenController';
+} from './SlotChildrenController.tsx';
 export {
   SlotScopeMolecule,
   SlotScopeProvider,
   SlotMolecule,
-} from './SlotScope';
+} from './SlotScope.tsx';

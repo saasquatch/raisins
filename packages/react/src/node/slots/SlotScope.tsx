@@ -1,14 +1,14 @@
-import { RaisinElementNode, RaisinNodeWithChildren } from '@raisins/core';
-import type { Slot } from '@raisins/schema/schema';
+import { type RaisinElementNode, type RaisinNodeWithChildren } from '@raisins/core';
+import type { Slot } from '@raisins/schema';
 import { atom } from 'jotai';
 import { createScope, molecule, ScopeProvider } from 'bunshi/react';
 import { focusAtom } from 'jotai-optics';
 import { splitAtom } from 'jotai/utils';
 import { optic_ } from 'optics-ts';
 import React from 'react';
-import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
-import { NodeMolecule } from '../NodeMolecule';
-import { isInSlot } from './isInSlot';
+import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel.tsx';
+import { NodeMolecule } from '../NodeMolecule.tsx';
+import { isInSlot } from './isInSlot.tsx';
 
 export const SlotScope = createScope<string | undefined>(undefined);
 SlotScope.displayName = 'SlotScope';

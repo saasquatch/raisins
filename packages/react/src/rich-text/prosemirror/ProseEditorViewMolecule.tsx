@@ -1,8 +1,8 @@
-import { Atom, atom, SetStateAction } from 'jotai';
+import { type Atom, atom, type SetStateAction } from 'jotai';
 import { createScope, molecule } from 'bunshi/react';
 import { EditorView } from 'prosemirror-view';
-import connectedAtom from '../../util/atoms/connectedAtom';
-import { ProseEditorStateMolecule } from './ProseEditorStateMolecule';
+import connectedAtom from '../../util/atoms/connectedAtom.tsx';
+import { ProseEditorStateMolecule } from './ProseEditorStateMolecule.tsx';
 
 /**
  * Wraps a ProseMirror {@link EditorView} in a way that works with atomic state in jotai

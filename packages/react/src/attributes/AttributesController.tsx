@@ -1,8 +1,8 @@
 import { useMolecule } from 'bunshi/react';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import { AttributeMolecule, AttributeProvider } from './AttributeMolecule';
-import { AttributesMolecule } from './AttributesMolecule';
+import { AttributeMolecule, AttributeProvider } from './AttributeMolecule.tsx';
+import { AttributesMolecule } from './AttributesMolecule.ts';
 
 export type AttributesControllerProps = {
   /**

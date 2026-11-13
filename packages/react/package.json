@@ -4,124 +4,85 @@
   "description": "React package with tools for building a Raisins editor",
   "version": "1.8.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/react.esm.js",
-  "typings": "dist/index.d.ts",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/saasquatch/raisins",
     "directory": "packages/react"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "files": [
     "dist",
     "src"
   ],
-  "engines": {
-    "node": ">=10"
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "start": "dts watch",
-    "build": "dts build",
+    "start": "tsdown --watch",
+    "build": "tsdown",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint src",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
+    "lint": "oxlint",
+    "format": "oxfmt",
     "storybook": "storybook dev -p 6007 -c .storybook",
     "storybook:build": "storybook build -c .storybook -o .out"
   },
-  "peerDependencies": {
-    "jotai": "^2.0.0",
-    "react": "^17.0.0 || ^18.0.0"
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "size-limit": [
-    {
-      "path": "dist/react.cjs.production.min.js",
-      "limit": "150 KB"
-    },
-    {
-      "path": "dist/react.esm.js",
-      "limit": "150 KB"
-    }
-  ],
   "dependencies": {
     "@raisins/core": "^1.4.1",
     "@raisins/schema": "^1.4.0",
     "bunshi": "~2.0.2",
-    "css-tree": "^1.1.3",
-    "fast-equals": "^5.0.1",
-    "hotkeys-js": "^3.8.7",
+    "fast-equals": "^5.4.5",
+    "hotkeys-js": "^3.13.15",
     "jotai-optics": "^0.4.0",
     "jotai-zustand": "^0.4.0",
-    "jsonpointer": "^5.0.0",
-    "optics-ts": "^2.2.0",
+    "jsonpointer": "^5.0.1",
+    "optics-ts": "^2.4.1",
     "penpal": "^6.2.2",
-    "prosemirror-commands": "^1.6.2",
-    "prosemirror-keymap": "^1.2.2",
-    "prosemirror-model": "^1.23.0",
-    "prosemirror-schema-basic": "^1.2.3",
-    "prosemirror-state": "^1.4.3",
-    "prosemirror-view": "^1.35.0",
-    "snabbdom": "^3.6.2",
+    "prosemirror-commands": "^1.7.2",
+    "prosemirror-keymap": "^1.2.3",
+    "prosemirror-model": "^1.25.13",
+    "prosemirror-schema-basic": "^1.2.5",
+    "prosemirror-state": "^1.4.4",
+    "prosemirror-view": "^1.42.9",
+    "snabbdom": "^3.6.4",
     "style-to-object": "^0.3.0",
-    "throttle-debounce": "^5.0.0",
-    "valtio": "^1.5.2",
-    "zustand": "^4.5.4"
+    "throttle-debounce": "^5.0.2",
+    "zustand": "^4.5.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@eslint/js": "^8.57.0",
-    "@mdx-js/react": "^2.1.1",
-    "@size-limit/preset-small-lib": "^5.0.4",
-    "@storybook/addons": "^7.0.21",
-    "@storybook/cli": "^7.0.21",
-    "@storybook/react": "^7.0.21",
-    "@storybook/react-vite": "^7.5.3",
-    "@testing-library/react": "^14.1.2",
-    "@types/css-tree": "^1.0.6",
-    "@types/jest": "^29.1.0",
-    "@types/prosemirror-commands": "^1.3.0",
-    "@types/prosemirror-keymap": "^1.2.0",
-    "@types/prosemirror-schema-basic": "^1.2.0",
-    "@types/prosemirror-state": "^1.4.0",
-    "@types/prosemirror-view": "^1.24.0",
-    "@types/react": "18",
-    "@types/react-dom": "^18.3.0",
-    "@types/resize-observer-browser": "^0.1.7",
-    "@types/styled-components": "^5.1.14",
-    "@types/throttle-debounce": "^5.0.0",
-    "babel-loader": "^8.2.2",
-    "custom-elements-manifest": "^1.0.0",
-    "cypress": "^12.12.0",
-    "dts-cli": "^1.5.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.1",
-    "globals": "^15.2.0",
-    "jest-environment-jsdom": "^29.1.0",
-    "local-cypress": "^1.2.5",
-    "react": "*",
+    "@storybook/react": "^10.6.7",
+    "@storybook/react-vite": "^10.6.7",
+    "@testing-library/react": "^14.3.1",
+    "@types/node": "^24",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@types/throttle-debounce": "^5.0.2",
+    "jsdom": "^31.0.0",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
+    "oxlint-tsgolint": "^7.0.2007",
+    "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hooks-testing-library": "^0.6.0",
-    "react-is": "^17.0.2",
-    "size-limit": "^5.0.4",
-    "storybook": "^7.5.3",
-    "ts-jest": "^29.1.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.4.3",
-    "typescript-eslint": "^7.8.0",
-    "vitest": "^1.6.0"
+    "storybook": "^10.6.7",
+    "tsdown": "^0.23.7",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   },
-  "bugs": {
-    "url": "https://github.com/saasquatch/raisins/issues"
+  "peerDependencies": {
+    "jotai": "^2.20.3",
+    "react": "^17.0.0 || ^18.0.0"
+  },
+  "engines": {
+    "node": "^24 || ^26"
   }
 }

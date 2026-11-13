@@ -1,18 +1,18 @@
 import {
   htmlUtil,
-  NodePath,
-  RaisinNode,
-  RaisinNodeWithChildren,
+  type NodePath,
+  type RaisinNode,
+  type RaisinNodeWithChildren,
 } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { CoreMolecule } from '../CoreAtoms';
-import { SoulsMolecule } from '../souls/Soul';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { SoulsMolecule } from '../souls/Soul.ts';
 import {
   generateId,
   RAISIN_ID_ATTR,
-} from '../../css-editing/RaisinCssIds';
-import { RaisinIdsMolecule } from '../../css-editing/RaisinIdsMolecule';
+} from '../../css-editing/RaisinCssIds.ts';
+import { RaisinIdsMolecule } from '../../css-editing/RaisinIdsMolecule.ts';
 
 const { clone, duplicate, insertAt, remove, replace, replacePath, visit } = htmlUtil;
 

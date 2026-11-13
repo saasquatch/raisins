@@ -1,5 +1,5 @@
-import * as schema from '@raisins/schema/schema';
-import type { PackageJson } from '../util/NPMRegistry';
+import type * as schema from '@raisins/schema';
+import type { PackageJson } from '../util/NPMRegistry.ts';
 
 export type Module = {
   package: string;

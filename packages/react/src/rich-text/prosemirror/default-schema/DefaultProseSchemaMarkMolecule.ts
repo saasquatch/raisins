@@ -1,13 +1,13 @@
 import { DefaultTextMarks } from '@raisins/core';
 import { molecule } from 'bunshi/react';
-import { atom, WritableAtom } from 'jotai';
+import { atom, type WritableAtom } from 'jotai';
 import { atomFamily } from 'jotai/utils';
 import type { MarkType } from 'prosemirror-model';
 import { EditorState } from 'prosemirror-state';
 import React from 'react';
-import { ProseEditorStateMolecule } from '../ProseEditorStateMolecule';
-import { ProseToggleMarkMolecule } from '../ProseToggleMarkMolecule';
-import { DefaultProseSchema } from './DefaultProseSchema';
+import { ProseEditorStateMolecule } from '../ProseEditorStateMolecule.tsx';
+import { ProseToggleMarkMolecule } from '../ProseToggleMarkMolecule.tsx';
+import { DefaultProseSchema } from './DefaultProseSchema.ts';
 
 type ToggleMarkAtom = WritableAtom<
   boolean,
