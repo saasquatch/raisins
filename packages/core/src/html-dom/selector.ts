@@ -1,21 +1,25 @@
-import { is, selectAll } from "css-select";
-import type { Adapter, Predicate, Query } from "css-select/lib/types.js";
+import { is, selectAll, type Options } from "css-select";
 import { DefaultTextMarks } from "./DefaultTextMarks.ts";
 import type {
   RaisinDocumentNode,
   RaisinElementNode,
   RaisinNode,
-  RaisinNodeWithChildren
+  RaisinNodeWithChildren,
 } from "./RaisinNode.ts";
 import { getAncestry, getParents, visit } from "./util.ts";
 
 type Node = RaisinNode;
 type ElementNode = RaisinElementNode;
+type Adapter = NonNullable<Options<RaisinNode, RaisinElementNode>["adapter"]>;
+type Predicate<V> = (v: V) => boolean;
+type Query = Parameters<typeof selectAll<RaisinNode, RaisinElementNode>>[0];
 
-class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
+class RaisinAdapter implements Adapter {
   _parents: WeakMap<RaisinNode, RaisinNodeWithChildren>;
+  private root: RaisinDocumentNode;
 
-  constructor(private root: RaisinDocumentNode) {
+  constructor(root: RaisinDocumentNode) {
+    this.root = root;
     this._parents = getParents(root);
   }
 
@@ -60,12 +64,12 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
   getText(node: Node) {
     return (
       visit<string>(node, {
-        onComment: _ => "",
-        onDirective: _ => "",
+        onComment: (_) => "",
+        onDirective: (_) => "",
         onElement: (_, c) => c.join(""),
         onRoot: (_, c) => c.join(""),
         onStyle: () => "",
-        onText: e => e.data
+        onText: (e) => e.data,
       }) ?? ""
     );
   }
@@ -84,7 +88,7 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
       const ancestors = getAncestry(this.root, node, this._parents);
       return [...acc, ...ancestors];
     }, [] as Node[]);
-    return nodes.filter(n => removable.includes(n));
+    return nodes.filter((n) => removable.includes(n));
   }
 
   /**
@@ -92,17 +96,17 @@ class RaisinAdapter implements Adapter<RaisinNode, RaisinElementNode> {
    * as well as any of their children that match it.
    */
   findAll(test: Predicate<ElementNode>, nodes: Node[]) {
-    return (nodes.filter(n => n.type === "tag") as ElementNode[]).reduce(
+    return (nodes.filter((n) => n.type === "tag") as ElementNode[]).reduce(
       (arr, n) => {
-        const matchingChildren = (n.children.filter(
-          n => n.type === "tag"
-        ) as ElementNode[]).filter(test);
+        const matchingChildren = (
+          n.children.filter((n) => n.type === "tag") as ElementNode[]
+        ).filter(test);
         if (test(n)) {
           return [...arr, n, ...matchingChildren];
         }
         return [...arr, ...matchingChildren];
       },
-      [] as ElementNode[]
+      [] as ElementNode[],
     );
   }
 
@@ -147,7 +151,7 @@ export default function select(node: RaisinDocumentNode, query: string) {
   return selectAll(query, node, {
     adapter: new RaisinAdapter(node),
     cacheResults: false,
-    context: node
+    context: node,
   });
 }
 
@@ -155,7 +159,7 @@ const textMarksSet = new Set<string>(DefaultTextMarks);
 export const matches = (
   root: RaisinDocumentNode,
   elem: RaisinElementNode,
-  query: Query<RaisinElementNode>
+  query: Query,
 ) =>
   is(elem, query, {
     adapter: new RaisinAdapter(root),
@@ -166,6 +170,6 @@ export const matches = (
           return textMarksSet.has(el.tagName);
         }
         return false;
-      }
-    }
+      },
+    },
   });

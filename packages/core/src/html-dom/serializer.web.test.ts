@@ -1,10 +1,21 @@
-/* istanbul ignore file */
-
-/// <reference types="cypress" />
-
 import isHtmlEquivalent from "./isHtmlEquivalent.ts";
 import parse from "./parser.ts";
 import serializer from "./serializer.ts";
+
+const emailFiles = Object.values(
+  import.meta.glob<string>("../../benchmark-emails/**/*.html", {
+    eager: true,
+    query: "?raw",
+    import: "default",
+  }),
+);
+const benchmarkFiles = Object.entries(
+  import.meta.glob<string>("../../benchmark-files/**/*.html", {
+    eager: true,
+    query: "?raw",
+    import: "default",
+  }),
+);
 
 describe("Parse + serialize", () => {
   it("Can parse simple HTML", () => {
@@ -12,19 +23,15 @@ describe("Parse + serialize", () => {
     const node = parse(source);
     const out = serializer(node);
     expect(out).toBe(source);
-    cy.log("Pass");
   });
 
   it("Can parse Email Benchmark cases", () => {
-    cy.task("getFiles", "benchmark-emails").each(file => {
-      cy.readFile("./benchmark-emails/" + file).then(source => {
-        const raisinNode = parse(source, {
-          cleanWhitespace: false
-        });
-        const raisinString = serializer(raisinNode);
-        expect(isHtmlEquivalent(source, raisinString)).toBe(true);
-      });
-    });
+    expect(emailFiles.length).toBeGreaterThan(0);
+    for (const source of emailFiles) {
+      const raisinNode = parse(source, { cleanWhitespace: false });
+      const raisinString = serializer(raisinNode);
+      expect(isHtmlEquivalent(source, raisinString)).toBe(true);
+    }
   });
 
   it("Can parse HTML Benchmark cases", () => {
@@ -51,26 +58,25 @@ describe("Parse + serialize", () => {
       "cd65a11a9c7c6a3deac05443833a7097578ee6d5538479408dc0bbdbae438fcc.html",
       "e1e4dba652a78f4d1af52f5a7f4ac247c83070220a0e6fbad0bb26b6742dfcee.html",
       "fc5a55c65ef9b22d7309cdb4d9a6efe319baeda10190547b3e49dc9152e92f14.html",
-      "fff65493446424d4b8d49bd1027a851bdd685a75bd11a324897ebe836b3ebb85.html"
+      "fff65493446424d4b8d49bd1027a851bdd685a75bd11a324897ebe836b3ebb85.html",
     ];
 
-    cy.task("getFiles", "benchmark-files").each(file => {
-      cy.readFile("./benchmark-files/" + file).then(source => {
-        const raisinNode = parse(source, { cleanWhitespace: false });
-        const raisinString = serializer(raisinNode);
+    expect(benchmarkFiles.length).toBeGreaterThan(0);
+    for (const [file, source] of benchmarkFiles) {
+      const raisinNode = parse(source, { cleanWhitespace: false });
+      const raisinString = serializer(raisinNode);
+      const ignoreComments = badFileComments.some((name) =>
+        file.endsWith(name),
+      );
 
-        let ignoreComments = false;
-        /* Some files have comments that are parsed differently in browser, simply ignore them */
-        if (badFileComments.includes(String(file))) ignoreComments = true;
-        expect(
-          isHtmlEquivalent(
-            source,
-            raisinString,
-            { ignoreComments },
-            { scriptingEnabled: false }
-          )
-        ).toBe(true);
-      });
-    });
+      expect(
+        isHtmlEquivalent(
+          source,
+          raisinString,
+          { ignoreComments },
+          { scriptingEnabled: false },
+        ),
+      ).toBe(true);
+    }
   });
 });

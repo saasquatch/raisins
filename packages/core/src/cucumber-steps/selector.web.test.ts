@@ -1,14 +1,18 @@
+import jsonata from "jsonata";
 /* istanbul ignore file */
 import parse from "../html-dom/parser.ts";
-import type { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode.ts";
-import selector from "../html-dom/selector.ts";
+import type {
+  RaisinDocumentNode,
+  RaisinElementNode,
+} from "../html-dom/RaisinNode.ts";
+import featureText from "../html-dom/selector.feature?raw";
+import selector, { matches } from "../html-dom/selector.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
-import isJest from "../testing/isJest.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   when: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   let source: string;
   let found: RaisinElementNode[];
@@ -22,27 +26,23 @@ const cucumber = (
     found = selector(node, select);
   });
 
+  then(/^it should match "(.*)"$/, (query: string) => {
+    expect(found).toHaveLength(1);
+    expect(matches(node, found[0], query)).toBe(true);
+  });
+
+  then(/^it should not match "(.*)"$/, (query: string) => {
+    expect(found).toHaveLength(1);
+    expect(matches(node, found[0], query)).toBe(false);
+  });
+
   then(/^it should return "(.*)"$/, (jsSelector: string) => {
-    if (!isJest()) {
-      cy.task("getJsonata", { jsSelector, node, found }).then((result: any) => {
-        for (let i = 0; i < result.f_array.length; i++) {
-          expect(result.f_array[i]).toStrictEqual(result.expected_array[i]);
-        }
-      });
-    } else {
-      //   let jsonata = require("jsonata");
-      //   let expected = jsonata(jsSelector).evaluate({
-      //     node,
-      //     undefined: undefined
-      //   });
-      //   if (!Array.isArray(expected)) {
-      //     expected = [expected];
-      //   }
-      //   found.forEach((f, idx) => {
-      //     expect(f).toBe(expected[idx]);
-      //   });
-    }
+    const result = jsonata(jsSelector).evaluate({ node, undefined });
+    const expected =
+      result === undefined ? [] : Array.isArray(result) ? result : [result];
+
+    expect(found).toEqual(expected);
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/selector.feature");
+bindIsomorphicCucumberSteps(cucumber, featureText);

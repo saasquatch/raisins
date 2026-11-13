@@ -26,6 +26,11 @@ export default defineConfig({
         },
         test: {
           name: "browser",
+          server: {
+            deps: {
+              inline: ["jest-cucumber", "glob"],
+            },
+          },
           include: ["src/**/*.{iso,web}.test.ts"],
           browser: {
             enabled: true,

@@ -1,5 +1,6 @@
 /* istanbul ignore file */
 
+import { vi } from "vitest";
 import type { RaisinNode } from "./RaisinNode.ts";
 import { visit, visitAll } from "./util.ts";
 
@@ -13,24 +14,23 @@ it("Visitor skip node", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
   const visitor = {
-    skipNode: (_skipNode: any) => false
+    skipNode: (_skipNode: any) => false,
   };
 
-  const spySkip = cy.spy(visitor, "skipNode");
+  const spySkip = vi.spyOn(visitor, "skipNode");
 
   visit(node, visitor, true);
   visit(node, visitor, false);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(spySkip).to.be.called;
+  expect(spySkip).toHaveBeenCalled();
 });
 
 it("Visit all", () => {
@@ -43,25 +43,24 @@ it("Visit all", () => {
         children: [
           {
             type: "text",
-            data: "hello world"
-          }
+            data: "hello world",
+          },
         ],
-        attribs: {}
-      }
-    ]
+        attribs: {},
+      },
+    ],
   };
 
   const callback = {
-    callbackCounter: (_callback: any) => false
+    callbackCounter: (_callback: any) => false,
   };
 
-  const callbackSpy = cy.spy(callback, "callbackCounter");
+  const callbackSpy = vi.spyOn(callback, "callbackCounter");
 
   visitAll(node, (n: RaisinNode) => {
     callback.callbackCounter(0);
     return n;
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-  expect(callbackSpy).to.be.called;
+  expect(callbackSpy).toHaveBeenCalled();
 });

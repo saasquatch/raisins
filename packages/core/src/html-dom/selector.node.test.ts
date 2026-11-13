@@ -1,24 +1,19 @@
-import {
-  Given as given,
-  Then as then,
-  When as when
-} from "cypress-cucumber-preprocessor/steps";
-import type { StepDefinitions } from "jest-cucumber";
-import parse from "../html-dom/parser.ts";
-import type { RaisinDocumentNode, RaisinElementNode } from "../html-dom/RaisinNode.ts";
-import selector, { matches } from "../html-dom/selector.ts";
-import isJest from "../testing/isJest.ts";
+import jsonata from "jsonata";
+import { bindIsomorphicCucumberSteps } from "../cucumber-steps/bindIsomorphicCucumberSteps.ts";
+import parse from "./parser.ts";
+import type { RaisinDocumentNode, RaisinElementNode } from "./RaisinNode.ts";
+import featureText from "./selector.feature?raw";
+import selector, { matches } from "./selector.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   when: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
-  let source: string;
-  let found: RaisinElementNode[];
   let node: RaisinDocumentNode;
-  given("an html document", (itemName: string) => {
-    source = itemName;
+  let found: RaisinElementNode[];
+
+  given("an html document", (source: string) => {
     node = parse(source.trim());
   });
 
@@ -27,59 +22,22 @@ const cucumber = (
   });
 
   then(/^it should match "(.*)"$/, (query: string) => {
-    expect(found.length).toBe(1);
-    const doesMatch = matches(node, found[0], query);
-    expect(doesMatch).toBeTruthy();
+    expect(found).toHaveLength(1);
+    expect(matches(node, found[0], query)).toBe(true);
   });
 
   then(/^it should not match "(.*)"$/, (query: string) => {
-    expect(found.length).toBe(1);
-    const doesMatch = matches(node, found[0], query);
-    expect(doesMatch).toBeFalsy();
+    expect(found).toHaveLength(1);
+    expect(matches(node, found[0], query)).toBe(false);
   });
 
-  then(/^it should return "(.*)"$/, (jsSelector: string) => {
-    if (!isJest()) {
-      // @ts-ignore
-      globalThis.cy
-        .task("getJsonata", { jsSelector, node, found })
-        .then((result: any) => {
-          for (let i = 0; i < result.f_array.length; i++) {
-            expect(result.f_array[i]).toStrictEqual(result.expected_array[i]);
-          }
-        });
-    } else {
-      let jsonata = require("jsonata");
-      let expected = jsonata(jsSelector).evaluate({
-        node,
-        undefined: undefined
-      });
-      if (!Array.isArray(expected)) {
-        expected = [expected];
-      }
-      found.forEach((f, idx) => {
-        expect(f).toBe(expected[idx]);
-      });
-    }
+  then(/^it should return "(.*)"$/, (expression: string) => {
+    const result = jsonata(expression).evaluate({ node, undefined });
+    const expected =
+      result === undefined ? [] : Array.isArray(result) ? result : [result];
+
+    expect(found).toEqual(expected);
   });
 };
 
-let selectorSteps: StepDefinitions = () => {};
-
-if (!isJest()) {
-  cucumber(given, when, then);
-} else {
-  const jest_cucumber = require("jest-cucumber");
-
-  const feature = jest_cucumber.loadFeature("../html-dom/selector.feature", {
-    loadRelativePath: true
-  });
-
-  selectorSteps = ({ given, when, then }) => {
-    cucumber(given, when, then);
-  };
-
-  jest_cucumber.autoBindSteps([feature], [selectorSteps]);
-}
-
-export const steps = selectorSteps;
+bindIsomorphicCucumberSteps(cucumber, featureText);

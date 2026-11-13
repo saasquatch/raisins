@@ -5,14 +5,15 @@ import type {
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode
+  RaisinTextNode,
 } from "../html-dom/RaisinNode.ts";
+import featureText from "../validation/validateNode/validateNode.feature?raw";
 import {
   isValidColor,
   isValidDateInterval,
   isValidURL,
   validateAttributes,
-  validateChildConstraints
+  validateChildConstraints,
 } from "../validation/validateNode/validateNode.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
@@ -20,35 +21,35 @@ const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
   when: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   const root: RaisinDocumentNode = {
     type: "root",
-    children: []
+    children: [],
   };
   const style: RaisinStyleNode = {
     type: "style",
     attribs: {},
-    tagName: "style"
+    tagName: "style",
   };
   const text: RaisinTextNode = {
     type: "text",
-    data: ""
+    data: "",
   };
   const comment: RaisinCommentNode = {
     type: "comment",
-    data: ""
+    data: "",
   };
   const instruction: RaisinProcessingInstructionNode = {
     type: "directive",
     name: "",
-    data: ""
+    data: "",
   };
   const element: RaisinElementNode = {
     type: "tag",
     attribs: {},
     tagName: "",
-    children: []
+    children: [],
   };
 
   const nodes = {
@@ -57,7 +58,7 @@ const cucumber = (
     text,
     comment,
     element,
-    instruction
+    instruction,
   };
 
   type nodeType =
@@ -85,8 +86,8 @@ const cucumber = (
         type: "tag",
         attribs: { slot: "children" },
         tagName: "child",
-        children: []
-      }
+        children: [],
+      },
     ];
   });
 
@@ -97,7 +98,7 @@ const cucumber = (
   and("it includes a parent meta that allows child", () => {
     metalist.push({
       tagName: "parent",
-      slots: [{ name: "children", validChildren: ["child"] }]
+      slots: [{ name: "children", validChildren: ["child"] }],
     });
   });
 
@@ -162,8 +163,8 @@ const cucumber = (
     metalist = [
       {
         tagName: "div",
-        attributes: [{ name: "" }]
-      }
+        attributes: [{ name: "" }],
+      },
     ];
   });
 
@@ -180,7 +181,7 @@ const cucumber = (
     /^(?:(?!required|no error|error|doesChildAllowParent|enum|no validation error|isValidURL|isValidDateInterval|isValidColor))(.*) is (.*)$/,
     (prop: string, value: string) => {
       metalist[0].attributes[0][prop] = value;
-    }
+    },
   );
 
   and(/^a parsed (.*)$/, (html: string) => {
@@ -192,12 +193,9 @@ const cucumber = (
       expect(validateAttributes(node, metalist)).toStrictEqual([]);
     else
       expect(validateAttributes(node, metalist)[0]?.error?.rule).toStrictEqual(
-        rule
+        rule,
       );
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/validateNode/validateNode.feature"
-);
+bindIsomorphicCucumberSteps(cucumber, featureText);

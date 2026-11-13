@@ -1,10 +1,11 @@
+import featureText from "../html-dom/isHtmlEquivalent.feature?raw";
 import { isHtmlEquivalent } from "../html-dom/isHtmlEquivalent.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   var html_a: string;
   var html_b: string;
@@ -33,4 +34,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(cucumber, "../html-dom/isHtmlEquivalent.feature");
+bindIsomorphicCucumberSteps(cucumber, featureText);

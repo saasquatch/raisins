@@ -1,5 +1,5 @@
-import cssParser from "../css-om/parser.ts";
 import { ElementType } from "domelementtype";
+import cssParser from "../css-om/parser.ts";
 import parse from "./parser.ts";
 import type { RaisinElementNode, RaisinStyleNode } from "./RaisinNode.ts";
 import serializer from "./serializer.ts";
@@ -24,10 +24,10 @@ describe("Boolean attributes", () => {
       type: ElementType.Tag,
       tagName: "details",
       attribs: {
-        open: value
+        open: value,
       },
       children: [],
-      style: undefined
+      style: undefined,
     };
     expect(serializer(node)).toEqual(`<details open></details>`);
   }
@@ -35,7 +35,7 @@ describe("Boolean attributes", () => {
   function testBooleanAttribute(
     input: string,
     attrValue: any,
-    out: string = input
+    out: string = input,
   ) {
     const node = parse(input);
     expect(node).toEqual({
@@ -45,12 +45,12 @@ describe("Boolean attributes", () => {
           type: "tag",
           tagName: "details",
           attribs: {
-            open: attrValue
+            open: attrValue,
           },
           children: [],
-          style: undefined
-        }
-      ]
+          style: undefined,
+        },
+      ],
     });
     expect(serializer(node)).toEqual(out);
   }
@@ -82,10 +82,10 @@ describe("Attribute escaping", () => {
       type: ElementType.Tag,
       tagName: "div",
       attribs: {
-        "my-attribute": jsValue
+        "my-attribute": jsValue,
       },
       children: [],
-      style: undefined
+      style: undefined,
     };
     expect(serializer(node)).toEqual(`<div my-attribute="${htmlValue}"></div>`);
   }
@@ -93,13 +93,13 @@ describe("Attribute escaping", () => {
   it(`1. Replace any occurrence of the "&" character by the string "&amp;".`, () => {
     testAttribute(
       `There is an & in this string`,
-      `There is an &amp; in this string`
+      `There is an &amp; in this string`,
     );
   });
   it(`2. Replace any occurrences of the U+00A0 NO-BREAK SPACE character by the string "&nbsp;".`, () => {
     testAttribute(
       `Non breaking space -->${String.fromCharCode(160)}<--`,
-      `Non breaking space -->&nbsp;<--`
+      `Non breaking space -->&nbsp;<--`,
     );
   });
 
@@ -118,7 +118,7 @@ describe("Attribute escaping", () => {
     testAttribute(`Greater than >`, `Greater than >`);
   });
 
-  describe("Does not escape other charaters", () => {
+  it("Does not escape other characters", () => {
     for (let charCode = 0; charCode < 65536; charCode++) {
       const char = String.fromCharCode(charCode);
 
@@ -140,11 +140,11 @@ describe("Style raw-text escaping", () => {
       type: "style",
       tagName: "style",
       attribs: {},
-      contents: cssParser('.x{content:"</style><script>"}')
+      contents: cssParser('.x{content:"</style><script>"}'),
     };
 
     expect(serializer(node)).toBe(
-      '<style>.x{content:"<\\/style><script>"}</style>'
+      '<style>.x{content:"<\\/style><script>"}</style>',
     );
   });
 
@@ -153,7 +153,7 @@ describe("Style raw-text escaping", () => {
       type: "style",
       tagName: "style",
       attribs: {},
-      contents: cssParser('.x{content:"</style>"}')
+      contents: cssParser('.x{content:"</style>"}'),
     } as RaisinStyleNode);
 
     const reparsed = parse(once).children[0] as RaisinStyleNode;

@@ -5,43 +5,44 @@ import type {
   RaisinElementNode,
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
-  RaisinTextNode
+  RaisinTextNode,
 } from "../html-dom/RaisinNode.ts";
+import featureText from "../validation/rules/doesChildAllowParent.feature?raw";
 import { doesChildAllowParent } from "../validation/rules/doesChildAllowParent.ts";
 import { bindIsomorphicCucumberSteps } from "./bindIsomorphicCucumberSteps.ts";
 
 const cucumber = (
   given: (...args: any[]) => void,
   and: (...args: any[]) => void,
-  then: (...args: any[]) => void
+  then: (...args: any[]) => void,
 ) => {
   const root: RaisinDocumentNode = {
     type: "root",
-    children: []
+    children: [],
   };
   const style: RaisinStyleNode = {
     type: "style",
     attribs: {},
-    tagName: "style"
+    tagName: "style",
   };
   const text: RaisinTextNode = {
     type: "text",
-    data: ""
+    data: "",
   };
   const comment: RaisinCommentNode = {
     type: "comment",
-    data: ""
+    data: "",
   };
   const instruction: RaisinProcessingInstructionNode = {
     type: "directive",
     name: "",
-    data: ""
+    data: "",
   };
   const element: RaisinElementNode = {
     type: "tag",
     attribs: {},
     tagName: "",
-    children: []
+    children: [],
   };
 
   const nodes = {
@@ -50,7 +51,7 @@ const cucumber = (
     text,
     comment,
     element,
-    instruction
+    instruction,
   };
 
   type nodeType =
@@ -89,7 +90,4 @@ const cucumber = (
   });
 };
 
-bindIsomorphicCucumberSteps(
-  cucumber,
-  "../validation/rules/doesChildAllowParent.feature"
-);
+bindIsomorphicCucumberSteps(cucumber, featureText);
