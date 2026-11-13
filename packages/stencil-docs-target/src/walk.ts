@@ -30,7 +30,7 @@ export function walk(
   ignoreKeys: Set<string> = new Set()
 ) {
   const newSet = new Set(ignoreKeys);
-  if (obj === null || obj === undefined) return;
+  if (obj === null || obj === undefined) return undefined;
   if (typeof obj === 'string') return cb(obj);
   if (Array.isArray(obj)) {
     const tags = obj.filter(tag => !newSet.has(tag));
