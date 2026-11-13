@@ -31,7 +31,7 @@ export type Config = {
  * @param config
  */
 export function raisinsDocsTarget({
-  outDir = process.env.PWD ?? process.cwd(),
+  outDir = process.env["PWD"] ?? process.cwd(),
   outFile = 'raisins.json',
   extraModules: extraPackages = [],
   postProcess = m => m,
