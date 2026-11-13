@@ -8,7 +8,7 @@ import {
   type AttributesControllerProps,
   AttributesMolecule,
 } from '../attributes/index.ts';
-import { CanvasFull } from '../canvas/CanvasController.stories';
+import { CanvasFull } from '../canvas/CanvasController.stories.tsx';
 import { CanvasProvider } from '../canvas/CanvasScope.tsx';
 import {
   ConfigMolecule,
@@ -16,9 +16,9 @@ import {
   SelectedNodeController,
 } from '../core/index.ts';
 import {
-  AttributeEditor,
-  DefaultAttributeComponent,
-} from '../core/selection/SelectedNodeController.stories';
+  AttributeEditorView,
+  DefaultAttributeComponentView,
+} from '../core/selection/SelectedNodeController.stories.tsx';
 import {
   big,
   MintComponents,
@@ -31,8 +31,8 @@ import {
   VanillaComponents,
 } from '../examples/VanillaComponents.tsx';
 import { useHotkeys } from '../hotkeys/index.ts';
-import { BasicStory } from '../index.stories';
-import { JsonPointers } from '../node/NodeChildrenEditor.stories';
+import { BasicStory } from '../index.stories.tsx';
+import { JsonPointersView } from '../node/NodeChildrenEditor.stories.tsx';
 import { type Block, ComponentModelMolecule } from './ComponentModel.tsx';
 import { type Module, type ModuleDetails } from './types.ts';
 
@@ -123,13 +123,13 @@ const BlocksController = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = props => {
+const CustomAttributesControllerView: React.FC<AttributesControllerProps> = props => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
 
   if (!keys) return <></>;
-  const Component = props.Component ?? DefaultAttributeComponent;
+  const Component = props.Component ?? DefaultAttributeComponentView;
   return (
     <>
       {Object.keys(groupedSchema).map((key, idx) => {
@@ -163,10 +163,10 @@ const EditorWithProps = () => {
             <BlocksController />
           </details>
 
-          <AttributeEditor
+          <AttributeEditorView
             Controller={() => (
               <SelectedNodeController
-                HasSelectionComponent={CustomAttributesController}
+                HasSelectionComponent={CustomAttributesControllerView}
               ></SelectedNodeController>
             )}
           />
@@ -178,6 +178,12 @@ const EditorWithProps = () => {
     </CanvasProvider>
   );
 };
+
+export const CustomAttributesController = () => (
+  <BasicStory startingHtml={mintMono} startingPackages={MintComponents}>
+    <EditorWithProps />
+  </BasicStory>
+);
 
 const Editor = () => {
   useHotkeys();
@@ -294,7 +300,7 @@ export const LocalBlocksAndProps = () => {
 const CustomThemeTestWithProps = () => {
   return (
     <>
-      <JsonPointers />
+      <JsonPointersView />
       <EditorWithProps />
     </>
   );
@@ -312,7 +318,7 @@ const CustomThemeTest = () => {
         rows={6}
         style={{ width: '300px' }}
       />
-      <JsonPointers />
+      <JsonPointersView />
 
       <Editor />
     </>

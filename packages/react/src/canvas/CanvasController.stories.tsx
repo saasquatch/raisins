@@ -80,7 +80,7 @@ export const CanvasFull = () => {
   useMolecule(CanvasPickAndPlopMolecule);
   return (
     <div style={{ position: 'relative' }}>
-      <Toolbars />
+      <ToolbarsView />
       <BasicCanvasController />
     </div>
   );
@@ -192,7 +192,18 @@ export const BigCanvasOnly = ({ Component = BasicCanvasController }) => (
   </BasicStory>
 );
 
-export const Toolbars = () => {
+export const Toolbars = () => (
+  <BasicStory startingHtml={example}>
+    <CanvasProvider>
+      <div style={{ position: 'relative' }}>
+        <ToolbarsView />
+        <BasicCanvasController />
+      </div>
+    </CanvasProvider>
+  </BasicStory>
+);
+
+export const ToolbarsView = () => {
   const { PickedRectAtom } = useMolecule(CanvasPickAndPlopMolecule);
   const { SelectedRectAtom } = useMolecule(CanvasSelectionMolecule);
   const { HoveredRectAtom } = useMolecule(CanvasHoveredMolecule);
@@ -359,7 +370,7 @@ const SVGExample = ({ html = '' }) => (
 
 const meta: Meta = {
   title: 'Canvas Controller',
-  excludeStories: ['CanvasFull'],
+  excludeStories: ['CanvasFull', 'ToolbarsView'],
   argTypes: {
     CanvasType: {
       options: Object.keys(CanvasTypes),

@@ -6,7 +6,7 @@ import { h } from 'snabbdom';
 import { big, MintComponents, mintMono } from '../examples/MintComponents.tsx';
 import { useHotkeys } from '../hotkeys/index.ts';
 import { BasicStory } from '../index.stories.tsx';
-import { Toolbars } from './CanvasController.stories.tsx';
+import { ToolbarsView } from './CanvasController.stories.tsx';
 import { CanvasProvider } from './CanvasScope.tsx';
 import { CanvasScopeMolecule } from './CanvasScopeMolecule.tsx';
 import { BasicCanvasController } from './index.ts';
@@ -19,7 +19,7 @@ import { type RootRenderer } from './types.tsx';
 
 const meta: Meta = {
   title: 'Canvas Templates',
-  excludeStories: ['CanvasFull'],
+  excludeStories: ['CanvasFull', 'ToolbarsView'],
 };
 export default meta;
 
@@ -94,7 +94,7 @@ export const CanvasFull = () => {
     <>
       <ShadowPicker />
       <div style={{ position: 'relative' }}>
-        <Toolbars />
+        <ToolbarsView />
         <BasicCanvasController />
       </div>
     </>
