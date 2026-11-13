@@ -1,13 +1,13 @@
 import React from 'react';
 import { useMolecule } from 'bunshi/react';
-import { BasicCanvasController } from '../canvas/CanvasController';
-import { CanvasProvider } from '../canvas/CanvasScope';
-import { CanvasSelectionMolecule } from '../canvas/plugins/CanvasSelectionMolecule';
-import { SelectedNodeController } from '../core/selection/SelectedNodeController';
-import { LocalBedrockComponents } from '../examples/MintComponents';
+import { BasicCanvasController } from '../canvas/CanvasController.tsx';
+import { CanvasProvider } from '../canvas/CanvasScope.tsx';
+import { CanvasSelectionMolecule } from '../canvas/plugins/CanvasSelectionMolecule.tsx';
+import { SelectedNodeController } from '../core/selection/SelectedNodeController.tsx';
+import { LocalBedrockComponents } from '../examples/MintComponents.tsx';
 import { BasicStory } from '../index.stories';
-import { DocumentCssEditor } from './DocumentCssMolecule';
-import { StylePanel } from './StyleMolecule';
+import { DocumentCssEditor } from './DocumentCssMolecule.tsx';
+import { StylePanel } from './StyleMolecule.tsx';
 
 export default {
   title: 'Css Editing',

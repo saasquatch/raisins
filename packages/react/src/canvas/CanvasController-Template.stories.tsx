@@ -1,21 +1,21 @@
-import { Meta } from '@storybook/react';
+import { type Meta } from '@storybook/react';
 import { atom, useAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
 import { h } from 'snabbdom';
-import { big, MintComponents, mintMono } from '../examples/MintComponents';
-import { useHotkeys } from '../hotkeys';
+import { big, MintComponents, mintMono } from '../examples/MintComponents.tsx';
+import { useHotkeys } from '../hotkeys/index.ts';
 import { BasicStory } from '../index.stories';
 import { Toolbars } from './CanvasController.stories';
-import { CanvasProvider } from './CanvasScope';
-import { CanvasScopeMolecule } from './CanvasScopeMolecule';
-import { BasicCanvasController } from './index';
+import { CanvasProvider } from './CanvasScope.tsx';
+import { CanvasScopeMolecule } from './CanvasScopeMolecule.tsx';
+import { BasicCanvasController } from './index.ts';
 import {
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasSelectionMolecule,
-} from './plugins';
-import { RootRenderer } from './types';
+} from './plugins/index.ts';
+import { type RootRenderer } from './types.tsx';
 
 const meta: Meta = {
   title: 'Canvas Templates',

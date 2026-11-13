@@ -1,9 +1,9 @@
-import hotkeys, { KeyHandler } from 'hotkeys-js';
+import hotkeys, { type KeyHandler } from 'hotkeys-js';
 import { molecule } from 'bunshi/react';
-import { PickAndPlopMolecule } from '../core';
-import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { HistoryMolecule } from '../core/editting/HistoryAtoms';
-import connectedAtom from '../util/atoms/connectedAtom';
+import { PickAndPlopMolecule } from '../core/index.ts';
+import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom.ts';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms.tsx';
+import connectedAtom from '../util/atoms/connectedAtom.tsx';
 
 export const HotkeysMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);

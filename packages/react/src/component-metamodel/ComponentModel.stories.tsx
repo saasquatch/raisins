@@ -1,20 +1,20 @@
-import { htmlParser, RaisinElementNode } from '@raisins/core';
-import { Meta } from '@storybook/react';
+import { htmlParser, type RaisinElementNode } from '@raisins/core';
+import { type Meta } from '@storybook/react';
 import { useMolecule } from 'bunshi/react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
 import {
   AttributeProvider,
-  AttributesControllerProps,
+  type AttributesControllerProps,
   AttributesMolecule,
-} from '../attributes';
+} from '../attributes/index.ts';
 import { CanvasFull } from '../canvas/CanvasController.stories';
-import { CanvasProvider } from '../canvas/CanvasScope';
+import { CanvasProvider } from '../canvas/CanvasScope.tsx';
 import {
   ConfigMolecule,
   PickAndPlopMolecule,
   SelectedNodeController,
-} from '../core';
+} from '../core/index.ts';
 import {
   AttributeEditor,
   DefaultAttributeComponent,
@@ -25,16 +25,16 @@ import {
   mintMono,
   mintTimelineNewlines,
   mintTitledSection,
-} from '../examples/MintComponents';
+} from '../examples/MintComponents.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../examples/VanillaComponents';
-import { useHotkeys } from '../hotkeys';
+} from '../examples/VanillaComponents.tsx';
+import { useHotkeys } from '../hotkeys/index.ts';
 import { BasicStory } from '../index.stories';
 import { JsonPointers } from '../node/NodeChildrenEditor.stories';
-import { Block, ComponentModelMolecule } from './ComponentModel';
-import { Module, ModuleDetails } from './types';
+import { type Block, ComponentModelMolecule } from './ComponentModel.tsx';
+import { type Module, type ModuleDetails } from './types.ts';
 
 const meta: Meta = {
   title: 'Component Metamodel',

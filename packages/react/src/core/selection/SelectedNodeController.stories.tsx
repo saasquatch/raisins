@@ -6,25 +6,25 @@ import {
   AttributeMolecule,
   AttributeProvider,
   AttributesController,
-  AttributesControllerProps,
+  type AttributesControllerProps,
   AttributesMolecule,
-} from '../../attributes';
-import { BasicCanvasController } from '../../canvas/CanvasController';
-import { CanvasProvider } from '../../canvas/CanvasScope';
-import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
+} from '../../attributes/index.ts';
+import { BasicCanvasController } from '../../canvas/CanvasController.tsx';
+import { CanvasProvider } from '../../canvas/CanvasScope.tsx';
+import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule.tsx';
 import {
   mintMono,
   MintComponents,
   mintReferralTable,
   mintBigStat,
-} from '../../examples/MintComponents';
-import { widgets } from '../../examples/MockWidgets';
+} from '../../examples/MintComponents.tsx';
+import { widgets } from '../../examples/MockWidgets.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents';
+} from '../../examples/VanillaComponents.tsx';
 import { BasicStory, StoryConfigMolecule } from '../../index.stories';
-import { SelectedNodeController } from './SelectedNodeController';
+import { SelectedNodeController } from './SelectedNodeController.tsx';
 
 export default {
   title: 'Selected Node Controller',

@@ -1,6 +1,6 @@
 import { DefaultTextMarks } from '@raisins/core';
-import { Meta } from '@storybook/react';
-import { Atom, useAtomValue } from 'jotai';
+import { type Meta } from '@storybook/react';
+import { type Atom, useAtomValue } from 'jotai';
 import { useMolecule } from 'bunshi/react';
 import React, { useState } from 'react';
 import {
@@ -9,18 +9,18 @@ import {
   mintMono,
   mintTimelineNewlines,
   mintTimelineTrimmed,
-} from '../examples/MintComponents';
+} from '../examples/MintComponents.tsx';
 import { BasicStory } from '../index.stories';
 import { example } from '../node/children/LoadTest.example';
-import { SelectedNodeRichTextEditor } from '../rich-text/SelectedNodeRichTextEditor';
-import { CanvasProvider } from './CanvasScope';
-import { BasicCanvasController, CanvasController } from './index';
+import { SelectedNodeRichTextEditor } from '../rich-text/SelectedNodeRichTextEditor.tsx';
+import { CanvasProvider } from './CanvasScope.tsx';
+import { BasicCanvasController, CanvasController } from './index.ts';
 import {
   CanvasHoveredMolecule,
   CanvasPickAndPlopMolecule,
   CanvasSelectionMolecule,
-} from './plugins';
-import { Rect } from './types';
+} from './plugins/index.ts';
+import { type Rect } from './types.tsx';
 
 export const LoadTest = () => {
   return (

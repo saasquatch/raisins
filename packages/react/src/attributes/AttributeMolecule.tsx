@@ -1,11 +1,11 @@
 import { Attribute } from '@raisins/schema/schema';
 import { createScope, molecule, ScopeProvider } from 'bunshi/react';
-import { Atom, atom, PrimitiveAtom, SetStateAction } from 'jotai';
+import { type Atom, atom, type PrimitiveAtom, type SetStateAction } from 'jotai';
 import React from 'react';
-import { isFunction } from '../util/isFunction';
-import { AttributeConfigMolecule } from './AttributeConfig';
-import { AttributesMolecule } from './AttributesMolecule';
-import { resolveComponent } from './resolveComponent';
+import { isFunction } from '../util/isFunction.ts';
+import { AttributeConfigMolecule } from './AttributeConfig.ts';
+import { AttributesMolecule } from './AttributesMolecule.ts';
+import { resolveComponent } from './resolveComponent.tsx';
 
 const AttributeScope = createScope<string | undefined>(undefined);
 AttributeScope.displayName = 'AttributeScope';

@@ -3,13 +3,13 @@ import { molecule, useMolecule } from 'bunshi/react';
 import expect from 'expect';
 import { atom } from 'jotai';
 import React from 'react';
-import { Module } from '../component-metamodel/types';
-import { RaisinConfig, RaisinsProvider } from '../core/RaisinConfigScope';
-import { CanvasProvider } from './CanvasScope';
-import { CanvasScopeMolecule } from './CanvasScopeMolecule';
-import { CanvasHoveredMolecule } from './plugins/CanvasHoveredMolecule';
-import { CanvasPickAndPlopMolecule } from './plugins/CanvasPickAndPlopMolecule';
-import { CanvasSelectionMolecule } from './plugins/CanvasSelectionMolecule';
+import { type Module } from '../component-metamodel/types.ts';
+import { type RaisinConfig, RaisinsProvider } from '../core/RaisinConfigScope.tsx';
+import { CanvasProvider } from './CanvasScope.tsx';
+import { CanvasScopeMolecule } from './CanvasScopeMolecule.tsx';
+import { CanvasHoveredMolecule } from './plugins/CanvasHoveredMolecule.ts';
+import { CanvasPickAndPlopMolecule } from './plugins/CanvasPickAndPlopMolecule.tsx';
+import { CanvasSelectionMolecule } from './plugins/CanvasSelectionMolecule.tsx';
 
 function renderCanvasPlugins() {
   const StoryMolecule = molecule<Partial<RaisinConfig>>(() => ({

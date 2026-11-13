@@ -1,10 +1,10 @@
-import { isElementNode, RaisinNode } from '@raisins/core';
+import { isElementNode, type RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel';
-import { CoreMolecule } from '../CoreAtoms';
-import { Soul } from '../souls/Soul';
-import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
+import { ComponentModelMolecule } from '../../component-metamodel/ComponentModel.tsx';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { type Soul } from '../souls/Soul.ts';
+import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms.tsx';
 
 export const HoveredNodeMolecule = molecule((getMol) => {
   const { ParentsAtom } = getMol(CoreMolecule);

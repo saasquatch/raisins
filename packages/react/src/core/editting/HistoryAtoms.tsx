@@ -1,9 +1,9 @@
-import { RaisinNode } from '@raisins/core';
-import { atom, WritableAtom } from 'jotai';
+import { type RaisinNode } from '@raisins/core';
+import { atom, type WritableAtom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { waitForUpdate } from '../../util/waitForUpdate';
-import { CoreMolecule } from '../CoreAtoms';
-import { SelectedNodeMolecule, Selection } from '../selection';
+import { waitForUpdate } from '../../util/waitForUpdate.ts';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { SelectedNodeMolecule, type Selection } from '../selection/index.ts';
 
 type HistoryState = {
   node: RaisinNode;

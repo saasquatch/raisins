@@ -1,5 +1,5 @@
-import type { NPMRegistry } from '../../util/NPMRegistry';
-import { ChildAPIModule } from './RaisinsChildAPI';
+import type { NPMRegistry } from '../../util/NPMRegistry.ts';
+import { ChildAPIModule } from './RaisinsChildAPI.tsx';
 
 export type Props = {
   selector: string;

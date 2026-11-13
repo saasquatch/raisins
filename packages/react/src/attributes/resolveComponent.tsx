@@ -1,4 +1,4 @@
-import { DefaultAttributeComponent } from './AttributeThemeMolecule';
+import { DefaultAttributeComponent } from './AttributeThemeMolecule.tsx';
 import { Attribute } from '@raisins/schema/schema';
 
 const FormatToComponent: Record<string, string> = {

@@ -2,22 +2,22 @@ import {
   calculatePlopTargets,
   isElementNode,
   isRoot,
-  RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
+  type RaisinElementNode,
+  type RaisinNode,
+  type RaisinNodeWithChildren,
 } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
-import { atom, Atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, type Atom, useAtomValue, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ComponentModelMolecule } from '../../component-metamodel';
-import { CoreMolecule, SoulsInDocMolecule } from '../../core';
+import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
+import { CoreMolecule, SoulsInDocMolecule } from '../../core/index.ts';
 import {
   DragAndDropMolecule,
-  DragPlopDestination,
-} from '../../core/selection/DragAndDropMolecule';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule } from '../CanvasScopeMolecule';
+  type DragPlopDestination,
+} from '../../core/selection/DragAndDropMolecule.tsx';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import { CanvasScopeMolecule } from '../CanvasScopeMolecule.tsx';
 
 /**
  * Synthetic component metadata used as the "parent meta" when the drop parent

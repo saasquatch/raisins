@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import { createMemoizeAtom } from './weakCache';
+import { createMemoizeAtom } from './weakCache.ts';
 import expect from 'expect';
 
 describe('Weak cache', () => {

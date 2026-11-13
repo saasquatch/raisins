@@ -1,24 +1,24 @@
-import { getSubErrors, RaisinElementNode } from '@raisins/core';
+import { getSubErrors, type RaisinElementNode } from '@raisins/core';
 import { Slot } from '@raisins/schema/schema';
 import { molecule } from 'bunshi/react';
-import { atom, PrimitiveAtom } from 'jotai';
-import { SelectionBookmark } from 'prosemirror-state';
-import { ComponentModelMolecule } from '../component-metamodel/ComponentModel';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { EditMolecule } from '../core/editting/EditAtoms';
-import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
-import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule';
-import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
-import { SoulsMolecule } from '../core/souls/Soul';
-import { atomWithShallowCheck } from '../util/atoms/atomWithShallowCheck';
-import { isElementNode } from '../util/isNode';
-import { waitForUpdate } from '../util/waitForUpdate';
-import { ValidationMolecule } from '../validation/ValidationMolecule';
-import { atomForAttributes } from './atoms/atomForAttributes';
-import { atomForChildren } from './atoms/atomForChildren';
-import { atomForTagName } from './atoms/atomForTagName';
-import { NodeScopeMolecule } from './NodeScope';
+import { atom, type PrimitiveAtom } from 'jotai';
+import { type SelectionBookmark } from 'prosemirror-state';
+import { ComponentModelMolecule } from '../component-metamodel/ComponentModel.tsx';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { EditMolecule } from '../core/editting/EditAtoms.ts';
+import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
+import { HoveredNodeMolecule } from '../core/selection/HoveredNodeMolecule.tsx';
+import { PickAndPlopMolecule } from '../core/selection/PickAndPlopMolecule.tsx';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule.tsx';
+import { SoulsMolecule } from '../core/souls/Soul.ts';
+import { atomWithShallowCheck } from '../util/atoms/atomWithShallowCheck.ts';
+import { isElementNode } from '../util/isNode.tsx';
+import { waitForUpdate } from '../util/waitForUpdate.ts';
+import { ValidationMolecule } from '../validation/ValidationMolecule.ts';
+import { atomForAttributes } from './atoms/atomForAttributes.tsx';
+import { atomForChildren } from './atoms/atomForChildren.tsx';
+import { atomForTagName } from './atoms/atomForTagName.tsx';
+import { NodeScopeMolecule } from './NodeScope.tsx';
 
 /**
  *  Scoped based on the {@link NodeScopeMolecule}, defaulting to the root molecule.

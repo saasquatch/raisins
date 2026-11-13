@@ -14,9 +14,15 @@
     "src"
   ],
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/react.esm.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },

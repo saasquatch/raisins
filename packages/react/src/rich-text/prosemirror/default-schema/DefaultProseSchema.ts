@@ -1,6 +1,6 @@
 import { DefaultTextMarks, HTMLComponents } from '@raisins/core';
 import { CustomElement } from '@raisins/schema/schema';
-import { AttributeSpec, MarkSpec, Schema } from 'prosemirror-model';
+import { type AttributeSpec, type MarkSpec, Schema } from 'prosemirror-model';
 import { nodes } from 'prosemirror-schema-basic';
 
 const { text, hard_break } = nodes;

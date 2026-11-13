@@ -1,10 +1,10 @@
-import { RaisinElementNode } from '@raisins/core';
+import { type RaisinElementNode } from '@raisins/core';
 import type { Attribute } from '@raisins/schema/schema';
-import { Atom, atom } from 'jotai';
+import { type Atom, atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { ComponentModelMolecule } from '../component-metamodel';
-import { SelectedNodeMolecule } from '../core';
-import { NodeMolecule } from '../node/NodeMolecule';
+import { ComponentModelMolecule } from '../component-metamodel/index.ts';
+import { SelectedNodeMolecule } from '../core/index.ts';
+import { NodeMolecule } from '../node/NodeMolecule.tsx';
 
 /**
  * Properties and changes for ALL the attributes of a node.

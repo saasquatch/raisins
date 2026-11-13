@@ -1,7 +1,7 @@
-import { Meta } from '@storybook/react';
+import { type Meta } from '@storybook/react';
 import React from 'react';
 import { BasicStory } from '../index.stories';
-import { NodeRichTextController } from './RichTextEditor';
+import { NodeRichTextController } from './RichTextEditor.tsx';
 const meta: Meta = {
   title: 'Rich Text (Prose) Editor',
 };

@@ -1,5 +1,5 @@
-import { atom, PrimitiveAtom, WritableAtom } from 'jotai';
-import { createMemoizeAtom } from '../weakCache';
+import { atom, type PrimitiveAtom, type WritableAtom } from 'jotai';
+import { createMemoizeAtom } from '../weakCache.ts';
 
 const memoizeAtom = createMemoizeAtom();
 

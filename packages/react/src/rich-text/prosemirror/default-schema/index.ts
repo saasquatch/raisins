@@ -1,3 +1,3 @@
-export * from './DefaultProseSchema';
-export * from './DefaultProseSchemaHotkeysPlugin';
-export * from './DefaultProseSchemaMarkMolecule';
+export * from './DefaultProseSchema.ts';
+export * from './DefaultProseSchemaHotkeysPlugin.ts';
+export * from './DefaultProseSchemaMarkMolecule.ts';
