@@ -10,8 +10,8 @@ import {
   mintTimelineNewlines,
   mintTimelineTrimmed,
 } from '../examples/MintComponents.tsx';
-import { BasicStory } from '../index.stories';
-import { example } from '../node/children/LoadTest.example';
+import { BasicStory } from '../index.stories.tsx';
+import { example } from '../node/children/LoadTest.example.ts';
 import { SelectedNodeRichTextEditor } from '../rich-text/SelectedNodeRichTextEditor.tsx';
 import { CanvasProvider } from './CanvasScope.tsx';
 import { BasicCanvasController, CanvasController } from './index.ts';
