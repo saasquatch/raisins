@@ -31,7 +31,7 @@
     "build": "tsdown",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "oxlint",
+    "lint": "oxlint src",
     "format": "oxfmt",
     "storybook": "storybook dev -p 6007 -c .storybook",
     "storybook:build": "storybook build -c .storybook -o .out"
