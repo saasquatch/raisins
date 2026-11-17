@@ -27,7 +27,7 @@ export namespace Components {
     interface MyComponent {
         /**
           * What to call people if we don't have their name
-          * @default "Friend"
+          * @default Friend
          */
         "anonymousLabel": string;
         /**
@@ -280,7 +280,7 @@ declare namespace LocalJSX {
     interface MyComponent {
         /**
           * What to call people if we don't have their name
-          * @default "Friend"
+          * @default Friend
          */
         "anonymousLabel"?: string;
         /**

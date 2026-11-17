@@ -51,6 +51,7 @@ export class MyComponent {
 
   /**
    * What to call people if we don't have their name
+   * @default Friend
    */
   @Prop() anonymousLabel: string = "Friend"
 
