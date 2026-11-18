@@ -38,7 +38,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "test": "node --test test",
+    "test": "node --test test/*.test.ts",
     "lint": "oxlint",
     "format": "oxfmt"
   },
