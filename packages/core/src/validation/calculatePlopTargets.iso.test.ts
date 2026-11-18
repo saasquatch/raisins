@@ -1,4 +1,4 @@
-import type { CustomElement } from "@raisins/schema";
+import type { CustomElement } from "@raisins/schema/schema";
 import parse from "../html-dom/parser.ts";
 import type { RaisinElementNode } from "../html-dom/RaisinNode.ts";
 import { getParents } from "../html-dom/util.ts";

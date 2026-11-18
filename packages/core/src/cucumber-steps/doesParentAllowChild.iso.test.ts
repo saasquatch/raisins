@@ -1,4 +1,4 @@
-import type { CustomElement } from "@raisins/schema";
+import type { CustomElement } from "@raisins/schema/schema";
 import type {
   RaisinCommentNode,
   RaisinDocumentNode,

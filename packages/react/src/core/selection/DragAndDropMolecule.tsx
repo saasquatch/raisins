@@ -156,7 +156,7 @@ export const DragAndDropMolecule = molecule(getMol => {
         const cloneOfDraggedNode = clone(
           dragged.block.content
         ) as RaisinElementNode;
-        cloneOfDraggedNode.attribs.slot = slot;
+        cloneOfDraggedNode.attribs['slot'] = slot;
 
         const newDocument = insertAtPath(
           currentDoc,

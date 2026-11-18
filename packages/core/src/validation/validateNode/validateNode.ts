@@ -1,4 +1,4 @@
-import type { Attribute, CustomElement } from "@raisins/schema";
+import type { Attribute, CustomElement } from "@raisins/schema/schema";
 import { parseToRgba } from "color2k";
 import { Interval } from "luxon";
 import { isElementNode, isRoot } from "../../html-dom/isNode.ts";

@@ -11,7 +11,7 @@ import {
   type RaisinNode,
   type RaisinNodeWithChildren,
 } from '@raisins/core';
-import type { CustomElement, Slot } from '@raisins/schema';
+import type { CustomElement, Slot } from '@raisins/schema/schema';
 import { molecule } from 'bunshi/react';
 import { shallowEqual } from 'fast-equals';
 import { type Atom, atom, type PrimitiveAtom, type WritableAtom } from 'jotai';
