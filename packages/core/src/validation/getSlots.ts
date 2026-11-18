@@ -1,4 +1,4 @@
-import type { CustomElement, Slot } from "@raisins/schema";
+import type { CustomElement, Slot } from "@raisins/schema/schema";
 import { isElementNode } from "../html-dom/isNode.ts";
 import type { RaisinNode } from "../html-dom/RaisinNode.ts";
 import { visit } from "../html-dom/util.ts";

@@ -1,4 +1,4 @@
-import type { CustomElement } from "@raisins/schema";
+import type { CustomElement } from "@raisins/schema/schema";
 import { isElementNode, isRoot } from "../../html-dom/isNode.ts";
 import type { RaisinNode } from "../../html-dom/RaisinNode.ts";
 
