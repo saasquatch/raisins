@@ -1,4 +1,4 @@
-import type { Attribute } from '@raisins/schema';
+import type { Attribute } from '@raisins/schema/schema';
 import { createScope, molecule, ScopeProvider } from 'bunshi/react';
 import { type Atom, atom, type PrimitiveAtom, type SetStateAction } from 'jotai';
 import React from 'react';

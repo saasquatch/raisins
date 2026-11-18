@@ -1,4 +1,4 @@
-import type * as schema from '@raisins/schema';
+import type * as schema from '@raisins/schema/schema';
 import { type CustomElement } from '../Component.ts';
 import { type ModuleDetails } from '../types.ts';
 

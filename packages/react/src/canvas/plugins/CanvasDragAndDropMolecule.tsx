@@ -6,7 +6,7 @@ import {
   type RaisinNode,
   type RaisinNodeWithChildren,
 } from '@raisins/core';
-import type { CustomElement } from '@raisins/schema';
+import type { CustomElement } from '@raisins/schema/schema';
 import { atom, type Atom, useAtomValue, useSetAtom } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
