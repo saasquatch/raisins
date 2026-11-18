@@ -1,15 +1,14 @@
 import Ajv from 'ajv';
 import fsSync from 'fs';
-// import childProcess from 'child_process';
-// import { promisify } from 'util';
+import schema from '@raisins/schema' with { type: "json" };
 import path from 'path';
-// const exec = promisify(childProcess.exec);
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+
 const fs = fsSync.promises;
 
-// JSON file
-const schema = require('@raisins/schema');
 const kitchenSinkPath = path.resolve(
-  __dirname,
+  import.meta.dirname,
   '../../../examples/my-kitchen-sink'
 );
 
@@ -17,10 +16,6 @@ describe('Stencil docs target', () => {
   it('builds and matches schema', async () => {
     let dataJson: any;
     try {
-      // const handle = await exec('npm run build',{
-      //   cwd: path.resolve(__dirname,"../my-kitchen-sink/"),
-      // });
-      // console.log(handle.stdout);
       const dataStr = await fs.readFile(
         path.resolve(kitchenSinkPath, 'raisins.json'),
         { encoding: 'utf-8' }
@@ -73,16 +68,16 @@ describe('Stencil docs target', () => {
     const tags = JSON.parse(dataStr).modules.flatMap((m: any) => m.tags ?? []);
     const component = tags.find((t: any) => t.tagName === 'my-ui-component');
 
-    expect(component.cssParts).toEqual([
+    assert.equal(JSON.stringify(component.cssParts), JSON.stringify([
       { name: 'greeting', description: 'The greeting text container' },
       { name: 'date', description: 'The formatted date text' },
-    ]);
-    expect(component.cssProperties).toEqual([
+    ]));
+    assert.equal(JSON.stringify(component.cssProperties), JSON.stringify([
       {
         name: '--my-ui-component-date-color',
         description: 'Controls the date text color',
       },
-    ]);
+    ]));
   });
 
   it('omits css parts and properties for components without them', async () => {
@@ -93,7 +88,7 @@ describe('Stencil docs target', () => {
     const tags = JSON.parse(dataStr).modules.flatMap((m: any) => m.tags ?? []);
     const component = tags.find((t: any) => t.tagName === 'my-card');
 
-    expect(component.cssParts).toBeUndefined();
-    expect(component.cssProperties).toBeUndefined();
+    assert.equal(component.cssParts, undefined);
+    assert.equal(component.cssProperties, undefined);
   });
 });

@@ -2,7 +2,6 @@
   "$schema": "https://www.schemastore.org/tsconfig",
 
   "include": ["src/**/*.ts", "test/**/*.ts"],
-  "exclude": ["test/generator.test.ts"],
 
   "compilerOptions": {
     "lib": [
