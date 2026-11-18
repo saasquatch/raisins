@@ -38,7 +38,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "test": "node --test test/convertToGrapesJSMeta.test.ts",
+    "test": "node --test test",
     "lint": "oxlint",
     "format": "oxfmt"
   },
