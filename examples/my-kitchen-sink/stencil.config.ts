@@ -10,6 +10,8 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
+      dir: 'dist/custom-elements',
+      customElementsExportBehavior: 'bundle',
     },
     {
       type: 'docs-readme',
