@@ -18,7 +18,12 @@
     "schema.d.ts"
   ],
   "main": "schema.json",
-  "types": "./schema.d.ts",
+  "exports": {
+    ".": "./schema.json",
+    "./schema": {
+      "types": "./schema.d.ts"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
