@@ -1,4 +1,7 @@
-import { parse, toPlainObject, type CssNodePlain, type ParseOptions } from "css-tree";
+import csstree from "css-tree";
+
+type ParseOptions = csstree.ParseOptions;
+type CssNodePlain = csstree.CssNodePlain;
 
 /**
  * Parses a CSS expression and returns a pure js object AST representation of the content
@@ -9,8 +12,8 @@ export function parser(
   css: string,
   parseOptions: ParseOptions = {}
 ): CssNodePlain {
-  var obj = parse(css, parseOptions);
-  const plain = toPlainObject(obj);
+  var obj = csstree.parse(css, parseOptions);
+  const plain = csstree.toPlainObject(obj);
   // Without this stringify->parse loop, there ends up being mutable references
   const extraPlain = JSON.parse(JSON.stringify(plain));
   return extraPlain;
