@@ -62,15 +62,15 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
 
   const shadowDomModule: Module = {
     create: function (_, vNode: VNode) {
-      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
-        ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+      if (isElement(vNode.elm) && vNode.data?.['shadowContent'] !== undefined) {
+        ensureShadow(vNode.elm).innerHTML = vNode.data?.['shadowContent'];
       }
     },
     update: function (oldVNode: VNode, vNode: VNode) {
-      if (isElement(vNode.elm) && vNode.data?.shadowContent !== undefined) {
+      if (isElement(vNode.elm) && vNode.data?.['shadowContent'] !== undefined) {
         // Will only parse when the string content is different
-        if (oldVNode.data?.shadowContent !== vNode.data?.shadowContent) {
-          ensureShadow(vNode.elm).innerHTML = vNode.data?.shadowContent;
+        if (oldVNode.data?.['shadowContent'] !== vNode.data?.['shadowContent']) {
+          ensureShadow(vNode.elm).innerHTML = vNode.data?.['shadowContent'];
         }
       }
     },
@@ -79,7 +79,7 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
   const resizeModule: Module = {
     create: function (empty, next) {
       isElement(next.elm) &&
-        !!next.data?.resizeObserver &&
+        !!next.data?.['resizeObserver'] &&
         resizeObserver.observe(next.elm);
     },
     destroy: function (old) {
@@ -164,12 +164,12 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
           const { tagName } = vNode.elm;
           if (
             tagName.toLocaleLowerCase() === "template" &&
-            vNode.data?.templateContent !== undefined
+            vNode.data?.['templateContent'] !== undefined
           ) {
             // Do fragment patch
             patch()(
               (vNode.elm as HTMLTemplateElement).content,
-              vNode.data.templateContent
+              vNode.data['templateContent']
             );
           }
         }
@@ -179,11 +179,11 @@ export const ChildAPIModule: string = function RaisinsChildAPI() {
           const { tagName } = vNode.elm;
           if (
             tagName.toLocaleLowerCase() === "template" &&
-            vNode.data?.templateContent !== undefined
+            vNode.data?.['templateContent'] !== undefined
           ) {
-            if (oldVNode.data?.templateContent !== vNode.data?.templateContent) {
+            if (oldVNode.data?.['templateContent'] !== vNode.data?.['templateContent']) {
               // Do fragment patch
-              patch()(oldVNode.data!.templateContent, vNode.data.templateContent);
+              patch()(oldVNode.data!['templateContent'], vNode.data['templateContent']);
             }
           }
         }

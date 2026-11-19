@@ -42,7 +42,7 @@ import {
 } from './examples/VanillaComponents.tsx';
 import { useHotkeys } from './hotkeys/useHotkeys.ts';
 import { NodeMolecule } from './node/index.ts';
-import { LayersController } from './node/slots/SlotChildrenController.stories';
+import { LayersController } from './node/slots/SlotChildrenController.stories.tsx';
 import { SelectedNodeRichTextEditor } from './rich-text/SelectedNodeRichTextEditor.tsx';
 
 const meta: Meta = {

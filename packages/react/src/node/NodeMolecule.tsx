@@ -182,7 +182,7 @@ export const NodeMolecule = molecule((getMol, getScope) => {
     const children = get(atomForChildren(n));
 
     const childSlots = children.map(child => {
-      const slotName = (child as RaisinElementNode)?.attribs?.slot ?? '';
+      const slotName = (child as RaisinElementNode)?.attribs?.['slot'] ?? '';
       return slotName;
     });
     return childSlots;

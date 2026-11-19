@@ -22,9 +22,9 @@ const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
   return true;
 };
 
-const boldCmd = toggleMark(DefaultProseSchema.marks.strong);
-const underlineCmd = toggleMark(DefaultProseSchema.marks.underline);
-const emCmd = toggleMark(DefaultProseSchema.marks.em);
+const boldCmd = toggleMark(DefaultProseSchema.marks['strong']);
+const underlineCmd = toggleMark(DefaultProseSchema.marks['underline']);
+const emCmd = toggleMark(DefaultProseSchema.marks['em']);
 
 const newLineCmd = chainCommands(
   newlineInCode,

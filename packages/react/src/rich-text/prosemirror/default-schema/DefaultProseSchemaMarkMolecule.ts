@@ -71,9 +71,9 @@ export const DefaultProseSchemaMarkMolecule = molecule((getMol) => {
 
   return {
     ...toggleDefaultMarks,
-    toggleBold: toggleMarkAtomFamily(DefaultProseSchema.marks.strong),
-    toggleUnderline: toggleMarkAtomFamily(DefaultProseSchema.marks.underline),
-    toggleItalic: toggleMarkAtomFamily(DefaultProseSchema.marks.em),
+    toggleBold: toggleMarkAtomFamily(DefaultProseSchema.marks['strong']),
+    toggleUnderline: toggleMarkAtomFamily(DefaultProseSchema.marks['underline']),
+    toggleItalic: toggleMarkAtomFamily(DefaultProseSchema.marks['em']),
     toggleLink,
   };
 });

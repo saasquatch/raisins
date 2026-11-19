@@ -312,7 +312,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
           const ch = parentNode.children[i];
           if (
             isElementNode(ch) &&
-            ((ch as RaisinElementNode).attribs.slot ?? '') === target.slot
+            ((ch as RaisinElementNode).attribs['slot'] ?? '') === target.slot
           ) {
             prevRect = rectForNode(ch);
             if (prevRect) break;
@@ -322,7 +322,7 @@ export const CanvasDragAndDropMolecule = molecule(getMol => {
           const ch = parentNode.children[i];
           if (
             isElementNode(ch) &&
-            ((ch as RaisinElementNode).attribs.slot ?? '') === target.slot
+            ((ch as RaisinElementNode).attribs['slot'] ?? '') === target.slot
           ) {
             nextRect = rectForNode(ch);
             if (nextRect) break;
