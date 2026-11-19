@@ -107,7 +107,7 @@ export const PickAndPlopMolecule = molecule(getMol => {
         const cloneOfPickedNode = clone(
           picked.block.content
         ) as RaisinElementNode;
-        cloneOfPickedNode.attribs.slot = slot;
+        cloneOfPickedNode.attribs['slot'] = slot;
 
         const newDocument = insertAtPath(
           currentDoc,

@@ -282,10 +282,10 @@ export const ComponentModelMolecule = molecule(
 
         // allows default HTML components to inherit its parent's custom slot names
         const slots =
-          parent.attribs.slot && parentMeta.slots
+          parent.attribs['slot'] && parentMeta.slots
             ? [
                 ...parentMeta.slots,
-                { name: parent.attribs.slot, title: parent.attribs.slot },
+                { name: parent.attribs['slot'], title: parent.attribs['slot'] },
               ]
             : parentMeta.slots;
 

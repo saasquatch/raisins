@@ -315,7 +315,7 @@ function AddNew(props: { idx: number; slot?: string }) {
                 onClick={() => {
                   const cloned = clone(b.content) as RaisinElementNode;
                   // TODO: add "insert into slot" into core model?
-                  props.slot && (cloned.attribs.slot = props.slot);
+                  props.slot && (cloned.attribs['slot'] = props.slot);
                   insert({
                     node: cloned,
                     parent: node as RaisinElementNode,

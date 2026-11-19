@@ -154,8 +154,8 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       // if (!isElementNode(n)) return vnodeChildren;
 
       const slot =
-        (n as RaisinElementNode).attribs?.slot ??
-        candidate.attribs?.slot ??
+        (n as RaisinElementNode).attribs?.['slot'] ??
+        candidate.attribs?.['slot'] ??
         '';
       const isValid = metamodel.isValidChild(candidate, n, slot);
       if (!isValid) return vnodeChildren;
@@ -240,7 +240,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
   });
 
   CanvasAtoms.registerOnce(CanvasPickAndPlopMolecule, () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env['NODE_ENV'] === 'development') {
       CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
     }
     CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);

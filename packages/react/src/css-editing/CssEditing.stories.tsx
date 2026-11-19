@@ -5,7 +5,7 @@ import { CanvasProvider } from '../canvas/CanvasScope.tsx';
 import { CanvasSelectionMolecule } from '../canvas/plugins/CanvasSelectionMolecule.tsx';
 import { SelectedNodeController } from '../core/selection/SelectedNodeController.tsx';
 import { LocalBedrockComponents } from '../examples/MintComponents.tsx';
-import { BasicStory } from '../index.stories';
+import { BasicStory } from '../index.stories.tsx';
 import { DocumentCssEditor } from './DocumentCssMolecule.tsx';
 import { StylePanel } from './StyleMolecule.tsx';
 
