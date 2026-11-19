@@ -23,7 +23,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.mjs"
     }
   },
   "publishConfig": {
@@ -32,11 +33,12 @@
   "scripts": {
     "start": "tsdown --watch",
     "build": "tsdown",
-    "test": "vitest run --project node",
+    "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --project node --coverage",
     "lint": "oxlint",
     "format": "oxfmt",
+    "test:node": "vitest run --project node",
     "test:browser": "vitest run --project browser"
   },
   "dependencies": {

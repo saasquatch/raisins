@@ -1,5 +1,7 @@
 // eslint-disable-next-line prettier/prettier
-import csstree, { type CssNodePlain, parse, toPlainObject } from "css-tree";
+import csstree from "css-tree";
+
+type CssNodePlain = csstree.CssNodePlain;
 
 /**
  * Rewrites every selector in a stylesheet AST so that the rules apply only to
@@ -96,7 +98,7 @@ function expandNesting(
       child.value.includes("&")
     ) {
       const expanded = replaceNestingSelectorTokens(child.value, selectorStr);
-      const parsed = toPlainObject(parse(expanded));
+      const parsed = csstree.toPlainObject(csstree.parse(expanded));
       if (parsed.type === "StyleSheet" && Array.isArray(parsed.children)) {
         lifted.push(...parsed.children);
       }
@@ -219,8 +221,8 @@ function extractHostInner(host: any): any[] {
   if (!Array.isArray(inner) || inner.length === 0) return [];
   const innerText = inner[0]?.value;
   if (typeof innerText !== "string" || innerText.length === 0) return [];
-  const parsedSelector: any = toPlainObject(
-    parse(innerText, { context: "selector" })
+  const parsedSelector: any = csstree.toPlainObject(
+    csstree.parse(innerText, { context: "selector" })
   );
   if (
     parsedSelector.type !== "Selector" ||
