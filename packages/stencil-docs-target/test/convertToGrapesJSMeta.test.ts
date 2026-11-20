@@ -3,14 +3,17 @@ import { describe, it } from "node:test";
 import type { JsonDocs } from "@stencil/core/internal";
 import { convertToGrapesJSMeta } from "../src/convertToRaisins.ts";
 
-function tagFor(docsTags: Array<{ name: string; text: string }>) {
+function tagFor(
+  docsTags: Array<{ name: string; text: string }>,
+  props: unknown[] = [],
+) {
   // oxlint-disable no-unsafe-type-assertion
   const module = convertToGrapesJSMeta({
     components: [
       {
         tag: "my-component",
         docsTags,
-        props: [],
+        props,
         dependencies: [],
       },
     ],
@@ -18,6 +21,16 @@ function tagFor(docsTags: Array<{ name: string; text: string }>) {
   const tag = module.tags?.[0];
   assert.ok(tag);
   return tag;
+}
+
+function defaultFor(prop: {
+  default?: string;
+  docsTags: Array<{ name: string; text: string }>;
+}) {
+  const attribute = tagFor([], [{ name: "label", attr: "label", ...prop }])
+    .attributes?.[0];
+  assert.ok(attribute);
+  return attribute.default;
 }
 
 function assertThrowsIncluding(fn: () => unknown, message: string) {
@@ -109,6 +122,46 @@ void describe("convertToGrapesJSMeta", () => {
       assertThrowsIncluding(
         () => tagFor([{ name: "cssprop", text: "brand - The brand color" }]),
         `Invalid @cssprop tag on component "my-component" must start with "--".`,
+      );
+    });
+  });
+
+  void describe("attribute defaults", () => {
+    void it("unquotes a string initializer that Stencil 4 copied into @default", () => {
+      assert.equal(
+        defaultFor({
+          default: '"Friend"',
+          docsTags: [{ name: "default", text: '"Friend"' }],
+        }),
+        "Friend",
+      );
+    });
+
+    void it("keeps a non-string @default as attribute text", () => {
+      const injected = (literal: string) =>
+        defaultFor({
+          default: literal,
+          docsTags: [{ name: "default", text: literal }],
+        });
+      assert.equal(injected("false"), "false");
+      assert.equal(injected("6"), "6");
+    });
+
+    void it("parses the initializer when there is no @default tag (Stencil 2)", () => {
+      assert.equal(defaultFor({ default: '"Friend"', docsTags: [] }), "Friend");
+    });
+
+    void it("keeps an authored @default verbatim", () => {
+      assert.equal(
+        defaultFor({
+          default: '"Friend"',
+          docsTags: [{ name: "default", text: "Pal" }],
+        }),
+        "Pal",
+      );
+      assert.equal(
+        defaultFor({ docsTags: [{ name: "default", text: "Friend" }] }),
+        "Friend",
       );
     });
   });

@@ -16,7 +16,7 @@ function renderCanvasPlugins() {
     HTMLAtom: atom('<p>hi</p>'),
     PackagesAtom: atom([] as Module[]),
   }));
-  const Wrapper: React.FC = ({ children }) => (
+  const Wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
     <RaisinsProvider molecule={StoryMolecule}>
       <CanvasProvider>{children}</CanvasProvider>
     </RaisinsProvider>

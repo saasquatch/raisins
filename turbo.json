@@ -15,6 +15,10 @@
       "passThroughEnv": ["PLAYWRIGHT_BROWSERS_PATH"],
       "outputs": []
     },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "lint": {
       "outputs": []
     },

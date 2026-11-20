@@ -54,7 +54,7 @@ function renderCssEditing(startingHtml: string) {
     HTMLAtom: atom(startingHtml),
     PackagesAtom: atom([] as Module[]),
   }));
-  const Wrapper: React.FC = ({ children }) => (
+  const Wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
     <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
   );
   return renderHook(() => useCssEditing(), { wrapper: Wrapper });

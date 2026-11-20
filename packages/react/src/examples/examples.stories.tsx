@@ -4,14 +4,13 @@ import {
   type RaisinNode,
 } from '@raisins/core';
 import { type Meta } from '@storybook/react';
+import type { splitAtom } from 'jotai/utils';
 import {
   useAtomValue,
   atom,
   type Atom,
   useSetAtom,
   useAtom,
-  type WritableAtom,
-  type PrimitiveAtom,
 } from 'jotai';
 import {
   createScope,
@@ -778,11 +777,7 @@ type Atoms = {
   slot: string;
   slotDetails: Atom<Slot>;
   slotName: string;
-  childrenInSlot: WritableAtom<
-    PrimitiveAtom<RaisinNode>[],
-    PrimitiveAtom<RaisinNode>,
-    void
-  >;
+  childrenInSlot: ReturnType<typeof splitAtom<RaisinNode, unknown>>;
 };
 
 function SlotWidget() {

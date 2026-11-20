@@ -55,7 +55,7 @@ export const SnabbdomIframeMolecule = molecule((getMol, getScope) => {
     throw new Error(
       'Missing SnabbdomIframeScope for SnabbdomIframeMolecule, make sure this molecule is used inside a <ScopeProvider/>'
     );
-  const props = getMol(propsMol);
+  const props = getMol<SnabbdomIframeProps>(propsMol);
   return createAtoms(props);
 });
 

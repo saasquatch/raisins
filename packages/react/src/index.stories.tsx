@@ -175,12 +175,14 @@ export function ErrorListController() {
                 )}
               </li>
             );
-          } else {
+          } else if (error.type === 'attribute') {
             return (
               <li>
                 {error.attribute.name} is invalid. {error.rule}
               </li>
             );
+          } else {
+            return <li>{error.message}</li>;
           }
         })}
       </details>
@@ -446,7 +448,7 @@ function ToolbarController() {
         </button>
       ))}
       <span style={{ margin: '0 4px', color: '#666' }}>|</span>
-      <button onClick={() => setOutlined(o => !o)}>
+      <button onClick={() => setOutlined(!outlined)}>
         {outlined ? 'Outlined' : 'No Outline'}
       </button>
       {hovered && (
