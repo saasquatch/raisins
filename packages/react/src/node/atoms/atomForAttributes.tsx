@@ -17,7 +17,7 @@ export function atomForAttributes(baseAtom: PrimitiveAtom<RaisinNode>) {
       atom<Attributes, SetStateAction<Attributes>[], void>(
         get => {
           const el = get(baseAtom);
-          return isElementNode(el) ? el.attribs : undefined ?? {};
+          return isElementNode(el) ? el.attribs : {};
         },
         (_, set, next: SetStateAction<Attributes>) => {
           set(baseAtom, prev => {

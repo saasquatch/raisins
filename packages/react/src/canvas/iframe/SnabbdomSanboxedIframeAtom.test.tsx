@@ -37,7 +37,7 @@ describe('Thing', () => {
 
   // TODO: Move this testing functionality to playwright tests
   it.skip('Should render an iframe', async () => {
-    const Wrapper: React.FC = ({ children }) => (
+    const Wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
       <ScopeProvider scope={SnabbdomIframeScope} value={Props}>
         {children}
       </ScopeProvider>
