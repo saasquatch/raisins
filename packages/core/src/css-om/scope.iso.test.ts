@@ -1,7 +1,6 @@
-import expect from "expect";
-import parser from "./parser";
-import serializer from "./serializer";
-import { scopeStylesheet } from "./scope";
+import parser from "./parser.ts";
+import serializer from "./serializer.ts";
+import { scopeStylesheet } from "./scope.ts";
 
 function scoped(css: string, id = "abc"): string {
   return serializer(scopeStylesheet(parser(css), id));

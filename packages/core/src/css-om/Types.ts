@@ -1,7 +1,7 @@
 // eslint-disable-next-line prettier/prettier
 import type { CssNodePlain } from 'css-tree';
 // eslint-disable-next-line prettier/prettier
-import type { StateUpdater } from '../util/NewState';
+import type { StateUpdater } from '../util/NewState.ts';
 
 
 export type StyleNodeProps<T extends CssNodePlain = CssNodePlain> = {

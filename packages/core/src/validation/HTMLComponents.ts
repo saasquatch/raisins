@@ -1,4 +1,4 @@
-import { CustomElement, Slot } from "@raisins/schema/schema";
+import type { CustomElement, Slot } from "@raisins/schema/schema";
 
 /**
  * Standard HTML library of components

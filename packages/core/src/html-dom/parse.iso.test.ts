@@ -1,10 +1,9 @@
 import { ElementType } from "domelementtype";
-import expect from "expect";
 // eslint-disable-next-line prettier/prettier
-import type { ParseError, ParseErrorStack } from "./ParseError";
-import parse, { parseWithErrors } from "./parser";
-import { RaisinNode } from "./RaisinNode";
-import serializer from "./serializer";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import parse, { parseWithErrors } from "./parser.ts";
+import type { RaisinNode } from "./RaisinNode.ts";
+import serializer from "./serializer.ts";
 
 describe("Parse simple nodes", () => {
   function parseElement(src: string, tagName: string, attribs: any = {}) {
@@ -131,6 +130,7 @@ describe("parseWithErrors", () => {
     cases.forEach(({ html, childField }) => {
       it(`${html} → child.${childField} is defined`, () => {
         const result = parseWithErrors(html);
+        // oxlint-disable-next-line typescript/no-unsafe-type-assertion
         const child = result.node.children[0] as any;
         expect(child[childField]).toBeDefined();
       });

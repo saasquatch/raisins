@@ -1,4 +1,4 @@
 /* istanbul ignore file */
-export * from "./types";
-export * from "./utils";
-export * from "./validateNode";
+export * from "./types.ts";
+export * from "./utils.ts";
+export * from "./validateNode.ts";
