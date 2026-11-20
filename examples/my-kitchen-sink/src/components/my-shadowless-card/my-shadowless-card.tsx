@@ -2,7 +2,7 @@ import { Component, Prop, h, Host } from '@stencil/core';
 
 /**
  * @uiName Card
- * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+ * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
  * @slotEditor inline
  * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
  * @canvasRenderer always-replace
