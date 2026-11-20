@@ -4,3 +4,4 @@ export * from './CanvasScope.tsx';
 export * from './CanvasScopeMolecule.tsx';
 export * from './plugins/index.ts';
 export * from './types.tsx';
+export type { SnabbdomRenderer } from './util/raisinToSnabdom.tsx';

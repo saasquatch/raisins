@@ -8,3 +8,4 @@ export {
 } from './AttributesController.tsx';
 export type {  AttributesControllerProps,} from "./AttributesController.tsx"
 export { AttributesMolecule } from './AttributesMolecule.ts';
+export type { AttributeTemplateProps } from './AttributeThemeMolecule.tsx';
