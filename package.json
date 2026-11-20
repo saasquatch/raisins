@@ -12,6 +12,7 @@
     "storybook": "turbo run storybook",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
     "version": "changeset version && npm i",
     "publish": "changeset publish",
     "format": "oxfmt"
@@ -22,6 +23,9 @@
     "oxfmt": "^0.78.0",
     "pify": "^6.1.0",
     "turbo": "^2.11.11"
+  },
+  "engines": {
+    "node": "^24 || ^26"
   },
   "packageManager": "npm@11.20.0"
 }
