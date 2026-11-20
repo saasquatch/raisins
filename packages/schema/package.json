@@ -22,7 +22,9 @@
     ".": "./schema.json",
     "./schema": {
       "types": "./schema.d.ts"
-    }
+    },
+    "./schema.json": "./schema.json",
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public"
@@ -31,6 +33,7 @@
     "build": "typescript-json-schema --required --ignoreErrors schema.d.ts -o schema.json Package",
     "prepublishOnly": "npm run build",
     "test": "echo 'No tests'",
+    "typecheck": "tsc --noEmit --strict schema.d.ts",
     "lint": "oxlint schema.d.ts"
   },
   "devDependencies": {

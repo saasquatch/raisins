@@ -17,7 +17,7 @@ describe('Stencil docs target', () => {
     let dataJson: any;
     try {
       const dataStr = await fs.readFile(
-        path.resolve(kitchenSinkPath, 'raisins.json'),
+        path.resolve(kitchenSinkPath, 'docs', 'raisins.json'),
         { encoding: 'utf-8' }
       );
       if (!dataStr) throw new Error();
