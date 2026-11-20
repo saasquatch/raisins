@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      */
@@ -27,7 +27,7 @@ export namespace Components {
     interface MyComponent {
         /**
           * What to call people if we don't have their name
-          * @default Friend
+          * @default "Friend"
          */
         "anonymousLabel": string;
         /**
@@ -69,7 +69,7 @@ export namespace Components {
     }
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      * @canvasRenderer always-replace
@@ -182,7 +182,7 @@ export namespace Components {
 declare global {
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      */
@@ -206,7 +206,7 @@ declare global {
     };
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      * @canvasRenderer always-replace
@@ -261,7 +261,7 @@ declare global {
 declare namespace LocalJSX {
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      */
@@ -280,7 +280,7 @@ declare namespace LocalJSX {
     interface MyComponent {
         /**
           * What to call people if we don't have their name
-          * @default Friend
+          * @default "Friend"
          */
         "anonymousLabel"?: string;
         /**
@@ -322,7 +322,7 @@ declare namespace LocalJSX {
     }
     /**
      * @uiName Card
-     * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+     * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
      * @slotEditor inline
      * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
      * @canvasRenderer always-replace
@@ -476,7 +476,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             /**
              * @uiName Card
-             * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+             * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
              * @slotEditor inline
              * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
              */
@@ -490,7 +490,7 @@ declare module "@stencil/core" {
             "my-component": LocalJSX.IntrinsicElements["my-component"] & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * @uiName Card
-             * @slots [{"title":"Body", "description": "Body of the card"},{"title":"Label", "description": "The card label"}]
+             * @slots [{"name":"", "title":"Body", "description": "Body of the card"},{"name":"title", "title":"Label", "description": "The card label"}]
              * @slotEditor inline
              * @example Rich Text - <my-card><span slot=title>Title <u>with</u> <a href="https://www.example.com">link</a></span><div><p>I am a bunch of editable <u>rich</u> <strong>text</strong></p><p>And I am in many paragraphs</p></div></my-split>
              * @canvasRenderer always-replace
