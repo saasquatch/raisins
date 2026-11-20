@@ -1,7 +1,7 @@
-import * as schema from '@raisins/schema/schema';
-import { JsonDocs, JsonDocsTag } from '@stencil/core/internal';
-import splitOnFirst from './split-on-first';
-import { walk } from './walk';
+import type * as schema from '@raisins/schema/schema';
+import type { JsonDocs, JsonDocsProp, JsonDocsTag } from '@stencil/core/internal';
+import splitOnFirst from './split-on-first.ts';
+import { walk } from './walk.ts';
 
 export type HasDocsTags = { docsTags: JsonDocsTag[] };
 
@@ -18,7 +18,8 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               parsed = JSON.parse(t.text!);
             } catch (e) {
               throw new Error(
-                `Unable to parse JSON for @componentState tag on component "${component?.tag}" and property "${p.name}". Reason: ${e}`
+                `Unable to parse JSON for @componentState tag on component "${component?.tag}" and property "${p.name}".`,
+                { cause: e },
               );
             }
             const { title, slot, dependencies, props, ...meta } = parsed;
@@ -68,7 +69,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
               description: p.docs,
-              default: defaultValue(p) ?? (p.default && JSON.parse(p.default)),
+              default: defaultTag(p) ?? (p.default && JSON.parse(p.default)),
               // TODO: Support enums -- need to add to Raisins model
               // Reference: https://coda.io/d/Self-Serve-Widget_dtoEr2girWN/Raisins-Schema_sucK8#_luqov
               enum: jsonTagValue(p, 'uiEnum'),
@@ -137,6 +138,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         const elem: schema.CustomElement = {
           tagName: comp.tag,
           title: uiName(comp) ?? comp.tag,
+          // oxlint-disable no-unsafe-type-assertion
           slots: jsonTagValue(comp, 'slots') as schema.Slot[],
           attributes,
           cssParts,
@@ -168,7 +170,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
         };
         return elem;
       } catch (e) {
-        throw new Error(`Invalid docs tag for ${comp.tag}. ` + e);
+        throw new Error(`Invalid docs tag for ${comp.tag}. ` + e, { cause: e });
       }
     });
 
@@ -194,14 +196,30 @@ function jsonTagValue(tags: HasDocsTags, name: string) {
   try {
     return value && JSON.parse(value);
   } catch (e) {
-    throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e);
+    throw new Error(`Unable to parse JSON for ${name} tag. Reason: ` + e, {
+      cause: e,
+    });
   }
 }
+
 const documented = (x: HasDocsTags) =>
   !x.docsTags.find(tag => tag.name === 'undocumented');
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const defaultValue = (x: HasDocsTags) => tagValue(x.docsTags, 'default');
+// Stencil 4 copies the raw initializer into @default when none is written, so unquote that copy.
+const defaultTag = (p: JsonDocsProp) => {
+  const text = defaultValue(p);
+  return text !== undefined && text === p.default ? unquote(text) : text;
+};
+const unquote = (literal: string) => {
+  try {
+    const value: unknown = JSON.parse(literal);
+    return typeof value === 'string' ? value : literal;
+  } catch {
+    return literal;
+  }
+};
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
 const slotEditor = (x: HasDocsTags) => tagValue(x.docsTags, 'slotEditor');
 const required = (x: HasDocsTags) =>
