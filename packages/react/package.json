@@ -31,6 +31,7 @@
     "start": "tsdown --watch",
     "build": "tsdown",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .",
     "test:watch": "vitest",
     "lint": "oxlint src",
     "format": "oxfmt",
@@ -80,10 +81,7 @@
     "vitest": "^5.1.0"
   },
   "peerDependencies": {
-    "jotai": "^2.20.3",
+    "jotai": "^2.0.0",
     "react": "^17.0.0 || ^18.0.0"
-  },
-  "engines": {
-    "node": "^24 || ^26"
   }
 }
