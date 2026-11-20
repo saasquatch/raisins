@@ -2,27 +2,27 @@ import {
   calculatePlopTargets,
   isElementNode,
   isRoot,
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNodeWithChildren,
+  type RaisinDocumentNode,
+  type RaisinElementNode,
+  type RaisinNodeWithChildren,
 } from '@raisins/core';
-import { CustomElement } from '@raisins/schema/schema';
-import { Atom, atom } from 'jotai';
+import type { CustomElement } from '@raisins/schema/schema';
+import { type Atom, atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { h, VNode, VNodeStyle } from 'snabbdom';
-import { ComponentModelMolecule } from '../../component-metamodel';
+import { h, type VNode, type VNodeStyle } from 'snabbdom';
+import { ComponentModelMolecule } from '../../component-metamodel/index.ts';
 import {
   CoreMolecule,
   PickAndPlopMolecule,
   SoulsInDocMolecule,
   SoulsMolecule,
-} from '../../core';
-import { DragAndDropMolecule } from '../../core/selection/DragAndDropMolecule';
-import { RawCanvasEvent } from '../api/_CanvasRPCContract';
-import { CanvasConfigMolecule } from '../CanvasConfig';
-import { CanvasScopeMolecule, RichCanvasEvent } from '../CanvasScopeMolecule';
-import { defaultRectAtom } from '../util/defaultRectAtom';
-import { SnabbdomAppender, SnabbdomRenderer } from '../util/raisinToSnabdom';
+} from '../../core/index.ts';
+import { DragAndDropMolecule } from '../../core/selection/DragAndDropMolecule.tsx';
+import { type RawCanvasEvent } from '../api/_CanvasRPCContract.tsx';
+import { CanvasConfigMolecule } from '../CanvasConfig.tsx';
+import { CanvasScopeMolecule, type RichCanvasEvent } from '../CanvasScopeMolecule.tsx';
+import { defaultRectAtom } from '../util/defaultRectAtom.tsx';
+import { type SnabbdomAppender, type SnabbdomRenderer } from '../util/raisinToSnabdom.tsx';
 
 export const CanvasPickAndPlopMolecule = molecule(getMol => {
   const CanvasConfig = getMol(CanvasConfigMolecule);
@@ -154,8 +154,8 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
       // if (!isElementNode(n)) return vnodeChildren;
 
       const slot =
-        (n as RaisinElementNode).attribs?.slot ??
-        candidate.attribs?.slot ??
+        (n as RaisinElementNode).attribs?.['slot'] ??
+        candidate.attribs?.['slot'] ??
         '';
       const isValid = metamodel.isValidChild(candidate, n, slot);
       if (!isValid) return vnodeChildren;
@@ -240,7 +240,7 @@ export const CanvasPickAndPlopMolecule = molecule(getMol => {
   });
 
   CanvasAtoms.registerOnce(CanvasPickAndPlopMolecule, () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env['NODE_ENV'] === 'development') {
       CanvasAtoms.addEventListener('dblclick', DoubleClickAtom);
     }
     CanvasAtoms.HTMLSet.add(PickAndPlopStyleAtom);

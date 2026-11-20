@@ -1,6 +1,6 @@
 import React from 'react';
-import { SelectedNodeController } from '../core/selection/SelectedNodeController';
-import { NodeRichTextController } from './RichTextEditor';
+import { SelectedNodeController } from '../core/selection/SelectedNodeController.tsx';
+import { NodeRichTextController } from './RichTextEditor.tsx';
 
 export function SelectedNodeRichTextEditor() {
   return (

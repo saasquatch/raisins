@@ -1,6 +1,7 @@
-export * from './CanvasConfig';
-export * from './CanvasController';
-export * from './CanvasScope';
-export * from './CanvasScopeMolecule';
-export * from './plugins';
-export * from './types';
+export * from './CanvasConfig.tsx';
+export * from './CanvasController.tsx';
+export * from './CanvasScope.tsx';
+export * from './CanvasScopeMolecule.tsx';
+export * from './plugins/index.ts';
+export * from './types.tsx';
+export type { SnabbdomRenderer } from './util/raisinToSnabdom.tsx';

@@ -3,12 +3,12 @@ import { molecule } from 'bunshi/react';
 import { Node } from 'prosemirror-model';
 import {
   EditorState,
-  SelectionBookmark,
+  type SelectionBookmark,
   TextSelection,
   Transaction,
 } from 'prosemirror-state';
-import { ProseEditorScope } from './ProseEditorScope';
-import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin';
+import { ProseEditorScope } from './ProseEditorScope.tsx';
+import { proseRichDocToRaisin, raisinToProseDoc } from './util/Prose2Raisin.ts';
 
 /**
  * Molecule wrapper for ProseMirror {@link EditorState} that adapts {@link RaisinNode} to

@@ -1,10 +1,10 @@
-import { atom, Atom, PrimitiveAtom } from 'jotai';
+import { atom, type Atom, type PrimitiveAtom } from 'jotai';
 import { createScope, ScopeProvider } from 'bunshi/react';
 import { molecule } from 'bunshi/react';
 import React from 'react';
-import { AttributeConfig } from '../attributes/AttributeConfig';
-import { CanvasConfig } from '../canvas/CanvasConfig';
-import { Module } from '../component-metamodel/types';
+import { type AttributeConfig } from '../attributes/AttributeConfig.ts';
+import { type CanvasConfig } from '../canvas/CanvasConfig.tsx';
+import { type Module } from '../component-metamodel/types.ts';
 
 export type RaisinConfig = Partial<CanvasConfig> &
   Partial<AttributeConfig> & {

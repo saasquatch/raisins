@@ -1,9 +1,12 @@
-import hotkeys, { KeyHandler } from 'hotkeys-js';
+import hotkeysModule, { type Hotkeys, type KeyHandler } from 'hotkeys-js';
 import { molecule } from 'bunshi/react';
-import { PickAndPlopMolecule } from '../core';
-import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { HistoryMolecule } from '../core/editting/HistoryAtoms';
-import connectedAtom from '../util/atoms/connectedAtom';
+import { PickAndPlopMolecule } from '../core/index.ts';
+import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom.ts';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms.tsx';
+import connectedAtom from '../util/atoms/connectedAtom.tsx';
+
+// hotkeys-js types declare an ES default, but its CJS build's module.exports is the hotkeys function itself.
+const hotkeys = hotkeysModule as unknown as Hotkeys;
 
 export const HotkeysMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);

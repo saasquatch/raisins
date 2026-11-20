@@ -1,17 +1,16 @@
 import {
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNode,
+  type RaisinDocumentNode,
+  type RaisinElementNode,
+  type RaisinNode,
 } from '@raisins/core';
-import { Meta } from '@storybook/react';
+import { type Meta } from '@storybook/react';
+import type { splitAtom } from 'jotai/utils';
 import {
   useAtomValue,
   atom,
-  Atom,
+  type Atom,
   useSetAtom,
   useAtom,
-  WritableAtom,
-  PrimitiveAtom,
 } from 'jotai';
 import {
   createScope,
@@ -19,31 +18,31 @@ import {
   ScopeProvider,
   useMolecule,
 } from 'bunshi/react';
-import React, { CSSProperties, FC, useCallback, useMemo } from 'react';
-import { AttributesController } from '../attributes';
+import React, { type CSSProperties, type FC, useCallback, useMemo } from 'react';
+import { AttributesController } from '../attributes/index.ts';
 import {
   CanvasSelectionMolecule,
   CanvasHoveredMolecule,
   BasicCanvasController,
   CanvasProvider,
-  Rect,
+  type Rect,
   CanvasPickAndPlopMolecule,
-} from '../canvas';
-import { ComponentModelMolecule, Module } from '../component-metamodel';
-import { Slot } from '../component-metamodel/Component';
+} from '../canvas/index.ts';
+import { ComponentModelMolecule, type Module } from '../component-metamodel/index.ts';
+import { type Slot } from '../component-metamodel/Component.ts';
 import {
   HoveredNodeMolecule,
   SelectedNodeMolecule,
   HistoryMolecule,
-  RaisinConfig,
+  type RaisinConfig,
   SelectedNodeController,
   RaisinsProvider,
   EditSelectedMolecule,
   EditMolecule,
   CoreMolecule,
   PickAndPlopMolecule,
-} from '../core';
-import { useHotkeys } from '../hotkeys';
+} from '../core/index.ts';
+import { useHotkeys } from '../hotkeys/index.ts';
 import {
   ChildrenEditorForAtoms,
   NodeChildrenEditor,
@@ -52,13 +51,13 @@ import {
   SlotChildrenController,
   SlotMolecule,
   SlotScopeProvider,
-} from '../node';
+} from '../node/index.ts';
 import {
   ProseEditor,
   ProseEditorScopeProvider,
   RichTextMolecule,
-} from '../rich-text';
-import { NodeRichTextController } from '../rich-text/RichTextEditor';
+} from '../rich-text/index.ts';
+import { NodeRichTextController } from '../rich-text/RichTextEditor.tsx';
 
 const meta: Meta = {
   title: 'Examples',
@@ -778,11 +777,7 @@ type Atoms = {
   slot: string;
   slotDetails: Atom<Slot>;
   slotName: string;
-  childrenInSlot: WritableAtom<
-    PrimitiveAtom<RaisinNode>[],
-    PrimitiveAtom<RaisinNode>,
-    void
-  >;
+  childrenInSlot: ReturnType<typeof splitAtom<RaisinNode, unknown>>;
 };
 
 function SlotWidget() {

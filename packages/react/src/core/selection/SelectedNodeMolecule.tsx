@@ -2,17 +2,17 @@ import {
   getNode,
   getPath,
   isElementNode,
-  NodePath,
-  NodeSelection,
-  RaisinNode,
+  type NodePath,
+  type NodeSelection,
+  type RaisinNode,
 } from '@raisins/core';
-import { atom, Getter, PrimitiveAtom, SetStateAction } from 'jotai';
+import { atom, type Getter, type PrimitiveAtom, type SetStateAction } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { SelectionBookmark } from 'prosemirror-state';
-import { isFunction } from '../../util/isFunction';
-import { CoreMolecule } from '../CoreAtoms';
-import { Soul, SoulsMolecule } from '../souls/Soul';
-import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms';
+import { type SelectionBookmark } from 'prosemirror-state';
+import { isFunction } from '../../util/isFunction.ts';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { type Soul, SoulsMolecule } from '../souls/Soul.ts';
+import { SoulsInDocMolecule } from '../souls/SoulsInDocumentAtoms.tsx';
 
 export type Selection = RichTextSelection | NodeSelection;
 

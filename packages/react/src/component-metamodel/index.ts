@@ -1,3 +1,3 @@
-export * from './ComponentModel';
-export { modulesToDetails } from './convert/modulesToDetails';
-export type { Module, ModuleDetails } from './types';
+export * from './ComponentModel.tsx';
+export { modulesToDetails } from './convert/modulesToDetails.tsx';
+export type { Module, ModuleDetails } from './types.ts';
