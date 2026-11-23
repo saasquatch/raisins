@@ -149,6 +149,30 @@ void describe("convertToGrapesJSMeta", () => {
 
     void it("parses the initializer when there is no @default tag (Stencil 2)", () => {
       assert.equal(defaultFor({ default: '"Friend"', docsTags: [] }), "Friend");
+      assert.equal(defaultFor({ default: "'Friend'", docsTags: [] }), "Friend");
+    });
+
+    void it("decodes single-quoted, template and escaped string initializers", () => {
+      const injected = (literal: string) =>
+        defaultFor({
+          default: literal,
+          docsTags: [{ name: "default", text: literal }],
+        });
+      assert.equal(injected("'Friend'"), "Friend");
+      assert.equal(injected("`Friend`"), "Friend");
+      assert.equal(injected(String.raw`'It\'s "ok"'`), `It's "ok"`);
+      assert.equal(injected(String.raw`"tab\there"`), "tab\there");
+    });
+
+    void it("keeps initializers that are not plain string literals as text", () => {
+      const injected = (literal: string) =>
+        defaultFor({
+          default: literal,
+          docsTags: [{ name: "default", text: literal }],
+        });
+      assert.equal(injected("`Hi ${name}`"), "`Hi ${name}`");
+      assert.equal(injected("'a' + 'b'"), "'a' + 'b'");
+      assert.equal(injected('"a" + "b"'), '"a" + "b"');
     });
 
     void it("keeps an authored @default verbatim", () => {

@@ -69,7 +69,7 @@ export function convertToGrapesJSMeta(docs: JsonDocs): schema.Module {
               type: uiType(p) ?? p.type,
               title: uiName(p) ?? p.attr ?? p.name,
               description: p.docs,
-              default: defaultTag(p) ?? (p.default && JSON.parse(p.default)),
+              default: defaultTag(p) ?? (p.default && (stringLiteralValue(p.default) ?? JSON.parse(p.default))),
               // TODO: Support enums -- need to add to Raisins model
               // Reference: https://coda.io/d/Self-Serve-Widget_dtoEr2girWN/Raisins-Schema_sucK8#_luqov
               enum: jsonTagValue(p, 'uiEnum'),
@@ -207,17 +207,40 @@ const documented = (x: HasDocsTags) =>
 const uiName = (x: HasDocsTags) => tagValue(x.docsTags, 'uiName');
 const uiType = (x: HasDocsTags) => tagValue(x.docsTags, 'uiType');
 const defaultValue = (x: HasDocsTags) => tagValue(x.docsTags, 'default');
-// Stencil 4 copies the raw initializer into @default when none is written, so unquote that copy.
+// Stencil 4 copies the raw initializer into @default when none is written, so decode that copy.
 const defaultTag = (p: JsonDocsProp) => {
   const text = defaultValue(p);
-  return text !== undefined && text === p.default ? unquote(text) : text;
+  return text !== undefined && text === p.default
+    ? (stringLiteralValue(text) ?? text)
+    : text;
 };
-const unquote = (literal: string) => {
+// Decodes a JS string literal ('a', "a", `a` without ${}); undefined for anything else.
+const stringLiteralValue = (literal: string): string | undefined => {
+  const quote = literal[0];
+  if (
+    literal.length < 2 ||
+    !quote ||
+    !`'"\``.includes(quote) ||
+    literal.at(-1) !== quote ||
+    (quote === '`' && literal.includes('${'))
+  )
+    return undefined;
+  let isSingleLiteral = true;
+  const asJson = literal
+    .slice(1, -1)
+    .replace(/\\([\s\S])|["'`]/g, (match, escaped?: string) => {
+      if (escaped === undefined) {
+        if (match === quote) isSingleLiteral = false;
+        return match === '"' ? '\\"' : match;
+      }
+      return escaped === "'" || escaped === '`' ? escaped : match;
+    });
+  if (!isSingleLiteral) return undefined;
   try {
-    const value: unknown = JSON.parse(literal);
-    return typeof value === 'string' ? value : literal;
+    const value: unknown = JSON.parse(`"${asJson}"`);
+    return typeof value === 'string' ? value : undefined;
   } catch {
-    return literal;
+    return undefined;
   }
 };
 const uiWidget = (x: HasDocsTags) => tagValue(x.docsTags, 'uiWidget');
