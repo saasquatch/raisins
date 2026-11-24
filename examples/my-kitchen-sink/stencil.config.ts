@@ -9,7 +9,9 @@ export const config: Config = {
       esmLoaderPath: '../loader',
     },
     {
-      type: 'dist-custom-elements-bundle',
+      type: 'dist-custom-elements',
+      dir: 'dist/custom-elements',
+      customElementsExportBehavior: 'bundle',
     },
     {
       type: 'docs-readme',
