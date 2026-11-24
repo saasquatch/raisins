@@ -1,8 +1,8 @@
-import { RaisinNode } from '@raisins/core';
-import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
-import { isFunction } from '../../util/isFunction';
-import { isElementNode } from '../../util/isNode';
-import { createMemoizeAtom } from '../../util/weakCache';
+import { type RaisinNode } from '@raisins/core';
+import { atom, type PrimitiveAtom, type SetStateAction } from 'jotai';
+import { isFunction } from '../../util/isFunction.ts';
+import { isElementNode } from '../../util/isNode.tsx';
+import { createMemoizeAtom } from '../../util/weakCache.ts';
 
 const memoizeAtom = createMemoizeAtom();
 
@@ -17,7 +17,7 @@ export function atomForAttributes(baseAtom: PrimitiveAtom<RaisinNode>) {
       atom<Attributes, SetStateAction<Attributes>[], void>(
         get => {
           const el = get(baseAtom);
-          return isElementNode(el) ? el.attribs : undefined ?? {};
+          return isElementNode(el) ? el.attribs : {};
         },
         (_, set, next: SetStateAction<Attributes>) => {
           set(baseAtom, prev => {

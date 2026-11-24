@@ -4,7 +4,7 @@ import {
   selectorOf,
   writeSection,
   writeSectionProperty,
-} from './cssSections';
+} from './cssSections.ts';
 
 describe('selectorOf', () => {
   it.each([

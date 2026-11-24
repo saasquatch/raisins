@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
-import { createMemoizeAtom } from './weakCache';
-import expect from 'expect';
+import { createMemoizeAtom } from './weakCache.ts';
+import { expect } from 'vitest';
 
 describe('Weak cache', () => {
   it('order matters', () => {

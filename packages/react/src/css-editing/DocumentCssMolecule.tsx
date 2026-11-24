@@ -1,7 +1,7 @@
 import { molecule, useMolecule } from 'bunshi/react';
 import { useAtom } from 'jotai';
 import React, { useEffect, useRef, useState } from 'react';
-import { CssEditingMolecule } from './CssEditingMolecule';
+import { CssEditingMolecule } from './CssEditingMolecule.tsx';
 
 /**
  * Document-wide CSS editor. Reads and writes the same atom that drives the

@@ -1,25 +1,25 @@
-import { parseWithErrors, RaisinElementNode, RaisinNode } from '@raisins/core';
+import { parseWithErrors, type RaisinElementNode, type RaisinNode } from '@raisins/core';
 import { act, renderHook } from '@testing-library/react';
 import { molecule, useMolecule } from 'bunshi/react';
-import expect from 'expect';
+import { expect } from 'vitest';
 import { atom, useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React from 'react';
-import { Module } from '../component-metamodel/types';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { EditMolecule } from '../core/editting/EditAtoms';
+import { type Module } from '../component-metamodel/types.ts';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { EditMolecule } from '../core/editting/EditAtoms.ts';
 import {
   ConfigMolecule,
-  RaisinConfig,
+  type RaisinConfig,
   RaisinsProvider,
-} from '../core/RaisinConfigScope';
-import { CssEditingMolecule } from './CssEditingMolecule';
+} from '../core/RaisinConfigScope.tsx';
+import { CssEditingMolecule } from './CssEditingMolecule.tsx';
 import {
   RAISIN_CSS_ATTR,
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_ID_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from './RaisinCssIds';
-import { RaisinIdsMolecule } from './RaisinIdsMolecule';
+} from './RaisinCssIds.ts';
+import { RaisinIdsMolecule } from './RaisinIdsMolecule.ts';
 
 function useCssEditing() {
   const { HTMLAtom } = useMolecule(ConfigMolecule);
@@ -54,7 +54,7 @@ function renderCssEditing(startingHtml: string) {
     HTMLAtom: atom(startingHtml),
     PackagesAtom: atom([] as Module[]),
   }));
-  const Wrapper: React.FC = ({ children }) => (
+  const Wrapper: React.FC<React.PropsWithChildren> = ({ children }) => (
     <RaisinsProvider molecule={StoryMolecule}>{children}</RaisinsProvider>
   );
   return renderHook(() => useCssEditing(), { wrapper: Wrapper });

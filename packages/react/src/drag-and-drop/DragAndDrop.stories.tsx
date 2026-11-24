@@ -1,38 +1,38 @@
-import { htmlParser, RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { Meta } from '@storybook/react';
+import { htmlParser, type RaisinDocumentNode, type RaisinElementNode } from '@raisins/core';
+import { type Meta } from '@storybook/react';
 import { useMolecule } from 'bunshi/react';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import React, { CSSProperties } from 'react';
+import React, { type CSSProperties } from 'react';
 import {
   PickAndPlopMolecule,
   SelectedNodeController,
-} from '../core';
-import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule';
-import { Block, ComponentModelMolecule } from '../component-metamodel';
+} from '../core/index.ts';
+import { SelectedNodeMolecule } from '../core/selection/SelectedNodeMolecule.tsx';
+import { type Block, ComponentModelMolecule } from '../component-metamodel/index.ts';
 import {
   big,
   MintComponents,
   mintMono,
-} from '../examples/MintComponents';
+} from '../examples/MintComponents.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../examples/VanillaComponents';
-import { useHotkeys } from '../hotkeys';
-import { BasicStory } from '../index.stories';
-import { AttributesController } from '../attributes';
-import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule';
-import { useDragBlock, useDragSelectedNode, useDropTarget } from './useDragAndDrop';
+} from '../examples/VanillaComponents.tsx';
+import { useHotkeys } from '../hotkeys/index.ts';
+import { BasicStory } from '../index.stories.tsx';
+import { AttributesController } from '../attributes/index.ts';
+import { DragAndDropMolecule } from '../core/selection/DragAndDropMolecule.tsx';
+import { useDragBlock, useDragSelectedNode, useDropTarget } from './useDragAndDrop.tsx';
 import {
   NodeChildrenEditor,
   ChildrenEditorForAtoms,
-} from '../node/NodeChildrenEditor';
-import { NodeMolecule } from '../node/NodeMolecule';
-import { NodeScopeProvider } from '../node/NodeScope';
-import { SlotChildrenController } from '../node/slots/SlotChildrenController';
-import { SlotMolecule, SlotScopeProvider } from '../node/slots/SlotScope';
-import { NodeRichTextController } from '../rich-text/RichTextEditor';
-import { CoreMolecule } from '../core/CoreAtoms';
+} from '../node/NodeChildrenEditor.tsx';
+import { NodeMolecule } from '../node/NodeMolecule.tsx';
+import { NodeScopeProvider } from '../node/NodeScope.tsx';
+import { SlotChildrenController } from '../node/slots/SlotChildrenController.tsx';
+import { SlotMolecule, SlotScopeProvider } from '../node/slots/SlotScope.tsx';
+import { NodeRichTextController } from '../rich-text/RichTextEditor.tsx';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
 import {
   BasicCanvasController,
   CanvasDragAndDropMolecule,
@@ -41,7 +41,7 @@ import {
   CanvasPickAndPlopMolecule,
   CanvasProvider,
   CanvasSelectionMolecule,
-} from '../canvas';
+} from '../canvas/index.ts';
 
 const meta: Meta = {
   title: 'Drag and Drop',

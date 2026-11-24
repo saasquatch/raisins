@@ -1,9 +1,9 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    exclude: ['node_modules'],
+    exclude: ["node_modules"],
     globals: true,
-    environment: 'jsdom',
+    environment: "jsdom",
   },
 });

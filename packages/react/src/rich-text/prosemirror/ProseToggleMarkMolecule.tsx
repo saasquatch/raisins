@@ -2,7 +2,7 @@ import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
 import { toggleMark } from 'prosemirror-commands';
 import type { MarkType } from 'prosemirror-model';
-import { ProseEditorStateMolecule } from './ProseEditorStateMolecule';
+import { ProseEditorStateMolecule } from './ProseEditorStateMolecule.tsx';
 
 type ToggleMarkAction = {
   mark: MarkType;
