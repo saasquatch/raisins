@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- [#58](https://github.com/saasquatch/raisins/pull/58) [`0b93a75`](https://github.com/saasquatch/raisins/commit/0b93a75df9f92921ba0054938eb7f8b228e00dd0) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - Publish as an ES module with an `exports` map (built with tsdown). `require("@raisins/core")` needs a runtime that supports `require(esm)` (Node 20.19+/22.12+), and deep imports into `dist/` are no longer supported. Drop the `css` dependency, which carried high-severity advisories.
+
+### Patch Changes
+
+- Updated dependencies [[`d64de29`](https://github.com/saasquatch/raisins/commit/d64de29d8f89dc96e140686da3f83bc54e5df70e)]:
+  - @raisins/schema@1.5.0
+
 ## 1.4.1
 
 ### Patch Changes

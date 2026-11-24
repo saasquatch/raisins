@@ -2,7 +2,7 @@
   "name": "@raisins/react",
   "author": "ReferralSaaSquatch.com, Inc.",
   "description": "React package with tools for building a Raisins editor",
-  "version": "1.8.0",
+  "version": "2.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -39,8 +39,8 @@
     "storybook:build": "storybook build -c .storybook -o .out"
   },
   "dependencies": {
-    "@raisins/core": "^1.4.1",
-    "@raisins/schema": "^1.4.0",
+    "@raisins/core": "^2.0.0",
+    "@raisins/schema": "^1.5.0",
     "bunshi": "~2.0.2",
     "fast-equals": "^5.4.5",
     "hotkeys-js": "^3.13.15",

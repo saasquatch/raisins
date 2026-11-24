@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- [#57](https://github.com/saasquatch/raisins/pull/57) [`b804b8b`](https://github.com/saasquatch/raisins/commit/b804b8b17581d6d6eae5b6adf33c20ed49b3b74b) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - Ship as dual ESM/CJS with an `exports` map (built with tsdown); deep imports into `dist/` are no longer supported. Declare `@stencil/core` (`>=1`) as a peer dependency and require Node 14 or later. String-literal defaults (`"Friend"`, `'Friend'`, `` `Friend` ``) are decoded to their value instead of keeping their quotes on Stencil 4 or failing the build on Stencil 2, and a `@default` that Stencil copies from a non-string initializer is emitted as attribute text (`"6"`, `"false"`).
+
+### Patch Changes
+
+- Updated dependencies [[`d64de29`](https://github.com/saasquatch/raisins/commit/d64de29d8f89dc96e140686da3f83bc54e5df70e)]:
+  - @raisins/schema@1.5.0
+
 ## 1.4.0
 
 ### Minor Changes
