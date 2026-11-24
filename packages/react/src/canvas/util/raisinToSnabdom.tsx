@@ -85,10 +85,7 @@ export function raisinToSnabbdom(
         }
       } catch (e) {
         // If the style string is malformed, avoid throwing an error that breaks the entire render
-        if (
-          typeof process !== 'undefined' &&
-          process.env?.['NODE_ENV'] === 'development'
-        ) {
+        if (process.env['NODE_ENV'] === 'development') {
           console.warn('Failed to serialize style for', el.tagName, e);
         }
         styleObj = {};
