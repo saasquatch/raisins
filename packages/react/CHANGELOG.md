@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- [#58](https://github.com/saasquatch/raisins/pull/58) [`0b93a75`](https://github.com/saasquatch/raisins/commit/0b93a75df9f92921ba0054938eb7f8b228e00dd0) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - Publish as an ES module with an `exports` map (built with tsdown); deep imports into `dist/` and `src/` are no longer supported, and `require("@raisins/react")` needs a runtime that supports `require(esm)` (Node 20.19+/22.12+). The `SnabbdomRenderer` and `AttributeTemplateProps` types, previously only reachable through `dist/` paths, are now exported from the package root. Raise the `prosemirror-view` floor to `^1.42.9` to pick up security fixes. Drop the unused `valtio` and `css-tree` dependencies.
+
+### Patch Changes
+
+- Updated dependencies [[`0b93a75`](https://github.com/saasquatch/raisins/commit/0b93a75df9f92921ba0054938eb7f8b228e00dd0), [`d64de29`](https://github.com/saasquatch/raisins/commit/d64de29d8f89dc96e140686da3f83bc54e5df70e)]:
+  - @raisins/core@2.0.0
+  - @raisins/schema@1.5.0
+
 ## 1.8.0
 
 ### Minor Changes

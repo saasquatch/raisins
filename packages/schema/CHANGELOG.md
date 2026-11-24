@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+### Minor Changes
+
+- [#55](https://github.com/saasquatch/raisins/pull/55) [`d64de29`](https://github.com/saasquatch/raisins/commit/d64de29d8f89dc96e140686da3f83bc54e5df70e) Thanks [@ashley-osuna](https://github.com/ashley-osuna)! - Add an `exports` map. The documented entry points (`@raisins/schema` → `schema.json`, `@raisins/schema/schema` → types) and the `./schema.json` and `./package.json` paths still resolve. Model types in `schema.d.ts` are now declared as `interface`s instead of `type` aliases.
+
 ## 1.4.0
 
 ### Minor Changes
