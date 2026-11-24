@@ -1,8 +1,8 @@
 import { validateNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { ComponentModelMolecule } from '../component-metamodel';
-import { CoreMolecule } from '../core';
+import { ComponentModelMolecule } from '../component-metamodel/index.ts';
+import { CoreMolecule } from '../core/index.ts';
 
 export const ValidationMolecule = molecule(getMol => {
   const { RootNodeAtom } = getMol(CoreMolecule);

@@ -1,9 +1,9 @@
-import { RaisinNode } from '@raisins/core';
-import { isElementNode } from '../../util/isNode';
+import { type RaisinNode } from '@raisins/core';
+import { isElementNode } from '../../util/isNode.tsx';
 
 // TODO: Remove raisinnode to improve performance?
 export function isInSlot(c: RaisinNode, slotName: string): boolean {
-  const slotNameForNode = isElementNode(c) ? c.attribs.slot : undefined;
+  const slotNameForNode = isElementNode(c) ? c.attribs['slot'] : undefined;
   if (!slotName && !slotNameForNode) {
     // Default slot (might not have a slot attributes)
     // Have to hanlde undefined.

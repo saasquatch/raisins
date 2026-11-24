@@ -3,30 +3,30 @@ import {
   cssSerializer,
   htmlSerializer,
   htmlUtil,
-  RaisinElementNode,
-  RaisinNode,
-  RaisinNodeWithChildren,
-  RaisinStyleNode,
+  type RaisinElementNode,
+  type RaisinNode,
+  type RaisinNodeWithChildren,
+  type RaisinStyleNode,
   scopeStylesheet,
 } from '@raisins/core';
 import { molecule } from 'bunshi/react';
-import { atom, Atom, WritableAtom } from 'jotai';
-import { CoreMolecule } from '../core/CoreAtoms';
-import { EditMolecule } from '../core/editting/EditAtoms';
+import { atom, type Atom, type WritableAtom } from 'jotai';
+import { CoreMolecule } from '../core/CoreAtoms.tsx';
+import { EditMolecule } from '../core/editting/EditAtoms.ts';
 import {
   generateId,
   RAISIN_CSS_ATTR,
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_ID_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from './RaisinCssIds';
-import { RaisinIdsMolecule } from './RaisinIdsMolecule';
+} from './RaisinCssIds.ts';
+import { RaisinIdsMolecule } from './RaisinIdsMolecule.ts';
 
 /**
  * HTML attributes used by Raisins to mark elements that participate in
  * per-instance CSS editing.
  */
-export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds';
+export { RAISIN_CSS_ATTR, RAISIN_ID_ATTR } from './RaisinCssIds.ts';
 
 const { visit, remove } = htmlUtil;
 

@@ -1,8 +1,8 @@
-import { htmlUtil, RaisinNode } from '@raisins/core';
+import { htmlUtil, type RaisinNode } from '@raisins/core';
 import { atom } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { CoreMolecule } from '../CoreAtoms';
-import { Soul, SoulsMolecule, soulToString } from './Soul';
+import { CoreMolecule } from '../CoreAtoms.tsx';
+import { type Soul, SoulsMolecule, soulToString } from './Soul.ts';
 
 const { visitAll } = htmlUtil;
 

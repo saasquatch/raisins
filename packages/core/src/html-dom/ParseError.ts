@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import type { ErrorEntry, ErrorStack } from "../validation/validateNode/types";
+import type { ErrorEntry, ErrorStack } from "../validation/validateNode/types.ts";
 
 export type CssParseError = {
   type: "css";

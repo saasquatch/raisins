@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getPath, htmlParser, RaisinElementNode } from '@raisins/core';
-import { tryGetNode } from './tryGetNode';
+import { getPath, htmlParser, type RaisinElementNode } from '@raisins/core';
+import { tryGetNode } from './tryGetNode.ts';
 
 const doc = htmlParser('<div><span>hello</span><p>world</p></div>');
 const div = doc.children[0] as RaisinElementNode;

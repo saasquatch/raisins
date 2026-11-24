@@ -1,7 +1,7 @@
-import cssParser from "../css-om/parser";
-import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType";
-import { ParseError, ParseErrorStack } from "./ParseError";
-import { RaisinDocumentNode, RaisinNode } from "./RaisinNode";
+import cssParser from "../css-om/parser.ts";
+import { COMMENT, DIRECTIVE, STYLE, TAG, TEXT } from "./domElementType.ts";
+import type { ParseError, ParseErrorStack } from "./ParseError.ts";
+import type { RaisinDocumentNode, RaisinNode } from "./RaisinNode.ts";
 
 export type DomNativeToRaisinOptions = {
   onParseError?: (error: ParseError, jsonPointer: string) => void;
@@ -91,19 +91,21 @@ function nodeToRaisin(
   report: (error: ParseError, jsonPointer: string) => void
 ): RaisinNode {
   switch (node.nodeType) {
-    case Node.ELEMENT_NODE:
-      const element = node as HTMLElement;
+    case Node.ELEMENT_NODE: {
+      if (!(node instanceof Element)) {
+        throw new Error("Element node type did not contain an Element");
+      }
+      const element = node;
       const attribs = getAttribues(element);
       const { style, ...otherAttribs } = attribs;
 
-      if (element.nodeName === "TEMPLATE") {
-        const template = element as HTMLTemplateElement;
+      if (element instanceof HTMLTemplateElement) {
         return {
           type: TAG,
           attribs: getAttribues(element),
           tagName: element.nodeName.toLowerCase(),
           children: nodeListToRaisin(
-            template.content.childNodes,
+            element.content.childNodes,
             false,
             pointer,
             report
@@ -136,33 +138,43 @@ function nodeToRaisin(
               })
             : undefined
       };
-    case Node.TEXT_NODE:
-      const textNode = node as Text;
+    }
+    case Node.TEXT_NODE: {
+      if (!(node instanceof Text)) {
+        throw new Error("Text node type did not contain a Text node");
+      }
       return {
         type: TEXT,
         // TODO: Should we convert null to empty string? Or not return a text node? Or change the raisin node interface?
-        data: textNode.textContent ?? ""
+        data: node.textContent ?? ""
       };
-    case Node.COMMENT_NODE:
-      const comment = node as Comment;
+    }
+    case Node.COMMENT_NODE: {
+      if (!(node instanceof Comment)) {
+        throw new Error("Comment node type did not contain a Comment node");
+      }
       return {
         type: COMMENT,
         // TODO: Should we convert null to empty string? Or not return a comment node? Or change the raisin node interface?
-        data: comment.textContent ?? ""
+        data: node.textContent ?? ""
       };
-    case Node.DOCUMENT_TYPE_NODE:
-      const documentNode = node as Document;
+    }
+    case Node.DOCUMENT_TYPE_NODE: {
+      if (!(node instanceof DocumentType)) {
+        throw new Error("Document type node did not contain a DocumentType");
+      }
       return {
         type: DIRECTIVE,
-        data: "!DOCTYPE " + documentNode.nodeName,
+        data: "!DOCTYPE " + node.nodeName,
         name: "!doctype"
       };
+    }
     default:
       throw new Error("Unhandled node type " + node.nodeType);
   }
 }
 
-function getAttribues(element: HTMLElement): Record<string, string> {
+function getAttribues(element: Element): Record<string, string> {
   const names = element.getAttributeNames();
 
   return names.reduce((acc, key) => {

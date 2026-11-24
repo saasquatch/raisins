@@ -8,8 +8,8 @@ import {
 } from 'prosemirror-commands';
 import {} from 'prosemirror-transform';
 import { keymap } from 'prosemirror-keymap';
-import { Command, EditorState, Plugin, Transaction } from 'prosemirror-state';
-import { DefaultProseSchema } from './DefaultProseSchema';
+import { type Command, EditorState, Plugin, Transaction } from 'prosemirror-state';
+import { DefaultProseSchema } from './DefaultProseSchema.ts';
 
 const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
   // const { $from, $to } = state.selection;
@@ -22,9 +22,9 @@ const cmd = (state: EditorState, dispatch?: (tr: Transaction) => void) => {
   return true;
 };
 
-const boldCmd = toggleMark(DefaultProseSchema.marks.strong);
-const underlineCmd = toggleMark(DefaultProseSchema.marks.underline);
-const emCmd = toggleMark(DefaultProseSchema.marks.em);
+const boldCmd = toggleMark(DefaultProseSchema.marks['strong']);
+const underlineCmd = toggleMark(DefaultProseSchema.marks['underline']);
+const emCmd = toggleMark(DefaultProseSchema.marks['em']);
 
 const newLineCmd = chainCommands(
   newlineInCode,

@@ -1,12 +1,12 @@
-import { RaisinDocumentNode, RaisinElementNode } from '@raisins/core';
-import { atom, PrimitiveAtom, SetStateAction } from 'jotai';
+import { type RaisinDocumentNode, type RaisinElementNode } from '@raisins/core';
+import { atom, type PrimitiveAtom, type SetStateAction } from 'jotai';
 import { molecule } from 'bunshi/react';
-import { SoulsMolecule } from '../core/souls/Soul';
-import { NodeMolecule } from '../node';
-import { HistoryKeyMapPluginMolecule } from './HistoryKeyMapPluginAtom';
-import { DefaultProseSchema } from './prosemirror/default-schema/DefaultProseSchema';
-import { DefaultProseSchemaHotkeysPlugin } from './prosemirror/default-schema/DefaultProseSchemaHotkeysPlugin';
-import { ProseEditorScopeProps } from './prosemirror/ProseEditorScope';
+import { SoulsMolecule } from '../core/souls/Soul.ts';
+import { NodeMolecule } from '../node/index.ts';
+import { HistoryKeyMapPluginMolecule } from './HistoryKeyMapPluginAtom.ts';
+import { DefaultProseSchema } from './prosemirror/default-schema/DefaultProseSchema.ts';
+import { DefaultProseSchemaHotkeysPlugin } from './prosemirror/default-schema/DefaultProseSchemaHotkeysPlugin.ts';
+import { type ProseEditorScopeProps } from './prosemirror/ProseEditorScope.tsx';
 
 export const RichTextMolecule = molecule(getMol => {
   const nodeAtoms = getMol(NodeMolecule);

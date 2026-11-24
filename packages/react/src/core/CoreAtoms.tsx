@@ -3,18 +3,18 @@ import {
   getPath,
   htmlSerializer,
   htmlUtil,
-  NodePath,
+  type NodePath,
   parseWithErrors,
-  RaisinNode,
-  RaisinNodeWithChildren,
+  type RaisinNode,
+  type RaisinNodeWithChildren,
 } from '@raisins/core';
 import type {
   ParseErrorStack,
 } from '@raisins/core';
 import { molecule } from 'bunshi/react';
-import { atom, SetStateAction, WritableAtom } from 'jotai';
-import { MutableRefObject } from 'react';
-import { ConfigMolecule } from './RaisinConfigScope';
+import { atom, type SetStateAction, type WritableAtom } from 'jotai';
+import { type MutableRefObject } from 'react';
+import { ConfigMolecule } from './RaisinConfigScope.tsx';
 
 export type InternalState = {
   current: RaisinNode;

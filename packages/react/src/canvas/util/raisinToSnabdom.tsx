@@ -1,17 +1,17 @@
 import {
   cssSerializer,
   htmlUtil,
-  RaisinDocumentNode,
-  RaisinElementNode,
-  RaisinNodeWithChildren,
+  type RaisinDocumentNode,
+  type RaisinElementNode,
+  type RaisinNodeWithChildren,
 } from '@raisins/core';
-import { h, VNode, VNodeData, fragment } from 'snabbdom';
+import { h, type VNode, type VNodeData, fragment } from 'snabbdom';
 import styleToObject from 'style-to-object';
 import {
   RAISIN_DOCUMENT_CSS_ATTR,
   RAISIN_MANAGED_CSS_ATTR,
-} from '../../css-editing/RaisinCssIds';
-import { RootRenderer } from '../types';
+} from '../../css-editing/RaisinCssIds.ts';
+import { type RootRenderer } from '../types.tsx';
 const { visit } = htmlUtil;
 
 const GLOBAL_ENTRY = 'body';
@@ -85,7 +85,7 @@ export function raisinToSnabbdom(
         }
       } catch (e) {
         // If the style string is malformed, avoid throwing an error that breaks the entire render
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env['NODE_ENV'] === 'development') {
           console.warn('Failed to serialize style for', el.tagName, e);
         }
         styleObj = {};

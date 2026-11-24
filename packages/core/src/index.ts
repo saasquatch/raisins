@@ -1,10 +1,10 @@
 /* istanbul ignore file */
-import cssParser from "./css-om/parser";
-import { scopeStylesheet } from "./css-om/scope";
-import cssSerializer from "./css-om/serializer";
-import { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types";
-import * as cssUtil from "./css-om/util";
-import { DefaultTextMarks } from "./html-dom/DefaultTextMarks";
+import cssParser from "./css-om/parser.ts";
+import { scopeStylesheet } from "./css-om/scope.ts";
+import cssSerializer from "./css-om/serializer.ts";
+import type { StyleNodeProps, StyleNodeWithChildren } from "./css-om/Types.ts";
+import * as cssUtil from "./css-om/util.ts";
+import { DefaultTextMarks } from "./html-dom/DefaultTextMarks.ts";
 import {
   isCommentNode,
   isDirectiveNode,
@@ -13,15 +13,15 @@ import {
   isRoot,
   isStyleNode,
   isTextNode
-} from "./html-dom/isNode";
-import htmlParser, { parseWithErrors } from "./html-dom/parser";
+} from "./html-dom/isNode.ts";
+import htmlParser, { parseWithErrors } from "./html-dom/parser.ts";
 // eslint-disable-next-line prettier/prettier
 import type {
   CssParseError,
   ParseError,
   ParseErrorEntry,
   ParseErrorStack
-} from "./html-dom/ParseError";
+} from "./html-dom/ParseError.ts";
 // eslint-disable-next-line prettier/prettier
 import type {
   RaisinCommentNode,
@@ -32,24 +32,24 @@ import type {
   RaisinProcessingInstructionNode,
   RaisinStyleNode,
   RaisinTextNode
-} from "./html-dom/RaisinNode";
-import cssSelector from "./html-dom/selector";
-import htmlSerializer from "./html-dom/serializer";
-import * as htmlUtil from "./html-dom/util";
-import { NodeVisitor as RaisinNodeVisitor } from "./html-dom/util";
-import { getNode, getPath, NodePath, NodeSelection } from "./paths/Paths";
-import { calculatePlopTargets } from "./validation/calculatePlopTargets";
-import { getSlots } from "./validation/getSlots";
-import * as HTMLComponents from "./validation/HTMLComponents";
-import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent";
-import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild";
-import { isNodeAllowed } from "./validation/rules/isNodeAllowed";
-import { NamedSlot, NodeWithSlots } from "./validation/SlotModel";
-import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils";
+} from "./html-dom/RaisinNode.ts";
+import cssSelector from "./html-dom/selector.ts";
+import htmlSerializer from "./html-dom/serializer.ts";
+import * as htmlUtil from "./html-dom/util.ts";
+import type { NodeVisitor as RaisinNodeVisitor } from "./html-dom/util.ts";
+import { getNode, getPath, type NodePath, type NodeSelection } from "./paths/Paths.ts";
+import { calculatePlopTargets } from "./validation/calculatePlopTargets.ts";
+import { getSlots } from "./validation/getSlots.ts";
+import * as HTMLComponents from "./validation/HTMLComponents.ts";
+import { doesChildAllowParent } from "./validation/rules/doesChildAllowParent.ts";
+import { doesParentAllowChild } from "./validation/rules/doesParentAllowChild.ts";
+import { isNodeAllowed } from "./validation/rules/isNodeAllowed.ts";
+import type { NamedSlot, NodeWithSlots } from "./validation/SlotModel.ts";
+import { getSubErrors, hasSubErrors, removeError } from "./validation/validateNode/utils.ts";
 import {
   generateJsonPointers,
   validateAttributes, validateChildConstraints, validateNode
-} from "./validation/validateNode/validateNode";
+} from "./validation/validateNode/validateNode.ts";
 
 export {
   htmlSerializer,
@@ -115,4 +115,3 @@ export type {
   ParseErrorEntry,
   ParseErrorStack
 };
-

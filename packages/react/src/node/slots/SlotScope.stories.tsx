@@ -2,10 +2,10 @@ import { htmlParser } from '@raisins/core';
 import { atom, useAtom } from 'jotai';
 import { molecule, ScopeProvider, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope';
-import { NodeChildrenEditor } from '../NodeChildrenEditor';
-import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope';
-import { SlotScope, SlotScopeMolecule, SlotScopeProvider } from './SlotScope';
+import { type RaisinConfig, RaisinsProvider } from '../../core/RaisinConfigScope.tsx';
+import { NodeChildrenEditor } from '../NodeChildrenEditor.tsx';
+import { NodeScopeMolecule, NodeScopeProvider } from '../NodeScope.tsx';
+import { SlotScope, SlotScopeMolecule, SlotScopeProvider } from './SlotScope.tsx';
 
 export default {
   title: 'Slot scope',
@@ -21,9 +21,11 @@ const StoryMolecule = molecule<Partial<RaisinConfig>>(() => {
 
 export const Test2 = () => {
   return (
-    <SlotScopeProvider slot={'test'}>
-      <TestComponent />
-    </SlotScopeProvider>
+    <RaisinsProvider molecule={StoryMolecule}>
+      <SlotScopeProvider slot={'test'}>
+        <TestComponent />
+      </SlotScopeProvider>
+    </RaisinsProvider>
   );
 };
 export const Test1 = () => {

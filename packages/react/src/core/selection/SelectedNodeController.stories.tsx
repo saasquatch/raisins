@@ -1,33 +1,38 @@
 import { atom, useAtomValue } from 'jotai';
 import { molecule, useMolecule } from 'bunshi/react';
 import React from 'react';
-import { RaisinConfig } from '..';
+import type { RaisinConfig } from '../../core/index.ts';
 import {
   AttributeMolecule,
   AttributeProvider,
   AttributesController,
-  AttributesControllerProps,
+  type AttributesControllerProps,
   AttributesMolecule,
-} from '../../attributes';
-import { BasicCanvasController } from '../../canvas/CanvasController';
-import { CanvasProvider } from '../../canvas/CanvasScope';
-import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule';
+} from '../../attributes/index.ts';
+import { BasicCanvasController } from '../../canvas/CanvasController.tsx';
+import { CanvasProvider } from '../../canvas/CanvasScope.tsx';
+import { CanvasSelectionMolecule } from '../../canvas/plugins/CanvasSelectionMolecule.tsx';
 import {
   mintMono,
   MintComponents,
   mintReferralTable,
   mintBigStat,
-} from '../../examples/MintComponents';
-import { widgets } from '../../examples/MockWidgets';
+} from '../../examples/MintComponents.tsx';
+import { widgets } from '../../examples/MockWidgets.tsx';
 import {
   referrerWidget,
   VanillaComponents,
-} from '../../examples/VanillaComponents';
-import { BasicStory, StoryConfigMolecule } from '../../index.stories';
-import { SelectedNodeController } from './SelectedNodeController';
+} from '../../examples/VanillaComponents.tsx';
+import { BasicStory, StoryConfigMolecule } from '../../index.stories.tsx';
+import { SelectedNodeController } from './SelectedNodeController.tsx';
 
 export default {
   title: 'Selected Node Controller',
+  excludeStories: [
+    'AttributeEditorView',
+    'CustomAttributesControllerView',
+    'DefaultAttributeComponentView',
+  ],
 };
 
 const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
@@ -39,7 +44,7 @@ const ConfigMolecule = molecule<Partial<RaisinConfig>>((getMol) => {
   };
 });
 
-export const AttributeEditor = ({
+export const AttributeEditorView = ({
   Controller = () => (
     <SelectedNodeController
       HasSelectionComponent={AttributesController}
@@ -74,9 +79,36 @@ export const AttributeEditor = ({
 
 const CanvasEditor = () => (
   <CanvasProvider>
-    <AttributeEditor />
+    <AttributeEditorView />
   </CanvasProvider>
 );
+
+const AttributeControllerStory = ({
+  HasSelectionComponent,
+}: {
+  HasSelectionComponent: React.ComponentType;
+}) => (
+  <BasicStory
+    startingHtml={mintMono}
+    startingPackages={MintComponents}
+    Molecule={ConfigMolecule}
+  >
+    <CanvasProvider>
+      <AttributeEditorView
+        Controller={() => (
+          <SelectedNodeController
+            HasSelectionComponent={HasSelectionComponent}
+          />
+        )}
+      />
+    </CanvasProvider>
+  </BasicStory>
+);
+
+export const AttributeEditor = () => (
+  <AttributeControllerStory HasSelectionComponent={AttributesController} />
+);
+
 export const Mint = () => {
   return (
     <BasicStory
@@ -133,7 +165,7 @@ export const CustomUnselectedComponent = () => {
       Molecule={ConfigMolecule}
     >
       <CanvasProvider>
-        <AttributeEditor
+        <AttributeEditorView
           Controller={() => (
             <SelectedNodeController
               HasSelectionComponent={AttributesController}
@@ -159,10 +191,10 @@ export const CustomSelectedComponentMint = () => {
       Molecule={ConfigMolecule}
     >
       <CanvasProvider>
-        <AttributeEditor
+        <AttributeEditorView
           Controller={() => (
             <SelectedNodeController
-              HasSelectionComponent={CustomAttributesController}
+              HasSelectionComponent={CustomAttributesControllerView}
             ></SelectedNodeController>
           )}
         />
@@ -179,10 +211,10 @@ export const CustomSelectedComponentVanilla = () => {
       Molecule={ConfigMolecule}
     >
       <CanvasProvider>
-        <AttributeEditor
+        <AttributeEditorView
           Controller={() => (
             <SelectedNodeController
-              HasSelectionComponent={CustomAttributesController}
+              HasSelectionComponent={CustomAttributesControllerView}
             ></SelectedNodeController>
           )}
         />
@@ -191,15 +223,13 @@ export const CustomSelectedComponentVanilla = () => {
   );
 };
 
-export const CustomAttributesController: React.FC<AttributesControllerProps> = (
-  props
-) => {
+export const CustomAttributesControllerView: React.FC<AttributesControllerProps> = props => {
   const { keysAtom, groupedSchemaAtom } = useMolecule(AttributesMolecule);
   const keys = useAtomValue(keysAtom);
   const groupedSchema = useAtomValue(groupedSchemaAtom);
 
   if (!keys) return <></>;
-  const Component = props.Component ?? DefaultAttributeComponent;
+  const Component = props.Component ?? DefaultAttributeComponentView;
   return (
     <>
       {Object.keys(groupedSchema).map((key, idx) => {
@@ -224,8 +254,22 @@ export const CustomAttributesController: React.FC<AttributesControllerProps> = (
   );
 };
 
-export const DefaultAttributeComponent = () => {
+export const CustomAttributesController = () => (
+  <AttributeControllerStory
+    HasSelectionComponent={CustomAttributesControllerView}
+  />
+);
+
+export const DefaultAttributeComponentView = () => {
   const { FieldAtom } = useMolecule(AttributeMolecule);
   const Field = useAtomValue(FieldAtom);
   return <Field />;
 };
+
+export const DefaultAttributeComponent = () => (
+  <AttributeControllerStory
+    HasSelectionComponent={() => (
+      <AttributesController Component={DefaultAttributeComponentView} />
+    )}
+  />
+);

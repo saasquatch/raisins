@@ -2,9 +2,10 @@ export {
   AttributeMolecule,
   AttributeProvider,
   AttributeScopeMolecule,
-} from './AttributeMolecule';
+} from './AttributeMolecule.tsx';
 export {
   AttributesController,
-} from './AttributesController';
-export type {  AttributesControllerProps,} from "./AttributesController"
-export { AttributesMolecule } from './AttributesMolecule';
+} from './AttributesController.tsx';
+export type {  AttributesControllerProps,} from "./AttributesController.tsx"
+export { AttributesMolecule } from './AttributesMolecule.ts';
+export type { AttributeTemplateProps } from './AttributeThemeMolecule.tsx';

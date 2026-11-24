@@ -1,9 +1,9 @@
 import { molecule } from 'bunshi/react';
 import { keymap } from 'prosemirror-keymap';
 import { Plugin } from 'prosemirror-state';
-import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom';
-import { HistoryMolecule } from '../core/editting/HistoryAtoms';
-import connectedAtom from '../util/atoms/connectedAtom';
+import { EditSelectedMolecule } from '../core/editting/EditSelectedAtom.ts';
+import { HistoryMolecule } from '../core/editting/HistoryAtoms.tsx';
+import connectedAtom from '../util/atoms/connectedAtom.tsx';
 
 export const HistoryKeyMapPluginMolecule = molecule((getMol) => {
   const { RedoAtom, UndoAtom } = getMol(HistoryMolecule);
