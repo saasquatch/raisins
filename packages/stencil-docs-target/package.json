@@ -57,5 +57,8 @@
   },
   "peerDependencies": {
     "@stencil/core": ">=1"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }

@@ -221,7 +221,7 @@ const stringLiteralValue = (literal: string): string | undefined => {
     literal.length < 2 ||
     !quote ||
     !`'"\``.includes(quote) ||
-    literal.at(-1) !== quote ||
+    literal[literal.length - 1] !== quote ||
     (quote === '`' && literal.includes('${'))
   )
     return undefined;
